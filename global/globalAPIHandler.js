@@ -33,6 +33,7 @@ const {
   gitStageAllItems,
   gitCommitChanges,
   gitPushToRemote,
+  gitStageItem,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -91,6 +92,10 @@ app.use(
       pushToRemote: async (args) => {
         const { repoId, remoteHost, branch } = args;
         return await gitPushToRemote(repoId, remoteHost, branch);
+      },
+      stageItem: async (args) => {
+        const { repoId, item } = args;
+        return await gitStageItem(repoId, item);
       },
     },
   })

@@ -11,6 +11,7 @@ const { gitSetBranchApi } = require("../git/gitSetBranch.js");
 const { gitStageAllItemsApi } = require("../git/gitStageAllItemsAPI");
 const { gitCommitChangesApi } = require("../git/gitCommitChangesAPI");
 const { gitPushToRemoteApi } = require("../git/gitPushToRemoteAPI");
+const { gitStageItem } = require("../git/gitStageItem");
 
 module.exports.healthCheckFunction = healthCheckFunction = async (payload) => {
   const hcPayload = await healthCheckHandler().then((res) => res);
@@ -173,4 +174,8 @@ module.exports.gitPushToRemote = gitPushToRemote = async (
   branch
 ) => {
   return await gitPushToRemoteApi(repoId, remoteHost, branch);
+};
+
+module.exports.gitStageItem = gitStageItemApi = async (repoId, item) => {
+  return await gitStageItem(repoId, item);
 };
