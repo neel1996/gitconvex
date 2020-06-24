@@ -1,8 +1,9 @@
-const express = require("express");
-const app = express();
+const { exec } = require("child_process");
+const util = require("util");
+const execPromisified = util.promisify(exec);
 const fs = require("fs");
 
-async function addRepoHandler(repoName, repoPath) {
+async function addRepoHandler(repoName, repoPath, initCheck) {
   const timeStamp = new Date().toUTCString();
   const id = new Date().getTime();
 
@@ -13,30 +14,52 @@ async function addRepoHandler(repoName, repoPath) {
     repoPath,
   };
 
-  const dataStoreFile = "./database/repo-datastore.json";
-
-  let fileData = fs.readFileSync(dataStoreFile);
-  const repoData = fileData.toString();
-
-  if (repoData) {
-    const existingData = JSON.parse(repoData);
-
-    existingData.push(repoObject);
-
-    fs.writeFileSync(dataStoreFile, JSON.stringify(existingData));
-
-    return {
-      addRepo: {
-        message: "REPO_DATA_UPDATED",
-      },
-    };
-  } else {
+  function errorResponse() {
     return {
       addRepo: {
         message: "REPO_WRITE_FAILED",
       },
     };
   }
+
+  function successResponse() {
+    return {
+      addRepo: {
+        message: "REPO_DATA_UPDATED",
+      },
+    };
+  }
+
+  const dataStoreFile = "./database/repo-datastore.json";
+
+  let fileData = fs.readFileSync(dataStoreFile);
+  const repoData = fileData.toString();
+
+
+
+  return await fs.promises
+    .access(repoPath)
+    .then(async () => {
+      if (initCheck) {
+        await execPromisified(`cd ${repoPath}; git init`);
+      }
+
+      if (repoData) {
+        const existingData = JSON.parse(repoData);
+
+        existingData.push(repoObject);
+
+        fs.writeFileSync(dataStoreFile, JSON.stringify(existingData));
+        return successResponse();
+      } else {
+        fs.writeFileSync(dataStoreFile, JSON.stringify([repoObject]));
+        return successResponse();
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      return errorResponse();
+    });
 }
 
 module.exports.addRepoHandler = addRepoHandler;

@@ -44,9 +44,12 @@ module.exports.fetchRepoFunction = fetchRepoFunction = async (payload) => {
 };
 
 module.exports.addRepoFunction = addRepoFunction = async (parsedPayload) => {
-  const { repoName, repoPath } = JSON.parse(parsedPayload);
+  const { repoName, repoPath, initCheck } = JSON.parse(parsedPayload);
+
   if (repoName && repoPath) {
-    return addRepoHandler(repoName, repoPath);
+    console.log(parsedPayload);
+
+    return await addRepoHandler(repoName, repoPath, initCheck);
   } else {
     return {
       message: "REPO_WRITE_FAILURE",

@@ -31,11 +31,9 @@ const getGitStatus = async (repoPath) => {
 
   let isGitLogAvailable = fs.promises
     .access(`${repoPath}/.git/logs`)
-    .then((res) => {
-      if (res) {
-        isGitLogAvailable = true;
-        return isGitLogAvailable;
-      }
+    .then(() => {
+      isGitLogAvailable = true;
+      return isGitLogAvailable;
     })
     .catch((err) => {
       // console.log(err);
@@ -106,13 +104,17 @@ const getGitStatus = async (repoPath) => {
       .map((entry) => {
         if (entry.includes("*")) {
           gitCurrentBranch = entry.trim().replace("*", "");
-          return;
+          return null;
         }
         return entry.trim();
       })
       .filter((entry) => (entry !== "" ? entry : null));
 
-  gitBranchList = [gitCurrentBranch, ...gitBranchList];
+  if (gitCurrentBranch.length > 0 && gitCurrentBranch !== "No Active Branch") {
+    gitBranchList = [gitCurrentBranch, ...gitBranchList];
+  } else {
+    gitBranchList = ["NO_BRANCH"];
+  }
 
   // Module to get total number of commits to current branch
   isGitLogAvailable &&
