@@ -16,6 +16,8 @@ const globalAPISchema = new buildSchema(
             gitCommitLogs: gitCommitLogResults!
             gitStagedFiles: gitStagedFileResults!
             gitUnpushedCommits: gitUnpushedCommitResults!
+            settingsDatabasePath: String!
+            settingsRepoDetails: [settingsFetchRepoResults]!
         }
 
         type healthCheckResults{
@@ -80,12 +82,21 @@ const globalAPISchema = new buildSchema(
             gitUnpushedCommits: [String]
         }
 
+        type settingsFetchRepoResults{
+            id: String!
+            repoName: String!
+            timeStamp: String!
+            repoPath: String!
+        }
+
         type GitConvexMutation{
             setBranch(repoId: String!, branch: String!): String!
             stageItem(repoId: String!, item: String!): String!
             stageAllItems(repoId: String): String!
             commitChanges(repoId: String!, commitMessage: String!): String!
             pushToRemote(repoId: String!, remoteHost: String!, branch: String!): String!
+            settingsEditDbPath(newPath: String!): String!
+            settingsDeleteRepo(repoId: String!): String!
         }
 
         schema{

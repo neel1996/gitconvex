@@ -13,6 +13,8 @@ const {
   COMMIT_LOGS,
   GIT_STAGED_FILES,
   GIT_UNPUSHED_COMMITS,
+  SETTINGS_DBPATH,
+  SETTINGS_REPODETAILS,
 } = require("./globalRouteStore");
 
 const graphqlHTTP = require("express-graphql");
@@ -34,6 +36,8 @@ const {
   gitCommitChanges,
   gitPushToRemote,
   gitStageItem,
+  settingsFetchDbPath,
+  settingsFetchRepoDetails,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -72,6 +76,10 @@ app.use(
             return gitGetStagedFiles(parsedPayload);
           case GIT_UNPUSHED_COMMITS:
             return gitUnpushedCommits(parsedPayload);
+          case SETTINGS_DBPATH:
+            return settingsFetchDbPath();
+          case SETTINGS_REPODETAILS:
+            return settingsFetchRepoDetails();
           default:
             return { message: "Query Termination" };
         }

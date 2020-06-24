@@ -3,7 +3,6 @@ const { exec } = require("child_process");
 const fs = require("fs");
 
 const util = require("util");
-const { stderr } = require("process");
 const execPromised = util.promisify(exec);
 
 const getGitStatus = async (repoPath) => {

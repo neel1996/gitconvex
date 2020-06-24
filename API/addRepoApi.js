@@ -3,6 +3,8 @@ const util = require("util");
 const execPromisified = util.promisify(exec);
 const fs = require("fs");
 
+const dotenv = require("dotenv").config();
+
 async function addRepoHandler(repoName, repoPath, initCheck) {
   const timeStamp = new Date().toUTCString();
   const id = new Date().getTime();
@@ -30,12 +32,11 @@ async function addRepoHandler(repoName, repoPath, initCheck) {
     };
   }
 
-  const dataStoreFile = "./database/repo-datastore.json";
+  const dataStoreFile =
+    process.env.DATABASE_FILE || "./database/repo-datastore.json";
 
   let fileData = fs.readFileSync(dataStoreFile);
   const repoData = fileData.toString();
-
-
 
   return await fs.promises
     .access(repoPath)
