@@ -97,6 +97,8 @@ const globalAPISchema = new buildSchema(
             pushToRemote(repoId: String!, remoteHost: String!, branch: String!): String!
             settingsEditDbPath(newPath: String!): String!
             settingsDeleteRepo(repoId: String!): String!
+            removeStagedItem(repoId: String!, item: String!): String!
+            removeAllStagedItem(repoId: String!): String!
         }
 
         schema{

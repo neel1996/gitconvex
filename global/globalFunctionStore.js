@@ -13,6 +13,10 @@ const { gitCommitChangesApi } = require("../git/gitCommitChangesAPI");
 const { gitPushToRemoteApi } = require("../git/gitPushToRemoteAPI");
 const { gitStageItem } = require("../git/gitStageItem");
 const { fetchDatabaseFile, fetchRepoDetails } = require("../API/settingsApi");
+const {
+  gitRemoveAllStagedItemApi,
+  gitRemoveStagedItemApi,
+} = require("../git/gitRemoveStagedItems");
 
 module.exports.healthCheckFunction = healthCheckFunction = async (payload) => {
   const hcPayload = await healthCheckHandler().then((res) => res);
@@ -190,4 +194,17 @@ module.exports.settingsFetchDbPath = settingsFetchDbPath = async () => {
 
 module.exports.settingsFetchRepoDetails = settingsFetchRepoDetails = async () => {
   return await fetchRepoDetails();
+};
+
+module.exports.gitRemoveStagedItem = gitRemoveStagedItem = async (
+  repoId,
+  item
+) => {
+  return await gitRemoveStagedItemApi(repoId, item);
+};
+
+module.exports.gitRemoveAllStagedItems = gitRemoveAllStagedItems = async (
+  repoId
+) => {
+  return await gitRemoveAllStagedItemApi(repoId);
 };
