@@ -15,6 +15,10 @@
 
 [Node js](https://nodejs.org/en/) 10.0+
 
+## Docker image
+
+[![](https://images.microbadger.com/badges/version/itassistors/gitconvex.svg)](https://microbadger.com/images/itassistors/gitconvex "gitconvex")
+
 ## Build status
 
 ![Gitconvex UI pipeline](https://github.com/neel1996/gitconvex/workflows/Gitconvex%20UI%20pipeline/badge.svg?branch=master)
