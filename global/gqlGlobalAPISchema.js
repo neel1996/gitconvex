@@ -99,6 +99,18 @@ const globalAPISchema = new buildSchema(
             settingsDeleteRepo(repoId: String!): String!
             removeStagedItem(repoId: String!, item: String!): String!
             removeAllStagedItem(repoId: String!): String!
+            fetchFromRemote(repoId: String!): gitFetchStatus!
+            pullFromRemote(repoId: String!): gitPullStatus!
+        }
+
+        type gitFetchStatus{
+            status: String!
+            fetchedItems: [String]
+        }
+
+        type gitPullStatus{
+            status: String!
+            pulledItems: [String]
         }
 
         schema{

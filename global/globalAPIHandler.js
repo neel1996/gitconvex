@@ -39,8 +39,10 @@ const {
   settingsFetchDbPath,
   settingsFetchRepoDetails,
   gitRemoveStagedItem,
+  gitRemoveAllStagedItems,
+  gitFetchFromRemote,
+  gitPullFromRemote,
 } = require("./globalFunctionStore");
-const { gitRemoveAllStagedItemApi } = require("../git/gitRemoveStagedItems");
 
 app.use(
   "/gitconvexapi",
@@ -113,7 +115,15 @@ app.use(
       },
       removeAllStagedItem: async (args) => {
         const { repoId } = args;
-        return await gitRemoveAllStagedItemApi(repoId);
+        return await gitRemoveAllStagedItems(repoId);
+      },
+      fetchFromRemote: async (args) => {
+        const { repoId } = args;
+        return await gitFetchFromRemote(repoId);
+      },
+      pullFromRemote: async (args) => {
+        const { repoId } = args;
+        return await gitPullFromRemote(repoId);
       },
     },
   })
