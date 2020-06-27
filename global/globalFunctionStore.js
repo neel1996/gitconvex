@@ -18,6 +18,7 @@ const {
   gitRemoveStagedItemApi,
 } = require("../git/gitRemoveStagedItems");
 const { gitFetchApi, gitPullApi } = require("../git/gitFetchPullApi");
+const { deleteRepoApi } = require("../API/deleteRepoApi");
 
 module.exports.healthCheckFunction = healthCheckFunction = async (payload) => {
   const hcPayload = await healthCheckHandler().then((res) => res);
@@ -216,4 +217,13 @@ module.exports.gitFetchFromRemote = gitFetchFromRemote = async (repoId) => {
 
 module.exports.gitPullFromRemote = gitPullFromRemote = async (repoId) => {
   return await gitPullApi(repoId);
+};
+
+module.exports.deleteRepo = deleteRepo = async (
+  repoId,
+  name,
+  pathName,
+  time
+) => {
+  return await deleteRepoApi(repoId, name, pathName, time);
 };

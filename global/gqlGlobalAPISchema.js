@@ -101,6 +101,7 @@ const globalAPISchema = new buildSchema(
             removeAllStagedItem(repoId: String!): String!
             fetchFromRemote(repoId: String!): gitFetchStatus!
             pullFromRemote(repoId: String!): gitPullStatus!
+            deleteRepo(repoId: String!, name: String!, pathName: String!, time: String!): deleteRepoStatus!
         }
 
         type gitFetchStatus{
@@ -111,6 +112,11 @@ const globalAPISchema = new buildSchema(
         type gitPullStatus{
             status: String!
             pulledItems: [String]
+        }
+
+        type deleteRepoStatus{
+            status: String!
+            repoId: String
         }
 
         schema{

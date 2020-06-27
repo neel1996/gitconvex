@@ -42,6 +42,7 @@ const {
   gitRemoveAllStagedItems,
   gitFetchFromRemote,
   gitPullFromRemote,
+  deleteRepo,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -124,6 +125,10 @@ app.use(
       pullFromRemote: async (args) => {
         const { repoId } = args;
         return await gitPullFromRemote(repoId);
+      },
+      deleteRepo: async (args) => {
+        const { repoId, name, pathName, time } = args;
+        return await deleteRepo(repoId, name, pathName, time);
       },
     },
   })
