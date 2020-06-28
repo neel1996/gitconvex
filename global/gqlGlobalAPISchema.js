@@ -34,6 +34,7 @@ const globalAPISchema = new buildSchema(
 
         type addRepoResults{
             message: String
+            repoId: String
         }
 
         type gitCommits{

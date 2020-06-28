@@ -1,6 +1,7 @@
 const { exec } = require("child_process");
 const util = require("util");
 const execPromise = util.promisify(exec);
+const os = require("os");
 
 async function healthCheckHandler() {
   let healthCheckResults = {
@@ -40,20 +41,28 @@ async function checkStatus(param) {
   }
 
   return await execPromise(commandString).then((res) => {
-    if (res.stderr) {
-      return {
-        code: "ERR",
-        status: `${param}_CHECK_FAILURE`,
-        message: res.stderr,
-      };
-    } else {
+    if (param === "OS") {
       return {
         code: "SUCCESS",
         status: `${param}_CHECK_PASSED`,
-        message: res.stdout.trim(),
+        message: os.platform().toString(),
       };
+    } else {
+      if (res.stderr) {
+        return {
+          code: "ERR",
+          status: `${param}_CHECK_FAILURE`,
+          message: res.stderr,
+        };
+      } else {
+        return {
+          code: "SUCCESS",
+          status: `${param}_CHECK_PASSED`,
+          message: res.stdout.trim(),
+        };
+      }
     }
   });
 }
 
-module.exports.healthCheckHandler = healthCheckHandler
+module.exports.healthCheckHandler = healthCheckHandler;

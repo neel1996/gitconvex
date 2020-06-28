@@ -28,6 +28,7 @@ async function addRepoHandler(repoName, repoPath, initCheck) {
     return {
       addRepo: {
         message: "REPO_DATA_UPDATED",
+        repoId: id,
       },
     };
   }
