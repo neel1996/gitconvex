@@ -1,10 +1,9 @@
+
 # Gitconvex
 <div align="center">
 <div><img src="https://i.ibb.co/KL4PshV/gitconvex.png" width="350"></div>
-<span>Web application for managing your git repositories </span>
+<strong>Web application for managing your git repositories </strong>
 </div>
-
-
 
 |supported platforms|
 |--|
@@ -13,7 +12,9 @@
 
 ## Requirements
 
-[Node js](https://nodejs.org/en/) 10.0+
+| <b>[Node js](https://nodejs.org/en/)</b> | <b>Tested on v12.0+ |
+|--|--|
+| <b>[Git](https://git-scm.com/)</b> | <b>Tested on v2.20+</b> |
 
 ## Docker image
 
@@ -21,9 +22,9 @@
 
 ## Build status
 
-![Gitconvex UI pipeline](https://github.com/neel1996/gitconvex/workflows/Gitconvex%20UI%20pipeline/badge.svg?branch=master)
-
-![Gitconvex Server pipeline](https://github.com/neel1996/gitconvex-server/workflows/Gitconvex%20Server%20pipeline/badge.svg?branch=master)
+| <b>React UI build status</b>  | ![Gitconvex UI pipeline](https://github.com/neel1996/gitconvex/workflows/Gitconvex%20UI%20pipeline/badge.svg?branch=master)| 
+|--|--|
+| <b>Node Server Build Status</b> | ![Gitconvex UI pipeline](https://github.com/neel1996/gitconvex/workflows/Gitconvex%20UI%20pipeline/badge.svg?branch=master) |
 
 # License
 

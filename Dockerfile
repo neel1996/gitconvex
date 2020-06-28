@@ -1,6 +1,6 @@
-FROM node:12.18.1
+FROM node:12.18.1-alpine3.12
 
-WORKDIR /opt/gitconvex-docker
+WORKDIR /opt/workroom/gitconvex-docker
 
 COPY package*.json ./
 

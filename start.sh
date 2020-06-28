@@ -1,2 +1,2 @@
 #!/bin/bash
-pm2 start server.js --name gitconvex-server --watch
+pm2 start ecosystem.config.js
