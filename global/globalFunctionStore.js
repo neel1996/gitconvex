@@ -19,6 +19,7 @@ const {
 } = require("../git/gitRemoveStagedItems");
 const { gitFetchApi, gitPullApi } = require("../git/gitFetchPullApi");
 const { deleteRepoApi } = require("../API/deleteRepoApi");
+const { gitAddBranchApi } = require("../git/gitAddBranchApi");
 
 module.exports.healthCheckFunction = healthCheckFunction = async (payload) => {
   const hcPayload = await healthCheckHandler().then((res) => res);
@@ -226,4 +227,8 @@ module.exports.deleteRepo = deleteRepo = async (
   time
 ) => {
   return await deleteRepoApi(repoId, name, pathName, time);
+};
+
+module.exports.addBranch = addBranch = async (repoId, branchName) => {
+  return await gitAddBranchApi(repoId, branchName);
 };

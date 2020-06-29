@@ -43,6 +43,7 @@ const {
   gitFetchFromRemote,
   gitPullFromRemote,
   deleteRepo,
+  addBranch,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -129,6 +130,10 @@ app.use(
       deleteRepo: async (args) => {
         const { repoId, name, pathName, time } = args;
         return await deleteRepo(repoId, name, pathName, time);
+      },
+      addBranch: async (args) => {
+        const { repoId, branchName } = args;
+        return await addBranch(repoId, branchName)
       },
     },
   })
