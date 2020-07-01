@@ -41,28 +41,43 @@ const getGitStatus = async (repoPath) => {
     });
 
   // Module to get git remote repo URL
-  await execPromised(
-    `${currentDir} if [ ! -z "\`git remote\`" ]; then git remote | xargs -L 1 git remote get-url; else echo "NO_REMOTE"; fi`
-  )
-    .then((res) => {
-      const { stdout, stderr } = res;
-      if (stderr !== "") {
-        console.log(stderr);
-        gitRemoteData = "NO_REMOTE";
-      } else {
-        gitRemoteData = stdout.trim();
-        console.log("REMOTE : " + gitRemoteData);
-        if (gitRemoteData.split("\n").length > 0) {
-          const splitRemote = gitRemoteData.split("\n");
-          gitRemoteData = splitRemote.join("||");
-          console.log(gitRemoteData);
+
+  let gitRemotePromise =
+    isGitLogAvailable &&
+    (await execPromised(`${currentDir} git remote`).then(
+      ({ stdout, stderr }) => {
+        if (stdout && !stderr) {
+          const localRemote = stdout.trim().split("\n");
+
+          const multiPromise = Promise.all(
+            localRemote &&
+              localRemote.map(async (remote) => {
+                console.log("LOOP ::", remote);
+                return await execPromised(
+                  `${currentDir} git remote get-url ${remote}`
+                ).then(({ stdout, stderr }) => {
+                  if (stdout && !stderr) {
+                    console.log("REMOTE :: ", stdout);
+                    return stdout.trim();
+                  } else {
+                    console.log(stderr);
+                  }
+                });
+              })
+          );
+          return multiPromise;
+        } else {
+          console.log(stderr);
+          return null;
         }
       }
-    })
-    .catch((err) => {
-      console.log("Error GIT : " + err);
-      gitRemoteData = "NO_REMOTE";
-    });
+    ));
+
+  if (gitRemotePromise) {
+    gitRemoteData = gitRemotePromise.join("||");
+  } else {
+    gitRemoteData = "NO_REMOTE";
+  }
 
   // Module to get Git actual repo name
   if (gitRemoteData && gitRemoteData !== "NO_REMOTE") {
@@ -117,15 +132,24 @@ const getGitStatus = async (repoPath) => {
 
   // Module to get total number of commits to current branch
   isGitLogAvailable &&
-    (await execPromised(`${currentDir} git log --oneline | wc -l`)
+    (await execPromised(`${currentDir} git log --oneline`)
       .then((res) => {
         const { stdout, stderr } = res;
         if (stderr) {
           console.log(stderr);
         }
         if (res && !res.stderr) {
-          gitTotalCommits = res.stdout.trim();
+          const gitLocalTotal = res.stdout.trim().split("\n");
+          if (gitLocalTotal && gitLocalTotal.length > 0) {
+            gitTotalCommits = gitLocalTotal.length;
+          } else if (gitLocalTotal.length === 1) {
+            gitTotalCommits = 1;
+          }
+        } else {
+          gitTotalCommits = 0;
+          console.log(stderr);
         }
+        return gitTotalCommits;
       })
       .catch((err) => {
         gitTotalCommits = 0;
@@ -144,44 +168,74 @@ const getGitStatus = async (repoPath) => {
   //Module to get all git tracked files
   var gitTrackedFileDetails = [];
 
-  isGitLogAvailable &&
-    (await execPromised(
-      `${currentDir} for i in \`git ls-tree --name-status HEAD\`; do if [ -f $i ] || [ -d $i ] ; then file $i; fi; done`
-    ).then((res) => {
-      const { stdout, stderr } = res;
-      if (res && !stderr) {
-        gitTrackedFiles = stdout.trim().split("\n");
-      } else {
-        console.log(stderr);
+  gitTrackedFiles =
+    isGitLogAvailable &&
+    (await execPromised(`${currentDir} git ls-tree --name-status HEAD`).then(
+      ({ stdout, stderr }) => {
+        if (stdout && !stderr) {
+          const fileList = stdout.trim().split("\n");
+
+          const localFiles = Promise.all(
+            fileList.map(async (item) => {
+              gitTrackedFileDetails.push(item);
+
+              return await fs.promises
+                .stat(`${item}`)
+                .then((fileType) => {
+                  if (fileType.isFile()) {
+                    return `${item}: File`;
+                  } else if (fileType.isDirectory()) {
+                    return `${item}: directory`;
+                  } else {
+                    return `${item}: File`;
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                  return `${item}: File`;
+                });
+            })
+          );
+          return localFiles;
+        } else {
+          console.log(stderr);
+          return [];
+        }
       }
-    }));
+    ));
 
   //Module to fetch commit for each file and folder
 
   var gitFileBasedCommit = [];
 
-  isGitLogAvailable &&
-    (await execPromised(
-      `${currentDir} for i in \`git ls-tree --name-status HEAD\`; do git log -1 --oneline $i; done 2> /dev/null`
-    ).then((res) => {
-      const { stdout, stderr } = res;
-
-      if (res && !stderr) {
-        gitFileBasedCommit = stdout
-          .split("\n")
-          .filter((elm) => (elm ? elm : null));
-      } else {
-        console.log(stderr);
-      }
-    }));
+  gitFileBasedCommit =
+    isGitLogAvailable &&
+    (await Promise.all(
+      gitTrackedFileDetails.map(async (gitFile) => {
+        return await execPromised(
+          `${currentDir} git log -1 --oneline ${gitFile}`
+        ).then(({ stdout, stderr }) => {
+          if (stdout && !stderr) {
+            return stdout.trim();
+          } else {
+            console.log(stderr);
+            return "";
+          }
+        });
+      })
+    ));
 
   //Module to get totally tracked git artifacts
 
   isGitLogAvailable &&
-    (await execPromised(`${currentDir} git ls-files | wc -l`).then((res) => {
+    (await execPromised(`${currentDir} git ls-files`).then((res) => {
       const { stdout, stderr } = res;
-      if (res && !stderr) {
-        gitTotalTrackedFiles = Number(stdout.trim());
+      if (stdout && !stderr) {
+        if (stdout.split("\n")) {
+          gitTotalTrackedFiles = Number(stdout.trim().split("\n").length);
+        } else {
+          return 0;
+        }
       } else {
         console.log(stderr);
       }
