@@ -15,6 +15,7 @@ const {
   GIT_UNPUSHED_COMMITS,
   SETTINGS_DBPATH,
   SETTINGS_REPODETAILS,
+  SETTINGS_PORT,
 } = require("./globalRouteStore");
 
 const graphqlHTTP = require("express-graphql");
@@ -44,6 +45,9 @@ const {
   gitPullFromRemote,
   deleteRepo,
   addBranch,
+  updateDbFileApi,
+  settingsGetPortDetails,
+  settingsUpdatePortDetail,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -84,6 +88,8 @@ app.use(
             return gitUnpushedCommits(parsedPayload);
           case SETTINGS_DBPATH:
             return settingsFetchDbPath();
+          case SETTINGS_PORT:
+            return settingsGetPortDetails();
           case SETTINGS_REPODETAILS:
             return settingsFetchRepoDetails();
           default:
@@ -133,7 +139,15 @@ app.use(
       },
       addBranch: async (args) => {
         const { repoId, branchName } = args;
-        return await addBranch(repoId, branchName)
+        return await addBranch(repoId, branchName);
+      },
+      updateRepoDataFile: async (args) => {
+        const { newDbFile } = args;
+        return await updateDbFileApi(newDbFile);
+      },
+      settingsEditPort: async (args) => {
+        const { newPort } = args;
+        return settingsUpdatePortDetail(newPort);
       },
     },
   })

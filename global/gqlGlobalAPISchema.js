@@ -17,6 +17,7 @@ const globalAPISchema = new buildSchema(
             gitStagedFiles: gitStagedFileResults!
             gitUnpushedCommits: gitUnpushedCommitResults!
             settingsDatabasePath: String!
+            settingsPortDetails: Int!
             settingsRepoDetails: [settingsFetchRepoResults]!
         }
 
@@ -97,12 +98,14 @@ const globalAPISchema = new buildSchema(
             commitChanges(repoId: String!, commitMessage: String!): String!
             pushToRemote(repoId: String!, remoteHost: String!, branch: String!): String!
             settingsEditDbPath(newPath: String!): String!
+            settingsEditPort(newPort: Int!): String!
             settingsDeleteRepo(repoId: String!): String!
             removeStagedItem(repoId: String!, item: String!): String!
             removeAllStagedItem(repoId: String!): String!
             addBranch(repoId: String!, branchName: String!): String!
             fetchFromRemote(repoId: String!): gitFetchStatus!
             pullFromRemote(repoId: String!): gitPullStatus!
+            updateRepoDataFile(newDbFile: String!): String!
             deleteRepo(repoId: String!, name: String!, pathName: String!, time: String!): deleteRepoStatus!
         }
 

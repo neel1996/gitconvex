@@ -22,6 +22,7 @@ const gitFetchApi = async (repoId) => {
           };
         }
       } else {
+        console.log(stderr);
         return {
           status: "FETCH_ABSENT",
         };

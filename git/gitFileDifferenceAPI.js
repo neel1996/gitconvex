@@ -1,4 +1,5 @@
 const fetchRepopath = require("../global/fetchGitRepoPath");
+const fs = require("fs");
 const { exec } = require("child_process");
 const util = require("util");
 const execPromisified = util.promisify(exec);
@@ -13,23 +14,56 @@ async function gitFileDifferenceHandler(repoId, fileName) {
 
 async function getGitFileDifference(repoId, fileName) {
   const repoPath = fetchRepopath.getRepoPath(repoId);
-  return await execPromisified(
-    `git diff --stat ${fileName} && echo "SPLIT___LINE" && git diff -U$(wc -l ${fileName} | xargs)`,
-    { cwd: repoPath }
-  ).then((res) => {
-    const { stdout, stderr } = res;
 
-    if (stdout && !stderr) {
-      var splitLines = stdout.split("SPLIT___LINE");
-      var diffStat = splitLines[0].trim().split("\n");
-      var fileDiff = splitLines[1].trim().split("\n");
+  const fileContentLength = await fs.promises
+    .readFile(repoPath + "/" + fileName)
+    .then((data) => {
+      const interData = data.toString().split("\n");
+      return interData.length;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-      return {
-        diffStat,
-        fileDiff,
-      };
+  const diffStat = await execPromisified(`git diff --stat ${fileName}`, {
+    cwd: repoPath,
+  })
+    .then(({ stdout, stderr }) => {
+      if (stdout && !stderr) {
+        return stdout.trim().split("\n");
+      } else {
+        console.log(stderr);
+        return ["NO_STAT"];
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      return ["NO_STAT"];
+    });
+
+  const fileDiff = await execPromisified(
+    `git diff -U${fileContentLength} ${fileName}`,
+    {
+      cwd: repoPath,
     }
-  });
+  )
+    .then(({ stdout, stderr }) => {
+      if (stdout && !stderr) {
+        return stdout.trim().split("\n");
+      } else {
+        console.log(stderr);
+        return ["NO_DIFF"];
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      return ["NO_DIFF"];
+    });
+
+  return {
+    diffStat,
+    fileDiff,
+  };
 }
 
 module.exports.gitFileDifferenceHandler = gitFileDifferenceHandler;

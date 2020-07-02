@@ -12,7 +12,13 @@ const { gitStageAllItemsApi } = require("../git/gitStageAllItemsAPI");
 const { gitCommitChangesApi } = require("../git/gitCommitChangesAPI");
 const { gitPushToRemoteApi } = require("../git/gitPushToRemoteAPI");
 const { gitStageItem } = require("../git/gitStageItem");
-const { fetchDatabaseFile, fetchRepoDetails } = require("../API/settingsApi");
+const {
+  fetchDatabaseFile,
+  fetchRepoDetails,
+  updateDbFile,
+  updatePortDetails,
+  getPortDetails,
+} = require("../API/settingsApi");
 const {
   gitRemoveAllStagedItemApi,
   gitRemoveStagedItemApi,
@@ -195,6 +201,16 @@ module.exports.settingsFetchDbPath = settingsFetchDbPath = async () => {
   return await fetchDatabaseFile();
 };
 
+module.exports.settingsGetPortDetails = settingsGetPortDetails = async () => {
+  return await getPortDetails();
+};
+
+module.exports.settingsUpdatePortDetail = settingsUpdatePortDetail = async (
+  newPort
+) => {
+  return await updatePortDetails(newPort);
+};
+
 module.exports.settingsFetchRepoDetails = settingsFetchRepoDetails = async () => {
   return await fetchRepoDetails();
 };
@@ -231,4 +247,8 @@ module.exports.deleteRepo = deleteRepo = async (
 
 module.exports.addBranch = addBranch = async (repoId, branchName) => {
   return await gitAddBranchApi(repoId, branchName);
+};
+
+module.exports.updateDbFileApi = updateDbFileApi = async (fileName) => {
+  return await updateDbFile(fileName);
 };
