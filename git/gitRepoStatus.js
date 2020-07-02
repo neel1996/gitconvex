@@ -182,7 +182,7 @@ const getGitStatus = async (repoPath) => {
             gitTrackedFileDetails.push(item);
 
             return await fs.promises
-              .stat(`${item}`)
+              .stat(`${repoPath}/${item}`)
               .then((fileType) => {
                 if (fileType.isFile()) {
                   return `${item}: File`;
