@@ -2,9 +2,6 @@ const { exec } = require("child_process");
 const dotenv = require("dotenv").config();
 const fs = require("fs");
 
-const util = require("util");
-const execPromised = util.promisify(exec);
-
 const fetchDatabaseFile = async () => {
   const dbPath = process.env.DATABASE_FILE || "NO_DATABASE_FILE";
   console.log(dbPath);

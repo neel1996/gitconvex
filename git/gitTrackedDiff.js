@@ -1,6 +1,4 @@
-const {
-  exec
-} = require("child_process");
+const { exec } = require("child_process");
 const util = require("util");
 const execPromosified = util.promisify(exec);
 const fetchRepoPath = require("../global/fetchGitRepoPath");
@@ -9,43 +7,39 @@ async function gitTrackedDiff(repoId) {
   const repoPath = fetchRepoPath.getRepoPath(repoId);
 
   var responseObject = {
-    gitChangedFiles: await getGitDiff(repoPath).then(res => res),
-    gitUntrackedFiles: await getUntrackedFiles(repoPath).then(res => res),
+    gitChangedFiles: await getGitDiff(repoPath).then((res) => res),
+    gitUntrackedFiles: await getUntrackedFiles(repoPath).then((res) => res),
   };
 
-  console.log(responseObject)
+  console.log(responseObject);
   return responseObject;
 }
 
 async function getGitDiff(repoPath) {
-  return await execPromosified(`cd ${repoPath}; git diff --raw`).then((res) => {
-    const {
-      stdout,
-      stderr
-    } = res;
-    var parsedEntry = stdout.trim().split("\n");
+  return await execPromosified(`git diff --raw`, { cwd: repoPath }).then(
+    (res) => {
+      const { stdout, stderr } = res;
+      var parsedEntry = stdout.trim().split("\n");
 
-    var gitDifference = parsedEntry.map((entry) => {
-      if (entry.split(/\s+/)) {
-        let splitEntry = entry.split(/\s+/);
-        if (splitEntry[4] && splitEntry[5]) {
-          return "" + splitEntry[4] + "," + splitEntry[5];
+      var gitDifference = parsedEntry.map((entry) => {
+        if (entry.split(/\s+/)) {
+          let splitEntry = entry.split(/\s+/);
+          if (splitEntry[4] && splitEntry[5]) {
+            return "" + splitEntry[4] + "," + splitEntry[5];
+          }
         }
-      }
-    });
+      });
 
-    return gitDifference.filter((entry) => (entry ? entry : ""));
-  });
+      return gitDifference.filter((entry) => (entry ? entry : ""));
+    }
+  );
 }
 
 async function getUntrackedFiles(repoPath) {
-  return await execPromosified(
-    `cd ${repoPath}; git ls-files --others --exclude-standard`
-  ).then((res) => {
-    const {
-      stdout,
-      stderr
-    } = res;
+  return await execPromosified(`git ls-files --others --exclude-standard`, {
+    cwd: repoPath,
+  }).then((res) => {
+    const { stdout, stderr } = res;
     var parsedEntry = stdout
       .trim()
       .split("\n")

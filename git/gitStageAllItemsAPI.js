@@ -5,12 +5,15 @@ const execPromisified = util.promisify(exec);
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const gitStageAllItemsApi = async (repoId) => {
-  return await execPromisified(
-    `cd ${fetchRepopath.getRepoPath(repoId)}; git add --all`
-  )
+  return await execPromisified(`git add --all`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+  })
     .then(({ stdout, stderr }) => {
       if (!stderr) {
         return "ALL_STAGED";
+      } else {
+        console.log(stderr);
+        return "ERR_STAGE_ALL";
       }
     })
     .catch((err) => {

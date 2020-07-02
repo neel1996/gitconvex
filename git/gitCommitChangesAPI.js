@@ -7,9 +7,9 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 const gitCommitChangesApi = async (repoId, commitMessage) => {
   commitMessage = commitMessage.split("||").join("\n");
 
-  return await execPromisified(
-    `cd ${fetchRepopath.getRepoPath(repoId)}; git commit -m "${commitMessage}"`
-  )
+  return await execPromisified(`git commit -m "${commitMessage}"`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+  })
     .then(({ stdout, stderr }) => {
       if (!stderr) {
         return "COMMIT_DONE";

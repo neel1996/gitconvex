@@ -27,9 +27,6 @@ async function checkStatus(param) {
   var commandString = "";
 
   switch (param) {
-    case "OS":
-      commandString = `uname`;
-      break;
     case "GIT":
       commandString = `git --version`;
       break;

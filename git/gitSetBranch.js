@@ -6,9 +6,9 @@ const execPromisified = util.promisify(exec);
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const gitSetBranchApi = async (repoId, branch) => {
-  return await execPromisified(
-    `cd ${fetchRepopath.getRepoPath(repoId)}; git checkout ${branch}`
-  ).then(({ stdout, stderr }) => {
+  return await execPromisified(`git checkout ${branch}`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+  }).then(({ stdout, stderr }) => {
     if (stderr) {
       return "BRANCH_SET_FAILED";
     } else {

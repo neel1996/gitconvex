@@ -6,9 +6,9 @@ const execPromisified = util.promisify(exec);
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const getStagedFiles = async (repoId) => {
-  return await execPromisified(
-    `cd ${fetchRepopath.getRepoPath(repoId)}; git diff --name-only --cached`
-  )
+  return await execPromisified(`git diff --name-only --cached`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+  })
     .then((res) => {
       const { stdout, stderr } = res;
 

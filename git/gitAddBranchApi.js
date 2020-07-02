@@ -5,9 +5,9 @@ const execPromisified = util.promisify(exec);
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const gitAddBranchApi = async (repoId, branchName) => {
-  return await execPromisified(
-    `cd ${fetchRepopath.getRepoPath(repoId)}; git checkout -b ${branchName}`
-  )
+  return await execPromisified(`git checkout -b ${branchName}`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+  })
     .then((res) => {
       console.log(res);
       return "BRANCH_CREATION_SUCCESS";

@@ -5,9 +5,9 @@ const execPromisified = util.promisify(exec);
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const gitFetchApi = async (repoId) => {
-  return await execPromisified(
-    `cd ${fetchRepopath.getRepoPath(repoId)}; git fetch`
-  )
+  return await execPromisified(`git fetch`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+  })
     .then(({ stdout, stderr }) => {
       if (stdout && !stderr) {
         const fetchResponse = stdout.trim().split("\n");
@@ -38,9 +38,9 @@ const gitFetchApi = async (repoId) => {
 };
 
 const gitPullApi = async (repoId) => {
-  return await execPromisified(
-    `cd ${fetchRepopath.getRepoPath(repoId)}; git pull`
-  )
+  return await execPromisified(`git pull`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+  })
     .then(async ({ stdout, stderr }) => {
       if (stdout && !stderr) {
         const pullResponse = stdout.trim().split("\n");

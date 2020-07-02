@@ -6,9 +6,9 @@ const execPromisified = util.promisify(exec);
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const gitRemoveStagedItemApi = async (repoId, item) => {
-  return await execPromisified(
-    `cd ${fetchRepopath.getRepoPath(repoId)}; git reset ${item}`
-  ).then(({ stdout, stderr }) => {
+  return await execPromisified(`git reset ${item}`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+  }).then(({ stdout, stderr }) => {
     if (stderr) {
       console.log(stderr);
       return "STAGE_REMOVE_FAILED";
@@ -20,9 +20,9 @@ const gitRemoveStagedItemApi = async (repoId, item) => {
 };
 
 const gitRemoveAllStagedItemApi = async (repoId) => {
-  return await execPromisified(
-    `cd ${fetchRepopath.getRepoPath(repoId)}; git reset`
-  ).then(({ stdout, stderr }) => {
+  return await execPromisified(`git reset`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+  }).then(({ stdout, stderr }) => {
     if (stderr) {
       console.log(stderr);
       return "STAGE_ALL_REMOVE_FAILED";

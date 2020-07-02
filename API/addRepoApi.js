@@ -43,7 +43,7 @@ async function addRepoHandler(repoName, repoPath, initCheck) {
     .access(repoPath)
     .then(async () => {
       if (initCheck) {
-        await execPromisified(`cd ${repoPath}; git init`);
+        await execPromisified(`git init`, { cwd: repoPath });
       }
 
       if (repoData) {

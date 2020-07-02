@@ -35,7 +35,6 @@ const getGitStatus = async (repoPath) => {
       return isGitLogAvailable;
     })
     .catch((err) => {
-      // console.log(err);
       isGitLogAvailable = false;
       return isGitLogAvailable;
     });
@@ -44,7 +43,7 @@ const getGitStatus = async (repoPath) => {
 
   let gitRemotePromise =
     isGitLogAvailable &&
-    (await execPromised(`${currentDir} git remote`).then(
+    (await execPromised(`git remote`, { cwd: repoPath }).then(
       ({ stdout, stderr }) => {
         if (stdout && !stderr) {
           const localRemote = stdout.trim().split("\n");
@@ -53,9 +52,9 @@ const getGitStatus = async (repoPath) => {
             localRemote &&
               localRemote.map(async (remote) => {
                 console.log("LOOP ::", remote);
-                return await execPromised(
-                  `${currentDir} git remote get-url ${remote}`
-                ).then(({ stdout, stderr }) => {
+                return await execPromised(`git remote get-url ${remote}`, {
+                  cwd: repoPath,
+                }).then(({ stdout, stderr }) => {
                   if (stdout && !stderr) {
                     console.log("REMOTE :: ", stdout);
                     return stdout.trim();
@@ -99,7 +98,7 @@ const getGitStatus = async (repoPath) => {
   // Module to get all available branches
   gitBranchList =
     isGitLogAvailable &&
-    (await execPromised(`${currentDir} git branch`)
+    (await execPromised(`git branch`, { cwd: repoPath })
       .then((res) => {
         if (!res.stderr) {
           return res.stdout;
@@ -132,7 +131,7 @@ const getGitStatus = async (repoPath) => {
 
   // Module to get total number of commits to current branch
   isGitLogAvailable &&
-    (await execPromised(`${currentDir} git log --oneline`)
+    (await execPromised(`git log --oneline`, { cwd: repoPath })
       .then((res) => {
         const { stdout, stderr } = res;
         if (stderr) {
@@ -159,50 +158,52 @@ const getGitStatus = async (repoPath) => {
   //Module to get latest git commit
 
   isGitLogAvailable &&
-    (await execPromised(`${currentDir} git log -1 --oneline`).then((res) => {
-      if (res && !res.stderr) {
-        gitLatestCommit = res.stdout.trim();
+    (await execPromised(`git log -1 --oneline`, { cwd: repoPath }).then(
+      (res) => {
+        if (res && !res.stderr) {
+          gitLatestCommit = res.stdout.trim();
+        }
       }
-    }));
+    ));
 
   //Module to get all git tracked files
   var gitTrackedFileDetails = [];
 
   gitTrackedFiles =
     isGitLogAvailable &&
-    (await execPromised(`${currentDir} git ls-tree --name-status HEAD`).then(
-      ({ stdout, stderr }) => {
-        if (stdout && !stderr) {
-          const fileList = stdout.trim().split("\n");
+    (await execPromised(`git ls-tree --name-status HEAD`, {
+      cwd: repoPath,
+    }).then(({ stdout, stderr }) => {
+      if (stdout && !stderr) {
+        const fileList = stdout.trim().split("\n");
 
-          const localFiles = Promise.all(
-            fileList.map(async (item) => {
-              gitTrackedFileDetails.push(item);
+        const localFiles = Promise.all(
+          fileList.map(async (item) => {
+            gitTrackedFileDetails.push(item);
 
-              return await fs.promises
-                .stat(`${item}`)
-                .then((fileType) => {
-                  if (fileType.isFile()) {
-                    return `${item}: File`;
-                  } else if (fileType.isDirectory()) {
-                    return `${item}: directory`;
-                  } else {
-                    return `${item}: File`;
-                  }
-                })
-                .catch((err) => {
-                  console.log(err);
+            return await fs.promises
+              .stat(`${item}`)
+              .then((fileType) => {
+                if (fileType.isFile()) {
                   return `${item}: File`;
-                });
-            })
-          );
-          return localFiles;
-        } else {
-          console.log(stderr);
-          return [];
-        }
+                } else if (fileType.isDirectory()) {
+                  return `${item}: directory`;
+                } else {
+                  return `${item}: File`;
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+                return `${item}: File`;
+              });
+          })
+        );
+        return localFiles;
+      } else {
+        console.log(stderr);
+        return [];
       }
-    ));
+    }));
 
   //Module to fetch commit for each file and folder
 
@@ -212,9 +213,9 @@ const getGitStatus = async (repoPath) => {
     isGitLogAvailable &&
     (await Promise.all(
       gitTrackedFileDetails.map(async (gitFile) => {
-        return await execPromised(
-          `${currentDir} git log -1 --oneline ${gitFile}`
-        ).then(({ stdout, stderr }) => {
+        return await execPromised(`git log -1 --oneline ${gitFile}`, {
+          cwd: repoPath,
+        }).then(({ stdout, stderr }) => {
           if (stdout && !stderr) {
             return stdout.trim();
           } else {
@@ -228,7 +229,7 @@ const getGitStatus = async (repoPath) => {
   //Module to get totally tracked git artifacts
 
   isGitLogAvailable &&
-    (await execPromised(`${currentDir} git ls-files`).then((res) => {
+    (await execPromised(`git ls-files`, { cwd: repoPath }).then((res) => {
       const { stdout, stderr } = res;
       if (stdout && !stderr) {
         if (stdout.split("\n")) {
