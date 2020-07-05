@@ -1,7 +1,7 @@
 
 # Gitconvex
 <div align="center">
-<div><img src="https://i.ibb.co/KL4PshV/gitconvex.png" width="350"></div>
+<div><img src="https://github.com/neel1996/gitconvex-package/blob/master/build/gitconvex.png" width="350"></div>
 <strong>Web application for managing your git repositories </strong>
 </div>
 
