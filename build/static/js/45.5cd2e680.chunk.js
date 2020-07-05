@@ -1,0 +1,2 @@
+(this.webpackJsonpgitconvex=this.webpackJsonpgitconvex||[]).push([[45],{120:function(n,t){Prism.languages.bnf={string:{pattern:/"[^\r\n"]*"|'[^\r\n']*'/},definition:{pattern:/<[^<>\r\n\t]+>(?=\s*::=)/,alias:["rule","keyword"],inside:{punctuation:/^<|>$/}},rule:{pattern:/<[^<>\r\n\t]+>/,inside:{punctuation:/^<|>$/}},operator:/::=|[|()[\]{}*+?]|\.{3}/},Prism.languages.rbnf=Prism.languages.bnf}}]);
+//# sourceMappingURL=45.5cd2e680.chunk.js.map
