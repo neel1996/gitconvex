@@ -9,9 +9,12 @@ const gitFetchApi = async (repoId) => {
     cwd: fetchRepopath.getRepoPath(repoId),
   })
     .then(({ stdout, stderr }) => {
-      if (stdout && !stderr) {
-        const fetchResponse = stdout.trim().split("\n");
-        if (fetchResponse && fetchResponse.length > 0) {
+      if (stdout || stderr) {
+        // Git fetch alone returns the result in the standard error stream
+        const fetchResponse = stderr.trim().split("\n");
+
+        console.log("Fetch Response :" + fetchResponse);
+        if (fetchResponse) {
           return {
             status: "FETCH_PRESENT",
             fetchedItems: fetchResponse,
@@ -22,7 +25,6 @@ const gitFetchApi = async (repoId) => {
           };
         }
       } else {
-        console.log(stderr);
         return {
           status: "FETCH_ABSENT",
         };
