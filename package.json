@@ -18,7 +18,7 @@
     "desktop"
   ],
   "author": "unicorns",
-  "license": "GPL-3.0",
+  "license": "Apache License 2.0",
   "bugs": {
     "url": "https://github.com/neel1996/gitconvex-server/issues"
   },
