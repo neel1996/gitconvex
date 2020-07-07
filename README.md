@@ -34,6 +34,17 @@ To run this project, install it locally using npm:
 $npm install (For installing all the dependencies)
 
 ```
+To setup server, Open terminal and enter the following:
+
+```
+$node server.js
+
+```
+You can see a success message as "GitConvex API connected!"
+
+Then, open your browser and type the following:
+
+localhost:9001/dashboard
 
 # License
 
