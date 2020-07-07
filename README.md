@@ -9,7 +9,7 @@
 |--|
 |Linux :penguin:  |
 |Mac OS  :apple: |
-|Windows :Windows: |
+|Windows :computer: |
 
 ## Requirements
 
