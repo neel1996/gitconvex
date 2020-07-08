@@ -34,6 +34,7 @@
 |--|
 |Linux :penguin:  |
 |Mac OS  :apple: |
+|Windows :black_square_button: |
 
 ## Requirements
 
@@ -46,6 +47,10 @@
 | <b>React UI build status</b>  | ![Gitconvex UI pipeline](https://github.com/neel1996/gitconvex/workflows/Gitconvex%20UI%20pipeline/badge.svg) |
 |--|--|
 | <b>Node Server Build Status</b> | ![Gitconvex Server pipeline](https://github.com/neel1996/gitconvex-server/workflows/Gitconvex%20Server%20pipeline/badge.svg) |
+
+# Detailed documentation
+
+Refer the detailed [Documentation](DOCUMENTATION) for how to setup and use the platform
 
 # License
 

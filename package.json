@@ -1,14 +1,12 @@
 {
   "name": "@itassistors/gitconvex",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Git web UI client",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+  "publishConfig": { 
+    "registry": "https://registry.npmjs.org/" 
   },
   "main": "server.js",
-  "bin": {
-    "gitconvex": "server.js"
-  },
+  "bin":"server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
@@ -19,9 +17,10 @@
   },
   "keywords": [
     "gitconvex",
+    "github",
+    "git-ui",
     "git",
-    "git",
-    "desktop"
+    "git-web-client"
   ],
   "author": "unicorns",
   "license": "Apache License 2.0",
