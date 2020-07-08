@@ -1,9 +1,9 @@
 const fs = require("fs");
 const dotenv = require("dotenv").config();
+const { DATABASE_FILE } = require("../global/envConfigReader").getEnvData();
 
 async function deleteRepoApi(repoId, name, pathName, time) {
-  const dataStoreFile =
-    process.env.DATABASE_FILE || "./database/repo-datastore.json";
+  const dataStoreFile = DATABASE_FILE || "./database/repo-datastore.json";
 
   return await fs.promises
     .readFile(dataStoreFile)

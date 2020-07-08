@@ -1,26 +1,42 @@
-const dotenv = require("dotenv").config();
 const fs = require("fs");
-const { parse, stringify } = require("envfile");
+const path = require("path");
+const { DATABASE_FILE } = require("../global/envConfigReader").getEnvData();
 
 const fetchDatabaseFile = async () => {
-  const dbPath = process.env.DATABASE_FILE || "NO_DATABASE_FILE";
-  console.log(dbPath);
+  const dbPath = DATABASE_FILE || "NO_DATABASE_FILE";
+  console.log("Databade File", dbPath);
   return {
-    settingsDatabasePath: dbPath,
+    settingsDatabasePath: dbPath.toString(),
   };
 };
 
 const fetchRepoDetails = async () => {
   return await fs.promises
-    .readFile(process.env.DATABASE_FILE)
+    .readFile(DATABASE_FILE)
     .then((res) => {
-      const fileData = JSON.parse(res.toString());
+      const fileContent = res.toString();
+      let parsedFileContent = [];
+      if (fileContent.length > 0) {
+        try {
+          parsedFileContent = JSON.parse(fileContent);
+        } catch (e) {
+          console.log(e);
+          parsedFileContent = [];
+        }
+      } else {
+        fs.writeFileSync(DATABASE_FILE, "[]");
+
+        return {
+          settingsRepoDetails: [],
+        };
+      }
       return {
-        settingsRepoDetails: fileData,
+        settingsRepoDetails: parsedFileContent,
       };
     })
     .catch((err) => {
       if (err) {
+        console.log(err);
         return {
           settingsRepoDetails: [],
         };
@@ -29,28 +45,31 @@ const fetchRepoDetails = async () => {
 };
 
 const deleteRepo = async (repoId) => {
-  return await fs.promises.readFile(process.env.DATABASE_FILE).then((res) => {
+  return await fs.promises.readFile(DATABASE_FILE).then((res) => {
     console.log(res);
   });
 };
 
 const updateDbFile = async (newFileName) => {
   console.log("FILE NAME : ", newFileName);
-  // DATABASE_FILE = "database/repo-datastore.json"
-  // GITCONVEX_PORT = 9001
 
   return await fs.promises
     .access(newFileName)
     .then(async (res) => {
-      const envContent = fs.readFileSync(".env").toString();
+      const envContent = fs
+        .readFileSync(path.relative(".", "env_config.json"))
+        .toString();
 
-      const parsedEnvContent = parse(envContent);
-      parsedEnvContent.DATABASE_FILE = `"${newFileName.toString()}"`;
+      const parsedEnvContent = JSON.parse(envContent)[0];
+      parsedEnvContent.databaseFile = newFileName.toString();
 
-      console.log(stringify(parsedEnvContent));
+      console.log(JSON.stringify(parsedEnvContent));
 
       return await fs.promises
-        .writeFile(".env", stringify(parsedEnvContent))
+        .writeFile(
+          path.relative(".", "env_config.json"),
+          JSON.stringify([parsedEnvContent])
+        )
         .then(() => {
           return "DATAFILE_UPDATE_SUCCESS";
         })
@@ -66,26 +85,33 @@ const updateDbFile = async (newFileName) => {
 };
 
 const getPortDetails = async () => {
-  const envContent = fs.readFileSync(".env").toString();
+  const envContent = fs
+    .readFileSync(path.relative(".", "env_config.json"))
+    .toString();
 
-  const parsedEnvContent = parse(envContent);
+  const parsedEnvContent = JSON.parse(envContent)[0];
 
-  console.log(stringify(parsedEnvContent));
+  console.log(JSON.stringify(parsedEnvContent));
 
-  return { settingsPortDetails: Number(parsedEnvContent.GITCONVEX_PORT) };
+  return { settingsPortDetails: Number(parsedEnvContent.port) };
 };
 
 const updatePortDetails = async (newPort) => {
   if (!isNaN(newPort)) {
-    const envContent = fs.readFileSync(".env").toString();
+    const envContent = fs
+      .readFileSync(path.relative(".", "env_config.json"))
+      .toString();
 
-    const parsedEnvContent = parse(envContent);
-    parsedEnvContent.GITCONVEX_PORT = Number(newPort);
+    const parsedEnvContent = JSON.parse(envContent)[0];
+    parsedEnvContent.port = Number(newPort);
 
-    console.log(stringify(parsedEnvContent));
+    console.log(JSON.stringify(parsedEnvContent));
 
     return await fs.promises
-      .writeFile(".env", stringify(parsedEnvContent))
+      .writeFile(
+        path.relative(".", "env_config.json"),
+        JSON.stringify([parsedEnvContent])
+      )
       .then(() => {
         return "PORT_UPDATE_SUCCESS";
       })

@@ -2,8 +2,10 @@ const { exec } = require("child_process");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 const fs = require("fs");
-
-const dotenv = require("dotenv").config();
+const {
+  DATABASE_FILE,
+  GITCONVEX_PORT,
+} = require("../global/envConfigReader").getEnvData();
 
 async function addRepoHandler(repoName, repoPath, initCheck) {
   const timeStamp = new Date().toUTCString();
@@ -34,7 +36,7 @@ async function addRepoHandler(repoName, repoPath, initCheck) {
   }
 
   const dataStoreFile =
-    process.env.DATABASE_FILE || "./database/repo-datastore.json";
+    DATABASE_FILE || "./database/repo-datastore.json";
 
   let fileData = fs.readFileSync(dataStoreFile);
   const repoData = fileData.toString();

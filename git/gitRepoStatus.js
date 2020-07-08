@@ -180,37 +180,41 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git ls-tree --name-status HEAD`, {
       cwd: repoPath,
       windowsHide: true,
-    }).then(({ stdout, stderr }) => {
-      if (stdout && !stderr) {
-        const fileList = stdout.trim().split("\n");
+    })
+      .then(({ stdout, stderr }) => {
+        if (stdout && !stderr) {
+          const fileList = stdout.trim().split("\n");
 
-        const localFiles = Promise.all(
-          fileList.map(async (item) => {
-            gitTrackedFileDetails.push(item);
+          const localFiles = Promise.all(
+            fileList.map(async (item) => {
+              gitTrackedFileDetails.push(item);
 
-            return await fs.promises
-              .stat(`${repoPath}/${item}`)
-              .then((fileType) => {
-                if (fileType.isFile()) {
-                  return `${item}: File`;
-                } else if (fileType.isDirectory()) {
-                  return `${item}: directory`;
-                } else {
-                  return `${item}: File`;
-                }
-              })
-              .catch((err) => {
-                console.log(err);
-                return `${item}: File`;
-              });
-          })
-        );
-        return localFiles;
-      } else {
-        console.log(stderr);
-        return [];
-      }
-    }));
+              return await fs.promises
+                .stat(`${repoPath}/${item}`)
+                .then((fileType) => {
+                  if (fileType.isFile()) {
+                    return `${item}: File`;
+                  } else if (fileType.isDirectory()) {
+                    return `${item}: directory`;
+                  } else {
+                    return `${item}: File`;
+                  }
+                })
+                .catch((err) => {
+                  console.log("Tracked file has been removed!");
+                  return `${item}: DEL`;
+                });
+            })
+          );
+          return localFiles;
+        } else {
+          console.log(stderr);
+          return [];
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      }));
 
   //Module to fetch commit for each file and folder
 
@@ -223,14 +227,19 @@ const getGitStatus = async (repoPath) => {
         return await execPromised(`git log -1 --oneline ${gitFile}`, {
           cwd: repoPath,
           windowsHide: true,
-        }).then(({ stdout, stderr }) => {
-          if (stdout && !stderr) {
-            return stdout.trim();
-          } else {
-            console.log(stderr);
+        })
+          .then(({ stdout, stderr }) => {
+            if (stdout && !stderr) {
+              return stdout.trim();
+            } else {
+              console.log(stderr);
+              return "";
+            }
+          })
+          .catch((err) => {
+            console.log("Tracked file has been removed!");
             return "";
-          }
-        });
+          });
       })
     ));
 

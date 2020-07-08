@@ -1,11 +1,17 @@
+#!/usr/bin/env node
+
 const globalAPI = require("./global/globalAPIHandler");
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv").config();
+const {
+  DATABASE_FILE,
+  GITCONVEX_PORT,
+} = require("./global/envConfigReader").getEnvData();
 
 const app = globalAPI;
-const port = process.env.GITCONVEX_PORT;
+const port = GITCONVEX_PORT;
 
 app.use(express.static(path.join(__dirname, "build")));
 
@@ -17,22 +23,23 @@ globalAPI.listen(port || 9001, async (err) => {
   if (err) {
     console.log(err);
   }
+
   console.log("GitConvex API connected!");
 
   console.log("\n#Checking data file availability...");
 
   await fs.promises
-    .access(process.env.DATABASE_FILE)
+    .access(DATABASE_FILE)
     .then(() => {
       console.log(
-        `INFO: Data file ${process.env.DATABASE_FILE} is present and it will be used as the active data file!\n\n## You can change this under the settings menu
+        `INFO: Data file ${DATABASE_FILE} is present and it will be used as the active data file!\n\n## You can change this under the settings menu
         `
       );
     })
     .catch(async (err) => {
       const dataFileCreator = async () => {
         return await fs.promises
-          .writeFile(process.env.DATABASE_FILE, "[]")
+          .writeFile(DATABASE_FILE, "[]")
           .then((res) => {
             console.log(
               "\nINFO: New data file created and it will be used as the active file\n\n## You can change this under the settings menu"
@@ -46,7 +53,7 @@ globalAPI.listen(port || 9001, async (err) => {
       };
 
       console.log(
-        `INFO: Data file is missing\nCreating new file under ${process.env.DATABASE_FILE}`
+        `INFO: Data file is missing\nCreating new file under ${DATABASE_FILE}`
       );
 
       await dataFileCreator();

@@ -1,9 +1,10 @@
 const fs = require("fs");
 const dotnev = require("dotenv").config();
+const { DATABASE_FILE } = require("../global/envConfigReader").getEnvData();
 
 async function fetchRepoHandler() {
   var repoDSContent = fs.readFileSync(
-    process.env.DATABASE_FILE || "./database/repo-datastore.json"
+    DATABASE_FILE || "./database/repo-datastore.json"
   );
 
   repoDSContent = repoDSContent.toString();

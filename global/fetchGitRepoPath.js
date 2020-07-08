@@ -1,9 +1,10 @@
 const fs = require("fs");
 const dotenv = require("dotenv").config();
+const { DATABASE_FILE } = require("./envConfigReader").getEnvData();
 
 const getRepoPath = (repoId) => {
   const dataEntry = fs
-    .readFileSync(process.env.DATABASE_FILE || "./database/repo-datastore.json")
+    .readFileSync(DATABASE_FILE || "./database/repo-datastore.json")
     .toString();
 
   const repoObject = JSON.parse(dataEntry);
