@@ -1,12 +1,12 @@
 {
   "name": "@itassistors/gitconvex",
-  "version": "1.0.6",
+  "version": "1.0.4",
   "description": "Git web UI client",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+  "publishConfig": { 
+    "registry": "https://registry.npmjs.org/" 
   },
   "main": "server.js",
-  "bin": "server.js",
+  "bin":"server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
@@ -22,7 +22,7 @@
     "git",
     "git-web-client"
   ],
-  "author": "unicorns",
+  "author": "neel1996",
   "license": "Apache License 2.0",
   "bugs": {
     "url": "https://github.com/neel1996/gitconvex-package/issues"
