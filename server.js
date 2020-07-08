@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const globalAPI = require("./global/globalAPIHandler");
 const express = require("express");
 const path = require("path");
