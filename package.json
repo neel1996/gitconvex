@@ -1,12 +1,12 @@
 {
   "name": "@itassistors/gitconvex",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Git web UI client",
-  "publishConfig": { 
-    "registry": "https://registry.npmjs.org/" 
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   },
   "main": "server.js",
-  "bin":"server.js",
+  "bin": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
