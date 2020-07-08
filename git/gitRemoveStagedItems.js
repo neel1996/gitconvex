@@ -8,6 +8,7 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 const gitRemoveStagedItemApi = async (repoId, item) => {
   return await execPromisified(`git reset ${item}`, {
     cwd: fetchRepopath.getRepoPath(repoId),
+    windowsHide: true,
   }).then(({ stdout, stderr }) => {
     if (stderr) {
       console.log(stderr);
@@ -22,6 +23,7 @@ const gitRemoveStagedItemApi = async (repoId, item) => {
 const gitRemoveAllStagedItemApi = async (repoId) => {
   return await execPromisified(`git reset`, {
     cwd: fetchRepopath.getRepoPath(repoId),
+    windowsHide: true,
   }).then(({ stdout, stderr }) => {
     if (stderr) {
       console.log(stderr);

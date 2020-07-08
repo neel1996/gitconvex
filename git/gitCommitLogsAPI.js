@@ -7,6 +7,7 @@ async function gitCommitLogHandler(repoId) {
   const repoPath = fetchRepopath.getRepoPath(repoId);
   return await execPromisified(`git log --pretty=format:"%h||%an||%ad||%s"`, {
     cwd: repoPath,
+    windowsHide: true,
   }).then((res) => {
     const { stdout, stderr } = res;
 

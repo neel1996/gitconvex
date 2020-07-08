@@ -7,6 +7,7 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 const gitStageAllItemsApi = async (repoId) => {
   return await execPromisified(`git add --all`, {
     cwd: fetchRepopath.getRepoPath(repoId),
+    windowsHide: true,
   })
     .then(({ stdout, stderr }) => {
       if (!stderr) {

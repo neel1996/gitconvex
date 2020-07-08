@@ -9,6 +9,7 @@ const gitCommitChangesApi = async (repoId, commitMessage) => {
 
   return await execPromisified(`git commit -m "${commitMessage}"`, {
     cwd: fetchRepopath.getRepoPath(repoId),
+    windowsHide: true,
   })
     .then(({ stdout, stderr }) => {
       if (!stderr) {

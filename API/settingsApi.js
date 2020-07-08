@@ -1,4 +1,3 @@
-const { exec } = require("child_process");
 const dotenv = require("dotenv").config();
 const fs = require("fs");
 const { parse, stringify } = require("envfile");

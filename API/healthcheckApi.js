@@ -37,7 +37,7 @@ async function checkStatus(param) {
       commandString = `echo 'NO_COMMAND'`;
   }
 
-  return await execPromise(commandString).then((res) => {
+  return await execPromise(commandString, { windowsHide: true }).then((res) => {
     if (param === "OS") {
       return {
         code: "SUCCESS",

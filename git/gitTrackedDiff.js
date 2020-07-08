@@ -16,28 +16,30 @@ async function gitTrackedDiff(repoId) {
 }
 
 async function getGitDiff(repoPath) {
-  return await execPromosified(`git diff --raw`, { cwd: repoPath }).then(
-    (res) => {
-      const { stdout, stderr } = res;
-      var parsedEntry = stdout.trim().split("\n");
+  return await execPromosified(`git diff --raw`, {
+    cwd: repoPath,
+    windowsHide: true,
+  }).then((res) => {
+    const { stdout, stderr } = res;
+    var parsedEntry = stdout.trim().split("\n");
 
-      var gitDifference = parsedEntry.map((entry) => {
-        if (entry.split(/\s+/)) {
-          let splitEntry = entry.split(/\s+/);
-          if (splitEntry[4] && splitEntry[5]) {
-            return "" + splitEntry[4] + "," + splitEntry[5];
-          }
+    var gitDifference = parsedEntry.map((entry) => {
+      if (entry.split(/\s+/)) {
+        let splitEntry = entry.split(/\s+/);
+        if (splitEntry[4] && splitEntry[5]) {
+          return "" + splitEntry[4] + "," + splitEntry[5];
         }
-      });
+      }
+    });
 
-      return gitDifference.filter((entry) => (entry ? entry : ""));
-    }
-  );
+    return gitDifference.filter((entry) => (entry ? entry : ""));
+  });
 }
 
 async function getUntrackedFiles(repoPath) {
   return await execPromosified(`git ls-files --others --exclude-standard`, {
     cwd: repoPath,
+    windowsHide: true,
   }).then((res) => {
     const { stdout, stderr } = res;
     var parsedEntry = stdout

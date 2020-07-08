@@ -7,7 +7,7 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 const gitPushToRemoteApi = async (repoId, remoteHost, branch) => {
   return await execPromisified(
     `git remote -v | grep '${remoteHost}' | grep 'push'`,
-    { cwd: fetchRepopath.getRepoPath(repoId) }
+    { cwd: fetchRepopath.getRepoPath(repoId), windowsHide: true }
   )
     .then(async ({ stdout, stderr }) => {
       if (!stderr) {

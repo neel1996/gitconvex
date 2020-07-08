@@ -7,6 +7,7 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 const gitAddBranchApi = async (repoId, branchName) => {
   return await execPromisified(`git checkout -b ${branchName}`, {
     cwd: fetchRepopath.getRepoPath(repoId),
+    windowsHide: true,
   })
     .then((res) => {
       console.log(res);

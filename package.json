@@ -1,16 +1,15 @@
 {
   "name": "gitconvex",
   "version": "1.0.0",
-  "description": "Git web UI client",
-  "main": "server.js",
-  "bin":"server.js",
+  "description": "Git client for linux servers",
+  "main": "index.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/neel1996/gitconvex-package.git"
+    "url": "git+ssh://git@github.com/neel1996/gitconvex-server.git"
   },
   "keywords": [
     "gitconvex",
@@ -21,9 +20,9 @@
   "author": "unicorns",
   "license": "Apache License 2.0",
   "bugs": {
-    "url": "https://github.com/neel1996/gitconvex-package/issues"
+    "url": "https://github.com/neel1996/gitconvex-server/issues"
   },
-  "homepage": "https://github.com/neel1996/gitconvex-package#readme",
+  "homepage": "https://github.com/neel1996/gitconvex-server#readme",
   "dependencies": {
     "axios": "^0.19.2",
     "child_process": "^1.0.2",

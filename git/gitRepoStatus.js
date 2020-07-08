@@ -43,34 +43,36 @@ const getGitStatus = async (repoPath) => {
 
   let gitRemotePromise =
     isGitLogAvailable &&
-    (await execPromised(`git remote`, { cwd: repoPath }).then(
-      ({ stdout, stderr }) => {
-        if (stdout && !stderr) {
-          const localRemote = stdout.trim().split("\n");
+    (await execPromised(`git remote`, {
+      cwd: repoPath,
+      windowsHide: true,
+    }).then(({ stdout, stderr }) => {
+      if (stdout && !stderr) {
+        const localRemote = stdout.trim().split("\n");
 
-          const multiPromise = Promise.all(
-            localRemote &&
-              localRemote.map(async (remote) => {
-                console.log("LOOP ::", remote);
-                return await execPromised(`git remote get-url ${remote}`, {
-                  cwd: repoPath,
-                }).then(({ stdout, stderr }) => {
-                  if (stdout && !stderr) {
-                    console.log("REMOTE :: ", stdout);
-                    return stdout.trim();
-                  } else {
-                    console.log(stderr);
-                  }
-                });
-              })
-          );
-          return multiPromise;
-        } else {
-          console.log(stderr);
-          return null;
-        }
+        const multiPromise = Promise.all(
+          localRemote &&
+            localRemote.map(async (remote) => {
+              console.log("LOOP ::", remote);
+              return await execPromised(`git remote get-url ${remote}`, {
+                cwd: repoPath,
+                windowsHide: true,
+              }).then(({ stdout, stderr }) => {
+                if (stdout && !stderr) {
+                  console.log("REMOTE :: ", stdout);
+                  return stdout.trim();
+                } else {
+                  console.log(stderr);
+                }
+              });
+            })
+        );
+        return multiPromise;
+      } else {
+        console.log(stderr);
+        return null;
       }
-    ));
+    }));
 
   if (gitRemotePromise) {
     gitRemoteData = gitRemotePromise.join("||");
@@ -98,7 +100,7 @@ const getGitStatus = async (repoPath) => {
   // Module to get all available branches
   gitBranchList =
     isGitLogAvailable &&
-    (await execPromised(`git branch`, { cwd: repoPath })
+    (await execPromised(`git branch`, { cwd: repoPath, windowsHide: true })
       .then((res) => {
         if (!res.stderr) {
           return res.stdout;
@@ -131,7 +133,10 @@ const getGitStatus = async (repoPath) => {
 
   // Module to get total number of commits to current branch
   isGitLogAvailable &&
-    (await execPromised(`git log --oneline`, { cwd: repoPath })
+    (await execPromised(`git log --oneline`, {
+      cwd: repoPath,
+      windowsHide: true,
+    })
       .then((res) => {
         const { stdout, stderr } = res;
         if (stderr) {
@@ -158,13 +163,14 @@ const getGitStatus = async (repoPath) => {
   //Module to get latest git commit
 
   isGitLogAvailable &&
-    (await execPromised(`git log -1 --oneline`, { cwd: repoPath }).then(
-      (res) => {
-        if (res && !res.stderr) {
-          gitLatestCommit = res.stdout.trim();
-        }
+    (await execPromised(`git log -1 --oneline`, {
+      cwd: repoPath,
+      windowsHide: true,
+    }).then((res) => {
+      if (res && !res.stderr) {
+        gitLatestCommit = res.stdout.trim();
       }
-    ));
+    }));
 
   //Module to get all git tracked files
   var gitTrackedFileDetails = [];
@@ -173,6 +179,7 @@ const getGitStatus = async (repoPath) => {
     isGitLogAvailable &&
     (await execPromised(`git ls-tree --name-status HEAD`, {
       cwd: repoPath,
+      windowsHide: true,
     }).then(({ stdout, stderr }) => {
       if (stdout && !stderr) {
         const fileList = stdout.trim().split("\n");
@@ -215,6 +222,7 @@ const getGitStatus = async (repoPath) => {
       gitTrackedFileDetails.map(async (gitFile) => {
         return await execPromised(`git log -1 --oneline ${gitFile}`, {
           cwd: repoPath,
+          windowsHide: true,
         }).then(({ stdout, stderr }) => {
           if (stdout && !stderr) {
             return stdout.trim();
@@ -229,7 +237,10 @@ const getGitStatus = async (repoPath) => {
   //Module to get totally tracked git artifacts
 
   isGitLogAvailable &&
-    (await execPromised(`git ls-files`, { cwd: repoPath }).then((res) => {
+    (await execPromised(`git ls-files`, {
+      cwd: repoPath,
+      windowsHide: true,
+    }).then((res) => {
       const { stdout, stderr } = res;
       if (stdout && !stderr) {
         if (stdout.split("\n")) {

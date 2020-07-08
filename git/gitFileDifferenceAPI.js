@@ -27,6 +27,7 @@ async function getGitFileDifference(repoId, fileName) {
 
   const diffStat = await execPromisified(`git diff --stat ${fileName}`, {
     cwd: repoPath,
+    windowsHide: true,
   })
     .then(({ stdout, stderr }) => {
       if (stdout && !stderr) {
@@ -45,6 +46,7 @@ async function getGitFileDifference(repoId, fileName) {
     `git diff -U${fileContentLength} ${fileName}`,
     {
       cwd: repoPath,
+      windowsHide: true,
     }
   )
     .then(({ stdout, stderr }) => {

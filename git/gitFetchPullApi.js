@@ -7,6 +7,7 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 const gitFetchApi = async (repoId) => {
   return await execPromisified(`git fetch`, {
     cwd: fetchRepopath.getRepoPath(repoId),
+    windowsHide: true,
   })
     .then(({ stdout, stderr }) => {
       if (stdout || stderr) {
@@ -43,6 +44,7 @@ const gitFetchApi = async (repoId) => {
 const gitPullApi = async (repoId) => {
   return await execPromisified(`git pull`, {
     cwd: fetchRepopath.getRepoPath(repoId),
+    windowsHide: true,
   })
     .then(async ({ stdout, stderr }) => {
       if (stdout && !stderr) {

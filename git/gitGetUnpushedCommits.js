@@ -7,7 +7,7 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 const gitGetUnpushedCommits = async (repoId, remoteURL) => {
   return await execPromisified(
     `git log --branches --not --remotes --pretty=format:"%h||%an||%ad||%s"`,
-    { cwd: fetchRepopath.getRepoPath(repoId) }
+    { cwd: fetchRepopath.getRepoPath(repoId), windowsHide: true }
   ).then((res) => {
     const { stdout, stderr } = res;
 
