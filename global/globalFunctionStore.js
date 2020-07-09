@@ -242,7 +242,7 @@ module.exports.deleteRepo = deleteRepo = async (
   pathName,
   time
 ) => {
-  return await deleteRepoApi(repoId, name, pathName, time);
+  return await deleteRepoApi(repoId);
 };
 
 module.exports.addBranch = addBranch = async (repoId, branchName) => {

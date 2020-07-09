@@ -134,8 +134,8 @@ app.use(
         return await gitPullFromRemote(repoId);
       },
       deleteRepo: async (args) => {
-        const { repoId, name, pathName, time } = args;
-        return await deleteRepo(repoId, name, pathName, time);
+        const { repoId } = args;
+        return await deleteRepo(repoId);
       },
       addBranch: async (args) => {
         const { repoId, branchName } = args;

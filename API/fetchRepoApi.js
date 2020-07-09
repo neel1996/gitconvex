@@ -1,11 +1,23 @@
 const fs = require("fs");
 const dotnev = require("dotenv").config();
-const { DATABASE_FILE } = require("../global/envConfigReader").getEnvData();
+const path = require("path");
+
+function getEnvData() {
+  const envFileData = fs.readFileSync(
+    path.join(__dirname, "..", "env_config.json")
+  );
+
+  const envContent = envFileData.toString();
+  let envData = JSON.parse(envContent)[0];
+
+  return {
+    DATABASE_FILE: envData.databaseFile,
+    GITCONVEX_PORT: envData.port,
+  };
+}
 
 async function fetchRepoHandler() {
-  var repoDSContent = fs.readFileSync(
-    DATABASE_FILE || "./database/repo-datastore.json"
-  );
+  var repoDSContent = fs.readFileSync(getEnvData().DATABASE_FILE);
 
   repoDSContent = repoDSContent.toString();
 

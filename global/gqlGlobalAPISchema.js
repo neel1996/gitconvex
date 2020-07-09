@@ -106,7 +106,7 @@ const globalAPISchema = new buildSchema(
             fetchFromRemote(repoId: String!): gitFetchStatus!
             pullFromRemote(repoId: String!): gitPullStatus!
             updateRepoDataFile(newDbFile: String!): String!
-            deleteRepo(repoId: String!, name: String!, pathName: String!, time: String!): deleteRepoStatus!
+            deleteRepo(repoId: String!): deleteRepoStatus!
         }
 
         type gitFetchStatus{

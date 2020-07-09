@@ -1,9 +1,22 @@
 const fs = require("fs");
-const dotenv = require("dotenv").config();
-const { DATABASE_FILE } = require("../global/envConfigReader").getEnvData();
+const path = require("path");
 
-async function deleteRepoApi(repoId, name, pathName, time) {
-  const dataStoreFile = DATABASE_FILE || "./database/repo-datastore.json";
+function getEnvData() {
+  const envFileData = fs.readFileSync(
+    path.join(__dirname, "..", "env_config.json")
+  );
+
+  const envContent = envFileData.toString();
+  let envData = JSON.parse(envContent)[0];
+
+  return {
+    DATABASE_FILE: envData.databaseFile,
+    GITCONVEX_PORT: envData.port,
+  };
+}
+
+async function deleteRepoApi(repoId) {
+  const dataStoreFile = getEnvData().DATABASE_FILE;
 
   return await fs.promises
     .readFile(dataStoreFile)
