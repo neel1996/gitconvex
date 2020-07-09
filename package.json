@@ -1,6 +1,6 @@
 {
   "name": "@itassistors/gitconvex",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Git web UI client",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
