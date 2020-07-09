@@ -5,13 +5,25 @@ const execPromisified = util.promisify(exec);
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const gitPushToRemoteApi = async (repoId, remoteHost, branch) => {
-  return await execPromisified(
-    `git remote -v | grep '${remoteHost}' | grep 'push'`,
-    { cwd: fetchRepopath.getRepoPath(repoId), windowsHide: true }
-  )
+  return await execPromisified(`git remote -v`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+    windowsHide: true,
+  })
     .then(async ({ stdout, stderr }) => {
       if (!stderr) {
-        const remoteName = stdout.trim().split(/\s/gi)[0];
+        const remoteVerbose = stdout.trim().split("\n");
+
+        const filteredRemote = remoteVerbose
+          .filter((remote) => {
+            if (remote.includes(remoteHost) && remote.includes("push")) {
+              return true;
+            }
+            return false;
+          })
+          .join("");
+
+        const remoteName = filteredRemote.trim().split(/\s/gi)[0];
+
         const pushCommand = `git push -u ${remoteName} ${branch}`;
 
         return await execPromisified(`${pushCommand}`, {
