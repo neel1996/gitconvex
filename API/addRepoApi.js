@@ -1,11 +1,22 @@
 const { exec } = require("child_process");
+const path = require("path");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 const fs = require("fs");
-const {
-  DATABASE_FILE,
-  GITCONVEX_PORT,
-} = require("../global/envConfigReader").getEnvData();
+
+function getEnvData() {
+  const envFileData = fs.readFileSync(
+    path.join(__dirname, "..", "env_config.json")
+  );
+
+  const envContent = envFileData.toString();
+  let envData = JSON.parse(envContent)[0];
+
+  return {
+    DATABASE_FILE: envData.databaseFile,
+    GITCONVEX_PORT: envData.port,
+  };
+}
 
 async function addRepoHandler(repoName, repoPath, initCheck) {
   const timeStamp = new Date().toUTCString();
@@ -35,8 +46,7 @@ async function addRepoHandler(repoName, repoPath, initCheck) {
     };
   }
 
-  const dataStoreFile =
-    DATABASE_FILE || "./database/repo-datastore.json";
+  const dataStoreFile = getEnvData().DATABASE_FILE;
 
   let fileData = fs.readFileSync(dataStoreFile);
   const repoData = fileData.toString();

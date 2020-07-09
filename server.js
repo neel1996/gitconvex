@@ -5,13 +5,28 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv").config();
+
 const { updateDbFile } = require("./API/settingsApi");
 const app = globalAPI;
 const log = console.log;
 var envConfigFilename = "env_config.json";
 var envConfigFilePath = path.join(__dirname, envConfigFilename);
 
+// DATABASE_FILE = path.join(__dirname, ".", DATABASE_FILE);
+
 app.use(express.static(path.join(__dirname, "build")));
+
+function getEnvData() {
+  const envFileData = fs.readFileSync(path.join(__dirname, "env_config.json"));
+
+  const envContent = envFileData.toString();
+  let envData = JSON.parse(envContent)[0];
+
+  return {
+    DATABASE_FILE: envData.databaseFile,
+    GITCONVEX_PORT: envData.port,
+  };
+}
 
 log("INFO: Checking for config file");
 
@@ -35,12 +50,6 @@ try {
   });
 }
 
-let {
-  DATABASE_FILE,
-  GITCONVEX_PORT,
-} = require("./global/envConfigReader").getEnvData();
-const port = GITCONVEX_PORT;
-
 log("INFO: Config file is present");
 log("INFO: Reading from config file " + envConfigFilePath);
 
@@ -48,7 +57,7 @@ app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
-globalAPI.listen(port || 9001, async (err) => {
+globalAPI.listen(getEnvData().GITCONVEX_PORT || 9001, async (err) => {
   if (err) {
     log(err);
   }
@@ -56,6 +65,8 @@ globalAPI.listen(port || 9001, async (err) => {
   log("GitConvex API connected!");
 
   log("\n#Checking data file availability...");
+
+  var DATABASE_FILE = getEnvData().DATABASE_FILE;
 
   await fs.promises
     .access(DATABASE_FILE)
@@ -104,9 +115,9 @@ globalAPI.listen(port || 9001, async (err) => {
     });
 
   log(
-    `\n## Gitconvex is running on port ${port}
+    `\n## Gitconvex is running on port ${getEnvData().GITCONVEX_PORT}
      
-    Open http://localhost:${port}/ to access gitconvex
+    Open http://localhost:${getEnvData().GITCONVEX_PORT}/ to access gitconvex
     `
   );
 });

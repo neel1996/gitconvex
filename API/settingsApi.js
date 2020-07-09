@@ -1,10 +1,23 @@
 const fs = require("fs");
 const path = require("path");
-const { DATABASE_FILE } = require("../global/envConfigReader").getEnvData();
+
+function getEnvData() {
+  const envFileData = fs.readFileSync(
+    path.join(__dirname, "..", "env_config.json")
+  );
+
+  const envContent = envFileData.toString();
+  let envData = JSON.parse(envContent)[0];
+
+  return {
+    DATABASE_FILE: envData.databaseFile,
+    GITCONVEX_PORT: envData.port,
+  };
+}
 
 const fetchDatabaseFile = async () => {
-  const dbPath = DATABASE_FILE || "NO_DATABASE_FILE";
-  console.log("Databade File", dbPath);
+  const dbPath = getEnvData().DATABASE_FILE || "NO_DATABASE_FILE";
+  console.log("Database File", dbPath);
   return {
     settingsDatabasePath: dbPath.toString(),
   };
@@ -12,7 +25,7 @@ const fetchDatabaseFile = async () => {
 
 const fetchRepoDetails = async () => {
   return await fs.promises
-    .readFile(DATABASE_FILE)
+    .readFile(getEnvData().DATABASE_FILE)
     .then((res) => {
       const fileContent = res.toString();
       let parsedFileContent = [];
@@ -24,7 +37,7 @@ const fetchRepoDetails = async () => {
           parsedFileContent = [];
         }
       } else {
-        fs.writeFileSync(DATABASE_FILE, "[]");
+        fs.writeFileSync(getEnvData().DATABASE_FILE, "[]");
 
         return {
           settingsRepoDetails: [],
@@ -45,7 +58,7 @@ const fetchRepoDetails = async () => {
 };
 
 const deleteRepo = async (repoId) => {
-  return await fs.promises.readFile(DATABASE_FILE).then((res) => {
+  return await fs.promises.readFile(getEnvData().DATABASE_FILE).then((res) => {
     console.log(res);
   });
 };
@@ -57,7 +70,7 @@ const updateDbFile = async (newFileName) => {
     .access(newFileName)
     .then(async (res) => {
       const envContent = fs
-        .readFileSync(path.relative(".", "env_config.json"))
+        .readFileSync(path.join(__dirname, "..", "env_config.json"))
         .toString();
 
       const parsedEnvContent = JSON.parse(envContent)[0];
@@ -67,7 +80,7 @@ const updateDbFile = async (newFileName) => {
 
       return await fs.promises
         .writeFile(
-          path.relative(".", "env_config.json"),
+          path.join(__dirname, "..", "env_config.json"),
           JSON.stringify([parsedEnvContent])
         )
         .then(() => {
@@ -85,21 +98,13 @@ const updateDbFile = async (newFileName) => {
 };
 
 const getPortDetails = async () => {
-  const envContent = fs
-    .readFileSync(path.relative(".", "env_config.json"))
-    .toString();
-
-  const parsedEnvContent = JSON.parse(envContent)[0];
-
-  console.log(JSON.stringify(parsedEnvContent));
-
-  return { settingsPortDetails: Number(parsedEnvContent.port) };
+  return { settingsPortDetails: Number(getEnvData().GITCONVEX_PORT) };
 };
 
 const updatePortDetails = async (newPort) => {
   if (!isNaN(newPort)) {
     const envContent = fs
-      .readFileSync(path.relative(".", "env_config.json"))
+      .readFileSync(path.join(__dirname, "..", "env_config.json"))
       .toString();
 
     const parsedEnvContent = JSON.parse(envContent)[0];
@@ -109,7 +114,7 @@ const updatePortDetails = async (newPort) => {
 
     return await fs.promises
       .writeFile(
-        path.relative(".", "env_config.json"),
+        path.join(__dirname, "..", "env_config.json"),
         JSON.stringify([parsedEnvContent])
       )
       .then(() => {
