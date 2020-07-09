@@ -5,15 +5,44 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv").config();
-const {
+const { updateDbFile } = require("./API/settingsApi");
+const app = globalAPI;
+const log = console.log;
+var envConfigFilename = "env_config.json";
+var envConfigFilePath = path.join(__dirname, envConfigFilename);
+
+app.use(express.static(path.join(__dirname, "build")));
+
+log("INFO: Checking for config file");
+
+let configStatus = "";
+try {
+  configStatus = fs.accessSync(envConfigFilePath);
+} catch (e) {
+  log("ERROR: No config file found. Falling back to config creation module");
+  const configData = [
+    {
+      databaseFile: path.join(__dirname, "database/repo-datastore.json"),
+      port: 9001,
+    },
+  ];
+  log(
+    "INFO: Creating config file with default config -> " +
+      JSON.stringify(configData)
+  );
+  fs.writeFileSync(envConfigFilePath, JSON.stringify(configData), {
+    flag: "w",
+  });
+}
+
+let {
   DATABASE_FILE,
   GITCONVEX_PORT,
 } = require("./global/envConfigReader").getEnvData();
-
-const app = globalAPI;
 const port = GITCONVEX_PORT;
 
-app.use(express.static(path.join(__dirname, "build")));
+log("INFO: Config file is present");
+log("INFO: Reading from config file " + envConfigFilePath);
 
 app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "build", "index.html"));
@@ -21,17 +50,17 @@ app.get("/*", (req, res) => {
 
 globalAPI.listen(port || 9001, async (err) => {
   if (err) {
-    console.log(err);
+    log(err);
   }
 
-  console.log("GitConvex API connected!");
+  log("GitConvex API connected!");
 
-  console.log("\n#Checking data file availability...");
+  log("\n#Checking data file availability...");
 
   await fs.promises
     .access(DATABASE_FILE)
     .then(() => {
-      console.log(
+      log(
         `INFO: Data file ${DATABASE_FILE} is present and it will be used as the active data file!\n\n## You can change this under the settings menu
         `
       );
@@ -41,41 +70,40 @@ globalAPI.listen(port || 9001, async (err) => {
         return await fs.promises
           .writeFile(DATABASE_FILE, "[]")
           .then((res) => {
-            console.log(
+            log(
               "\nINFO: New data file created and it will be used as the active file\n\n## You can change this under the settings menu"
             );
           })
           .catch((err) => {
-            console.log(
+            log(
               "INFO: New data file creation failed!\nINFO: Falling back to directory creation module"
             );
           });
       };
 
-      console.log(
+      log(
         `INFO: Data file is missing\nCreating new file under ${DATABASE_FILE}`
       );
 
       await dataFileCreator();
 
-      if (fs.existsSync()) {
-      } else {
-        console.log("INFO: Database directory is missing");
+      if (!fs.existsSync(DATABASE_FILE)) {
+        log("INFO: Database directory is missing");
         await fs.promises
-          .mkdir("./database")
+          .mkdir(path.join(__dirname, ".", "/database"))
           .then(async () => {
-            console.log(
+            log(
               "INFO: Created database directory\nINFO: Setting up new data file in database directory"
             );
             await dataFileCreator();
           })
           .catch((err) => {
-            console.log("ERROR: database directory creation failed!");
+            log("ERROR: database directory creation failed!");
           });
       }
     });
 
-  console.log(
+  log(
     `\n## Gitconvex is running on port ${port}
      
     Open http://localhost:${port}/ to access gitconvex
