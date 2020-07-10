@@ -48,6 +48,7 @@ const {
   updateDbFileApi,
   settingsGetPortDetails,
   settingsUpdatePortDetail,
+  gitAddRemoteRepoApi,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -148,6 +149,10 @@ app.use(
       settingsEditPort: async (args) => {
         const { newPort } = args;
         return settingsUpdatePortDetail(newPort);
+      },
+      addRemoteRepo: async (args) => {
+        const { repoId, remoteName, remoteUrl } = args;
+        return gitAddRemoteRepoApi(repoId, remoteName, remoteUrl);
       },
     },
   })

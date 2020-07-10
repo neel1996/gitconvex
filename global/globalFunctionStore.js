@@ -12,6 +12,7 @@ const { gitStageAllItemsApi } = require("../git/gitStageAllItemsAPI");
 const { gitCommitChangesApi } = require("../git/gitCommitChangesAPI");
 const { gitPushToRemoteApi } = require("../git/gitPushToRemoteAPI");
 const { gitStageItem } = require("../git/gitStageItem");
+const { gitAddRemoteApi } = require("../git/gitAddRemoteApi");
 const {
   fetchDatabaseFile,
   fetchRepoDetails,
@@ -251,4 +252,12 @@ module.exports.addBranch = addBranch = async (repoId, branchName) => {
 
 module.exports.updateDbFileApi = updateDbFileApi = async (fileName) => {
   return await updateDbFile(fileName);
+};
+
+module.exports.gitAddRemoteRepoApi = gitAddRemoteRepoApi = async (
+  repoId,
+  remoteName,
+  remoteUrl
+) => {
+  return await gitAddRemoteApi(repoId, remoteName, remoteUrl);
 };
