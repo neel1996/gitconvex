@@ -1,9 +1,9 @@
 
 # Gitconvex
-<div align="center">
-<div><img src="https://user-images.githubusercontent.com/47709856/86916853-d7749c00-c141-11ea-8d3a-be3e59c77ccf.png" width="350"></div>
-<strong>Web application for managing your git repositories </strong>
-</div>
+
+![gitconvex_logo](https://user-images.githubusercontent.com/47709856/87170859-8bfff080-c2ef-11ea-9140-b9e5db1c17d8.png)
+
+## Web application for managing your git repositories
 
 # Download options
 
@@ -20,6 +20,26 @@
 - Downloading package from **npm**
 
 `npm i -g @itassistors/gitconvex`
+
+This will install **gitconvex** as a global module and it can be started straight away from the command line with `gitconvex` command
+
+```
+$ gitconvex
+
+INFO: Checking for config file
+INFO: Config file is present
+INFO: Reading from config file /usr/lib/node_modules/@itassistors/gitconvex/env_config.json
+GitConvex API connected!
+
+Checking data file availability...
+INFO: Data file /usr/lib/node_modules/@itassistors/gitconvex/database/repo-datastore.json is present and it will be used as the active data file!
+
+You can change this under the settings menu
+
+Gitconvex is running on port 9001
+
+    Open http://localhost:9001/ to access gitconvex
+```
 
 - If you are into **docker**, then there is also a docker image available for gitconvex 
 
@@ -55,3 +75,4 @@ Refer the detailed [Documentation](DOCUMENTATION) for how to setup and use the p
 # License
 
 See [LICENSE ](LICENSE) info for more
+

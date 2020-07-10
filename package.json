@@ -7,7 +7,7 @@
   },
   "main": "server.js",
   "bin": {
-    "gitconvex": "server.js"
+      "gitconvex":"server.js"
   },
   "scripts": {
     "start": "node server.js",
