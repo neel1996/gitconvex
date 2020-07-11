@@ -103,8 +103,8 @@ const globalAPISchema = new buildSchema(
             removeStagedItem(repoId: String!, item: String!): String!
             removeAllStagedItem(repoId: String!): String!
             addBranch(repoId: String!, branchName: String!): String!
-            fetchFromRemote(repoId: String!): gitFetchStatus!
-            pullFromRemote(repoId: String!): gitPullStatus!
+            fetchFromRemote(repoId: String!, remoteUrl: String!, remoteBranch: String!): gitFetchStatus!
+            pullFromRemote(repoId: String!, remoteUrl: String!, remoteBranch: String!): gitPullStatus!
             updateRepoDataFile(newDbFile: String!): String!
             deleteRepo(repoId: String!): deleteRepoStatus!
             addRemoteRepo(repoId: String!, remoteName: String!, remoteUrl: String!): String!

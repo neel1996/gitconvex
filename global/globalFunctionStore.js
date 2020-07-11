@@ -229,12 +229,20 @@ module.exports.gitRemoveAllStagedItems = gitRemoveAllStagedItems = async (
   return await gitRemoveAllStagedItemApi(repoId);
 };
 
-module.exports.gitFetchFromRemote = gitFetchFromRemote = async (repoId) => {
-  return await gitFetchApi(repoId);
+module.exports.gitFetchFromRemote = gitFetchFromRemote = async (
+  repoId,
+  remoteUrl,
+  remoteBranch
+) => {
+  return await gitFetchApi(repoId, remoteUrl, remoteBranch);
 };
 
-module.exports.gitPullFromRemote = gitPullFromRemote = async (repoId) => {
-  return await gitPullApi(repoId);
+module.exports.gitPullFromRemote = gitPullFromRemote = async (
+  repoId,
+  remoteUrl,
+  remoteBranch
+) => {
+  return await gitPullApi(repoId, remoteUrl, remoteBranch);
 };
 
 module.exports.deleteRepo = deleteRepo = async (

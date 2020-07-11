@@ -4,8 +4,47 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
-const gitFetchApi = async (repoId) => {
-  return await execPromisified(`git fetch`, {
+const getRemoteName = async (repoId, remoteUrl) => {
+  return await execPromisified(`git remote -v`, {
+    cwd: fetchRepopath.getRepoPath(repoId),
+    windowsHide: true,
+  })
+    .then(({ stdout, stderr }) => {
+      if (stdout && !stderr) {
+        console.log(stdout);
+        const localName = stdout.trim().split("\n");
+        return localName
+          .filter((item) => {
+            if (item.includes(remoteUrl) && item.includes("fetch")) {
+              return true;
+            }
+          })
+          .join()
+          .split(/\s/gi)[0];
+      } else {
+        console.log(stderr);
+        return "";
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      return "";
+    });
+};
+
+const gitFetchApi = async (repoId, remoteUrl, remoteBranch) => {
+  const remoteName = await getRemoteName(repoId, remoteUrl);
+  console.log("Selected remote name : ", remoteName);
+
+  if (!remoteName) {
+    console.log("NO REMOTE MATCHING THE URL");
+
+    return {
+      status: "FETCH_ERROR",
+    };
+  }
+
+  return await execPromisified(`git fetch ${remoteName} ${remoteBranch}`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
   })
@@ -41,14 +80,25 @@ const gitFetchApi = async (repoId) => {
     });
 };
 
-const gitPullApi = async (repoId) => {
-  return await execPromisified(`git pull`, {
+const gitPullApi = async (repoId, remoteUrl, remoteBranch) => {
+  const remoteName = await getRemoteName(repoId, remoteUrl);
+  console.log("Selected remote name : ", remoteName);
+
+  if (!remoteName) {
+    console.log("NO REMOTE MATCHING THE URL");
+
+    return {
+      status: "PULL_ERROR",
+    };
+  }
+
+  return await execPromisified(`git pull ${remoteName} ${remoteBranch}`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
   })
     .then(async ({ stdout, stderr }) => {
-      if (stdout && !stderr) {
-        const pullResponse = stdout.trim().split("\n");
+      if (stdout || stderr) {
+        const pullResponse = stderr.trim().split("\n");
 
         if (pullResponse && pullResponse.length > 0) {
           return {
@@ -57,19 +107,19 @@ const gitPullApi = async (repoId) => {
           };
         } else {
           return {
-            status: "PULL_EMPTY",
+            status: "PULL_ABSENT",
           };
         }
       } else {
         return {
-          status: "PULL_FAILED",
+          status: "PULL_ERROR",
         };
       }
     })
     .catch((err) => {
       console.log(err);
       return {
-        status: "PULL_FAILED",
+        status: "PULL_ERROR",
       };
     });
 };

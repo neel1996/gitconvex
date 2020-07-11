@@ -9,30 +9,40 @@ const gitRemoveStagedItemApi = async (repoId, item) => {
   return await execPromisified(`git reset ${item}`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
-  }).then(({ stdout, stderr }) => {
-    if (stderr) {
-      console.log(stderr);
+  })
+    .then(({ stdout, stderr }) => {
+      if (stderr) {
+        console.log(stderr);
+        return "STAGE_REMOVE_FAILED";
+      } else {
+        console.log(stdout);
+        return "STAGE_REMOVE_SUCCESS";
+      }
+    })
+    .catch((err) => {
+      console.log(err);
       return "STAGE_REMOVE_FAILED";
-    } else {
-      console.log(stdout);
-      return "STAGE_REMOVE_SUCCESS";
-    }
-  });
+    });
 };
 
 const gitRemoveAllStagedItemApi = async (repoId) => {
   return await execPromisified(`git reset`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
-  }).then(({ stdout, stderr }) => {
-    if (stderr) {
-      console.log(stderr);
+  })
+    .then(({ stdout, stderr }) => {
+      if (stderr) {
+        console.log(stderr);
+        return "STAGE_ALL_REMOVE_FAILED";
+      } else {
+        console.log(stdout);
+        return "STAGE_ALL_REMOVE_SUCCESS";
+      }
+    })
+    .catch((err) => {
+      console.log(err);
       return "STAGE_ALL_REMOVE_FAILED";
-    } else {
-      console.log(stdout);
-      return "STAGE_ALL_REMOVE_SUCCESS";
-    }
-  });
+    });
 };
 
 module.exports.gitRemoveStagedItemApi = gitRemoveStagedItemApi;

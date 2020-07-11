@@ -127,12 +127,12 @@ app.use(
         return await gitRemoveAllStagedItems(repoId);
       },
       fetchFromRemote: async (args) => {
-        const { repoId } = args;
-        return await gitFetchFromRemote(repoId);
+        const { repoId, remoteUrl, remoteBranch } = args;
+        return await gitFetchFromRemote(repoId, remoteUrl, remoteBranch);
       },
       pullFromRemote: async (args) => {
-        const { repoId } = args;
-        return await gitPullFromRemote(repoId);
+        const { repoId, remoteUrl, remoteBranch } = args;
+        return await gitPullFromRemote(repoId, remoteUrl, remoteBranch);
       },
       deleteRepo: async (args) => {
         const { repoId } = args;
