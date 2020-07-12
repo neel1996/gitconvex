@@ -1,24 +1,28 @@
 ## Languages
-js : JavaScript <br>
-java : Java<br>
-py : Python<br>
-c : C<br>
-cpp : C++<br>
-go : Go<br>
-rust : Rust<br>
-ts : TypeScript<br>
-dart : Dart<br>
-php : PHP<br>
-html : Markup<br>
-json : JSON<br>
-xml : Markup<br>
-yaml : YAML<br>
-yml : YML<br>
-rb : Ruby<br>
-jsx : JSX<br>
-kt : Kotlin<br>
-ktm : Kotlin<br>
-kts : Kotlin<br>
-cs : C#<br>
-vb : Visual Basics<br>
-css : CSS<br>
+
+|Extensions|Languages|
+|-|-|
+|**js**|JavaScript|
+|**java**|Java|
+|**py**|Python|
+|**c**|C|
+|**cp**|C++|
+|**go**|Go|
+|**rust**|Rust|
+|**ts**|TypeScript|
+|**dart**|Dart|
+|**php**|PHP|
+|**html**|Markup|
+|**json**|JSON|
+|**xml**|Markup|
+|**yaml**|YAML|
+|**yml**|YML|
+|**rb**|Ruby|
+|**jsx**|JSX|
+|**kt**|Kotlin|
+|**ktm**|Kotlin|
+|**kts**|Kotlin|
+|**cs**|C#|
+|**vb**|Visual Basics|
+|**css**|CSS|
+
