@@ -70,7 +70,7 @@ Gitconvex is running on port 9001
 
 # Detailed documentation
 
-Refer the detailed [Documentation](DOCUMENTATIONi.md) for how to setup and use the platform
+Refer the detailed [Documentation](DOCUMENTATION.md) for how to setup and use the platform
 
 # License
 
