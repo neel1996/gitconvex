@@ -9,9 +9,9 @@
 
 > Use any of the below options to get gitconvex for your system
 
-[![gitconvex npm package](https://badgen.net/badge/gitconvex/v1.1.0/green?icon=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
-[![github release](https://badgen.net/badge/gitconvex/v1.1.0/blue?icon=github)](https://github.com/neel1996/gitconvex-package/releases)
-[![docker image](https://badgen.net/badge/gitconvex/v1.1.0/cyan?icon=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
+[![gitconvex npm package](https://badgen.net/badge/gitconvex/v1.0.1/green?icon=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
+[![github release](https://badgen.net/badge/gitconvex/v1.0.1/blue?icon=github)](https://github.com/neel1996/gitconvex-package/releases)
+[![docker image](https://badgen.net/badge/gitconvex/v1.0.1/cyan?icon=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
 
 - Cloning repo from **github**
 
