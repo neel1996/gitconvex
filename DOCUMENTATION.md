@@ -1,5 +1,5 @@
 # Introduction
-GitConvex is a web app for managing your git repositories. It is supported by Linux, Mac OS and Windows. The [latest version] (https://github.com/neel1996/gitconvex-package/releases) of GitConvex supports git features such as initializing and tracking a git repo, staging and unstaging changes, committing changes, pushing changes to the selected remote and so on.
+GitConvex is a web app for managing your git repositories. It is supported by Linux, Mac OS and Windows. The [latest version](https://github.com/neel1996/gitconvex-package/releases) of GitConvex supports git features such as initializing and tracking a git repo, staging and unstaging changes, committing changes, pushing changes to the selected remote and so on.
 The main goal of this platform is to act as a web-based alternative for Github desktop, but we are still in the starting stages, so we are not completely there yet (baby steps, right?)
 ## Table of Contents
 [Requirements](#requirements)<br>
@@ -54,7 +54,7 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 - Tracking modified files
 - Creating new branches (provided there are no diverging changes)
 - Initializing git inside a new repo and adding it to the platform tracker on the go
-- File difference tracker with syntax highlighting for the [supported languages] (LANGUAGES.md).
+- File difference tracker with syntax highlighting for the [supported languages](LANGUAGES.md).
 - Commit log viewer
 - Basic git operations such as staging, un-staging, committing and pushing to remote repo.
 
