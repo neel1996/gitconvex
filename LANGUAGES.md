@@ -13,7 +13,7 @@ html : Markup<br>
 json : JSON<br>
 xml : Markup<br>
 yaml : YAML<br>
-yml : YML<br><br>
+yml : YML<br>
 rb : Ruby<br>
 jsx : JSX<br>
 kt : Kotlin<br>
