@@ -44,7 +44,7 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 - Tracking modified files
 - Creating new branches (provided there are no diverging changes)
 - Initializing git inside a new repo and adding it to the platform tracker on the go
-- File difference tracker with syntax highlighting for the [supported languages](language).
+- File difference tracker with syntax highlighting for the [supported languages](LANGUAGES.md).
 - Commit log viewer
 - Basic git operations such as staging, un-staging, committing and pushing to remote repo.
 
