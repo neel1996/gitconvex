@@ -224,7 +224,7 @@ const getGitStatus = async (repoPath) => {
     isGitLogAvailable &&
     (await Promise.all(
       gitTrackedFileDetails.map(async (gitFile) => {
-        return await execPromised(`git log -1 --oneline ${gitFile}`, {
+        return await execPromised(`git log -1 --oneline "${gitFile}"`, {
           cwd: repoPath,
           windowsHide: true,
         })

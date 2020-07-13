@@ -6,7 +6,7 @@ const execPromisified = util.promisify(exec);
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const gitRemoveStagedItemApi = async (repoId, item) => {
-  return await execPromisified(`git reset ${item}`, {
+  return await execPromisified(`git reset "${item}"`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
   })
