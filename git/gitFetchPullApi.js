@@ -44,14 +44,22 @@ const gitFetchApi = async (repoId, remoteUrl, remoteBranch) => {
     };
   }
 
-  return await execPromisified(`git fetch ${remoteName} ${remoteBranch}`, {
+  return await execPromisified(`git fetch ${remoteName} ${remoteBranch} -v`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
   })
     .then(({ stdout, stderr }) => {
       if (stdout || stderr) {
         // Git fetch alone returns the result in the standard error stream
-        const fetchResponse = stderr.trim().split("\n");
+        let responseValue = "";
+        if (stdout) {
+          responseValue += stdout;
+        }
+        if (stderr) {
+          responseValue += stderr;
+        }
+
+        const fetchResponse = responseValue.trim().split("\n");
 
         console.log("Fetch Response :" + fetchResponse);
         if (fetchResponse) {
@@ -92,13 +100,20 @@ const gitPullApi = async (repoId, remoteUrl, remoteBranch) => {
     };
   }
 
-  return await execPromisified(`git pull ${remoteName} ${remoteBranch}`, {
+  return await execPromisified(`git pull ${remoteName} ${remoteBranch} -v`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
   })
     .then(async ({ stdout, stderr }) => {
       if (stdout || stderr) {
-        const pullResponse = stderr.trim().split("\n");
+        let responseValue = "";
+        if (stdout) {
+          responseValue += stdout;
+        }
+        if (stderr) {
+          responseValue += stderr;
+        }
+        const pullResponse = responseValue.trim().split("\n");
 
         if (pullResponse && pullResponse.length > 0) {
           return {
