@@ -30,7 +30,7 @@ async function getGitFileDifference(repoId, fileName) {
     windowsHide: true,
   })
     .then(({ stdout, stderr }) => {
-      if (stdout && !stderr) {
+      if (stdout) {
         return stdout.trim().split("\n");
       } else {
         console.log(stderr);
@@ -50,7 +50,7 @@ async function getGitFileDifference(repoId, fileName) {
     }
   )
     .then(({ stdout, stderr }) => {
-      if (stdout && !stderr) {
+      if (stdout) {
         return stdout.trim().split("\n");
       } else {
         console.log(stderr);
