@@ -13,6 +13,7 @@ const { gitCommitChangesApi } = require("../git/gitCommitChangesAPI");
 const { gitPushToRemoteApi } = require("../git/gitPushToRemoteAPI");
 const { gitStageItem } = require("../git/gitStageItem");
 const { gitAddRemoteApi } = require("../git/gitAddRemoteApi");
+const { gitDeleteBranchApi } = require("../git/gitBranchDeleteApi");
 const {
   fetchDatabaseFile,
   fetchRepoDetails,
@@ -245,12 +246,15 @@ module.exports.gitPullFromRemote = gitPullFromRemote = async (
   return await gitPullApi(repoId, remoteUrl, remoteBranch);
 };
 
-module.exports.deleteRepo = deleteRepo = async (
+module.exports.gitDeleteBranchApi = gitDeleteBranchFunction = async (
   repoId,
-  name,
-  pathName,
-  time
+  branchName,
+  forceFlag
 ) => {
+  return gitDeleteBranchApi(repoId, branchName, forceFlag);
+};
+
+module.exports.deleteRepo = deleteRepo = async (repoId) => {
   return await deleteRepoApi(repoId);
 };
 

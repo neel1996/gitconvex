@@ -17,6 +17,7 @@ const getGitStatus = async (repoPath) => {
   let gitLatestCommit = "";
   let gitTrackedFiles = "";
   let gitTotalTrackedFiles = 0;
+  let gitAllBranchList = [];
 
   const gitRemoteReference = [
     "github",
@@ -97,6 +98,31 @@ const getGitStatus = async (repoPath) => {
     gitRemoteHost = "No Remote Host Set";
   }
 
+  //Module to get all branch list
+  gitAllBranchList =
+    isGitLogAvailable &&
+    (await execPromised(`git branch --all`, {
+      cwd: repoPath,
+      windowsHide: true,
+    })
+      .then((res) => {
+        const { stdout, stderr } = res;
+        if (stdout && !stderr) {
+          let localBranchList = stdout.trim().split("\n");
+          localBranchList = localBranchList.map((branch) => {
+            return branch;
+          });
+          return localBranchList;
+        } else {
+          console.log(stderr);
+          return [];
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        return [];
+      }));
+
   // Module to get all available branches
   gitBranchList =
     isGitLogAvailable &&
@@ -163,7 +189,7 @@ const getGitStatus = async (repoPath) => {
   //Module to get latest git commit
 
   isGitLogAvailable &&
-    (await execPromised(`git log -1 --oneline`, {
+    (await execPromised(`git log -1 --oneline --pretty=format:"%s"`, {
       cwd: repoPath,
       windowsHide: true,
     }).then((res) => {
@@ -282,6 +308,7 @@ const getGitStatus = async (repoPath) => {
     gitTrackedFiles,
     gitFileBasedCommit,
     gitTotalTrackedFiles,
+    gitAllBranchList,
   };
 
   console.log(gitRepoDetails);

@@ -49,6 +49,7 @@ const {
   settingsGetPortDetails,
   settingsUpdatePortDetail,
   gitAddRemoteRepoApi,
+  gitDeleteBranchApi,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -153,6 +154,10 @@ app.use(
       addRemoteRepo: async (args) => {
         const { repoId, remoteName, remoteUrl } = args;
         return gitAddRemoteRepoApi(repoId, remoteName, remoteUrl);
+      },
+      deleteBranch: (args) => {
+        const { repoId, branchName, forceFlag } = args;
+        return gitDeleteBranchApi(repoId, branchName, forceFlag);
       },
     },
   })
