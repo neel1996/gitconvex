@@ -5,7 +5,7 @@ const execPromisified = util.promisify(exec);
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const gitStageItem = async (repoId, item) => {
-  return await execPromisified(`git add ${item}`, {
+  return await execPromisified(`git add "${item}"`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
   }).then(({ stdout, stderr }) => {
