@@ -89,13 +89,23 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 The repo detail view also provides features for performing the following git operations,
 ```
 - Adding a new branch
+- List all branches including remote branches
+- Switching branches
 - Pulling changes from remote
+- Branch deletion 
 - Fetching changes from remote
 - Adding a new remote repo
 ```
-![repo-card-details](https://user-images.githubusercontent.com/65342122/87232642-1f175400-c3de-11ea-8ead-80cd5ab4c37c.png)
+![Repo view detail](https://user-images.githubusercontent.com/65342122/87664834-8ee16200-c783-11ea-885e-6a1e29626a47.png)
 
+- "List all branches" under available branches, lists all the branches from the local and remote. Click on a branch to checkout to that branch. 
+- Can delete local branches and if the branches are not in the remote, it cannot be restored.( please be cautious! )  
+
+![list-branch](https://user-images.githubusercontent.com/65342122/87667169-812ddb80-c787-11ea-9ff8-98ef2a2f918c.png)
+
+- Show commit logs displays commit history with the timestamp. 
 ![commit-logs](https://user-images.githubusercontent.com/65342122/87232671-71587500-c3de-11ea-8ff5-25fb95b08553.png)
+
 
 #### Add new branch
 ![new-branch](https://user-images.githubusercontent.com/65342122/87232643-23437180-c3de-11ea-9d9e-7e3c3789c32e.png)
