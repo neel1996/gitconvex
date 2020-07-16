@@ -32,7 +32,7 @@ const getRemoteName = async (repoId, remoteUrl) => {
     });
 };
 
-const gitFetchApi = async (repoId, remoteUrl, remoteBranch) => {
+const gitFetchApi = async (repoId, remoteUrl = "", remoteBranch = "") => {
   const remoteName = await getRemoteName(repoId, remoteUrl);
   console.log("Selected remote name : ", remoteName);
 
