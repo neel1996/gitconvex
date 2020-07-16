@@ -232,8 +232,8 @@ module.exports.gitRemoveAllStagedItems = gitRemoveAllStagedItems = async (
 
 module.exports.gitFetchFromRemote = gitFetchFromRemote = async (
   repoId,
-  remoteUrl,
-  remoteBranch
+  remoteUrl = "",
+  remoteBranch = ""
 ) => {
   return await gitFetchApi(repoId, remoteUrl, remoteBranch);
 };
