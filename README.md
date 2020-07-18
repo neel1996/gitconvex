@@ -13,11 +13,11 @@
 [![github release](https://badgen.net/badge/gitconvex/v1.1.1/blue?icon=github)](https://github.com/neel1996/gitconvex-package/releases)
 [![docker image](https://badgen.net/badge/gitconvex/v1.1.1/cyan?icon=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
 
-- Cloning repo from **github**
+- **Option - 1** Cloning repo from **github**
 
 `git clone https://github.com/neel1996/gitconvex-package.git`
 
-- Downloading package from **npm**
+- **Option - 2**  Downloading package from **npm**
 
 `npm i -g @itassistors/gitconvex`
 
@@ -41,11 +41,11 @@ Gitconvex is running on port 9001
     Open http://localhost:9001/ to access gitconvex
 ```
 
-- If you are into **docker**, then there is also a docker image available for gitconvex 
+- **Option - 3** If you are into **docker**, then there is also a docker image available for gitconvex 
 
 `docker pull itassistors/gitconvex`
 
-- Downloading the zip file from the tagged github [**release**](https://github.com/neel1996/gitconvex-package/releases)
+- **Option - 4** Downloading the zip file from the tagged github [**release**](https://github.com/neel1996/gitconvex-package/releases)
 
 
 # Platforms
