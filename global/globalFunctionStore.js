@@ -5,6 +5,7 @@ const { getGitRepoStatus } = require("../git/gitRepoAPI");
 const { gitTrackedDiff } = require("../git/gitTrackedDiff");
 const { gitFileDifferenceHandler } = require("../git/gitFileDifferenceAPI");
 const { gitCommitLogHandler } = require("../git/gitCommitLogsAPI");
+const { gitCommitFileApi } = require("../git/gitCommitFilesApi");
 const { getStagedFiles } = require("../git/gitGetStagedFilesAPI");
 const { gitGetUnpushedCommits } = require("../git/gitGetUnpushedCommits");
 const { gitSetBranchApi } = require("../git/gitSetBranch.js");
@@ -91,6 +92,16 @@ module.exports.gitCommitLogsFunction = gitCommitLogsFunction = async (
       },
     };
   }
+};
+
+module.exports.gitCommitFileFunction = gitCommitFileFunction = async (
+  parsedPayload
+) => {
+  const { repoId, commitHash } = JSON.parse(parsedPayload);
+  console.log(await gitCommitFileApi(repoId, commitHash));
+  return {
+    gitCommitFiles: [...(await gitCommitFileApi(repoId, commitHash))],
+  };
 };
 
 module.exports.repoDetailsFunction = repoDetailsFunction = async (

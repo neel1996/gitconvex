@@ -11,6 +11,7 @@ const {
   REPO_TRACKED_DIFF,
   REPO_FILE_DIFF,
   COMMIT_LOGS,
+  COMMIT_FILES,
   GIT_STAGED_FILES,
   GIT_UNPUSHED_COMMITS,
   SETTINGS_DBPATH,
@@ -30,6 +31,7 @@ const {
   healthCheckFunction,
   repoDetailsFunction,
   gitCommitLogsFunction,
+  gitCommitFileFunction,
   gitGetStagedFiles,
   gitUnpushedCommits,
   gitSetBranch,
@@ -84,6 +86,8 @@ app.use(
             return gitFileDiffFunction(parsedPayload);
           case COMMIT_LOGS:
             return gitCommitLogsFunction(parsedPayload);
+          case COMMIT_FILES:
+            return gitCommitFileFunction(parsedPayload);
           case GIT_STAGED_FILES:
             return gitGetStagedFiles(parsedPayload);
           case GIT_UNPUSHED_COMMITS:

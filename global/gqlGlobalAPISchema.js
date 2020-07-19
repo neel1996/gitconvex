@@ -14,6 +14,7 @@ const globalAPISchema = new buildSchema(
             gitChanges: gitChangeResults!
             gitFileLineChanges: gitFileLineChangeResults!
             gitCommitLogs: gitCommitLogResults!
+            gitCommitFiles: [commitFileType]!
             gitStagedFiles: gitStagedFileResults!
             gitUnpushedCommits: gitUnpushedCommitResults!
             settingsDatabasePath: String!
@@ -43,6 +44,13 @@ const globalAPISchema = new buildSchema(
             author: String,
             commitTime: String,
             commitMessage: String,
+            commitRelativeTime: String
+            commitFilesCount: Int
+        }
+
+        type commitFileType{
+            type: String!
+            fileName: String!
         }
 
         type gitUnpushedCommitResults{
