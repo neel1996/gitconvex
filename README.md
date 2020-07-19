@@ -5,6 +5,10 @@
 
 ## Web application for managing your git repositories
 
+![open issues](https://badgen.net/github/open-issues/neel1996/gitconvex-package)
+![Gitconvex UI pipeline](https://github.com/neel1996/gitconvex/workflows/Gitconvex%20UI%20pipeline/badge.svg)
+![Gitconvex Server pipeline](https://github.com/neel1996/gitconvex-server/workflows/Gitconvex%20Server%20pipeline/badge.svg)
+
 # Download options
 
 > Use any of the below options to get gitconvex for your system
@@ -61,12 +65,6 @@ Gitconvex is running on port 9001
 | <b>[Node js](https://nodejs.org/en/)</b> | <b>Tested on v12.0+ |
 |--|--|
 | <b>[Git](https://git-scm.com/)</b> | <b>Tested on v2.20+</b> |
-
-## Build status
-
-| <b>React UI build status</b>  | ![Gitconvex UI pipeline](https://github.com/neel1996/gitconvex/workflows/Gitconvex%20UI%20pipeline/badge.svg) |
-|--|--|
-| <b>Node Server Build Status</b> | ![Gitconvex Server pipeline](https://github.com/neel1996/gitconvex-server/workflows/Gitconvex%20Server%20pipeline/badge.svg) |
 
 # Detailed documentation
 
