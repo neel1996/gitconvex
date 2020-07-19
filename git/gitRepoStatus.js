@@ -52,7 +52,7 @@ const getGitStatus = async (repoPath) => {
         const multiPromise = Promise.all(
           localRemote &&
             localRemote.map(async (remote) => {
-              console.log("LOOP ::", remote);
+              console.log("Remote ::", remote);
               return await execPromised(`git remote get-url ${remote}`, {
                 cwd: repoPath,
                 windowsHide: true,
@@ -225,7 +225,7 @@ const getGitStatus = async (repoPath) => {
                   }
                 })
                 .catch((err) => {
-                  console.log("Tracked file has been removed!");
+                  console.log("Tracked file has been removed!", err);
                   return `${item}: DEL`;
                 });
             })
@@ -261,7 +261,7 @@ const getGitStatus = async (repoPath) => {
             }
           })
           .catch((err) => {
-            console.log("Tracked file has been removed!");
+            console.log("Tracked file has been removed!", err);
             return "";
           });
       })

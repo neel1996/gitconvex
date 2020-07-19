@@ -19,21 +19,36 @@ async function getGitDiff(repoPath) {
   return await execPromosified(`git diff --raw`, {
     cwd: repoPath,
     windowsHide: true,
-  }).then((res) => {
-    const { stdout, stderr } = res;
-    var parsedEntry = stdout.trim().split("\n");
+  })
+    .then((res) => {
+      const { stdout, stderr } = res;
+      if (stdout) {
+        var parsedEntry = stdout.trim().split("\n");
 
-    var gitDifference = parsedEntry.map((entry) => {
-      if (entry.split(/\s+/)) {
-        let splitEntry = entry.split(/\s+/);
-        if (splitEntry[4] && splitEntry[5]) {
-          return "" + splitEntry[4] + "," + splitEntry[5];
-        }
+        var gitDifference = parsedEntry.map((entry) => {
+          if (entry.split(/\s+/)) {
+            let splitEntry = entry.split(/\s+/);
+            if (splitEntry[4] && splitEntry[5]) {
+              return (
+                "" +
+                splitEntry[4] +
+                "," +
+                splitEntry.slice(5, splitEntry.length).join(" ")
+              );
+            }
+          }
+        });
+
+        return gitDifference.filter((entry) => (entry ? entry : ""));
+      } else {
+        console.log(stderr);
+        return [];
       }
+    })
+    .catch((err) => {
+      console.log(err);
+      return [];
     });
-
-    return gitDifference.filter((entry) => (entry ? entry : ""));
-  });
 }
 
 async function getUntrackedFiles(repoPath) {
