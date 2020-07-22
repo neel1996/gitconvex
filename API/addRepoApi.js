@@ -18,33 +18,68 @@ function getEnvData() {
   };
 }
 
-async function addRepoHandler(repoName, repoPath, initCheck) {
+async function addRepoHandler(
+  repoName,
+  repoPath,
+  initCheck,
+  cloneCheck,
+  cloneUrl
+) {
   const timeStamp = new Date().toUTCString();
   const id = new Date().getTime();
 
-  var repoObject = {
-    id,
-    timeStamp,
-    repoName,
-    repoPath,
-  };
-
   function errorResponse() {
     return {
-      addRepo: {
-        message: "REPO_WRITE_FAILED",
-      },
+      message: "REPO_WRITE_FAILED",
     };
   }
 
   function successResponse() {
     return {
-      addRepo: {
-        message: "REPO_DATA_UPDATED",
-        repoId: id,
-      },
+      message: "REPO_DATA_UPDATED",
+      repoId: id,
     };
   }
+
+  if (cloneCheck) {
+    const cloneStatus = await execPromisified(`git clone "${cloneUrl}"`, {
+      cwd: repoPath,
+      windowsHide: true,
+    })
+      .then(({ stdout, stderr }) => {
+        console.log(stdout);
+        console.log(stderr);
+        if (stdout || stderr) {
+          console.log(stdout);
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        return false;
+      });
+
+    console.log("CLONE STAT : ", cloneStatus);
+
+    if (cloneStatus) {
+      if (repoPath.includes("\\")) {
+        repoPath = repoPath + "\\" + repoName;
+      } else {
+        repoPath = repoPath + "/" + repoName;
+      }
+    } else {
+      return errorResponse();
+    }
+  }
+
+  const repoObject = {
+    id,
+    timeStamp,
+    repoName,
+    repoPath,
+  };
 
   const dataStoreFile = getEnvData().DATABASE_FILE;
 

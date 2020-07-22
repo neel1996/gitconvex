@@ -60,13 +60,21 @@ module.exports.fetchRepoFunction = fetchRepoFunction = async (payload) => {
   };
 };
 
-module.exports.addRepoFunction = addRepoFunction = async (parsedPayload) => {
-  const { repoName, repoPath, initCheck } = JSON.parse(parsedPayload);
-
+module.exports.addRepoFunction = addRepoFunction = async (
+  repoName,
+  repoPath,
+  initCheck,
+  cloneCheck,
+  cloneUrl
+) => {
   if (repoName && repoPath) {
-    console.log(parsedPayload);
-
-    return await addRepoHandler(repoName, repoPath, initCheck);
+    return await addRepoHandler(
+      repoName,
+      repoPath,
+      initCheck,
+      cloneCheck,
+      cloneUrl
+    );
   } else {
     return {
       message: "REPO_WRITE_FAILURE",

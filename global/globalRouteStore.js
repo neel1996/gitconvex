@@ -1,6 +1,5 @@
 module.exports.HEALTH_CHECK = "HEALTH_CHECK";
 module.exports.FETCH_REPO = "FETCH_REPO";
-module.exports.ADD_REPO = "ADD_REPO";
 module.exports.COMMIT_LOGS = "COMMIT_LOGS";
 module.exports.COMMIT_FILES = "COMMIT_FILES";
 module.exports.REPO_DETAILS = "REPO_DETAILS";

@@ -6,7 +6,6 @@ app.use(cors());
 const {
   HEALTH_CHECK,
   FETCH_REPO,
-  ADD_REPO,
   REPO_DETAILS,
   REPO_TRACKED_DIFF,
   REPO_FILE_DIFF,
@@ -76,8 +75,6 @@ app.use(
             return healthCheckFunction();
           case FETCH_REPO:
             return fetchRepoFunction();
-          case ADD_REPO:
-            return addRepoFunction(parsedPayload);
           case REPO_DETAILS:
             return repoDetailsFunction(parsedPayload);
           case REPO_TRACKED_DIFF:
@@ -101,6 +98,16 @@ app.use(
           default:
             return { message: "Query Termination" };
         }
+      },
+      addRepo: async (args) => {
+        const { repoName, repoPath, initSwitch, cloneSwitch, cloneUrl } = args;
+        return await addRepoFunction(
+          repoName,
+          repoPath,
+          initSwitch,
+          cloneSwitch,
+          cloneUrl
+        );
       },
       setBranch: async (args) => {
         const { repoId, branch } = args;
