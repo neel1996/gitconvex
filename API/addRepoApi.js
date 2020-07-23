@@ -43,7 +43,7 @@ async function addRepoHandler(
 
   if (cloneCheck) {
     const cloneStatus = await execPromisified(
-      `git clone "${cloneUrl}" "${repoName}"`,
+      `git clone "${cloneUrl}" "./${repoName}"`,
       {
         cwd: repoPath,
         windowsHide: true,
