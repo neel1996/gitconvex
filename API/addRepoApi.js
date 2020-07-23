@@ -42,10 +42,13 @@ async function addRepoHandler(
   }
 
   if (cloneCheck) {
-    const cloneStatus = await execPromisified(`git clone "${cloneUrl}"`, {
-      cwd: repoPath,
-      windowsHide: true,
-    })
+    const cloneStatus = await execPromisified(
+      `git clone "${cloneUrl}" "${repoName}"`,
+      {
+        cwd: repoPath,
+        windowsHide: true,
+      }
+    )
       .then(({ stdout, stderr }) => {
         console.log(stdout);
         console.log(stderr);
