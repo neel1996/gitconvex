@@ -34,6 +34,7 @@ const getGitStatus = async (repoPath) => {
       return isGitLogAvailable;
     })
     .catch((err) => {
+      console.log(err);
       isGitLogAvailable = false;
       return isGitLogAvailable;
     });
@@ -190,11 +191,19 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git log -1 --oneline --pretty=format:"%s"`, {
       cwd: repoPath,
       windowsHide: true,
-    }).then((res) => {
-      if (res && !res.stderr) {
-        gitLatestCommit = res.stdout.trim();
-      }
-    }));
+    })
+      .then((res) => {
+        if (res && !res.stderr) {
+          gitLatestCommit = res.stdout.trim();
+        } else {
+          console.log(stderr);
+          gitLatestCommit = "No Commits in the Current Branch";
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        gitLatestCommit = "No Commits in the Current Branch";
+      }));
 
   //Module to get all git tracked files
   var gitTrackedFileDetails = [];

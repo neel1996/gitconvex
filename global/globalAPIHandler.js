@@ -6,11 +6,11 @@ app.use(cors());
 const {
   HEALTH_CHECK,
   FETCH_REPO,
-  ADD_REPO,
   REPO_DETAILS,
   REPO_TRACKED_DIFF,
   REPO_FILE_DIFF,
   COMMIT_LOGS,
+  COMMIT_FILES,
   GIT_STAGED_FILES,
   GIT_UNPUSHED_COMMITS,
   SETTINGS_DBPATH,
@@ -30,6 +30,7 @@ const {
   healthCheckFunction,
   repoDetailsFunction,
   gitCommitLogsFunction,
+  gitCommitFileFunction,
   gitGetStagedFiles,
   gitUnpushedCommits,
   gitSetBranch,
@@ -74,8 +75,6 @@ app.use(
             return healthCheckFunction();
           case FETCH_REPO:
             return fetchRepoFunction();
-          case ADD_REPO:
-            return addRepoFunction(parsedPayload);
           case REPO_DETAILS:
             return repoDetailsFunction(parsedPayload);
           case REPO_TRACKED_DIFF:
@@ -84,6 +83,8 @@ app.use(
             return gitFileDiffFunction(parsedPayload);
           case COMMIT_LOGS:
             return gitCommitLogsFunction(parsedPayload);
+          case COMMIT_FILES:
+            return gitCommitFileFunction(parsedPayload);
           case GIT_STAGED_FILES:
             return gitGetStagedFiles(parsedPayload);
           case GIT_UNPUSHED_COMMITS:
@@ -97,6 +98,16 @@ app.use(
           default:
             return { message: "Query Termination" };
         }
+      },
+      addRepo: async (args) => {
+        const { repoName, repoPath, initSwitch, cloneSwitch, cloneUrl } = args;
+        return await addRepoFunction(
+          repoName,
+          repoPath,
+          initSwitch,
+          cloneSwitch,
+          cloneUrl
+        );
       },
       setBranch: async (args) => {
         const { repoId, branch } = args;

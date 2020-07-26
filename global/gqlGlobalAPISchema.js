@@ -9,11 +9,11 @@ const globalAPISchema = new buildSchema(
         type GitConvexResults{
             healthCheck: healthCheckResults!
             fetchRepo: fetchRepoResults!
-            addRepo: addRepoResults!
             gitRepoStatus: gitRepoStatusResults!
             gitChanges: gitChangeResults!
             gitFileLineChanges: gitFileLineChangeResults!
             gitCommitLogs: gitCommitLogResults!
+            gitCommitFiles: [commitFileType]!
             gitStagedFiles: gitStagedFileResults!
             gitUnpushedCommits: gitUnpushedCommitResults!
             settingsDatabasePath: String!
@@ -32,17 +32,19 @@ const globalAPISchema = new buildSchema(
             repoPath: [String]
             repoName: [String]
         }
-
-        type addRepoResults{
-            message: String
-            repoId: String
-        }
-
+        
         type gitCommits{
             hash: String,
             author: String,
             commitTime: String,
             commitMessage: String,
+            commitRelativeTime: String
+            commitFilesCount: Int
+        }
+
+        type commitFileType{
+            type: String!
+            fileName: String!
         }
 
         type gitUnpushedCommitResults{
@@ -93,6 +95,7 @@ const globalAPISchema = new buildSchema(
         }
 
         type GitConvexMutation{
+            addRepo(repoName: String!, repoPath: String!, initSwitch: Boolean!, cloneSwitch: Boolean!, cloneUrl: String): addRepoStatus!
             setBranch(repoId: String!, branch: String!): String!
             stageItem(repoId: String!, item: String!): String!
             stageAllItems(repoId: String): String!
@@ -110,6 +113,11 @@ const globalAPISchema = new buildSchema(
             deleteRepo(repoId: String!): deleteRepoStatus!
             addRemoteRepo(repoId: String!, remoteName: String!, remoteUrl: String!): String!
             deleteBranch(repoId: String!, branchName: String!, forceFlag: Boolean!): deleteBranchStatus!
+        }
+
+        type addRepoStatus{
+            message: String!,
+            repoId: String
         }
 
         type gitFetchStatus{
