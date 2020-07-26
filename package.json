@@ -1,7 +1,7 @@
 {
   "name": "@itassistors/gitconvex",
-  "version": "1.0.15",
-  "description": "Git web UI client",
+  "version": "1.1.2",
+  "description": "Git web UI client for MacOS, Linux and Windows for managing git repos on the go",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
