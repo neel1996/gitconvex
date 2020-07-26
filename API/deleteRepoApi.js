@@ -24,9 +24,8 @@ async function deleteRepoApi(repoId) {
       const fileContent = JSON.parse(data.toString());
 
       if (fileContent && fileContent.length > 0) {
-        let updatedData = fileContent.filter(({ id, repoName, repoPath }) => {
+        let updatedData = fileContent.filter(({ id }) => {
           if (id.toString() === repoId.toString()) {
-            console.log("REPO DELETED");
             return false;
           }
 
