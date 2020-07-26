@@ -16,6 +16,7 @@
 [![gitconvex npm package](https://badgen.net/badge/gitconvex/v1.1.2/green?icon=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
 [![github release](https://badgen.net/badge/gitconvex/v1.1.2/blue?icon=github)](https://github.com/neel1996/gitconvex-package/releases)
 [![docker image](https://badgen.net/badge/gitconvex/v1.1.2/cyan?icon=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
+
 [![License](https://badgen.net/github/license/neel1996/gitconvex-package)](LICENSE)
 
 - **Option - 1** Cloning repo from **github**
