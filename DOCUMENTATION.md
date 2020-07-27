@@ -68,7 +68,7 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 
 ### Adding a new repo
 - Use "+" at the bottom right corner to add a repo.
-![add-a-repo](https://user-images.githubusercontent.com/65342122/88524947-a2a88600-d017-11ea-9fc8-4eafb15bc8a9.png)
+![add-a-repo](https://user-images.githubusercontent.com/65342122/88536126-db9d2680-d028-11ea-890f-c5fc11cd7cf0.png)
 
 - Enter repo name and paste the repo path. If the folder is not a git repo then check the "*Check this if the folder is not a git repo*" checkbox to initialize git.
 ![repo-details](https://user-images.githubusercontent.com/65342122/88486721-70f2d900-cf9d-11ea-802d-00b0b2aaf638.png)
