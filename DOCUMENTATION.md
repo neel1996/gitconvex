@@ -68,10 +68,10 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 
 ### Adding a new repo
 - Use "+" at the bottom right corner to add a repo.
-![add-a-repo](https://user-images.githubusercontent.com/65342122/87232632-0eff7480-c3de-11ea-8a9f-f0a6cf9cd6ee.png)<!-- .element style="height:10%; width:10%" -->
+![add-a-repo](https://user-images.githubusercontent.com/65342122/88536126-db9d2680-d028-11ea-890f-c5fc11cd7cf0.png)
 
 - Enter repo name and paste the repo path. If the folder is not a git repo then check the "*Check this if the folder is not a git repo*" checkbox to initialize git.
-![repo-details](https://user-images.githubusercontent.com/65342122/87232637-16268280-c3de-11ea-9f9d-708c5a3eb668.png)
+![repo-details](https://user-images.githubusercontent.com/65342122/88486721-70f2d900-cf9d-11ea-802d-00b0b2aaf638.png)
 
 - The newly added repo will be displayed as a card in the dashboard
 ![repo-card](https://user-images.githubusercontent.com/65342122/87243016-d13b3400-c44f-11ea-88ec-c4d14cbfbf97.png)
@@ -89,22 +89,13 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 The repo detail view also provides features for performing the following git operations,
 ```
 - Adding a new branch
-- List all branches including remote branches
-- Switching branches
 - Pulling changes from remote
-- Branch deletion 
 - Fetching changes from remote
 - Adding a new remote repo
 ```
-![Repo view detail](https://user-images.githubusercontent.com/65342122/87664834-8ee16200-c783-11ea-885e-6a1e29626a47.png)
+![repo-card-details](https://user-images.githubusercontent.com/65342122/87232642-1f175400-c3de-11ea-8ead-80cd5ab4c37c.png)
 
-- "List all branches" under available branches, lists all the branches from the local and remote. Click on a branch to checkout to that branch. 
-- Can delete local branches and if the branches are not in the remote, it cannot be restored.( please be cautious! )  
-
-![list-branch](https://user-images.githubusercontent.com/65342122/87667169-812ddb80-c787-11ea-9ff8-98ef2a2f918c.png)
-
-- Show commit logs displays commit history with the timestamp. 
-![commit-logs](https://user-images.githubusercontent.com/65342122/87232671-71587500-c3de-11ea-8ff5-25fb95b08553.png)
+![commit-logs](https://user-images.githubusercontent.com/65342122/88486754-9a136980-cf9d-11ea-94ad-436834cacf07.png)
 
 
 #### Add new branch
@@ -124,7 +115,7 @@ Note: In a newly initialized git repo, the newly added branch will be considered
 ![git-operations](https://user-images.githubusercontent.com/65342122/87232645-30f8f700-c3de-11ea-8ddb-52f4d5ec7140.png)
 
 - The staged files can be removed individually or it can be removed all at once.
-![staged-files](https://user-images.githubusercontent.com/65342122/87232658-51c14c80-c3de-11ea-95e1-b9bbeeac82bb.png)
+![staged-files](https://user-images.githubusercontent.com/65342122/88487285-4f93ec00-cfa1-11ea-8824-a70b3ba75d45.png)
 
 - The staged changes can be committed using the **Commit changes** option. This will display a pop-up with all the staged files and it requires a commit message to successfully commit the changes. The commit messages can either be a single line message or a multi-line message 
 ![commit-changes](https://user-images.githubusercontent.com/65342122/87232659-56860080-c3de-11ea-9bc4-a19ad727b101.png)
@@ -133,7 +124,7 @@ Note: In a newly initialized git repo, the newly added branch will be considered
 ![push-operation-with-remote](https://user-images.githubusercontent.com/65342122/87232662-61409580-c3de-11ea-8ad7-61c3871f0a4d.png)
 
 This section will let you know if the selected remote is not valid or if the push operation fails
-![push-opeartion-without-remote](https://user-images.githubusercontent.com/65342122/87232666-6867a380-c3de-11ea-9903-5ea12200e994.png)
+![push-opeartion-without-remote](https://user-images.githubusercontent.com/65342122/88487148-3ccce780-cfa0-11ea-874f-a2844760483f.png)
 
 ### Git Difference
 
