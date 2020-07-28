@@ -21,7 +21,13 @@
 
 - **Option - 1** Cloning repo from **github**
 
-`git clone https://github.com/neel1996/gitconvex-package.git`
+```
+
+$ git clone https://github.com/neel1996/gitconvex-package.git
+$ cd gitconvex-package
+$ npm start
+
+```
 
 - **Option - 2**  Downloading package from **npm**
 
@@ -51,7 +57,16 @@ Gitconvex is running on port 9001
 
 `docker pull itassistors/gitconvex`
 
+**Note:** Make sure you mount the host volume to the container to access the git repos from the host system. If you have git repos stored within your containers, then this is not required
+
 - **Option - 4** Downloading the zip file from the tagged github [**release**](https://github.com/neel1996/gitconvex-package/releases)
+
+```
+## Extract the downloaded zip file and execute the commands
+
+$ cd gitconvex-package
+$ npm start
+```
 
 
 # Platforms
