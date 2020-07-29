@@ -21,6 +21,8 @@
 
 - **Option - 1** Cloning repo from **github**
 
+**To be Noted :** The `master` branch contains the latest stable build of the project. For a reliable experience, always clone the repo from the master branch.
+
 ```
 
 $ git clone https://github.com/neel1996/gitconvex-package.git
@@ -90,5 +92,3 @@ Refer the detailed [Documentation](DOCUMENTATION.md) for how to setup and use th
 # License
 
 See [LICENSE ](LICENSE) info for more
-
-
