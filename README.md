@@ -6,7 +6,7 @@
 ## Web application for managing your git repositories
 
 ![open issues](https://badgen.net/github/open-issues/neel1996/gitconvex-package)
-![Gitconvex React UI pipeline](https://github.com/neel1996/gitconvex-ui/workflows/Gitconvex%20React%20UI%20pipeline/badge.svg)
+![Gitconvex UI pipeline](https://github.com/neel1996/gitconvex/workflows/Gitconvex%20UI%20pipeline/badge.svg)
 ![Gitconvex Server pipeline](https://github.com/neel1996/gitconvex-server/workflows/Gitconvex%20Server%20pipeline/badge.svg)
 
 # Download options
@@ -16,6 +16,7 @@
 [![gitconvex npm package](https://badgen.net/badge/gitconvex/v1.1.2/green?icon=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
 [![github release](https://badgen.net/badge/gitconvex/v1.1.2/blue?icon=github)](https://github.com/neel1996/gitconvex-package/releases)
 [![docker image](https://badgen.net/badge/gitconvex/v1.1.2/cyan?icon=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
+
 [![License](https://badgen.net/github/license/neel1996/gitconvex-package)](LICENSE)
 
 - **Option - 1** Cloning repo from **github**
@@ -24,8 +25,8 @@
 
 ```
 
-$ git clone https://github.com/neel1996/gitconvex.git
-$ cd gitconvex
+$ git clone https://github.com/neel1996/gitconvex-package.git
+$ cd gitconvex-package
 $ npm start
 
 ```
@@ -60,12 +61,12 @@ Gitconvex is running on port 9001
 
 **Note:** Make sure you mount the host volume to the container to access the git repos from the host system. If you have git repos stored within your containers, then this is not required
 
-- **Option - 4** Downloading the zip file from the tagged github [**release**](https://github.com/neel1996/gitconvex/releases)
+- **Option - 4** Downloading the zip file from the tagged github [**release**](https://github.com/neel1996/gitconvex-package/releases)
 
 ```
 ## Extract the downloaded zip file and execute the commands
 
-$ cd gitconvex
+$ cd gitconvex-package
 $ npm start
 ```
 
