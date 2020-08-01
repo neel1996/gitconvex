@@ -57,12 +57,6 @@ const fetchRepoDetails = async () => {
     });
 };
 
-const deleteRepo = async (repoId) => {
-  return await fs.promises.readFile(getEnvData().DATABASE_FILE).then((res) => {
-    console.log(res);
-  });
-};
-
 const updateDbFile = async (newFileName) => {
   console.log("FILE NAME : ", newFileName);
 
@@ -132,6 +126,5 @@ const updatePortDetails = async (newPort) => {
 module.exports.updateDbFile = updateDbFile;
 module.exports.fetchDatabaseFile = fetchDatabaseFile;
 module.exports.fetchRepoDetails = fetchRepoDetails;
-module.exports.deleteRepo = deleteRepo;
 module.exports.updatePortDetails = updatePortDetails;
 module.exports.getPortDetails = getPortDetails;

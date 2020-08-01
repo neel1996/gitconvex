@@ -1,5 +1,4 @@
 const fs = require("fs");
-const dotnev = require("dotenv").config();
 const path = require("path");
 
 function getEnvData() {
