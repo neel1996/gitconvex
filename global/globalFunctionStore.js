@@ -86,17 +86,17 @@ module.exports.addRepoFunction = addRepoFunction = async (
 module.exports.gitCommitLogsFunction = gitCommitLogsFunction = async (
   parsedPayload
 ) => {
-  const { repoId } = JSON.parse(parsedPayload);
+  const { repoId, skipLimit } = JSON.parse(parsedPayload);
   if (repoId) {
-    console.log(await gitCommitLogHandler(repoId));
     return {
       gitCommitLogs: {
-        ...(await gitCommitLogHandler(repoId)),
+        ...(await gitCommitLogHandler(repoId, skipLimit)),
       },
     };
   } else {
     return {
       gitCommitLogs: {
+        totalCommits: 0,
         commits: [],
       },
     };

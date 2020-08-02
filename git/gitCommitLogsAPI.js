@@ -3,10 +3,49 @@ const { exec } = require("child_process");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 
-async function gitCommitLogHandler(repoId) {
+async function gitCommitLogHandler(repoId, skipLimit = 0) {
   const repoPath = fetchRepopath.getRepoPath(repoId);
+  let commitLogLimit = 0;
+
+  const totalCommits = await execPromisified(`git log --oneline`, {
+    cwd: repoPath,
+    windowsHide: true,
+  })
+    .then((res) => {
+      const { stdout, stderr } = res;
+      if (stderr) {
+        console.log(stderr);
+      }
+      if (res && !res.stderr) {
+        const gitLocalTotal = stdout.trim().split("\n").length;
+        return gitLocalTotal;
+      } else {
+        console.log(stderr);
+        return 0;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      return 0;
+    });
+
+  console.log("Total commits in the repo : ", totalCommits);
+
+  commitLogLimit = totalCommits < 10 ? totalCommits : 10;
+
+  if (!totalCommits) {
+    return {
+      hash: "",
+      author: "",
+      commitTime: "",
+      commitMessage: "",
+      commitRelativeTime: "",
+      commitFilesCount: 0,
+    };
+  }
+
   return await execPromisified(
-    `git log --pretty=format:"%h||%an||%ad||%s" --date=short`,
+    `git log -n ${commitLogLimit} --skip ${skipLimit} --pretty=format:"%h||%an||%ad||%s" --date=short`,
     {
       cwd: repoPath,
       windowsHide: true,
@@ -19,7 +58,7 @@ async function gitCommitLogHandler(repoId) {
         let commits = stdout.trim();
 
         let commitRelativeTime = await execPromisified(
-          `git log --pretty=format:"%ad" --date=relative`,
+          `git log -n ${commitLogLimit} --skip ${skipLimit} --pretty=format:"%ad" --date=relative`,
           { cwd: repoPath, windowsHide: true }
         )
           .then(({ stdout, stderr }) => {
@@ -47,28 +86,30 @@ async function gitCommitLogHandler(repoId) {
               if (stdout) {
                 return stdout.trim().split("\n").length;
               } else {
-                console.log("Error occurred!");
+                console.log(stderr);
                 return 0;
               }
             })
             .catch((err) => {
-              console.log("Error occurred!");
+              console.log(err);
               return 0;
             });
           commit += "||" + commitFilesCount;
           return commitModel(commit);
         });
         return {
+          totalCommits: totalCommits,
           commits: commitArray,
         };
       } else {
         return {
+          totalCommits: 0,
           commits: [],
         };
       }
     })
     .catch((err) => {
-      console.log("ERROR : Commit log collection Error!");
+      console.log("ERROR : Commit log collection Error!", err);
       return {
         hash: "",
         author: "",
@@ -92,12 +133,11 @@ function commitModel(commit) {
 
   let commitSplit = commit.split("||");
 
-  commitObject.hash = commitSplit[0];
-  commitObject.author = commitSplit[1];
-  commitObject.commitTime = commitSplit[2];
-  commitObject.commitMessage = commitSplit[3];
-  commitObject.commitRelativeTime = commitSplit[4];
-  commitObject.commitFilesCount = commitSplit[5];
+  const objKeys = Object.keys(commitObject);
+
+  for (let i = 0; i < objKeys.length; i++) {
+    commitObject[objKeys[i]] = commitSplit[i];
+  }
 
   return commitObject;
 }

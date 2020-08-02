@@ -53,6 +53,7 @@ const globalAPISchema = new buildSchema(
         }
 
         type gitCommitLogResults{
+            totalCommits: Int
             commits: [gitCommits]
         }
 
