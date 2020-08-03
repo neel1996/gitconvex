@@ -251,7 +251,7 @@ const getGitStatus = async (repoPath) => {
 
   //Module to fetch commit for each file and folder
 
-  var gitFileBasedCommit = [];
+  var gitFileBasedCommit = ["NO_COMMITS"];
 
   gitFileBasedCommit =
     isGitLogAvailable &&
