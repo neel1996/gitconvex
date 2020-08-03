@@ -266,12 +266,12 @@ const getGitStatus = async (repoPath) => {
               return stdout.trim();
             } else {
               console.log(stderr);
-              return "";
+              return ["NO_COMMITS"];
             }
           })
           .catch((err) => {
             console.log("Tracked file has been removed!", err);
-            return "";
+            return ["NO_COMMITS"];
           });
       })
     ));
