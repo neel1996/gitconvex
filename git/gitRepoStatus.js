@@ -17,7 +17,7 @@ const getGitStatus = async (repoPath) => {
   };
 
   let gitRemoteData = "";
-  let gitBranchList = [];
+  let gitBranchList = ["NO_BRANCHES"];
   let gitCurrentBranch = errorStatus.noActiveBranch;
   let gitRemoteHost = "";
   let gitRepoName = "";
@@ -25,7 +25,8 @@ const getGitStatus = async (repoPath) => {
   let gitLatestCommit = "";
   let gitTrackedFiles = "";
   let gitTotalTrackedFiles = 0;
-  let gitAllBranchList = [];
+  let gitAllBranchList = ["NO_BRANCHES"];
+  let isGitLogAvailable = false;
 
   const gitRemoteReference = [
     "github",
@@ -37,17 +38,20 @@ const getGitStatus = async (repoPath) => {
 
   const currentDir = `cd ${repoPath};`;
 
-  let isGitLogAvailable = fs.promises
+  isGitLogAvailable = await fs.promises
     .access(`${repoPath}/.git/logs`)
     .then(() => {
       isGitLogAvailable = true;
       return isGitLogAvailable;
     })
     .catch((err) => {
-      console.log(err);
+      console.log("Not a git repo or a new git repo with no commits!");
+      // console.log(err);
       isGitLogAvailable = false;
       return isGitLogAvailable;
     });
+
+  console.log("Git log available : ", isGitLogAvailable);
 
   // Module to get git remote repo URL
 
@@ -148,6 +152,7 @@ const getGitStatus = async (repoPath) => {
       }));
 
   gitBranchList =
+    isGitLogAvailable &&
     gitBranchList.length > 0 &&
     gitBranchList
       .split("\n")
@@ -160,11 +165,21 @@ const getGitStatus = async (repoPath) => {
       })
       .filter((entry) => (entry !== "" ? entry : null));
 
-  if (gitCurrentBranch.length > 0 && gitCurrentBranch !== "No Active Branch") {
+  if (
+    isGitLogAvailable &&
+    gitCurrentBranch.length > 0 &&
+    gitCurrentBranch !== "No Active Branch"
+  ) {
     gitBranchList = [gitCurrentBranch, ...gitBranchList];
   } else {
     gitBranchList = errorStatus.noBranch;
   }
+
+  if (!gitBranchList && gitBranchList.length === 0) {
+    gitBranchList = errorStatus.noBranch;
+  }
+
+  console.log("GIT BRANCH LIST", gitBranchList);
 
   // Module to get total number of commits to current branch
   isGitLogAvailable &&
