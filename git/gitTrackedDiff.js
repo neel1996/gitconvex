@@ -2,13 +2,15 @@ const { exec } = require("child_process");
 const util = require("util");
 const execPromosified = util.promisify(exec);
 const fetchRepoPath = require("../global/fetchGitRepoPath");
+const { getStagedFiles } = require("./gitGetStagedFilesAPI");
 
 async function gitTrackedDiff(repoId) {
   const repoPath = fetchRepoPath.getRepoPath(repoId);
 
   var responseObject = {
-    gitChangedFiles: await getGitDiff(repoPath).then((res) => res),
-    gitUntrackedFiles: await getUntrackedFiles(repoPath).then((res) => res),
+    gitChangedFiles: await getGitDiff(repoPath),
+    gitUntrackedFiles: await getUntrackedFiles(repoPath),
+    gitStagedFiles: await getStagedFiles(repoId),
   };
 
   console.log(responseObject);

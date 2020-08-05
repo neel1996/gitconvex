@@ -79,6 +79,7 @@ const globalAPISchema = new buildSchema(
         type gitChangeResults{
             gitUntrackedFiles: [String]
             gitChangedFiles: [String]
+            gitStagedFiles: [String]
         }
 
         type gitFileLineChangeResults{
