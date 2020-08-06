@@ -46,7 +46,6 @@ const getGitStatus = async (repoPath) => {
     })
     .catch((err) => {
       console.log("Not a git repo or a new git repo with no commits!");
-      // console.log(err);
       isGitLogAvailable = false;
       return isGitLogAvailable;
     });
@@ -60,6 +59,7 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git remote`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     }).then(({ stdout, stderr }) => {
       if (stdout && !stderr) {
         const localRemote = stdout.trim().split("\n");
@@ -73,7 +73,6 @@ const getGitStatus = async (repoPath) => {
                 windowsHide: true,
               }).then(({ stdout, stderr }) => {
                 if (stdout && !stderr) {
-                  console.log("REMOTE :: ", stdout);
                   return stdout.trim();
                 } else {
                   console.log(stderr);
@@ -117,6 +116,7 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git branch --all`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     })
       .then((res) => {
         const { stdout, stderr } = res;
@@ -139,7 +139,11 @@ const getGitStatus = async (repoPath) => {
   // Module to get all available branches
   gitBranchList =
     isGitLogAvailable &&
-    (await execPromised(`git branch`, { cwd: repoPath, windowsHide: true })
+    (await execPromised(`git branch`, {
+      cwd: repoPath,
+      windowsHide: true,
+      maxBuffer: 1024 * 10240,
+    })
       .then((res) => {
         if (!res.stderr) {
           return res.stdout;
@@ -186,28 +190,35 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git log --oneline`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     })
       .then((res) => {
         const { stdout, stderr } = res;
-        if (stderr) {
-          console.log(stderr);
-        }
-        if (res && !res.stderr) {
-          const gitLocalTotal = res.stdout.trim().split("\n");
+        if (stdout && !stderr) {
+          const gitLocalTotal = stdout.trim().split("\n");
+          console.log("Total commits: ", gitLocalTotal.length);
           if (gitLocalTotal && gitLocalTotal.length > 0) {
             gitTotalCommits = gitLocalTotal.length;
           } else if (gitLocalTotal.length === 1) {
             gitTotalCommits = 1;
           }
         } else {
-          gitTotalCommits = 0;
-          console.log(stderr);
+          if (!gitTotalCommits) {
+            gitTotalCommits = 0;
+          }
+          console.log(
+            "ERROR: Error occurred while collcting all commits",
+            stderr
+          );
         }
         return gitTotalCommits;
       })
       .catch((err) => {
-        gitTotalCommits = 0;
-        console.log(err);
+        if (!gitTotalCommits) {
+          gitTotalCommits = 0;
+        }
+        console.log(typeof err);
+        console.log("ERROR: Error occurred while collcting all commits");
       }));
 
   //Module to get latest git commit
@@ -238,6 +249,7 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git ls-tree --name-status HEAD`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     })
       .then(({ stdout, stderr }) => {
         if (stdout && !stderr) {
@@ -307,6 +319,7 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git ls-files`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     }).then((res) => {
       const { stdout, stderr } = res;
       if (stdout && !stderr) {

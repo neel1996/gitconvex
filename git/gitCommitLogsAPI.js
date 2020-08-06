@@ -9,14 +9,12 @@ async function gitCommitLogHandler(repoId, skipLimit = 0) {
 
   const totalCommits = await execPromisified(`git log --oneline`, {
     cwd: repoPath,
+    maxBuffer: 1024 * 10240,
     windowsHide: true,
   })
     .then((res) => {
       const { stdout, stderr } = res;
-      if (stderr) {
-        console.log(stderr);
-      }
-      if (res && !res.stderr) {
+      if (stdout && !stderr) {
         const gitLocalTotal = stdout.trim().split("\n").length;
         return gitLocalTotal;
       } else {
@@ -49,6 +47,7 @@ async function gitCommitLogHandler(repoId, skipLimit = 0) {
     {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     }
   )
     .then(async (res) => {
