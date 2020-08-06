@@ -74,7 +74,7 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 ![repo-details](https://user-images.githubusercontent.com/65342122/88486721-70f2d900-cf9d-11ea-802d-00b0b2aaf638.png)
 
 - The newly added repo will be displayed as a card in the dashboard
-![repo-card](https://user-images.githubusercontent.com/65342122/87243016-d13b3400-c44f-11ea-88ec-c4d14cbfbf97.png)
+![repo-card](https://user-images.githubusercontent.com/65342122/89167157-ab113b80-d598-11ea-8985-2469e7ad261e.png)
 
 ### Repo Details
 - Click on the repo card to get the following details about the repo
@@ -92,10 +92,13 @@ The repo detail view also provides features for performing the following git ope
 - Pulling changes from remote
 - Fetching changes from remote
 - Adding a new remote repo
+- Directory navigator
+- Loading commit logs on demand
 ```
-![repo-card-details](https://user-images.githubusercontent.com/65342122/87232642-1f175400-c3de-11ea-8ead-80cd5ab4c37c.png)
 
-![commit-logs](https://user-images.githubusercontent.com/65342122/88486754-9a136980-cf9d-11ea-94ad-436834cacf07.png)
+![repo-card-details](https://user-images.githubusercontent.com/65342122/89164057-30deb800-d594-11ea-94d6-d3a330260044.png)
+
+![commit-logs](https://user-images.githubusercontent.com/65342122/89561986-ef216c00-d836-11ea-992e-fe9b2a6dc926.png)
 
 
 #### Add new branch
@@ -115,21 +118,23 @@ Note: In a newly initialized git repo, the newly added branch will be considered
 ![git-operations](https://user-images.githubusercontent.com/65342122/87232645-30f8f700-c3de-11ea-8ddb-52f4d5ec7140.png)
 
 - The staged files can be removed individually or it can be removed all at once.
-![staged-files](https://user-images.githubusercontent.com/65342122/88487285-4f93ec00-cfa1-11ea-8824-a70b3ba75d45.png)
+![staged-files](https://user-images.githubusercontent.com/65342122/89167388-ff1c2000-d598-11ea-8150-fc96b6aa41b7.png)
 
 - The staged changes can be committed using the **Commit changes** option. This will display a pop-up with all the staged files and it requires a commit message to successfully commit the changes. The commit messages can either be a single line message or a multi-line message 
 ![commit-changes](https://user-images.githubusercontent.com/65342122/87232659-56860080-c3de-11ea-9bc4-a19ad727b101.png)
 
 - **Push to remote** option pushes all commits to the selected remote host. The pop-up displayed will display the commits which are in queue to be pushed to the remote repository
-![push-operation-with-remote](https://user-images.githubusercontent.com/65342122/87232662-61409580-c3de-11ea-8ad7-61c3871f0a4d.png)
+
+![push-operation-with-remote](https://user-images.githubusercontent.com/65342122/89562600-d796b300-d837-11ea-969c-9abb93f24c1c.png)
 
 This section will let you know if the selected remote is not valid or if the push operation fails
-![push-opeartion-without-remote](https://user-images.githubusercontent.com/65342122/88487148-3ccce780-cfa0-11ea-874f-a2844760483f.png)
+![push-opeartion-without-remote](https://user-images.githubusercontent.com/65342122/89562476-a1f1ca00-d837-11ea-9f3a-bb566aeb327e.png)
 
 ### Git Difference
 
 In "Git Difference" click on the modified file to see the difference. The platform has syntax highlighting available for a limited set of [languages](LANGUAGES.md)
-![git-difference](https://user-images.githubusercontent.com/65342122/87243040-11021b80-c450-11ea-8775-d52dcc7f57e1.png)
+
+![git-difference](https://user-images.githubusercontent.com/65342122/89559704-ab793300-d833-11ea-88a8-28afea4b461b.png)
 
 ## Settings
 - Settings in the left pane has three sections (Server data file, saved repos, Active GitConvex port number).
