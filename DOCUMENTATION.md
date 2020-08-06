@@ -92,12 +92,13 @@ The repo detail view also provides features for performing the following git ope
 - Pulling changes from remote
 - Fetching changes from remote
 - Adding a new remote repo
+- Directory navigator
+- Loading commit logs on demand
 ```
 
 ![repo-card-details](https://user-images.githubusercontent.com/65342122/89164057-30deb800-d594-11ea-94d6-d3a330260044.png)
 
-
-![commit-logs](https://user-images.githubusercontent.com/65342122/88486754-9a136980-cf9d-11ea-94ad-436834cacf07.png)
+![commit-logs](https://user-images.githubusercontent.com/65342122/89561986-ef216c00-d836-11ea-992e-fe9b2a6dc926.png)
 
 
 #### Add new branch
@@ -123,16 +124,17 @@ Note: In a newly initialized git repo, the newly added branch will be considered
 ![commit-changes](https://user-images.githubusercontent.com/65342122/87232659-56860080-c3de-11ea-9bc4-a19ad727b101.png)
 
 - **Push to remote** option pushes all commits to the selected remote host. The pop-up displayed will display the commits which are in queue to be pushed to the remote repository
-![push-operation-with-remote](https://user-images.githubusercontent.com/65342122/87232662-61409580-c3de-11ea-8ad7-61c3871f0a4d.png)
+
+![push-operation-with-remote](https://user-images.githubusercontent.com/65342122/89562600-d796b300-d837-11ea-969c-9abb93f24c1c.png)
 
 This section will let you know if the selected remote is not valid or if the push operation fails
-![push-opeartion-without-remote](https://user-images.githubusercontent.com/65342122/88487148-3ccce780-cfa0-11ea-874f-a2844760483f.png)
+![push-opeartion-without-remote](https://user-images.githubusercontent.com/65342122/89562476-a1f1ca00-d837-11ea-9f3a-bb566aeb327e.png)
 
 ### Git Difference
 
 In "Git Difference" click on the modified file to see the difference. The platform has syntax highlighting available for a limited set of [languages](LANGUAGES.md)
 
-![git-difference](https://user-images.githubusercontent.com/65342122/89164179-608dc000-d594-11ea-8e00-a880b2bdcc88.png)
+![git-difference](https://user-images.githubusercontent.com/65342122/89559704-ab793300-d833-11ea-88a8-28afea4b461b.png)
 
 ## Settings
 - Settings in the left pane has three sections (Server data file, saved repos, Active GitConvex port number).
