@@ -15,6 +15,7 @@ const { gitPushToRemoteApi } = require("../git/gitPushToRemoteAPI");
 const { gitStageItem } = require("../git/gitStageItem");
 const { gitAddRemoteApi } = require("../git/gitAddRemoteApi");
 const { gitDeleteBranchApi } = require("../git/gitBranchDeleteApi");
+const { gitFetchFolderContentApi } = require("../git/gitFolderDetailsApi");
 const {
   fetchDatabaseFile,
   fetchRepoDetails,
@@ -85,17 +86,17 @@ module.exports.addRepoFunction = addRepoFunction = async (
 module.exports.gitCommitLogsFunction = gitCommitLogsFunction = async (
   parsedPayload
 ) => {
-  const { repoId } = JSON.parse(parsedPayload);
+  const { repoId, skipLimit } = JSON.parse(parsedPayload);
   if (repoId) {
-    console.log(await gitCommitLogHandler(repoId));
     return {
       gitCommitLogs: {
-        ...(await gitCommitLogHandler(repoId)),
+        ...(await gitCommitLogHandler(repoId, skipLimit)),
       },
     };
   } else {
     return {
       gitCommitLogs: {
+        totalCommits: 0,
         commits: [],
       },
     };
@@ -121,6 +122,13 @@ module.exports.repoDetailsFunction = repoDetailsFunction = async (
       ...repoDetails,
     },
   };
+};
+
+module.exports.gitFolderContentApi = gitFolderContentApi = async (
+  parsedPayload
+) => {
+  const { repoId, directoryName } = JSON.parse(parsedPayload);
+  return await gitFetchFolderContentApi(repoId, directoryName);
 };
 
 module.exports.gitChangeTrackerFunction = gitChangeTrackerFunction = async (

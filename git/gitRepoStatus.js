@@ -6,16 +6,27 @@ const execPromised = util.promisify(exec);
 const getGitStatus = async (repoPath) => {
   console.log("Repo Path : " + repoPath);
 
+  const errorStatus = {
+    noRemote: "NO_REMOTE",
+    noRemoteHost: "No Remote Host Set",
+    noBranch: ["NO_BRANCH"],
+    noActiveBranch: "No active branch",
+    noCommits: "No Commits in the Current Branch",
+    noFileCommits: ["NO_COMMITS"],
+    noTrackedFiles: ["NO_TRACKED_FILES"],
+  };
+
   let gitRemoteData = "";
-  let gitBranchList = [];
-  let gitCurrentBranch = "No Active Branch";
+  let gitBranchList = ["NO_BRANCHES"];
+  let gitCurrentBranch = errorStatus.noActiveBranch;
   let gitRemoteHost = "";
   let gitRepoName = "";
   let gitTotalCommits = "";
   let gitLatestCommit = "";
   let gitTrackedFiles = "";
   let gitTotalTrackedFiles = 0;
-  let gitAllBranchList = [];
+  let gitAllBranchList = ["NO_BRANCHES"];
+  let isGitLogAvailable = false;
 
   const gitRemoteReference = [
     "github",
@@ -27,17 +38,19 @@ const getGitStatus = async (repoPath) => {
 
   const currentDir = `cd ${repoPath};`;
 
-  let isGitLogAvailable = fs.promises
+  isGitLogAvailable = await fs.promises
     .access(`${repoPath}/.git/logs`)
     .then(() => {
       isGitLogAvailable = true;
       return isGitLogAvailable;
     })
     .catch((err) => {
-      console.log(err);
+      console.log("Not a git repo or a new git repo with no commits!");
       isGitLogAvailable = false;
       return isGitLogAvailable;
     });
+
+  console.log("Git log available : ", isGitLogAvailable);
 
   // Module to get git remote repo URL
 
@@ -46,6 +59,7 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git remote`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     }).then(({ stdout, stderr }) => {
       if (stdout && !stderr) {
         const localRemote = stdout.trim().split("\n");
@@ -59,7 +73,6 @@ const getGitStatus = async (repoPath) => {
                 windowsHide: true,
               }).then(({ stdout, stderr }) => {
                 if (stdout && !stderr) {
-                  console.log("REMOTE :: ", stdout);
                   return stdout.trim();
                 } else {
                   console.log(stderr);
@@ -77,11 +90,11 @@ const getGitStatus = async (repoPath) => {
   if (gitRemotePromise) {
     gitRemoteData = gitRemotePromise.join("||");
   } else {
-    gitRemoteData = "NO_REMOTE";
+    gitRemoteData = errorStatus.noRemote;
   }
 
   // Module to get Git actual repo name
-  if (gitRemoteData && gitRemoteData !== "NO_REMOTE") {
+  if (gitRemoteData && gitRemoteData !== errorStatus.noRemote) {
     let tempSplitLength = gitRemoteData.split("/").length;
     gitRepoName = gitRemoteData
       .split("/")
@@ -92,9 +105,9 @@ const getGitStatus = async (repoPath) => {
         gitRemoteHost = entry;
       }
     });
-  } else if (gitRemoteData === "NO_REMOTE") {
+  } else if (gitRemoteData === errorStatus.noRemote) {
     gitRepoName = repoPath.split("/")[currentDir.split("/").length - 1];
-    gitRemoteHost = "No Remote Host Set";
+    gitRemoteHost = errorStatus.noRemoteHost;
   }
 
   //Module to get all branch list
@@ -103,6 +116,7 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git branch --all`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     })
       .then((res) => {
         const { stdout, stderr } = res;
@@ -125,7 +139,11 @@ const getGitStatus = async (repoPath) => {
   // Module to get all available branches
   gitBranchList =
     isGitLogAvailable &&
-    (await execPromised(`git branch`, { cwd: repoPath, windowsHide: true })
+    (await execPromised(`git branch`, {
+      cwd: repoPath,
+      windowsHide: true,
+      maxBuffer: 1024 * 10240,
+    })
       .then((res) => {
         if (!res.stderr) {
           return res.stdout;
@@ -138,6 +156,7 @@ const getGitStatus = async (repoPath) => {
       }));
 
   gitBranchList =
+    isGitLogAvailable &&
     gitBranchList.length > 0 &&
     gitBranchList
       .split("\n")
@@ -150,39 +169,56 @@ const getGitStatus = async (repoPath) => {
       })
       .filter((entry) => (entry !== "" ? entry : null));
 
-  if (gitCurrentBranch.length > 0 && gitCurrentBranch !== "No Active Branch") {
+  if (
+    isGitLogAvailable &&
+    gitCurrentBranch.length > 0 &&
+    gitCurrentBranch !== "No Active Branch"
+  ) {
     gitBranchList = [gitCurrentBranch, ...gitBranchList];
   } else {
-    gitBranchList = ["NO_BRANCH"];
+    gitBranchList = errorStatus.noBranch;
   }
+
+  if (!gitBranchList && gitBranchList.length === 0) {
+    gitBranchList = errorStatus.noBranch;
+  }
+
+  console.log("GIT BRANCH LIST", gitBranchList);
 
   // Module to get total number of commits to current branch
   isGitLogAvailable &&
     (await execPromised(`git log --oneline`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     })
       .then((res) => {
         const { stdout, stderr } = res;
-        if (stderr) {
-          console.log(stderr);
-        }
-        if (res && !res.stderr) {
-          const gitLocalTotal = res.stdout.trim().split("\n");
+        if (stdout && !stderr) {
+          const gitLocalTotal = stdout.trim().split("\n");
+          console.log("Total commits: ", gitLocalTotal.length);
           if (gitLocalTotal && gitLocalTotal.length > 0) {
             gitTotalCommits = gitLocalTotal.length;
           } else if (gitLocalTotal.length === 1) {
             gitTotalCommits = 1;
           }
         } else {
-          gitTotalCommits = 0;
-          console.log(stderr);
+          if (!gitTotalCommits) {
+            gitTotalCommits = 0;
+          }
+          console.log(
+            "ERROR: Error occurred while collcting all commits",
+            stderr
+          );
         }
         return gitTotalCommits;
       })
       .catch((err) => {
-        gitTotalCommits = 0;
-        console.log(err);
+        if (!gitTotalCommits) {
+          gitTotalCommits = 0;
+        }
+        console.log(typeof err);
+        console.log("ERROR: Error occurred while collcting all commits");
       }));
 
   //Module to get latest git commit
@@ -197,12 +233,12 @@ const getGitStatus = async (repoPath) => {
           gitLatestCommit = res.stdout.trim();
         } else {
           console.log(stderr);
-          gitLatestCommit = "No Commits in the Current Branch";
+          gitLatestCommit = errorStatus.noCommits;
         }
       })
       .catch((err) => {
         console.log(err);
-        gitLatestCommit = "No Commits in the Current Branch";
+        gitLatestCommit = errorStatus.noCommits;
       }));
 
   //Module to get all git tracked files
@@ -213,6 +249,7 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git ls-tree --name-status HEAD`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     })
       .then(({ stdout, stderr }) => {
         if (stdout && !stderr) {
@@ -251,7 +288,7 @@ const getGitStatus = async (repoPath) => {
 
   //Module to fetch commit for each file and folder
 
-  var gitFileBasedCommit = [];
+  var gitFileBasedCommit = errorStatus.noFileCommits;
 
   gitFileBasedCommit =
     isGitLogAvailable &&
@@ -266,12 +303,12 @@ const getGitStatus = async (repoPath) => {
               return stdout.trim();
             } else {
               console.log(stderr);
-              return "";
+              return errorStatus.noFileCommits;
             }
           })
           .catch((err) => {
             console.log("Tracked file has been removed!", err);
-            return "";
+            return errorStatus.noFileCommits;
           });
       })
     ));
@@ -282,6 +319,7 @@ const getGitStatus = async (repoPath) => {
     (await execPromised(`git ls-files`, {
       cwd: repoPath,
       windowsHide: true,
+      maxBuffer: 1024 * 10240,
     }).then((res) => {
       const { stdout, stderr } = res;
       if (stdout && !stderr) {
@@ -298,9 +336,9 @@ const getGitStatus = async (repoPath) => {
   if (!isGitLogAvailable) {
     console.log("Untracked Git Repo!");
     gitTotalCommits = 0;
-    gitLatestCommit = "No Commits";
-    gitTrackedFiles = ["NO_TRACKED_FILES"];
-    gitFileBasedCommit = "No Changes";
+    gitLatestCommit = errorStatus.noCommits;
+    gitTrackedFiles = errorStatus.noTrackedFiles;
+    gitFileBasedCommit = errorStatus.noFileCommits;
     gitTotalTrackedFiles = 0;
   }
 

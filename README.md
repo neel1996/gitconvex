@@ -5,19 +5,18 @@
 
 ## Web application for managing your git repositories
 
-![open issues](https://badgen.net/github/open-issues/neel1996/gitconvex-package)
-![Gitconvex UI pipeline](https://github.com/neel1996/gitconvex/workflows/Gitconvex%20UI%20pipeline/badge.svg)
-![Gitconvex Server pipeline](https://github.com/neel1996/gitconvex-server/workflows/Gitconvex%20Server%20pipeline/badge.svg)
+![open issues](https://img.shields.io/github/issues/neel1996/gitconvex?color=orange&style=for-the-badge)
+![Gitconvex UI pipeline](https://img.shields.io/github/workflow/status/neel1996/gitconvex-ui/Gitconvex%20UI%20pipeline/master?label=gitconvex%20ui%20build&logo=github&style=for-the-badge)
+![Gitconvex Server pipeline](https://img.shields.io/github/workflow/status/neel1996/gitconvex-server/Gitconvex%20Server%20pipeline/master?label=gitconvex%20server%20build&logo=github&style=for-the-badge)
 
 # Download options
 
 > Use any of the below options to get gitconvex for your system
 
-[![gitconvex npm package](https://badgen.net/badge/gitconvex/v1.1.2/green?icon=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
-[![github release](https://badgen.net/badge/gitconvex/v1.1.2/blue?icon=github)](https://github.com/neel1996/gitconvex-package/releases)
-[![docker image](https://badgen.net/badge/gitconvex/v1.1.2/cyan?icon=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
-
-[![License](https://badgen.net/github/license/neel1996/gitconvex-package)](LICENSE)
+[![gitconvex npm package](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.2&color=red&style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
+[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.2&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
+[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.2&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
+[![License](https://img.shields.io/static/v1?label=LICENSE&message=Apache-2.0&color=yellow&style=for-the-badge)](LICENSE)
 
 - **Option - 1** Cloning repo from **github**
 
@@ -92,5 +91,3 @@ Refer the detailed [Documentation](DOCUMENTATION.md) for how to setup and use th
 # License
 
 See [LICENSE ](LICENSE) info for more
-
-

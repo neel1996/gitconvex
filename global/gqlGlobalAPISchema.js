@@ -10,6 +10,7 @@ const globalAPISchema = new buildSchema(
             healthCheck: healthCheckResults!
             fetchRepo: fetchRepoResults!
             gitRepoStatus: gitRepoStatusResults!
+            gitFolderContent: gitFolderContentResults
             gitChanges: gitChangeResults!
             gitFileLineChanges: gitFileLineChangeResults!
             gitCommitLogs: gitCommitLogResults!
@@ -52,6 +53,7 @@ const globalAPISchema = new buildSchema(
         }
 
         type gitCommitLogResults{
+            totalCommits: Int
             commits: [gitCommits]
         }
 
@@ -68,10 +70,16 @@ const globalAPISchema = new buildSchema(
             gitFileBasedCommit: [String]
             gitTotalTrackedFiles: Int
         }
+
+        type gitFolderContentResults{
+            gitTrackedFiles: [String]
+            gitFileBasedCommit: [String]
+        }
         
         type gitChangeResults{
             gitUntrackedFiles: [String]
             gitChangedFiles: [String]
+            gitStagedFiles: [String]
         }
 
         type gitFileLineChangeResults{
