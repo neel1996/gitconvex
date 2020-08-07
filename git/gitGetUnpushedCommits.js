@@ -4,6 +4,12 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteURL
+ * @returns {Array} - formatted commit logs for the commits which are not pushed to the remote
+ */
+
 const gitGetUnpushedCommits = async (repoId, remoteURL) => {
   return await execPromisified(
     `git log --branches --not --remotes --pretty=format:"%h||%an||%ad||%s"`,

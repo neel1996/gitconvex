@@ -1,19 +1,10 @@
 const fs = require("fs");
 const path = require("path");
+const { getEnvData } = require("../utils/getEnvData");
 
-function getEnvData() {
-  const envFileData = fs.readFileSync(
-    path.join(__dirname, "..", "env_config.json")
-  );
-
-  const envContent = envFileData.toString();
-  let envData = JSON.parse(envContent)[0];
-
-  return {
-    DATABASE_FILE: envData.databaseFile,
-    GITCONVEX_PORT: envData.port,
-  };
-}
+/**
+ * @returns {Object} - details about all the repos stored in the data file
+ */
 
 async function fetchRepoHandler() {
   var repoDSContent = fs.readFileSync(getEnvData().DATABASE_FILE);

@@ -10,7 +10,10 @@ const gitFetchFolderContentApi = async (repoId, directoryName) => {
   const targetPath = path.join(repoPath, directoryName);
 
   return await fs.promises.readdir(targetPath).then(async (folderContent) => {
-    /* @gitcommit section */
+    /**
+     * @description - to get the latest commit for a file / folder
+     */
+
     const gitCommits = folderContent.map(async (item) => {
       let commitCommand = "";
       if (directoryName) {
@@ -34,7 +37,10 @@ const gitFetchFolderContentApi = async (repoId, directoryName) => {
         });
     });
 
-    /* @folderContentTagging module */
+    /**
+     * @description - checks the type of the directory content and stores it to the object
+     */
+
     const folderObjects = folderContent.map(async (item, index) => {
       return await fs.promises
         .stat(path.join(targetPath, item))

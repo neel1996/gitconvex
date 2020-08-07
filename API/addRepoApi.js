@@ -3,20 +3,16 @@ const path = require("path");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 const fs = require("fs");
+const { getEnvData } = require("../utils/getEnvData");
 
-function getEnvData() {
-  const envFileData = fs.readFileSync(
-    path.join(__dirname, "..", "env_config.json")
-  );
-
-  const envContent = envFileData.toString();
-  let envData = JSON.parse(envContent)[0];
-
-  return {
-    DATABASE_FILE: envData.databaseFile,
-    GITCONVEX_PORT: envData.port,
-  };
-}
+/**
+ * @param  {String} repoName - Name of the repository
+ * @param  {String} repoPath - Path were the repo is residing or where it should be cloned / initialized
+ * @param  {boolean} initCheck - Switch to check if user has selected repo init option
+ * @param  {boolean} cloneCheck - Switch to check if user has selected repo cloning option
+ * @param  {String} cloneUrl - The If cloning switch is true, then this holds the URL of the remote repo
+ * @returns {Object} - created a new entry in the data file and retusn the status
+ */
 
 async function addRepoHandler(
   repoName,

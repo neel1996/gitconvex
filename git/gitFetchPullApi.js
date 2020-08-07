@@ -4,6 +4,12 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteUrl
+ * @returns {String} - name of the remote based on the remote URL
+ */
+
 const getRemoteName = async (repoId, remoteUrl) => {
   return await execPromisified(`git remote -v`, {
     cwd: fetchRepopath.getRepoPath(repoId),
@@ -31,6 +37,13 @@ const getRemoteName = async (repoId, remoteUrl) => {
       return "";
     });
 };
+
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteUrl=""
+ * @param  {String} remoteBranch=""
+ * @returns {Object: {status: String, fetchedItems: Array[String]}} - performs a git fetch and returns the status along with the fetched changes
+ */
 
 const gitFetchApi = async (repoId, remoteUrl = "", remoteBranch = "") => {
   const remoteName = await getRemoteName(repoId, remoteUrl);
@@ -87,6 +100,13 @@ const gitFetchApi = async (repoId, remoteUrl = "", remoteBranch = "") => {
       }
     });
 };
+
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteUrl
+ * @param  {String} remoteBranch
+ * @returns {Object: {status: String, pulledItems: Array[String]}} - performs a git pull from the remote and returns the pulled changes
+ */
 
 const gitPullApi = async (repoId, remoteUrl, remoteBranch) => {
   const remoteName = await getRemoteName(repoId, remoteUrl);

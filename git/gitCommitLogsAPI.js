@@ -3,6 +3,12 @@ const { exec } = require("child_process");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 
+/**
+ * @param  {String} repoId
+ * @param  {String} skipLimit=0 - git commit --skip limit to skip previous commits
+ * @returns {Object} - commit details -
+ */
+
 async function gitCommitLogHandler(repoId, skipLimit = 0) {
   const repoPath = fetchRepopath.getRepoPath(repoId);
   let commitLogLimit = 0;

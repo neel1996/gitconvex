@@ -5,6 +5,13 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @param  {String} item
+ * @returns {String} - status of the unstaging action
+ * @description - Removed the selected item from staged area
+ */
+
 const gitRemoveStagedItemApi = async (repoId, item) => {
   return await execPromisified(`git reset "${item}"`, {
     cwd: fetchRepopath.getRepoPath(repoId),
@@ -24,6 +31,12 @@ const gitRemoveStagedItemApi = async (repoId, item) => {
       return "STAGE_REMOVE_FAILED";
     });
 };
+
+/**
+ * @param  {String} repoId
+ * @returns {String}
+ * @description - removes all the the staged items
+ */
 
 const gitRemoveAllStagedItemApi = async (repoId) => {
   return await execPromisified(`git reset`, {

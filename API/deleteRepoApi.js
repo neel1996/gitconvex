@@ -1,21 +1,13 @@
 const fs = require("fs");
 const path = require("path");
+const { getEnvData } = require("../utils/getEnvData");
 
-function getEnvData() {
-  const envFileData = fs.readFileSync(
-    path.join(__dirname, "..", "env_config.json")
-  );
+/**
+ * @param  {String} repoId - ID of the repo stored in the data file
+ */
 
-  const envContent = envFileData.toString();
-  let envData = JSON.parse(envContent)[0];
 
-  return {
-    DATABASE_FILE: envData.databaseFile,
-    GITCONVEX_PORT: envData.port,
-  };
-}
-
-async function deleteRepoApi(repoId) {
+ async function deleteRepoApi(repoId) {
   const dataStoreFile = getEnvData().DATABASE_FILE;
 
   return await fs.promises

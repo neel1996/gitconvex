@@ -4,6 +4,12 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @param  {String} branchName
+ * @returns {Object} - adds a new branch and sends the status as JSON {String}
+ */
+
 const gitAddBranchApi = async (repoId, branchName) => {
   return await execPromisified(`git checkout -b ${branchName}`, {
     cwd: fetchRepopath.getRepoPath(repoId),

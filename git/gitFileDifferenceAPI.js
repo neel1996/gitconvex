@@ -4,13 +4,23 @@ const { exec } = require("child_process");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 
+/**
+ * @param  {String} repoId
+ * @param  {String} fileName
+ */
+
 async function gitFileDifferenceHandler(repoId, fileName) {
   if (repoId && fileName) {
     var differencePayload = await getGitFileDifference(repoId, fileName);
-
     return differencePayload;
   }
 }
+
+/**
+ * @param  {String} repoId
+ * @param  {String} fileName
+ * @returns {Object} - git diff status and the lines which of the files with the change indicator
+ */
 
 async function getGitFileDifference(repoId, fileName) {
   const repoPath = fetchRepopath.getRepoPath(repoId);

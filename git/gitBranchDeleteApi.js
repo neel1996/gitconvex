@@ -5,6 +5,13 @@ const execPromised = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @param  {String} branchName
+ * @param  {Boolean} forceFlag
+ * @returns {Object} - deletes a branch and sends the status as JSON {String}
+ */
+
 const gitDeleteBranchApi = async (repoId, branchName, forceFlag) => {
   let commandString = "";
   if (forceFlag) {

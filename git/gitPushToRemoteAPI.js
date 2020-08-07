@@ -4,6 +4,13 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteHost
+ * @param  {String} branch
+ * @returns {String} - status of the git push
+ */
+
 const gitPushToRemoteApi = async (repoId, remoteHost, branch) => {
   return await execPromisified(`git remote -v`, {
     cwd: fetchRepopath.getRepoPath(repoId),

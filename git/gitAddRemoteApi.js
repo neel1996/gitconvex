@@ -4,6 +4,13 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteName
+ * @param  {String} remoteUrl
+ * @returns {Object} - Adds a new remote and sends the status as JSON {String}
+ */
+
 const gitAddRemoteApi = async (repoId, remoteName, remoteUrl) => {
   return await execPromisified(`git remote add ${remoteName} ${remoteUrl}`, {
     cwd: fetchRepopath.getRepoPath(repoId),

@@ -31,7 +31,11 @@ const { gitFetchApi, gitPullApi } = require("../git/gitFetchPullApi");
 const { deleteRepoApi } = require("../API/deleteRepoApi");
 const { gitAddBranchApi } = require("../git/gitAddBranchApi");
 
-module.exports.healthCheckFunction = healthCheckFunction = async (payload) => {
+/**
+ * @returns {Object} - platform and required software related info
+ */
+
+module.exports.healthCheckFunction = healthCheckFunction = async () => {
   const hcPayload = await healthCheckHandler().then((res) => res);
   const { osCheck, gitCheck, nodeCheck } = JSON.parse(
     JSON.stringify(hcPayload)
@@ -45,7 +49,11 @@ module.exports.healthCheckFunction = healthCheckFunction = async (payload) => {
   };
 };
 
-module.exports.fetchRepoFunction = fetchRepoFunction = async (payload) => {
+/**
+ * @returns {Object} - details of all the stored repos
+ */
+
+module.exports.fetchRepoFunction = fetchRepoFunction = async () => {
   const repoFetchPayload = await fetchRepoHandler().then((res) => res);
 
   const { repoId, repoName, repoPath } = repoFetchPayload;
@@ -60,6 +68,15 @@ module.exports.fetchRepoFunction = fetchRepoFunction = async (payload) => {
     },
   };
 };
+
+/**
+ * @param  {String} repoName - name of the repo to be stored
+ * @param  {String} repoPath - path where the repo resides
+ * @param  {Boolean} initCheck - boolean switch to enable git init if the repo is not a git repo
+ * @param  {Boolean} cloneCheck - boolean switch to enable git clone if the repo needs to be pulled from a remote repo
+ * @param  {String} cloneUrl - URL of the remote repo if the clone switch is true
+ * @returns {Object} - returns object with status of the repo write operation
+ */
 
 module.exports.addRepoFunction = addRepoFunction = async (
   repoName,
@@ -83,6 +100,11 @@ module.exports.addRepoFunction = addRepoFunction = async (
   }
 };
 
+/**
+ * @param  {String} parsedPayload - strigified json with repoId: String and skipLimit: number
+ * @returns {Object} - containing staggered commits and total commits available in the repo
+ */
+
 module.exports.gitCommitLogsFunction = gitCommitLogsFunction = async (
   parsedPayload
 ) => {
@@ -103,6 +125,11 @@ module.exports.gitCommitLogsFunction = gitCommitLogsFunction = async (
   }
 };
 
+/**
+ * @param  {String} parsedPayload - strigified json holding the repoId: String and commitHash: String
+ * @returns {Object} - object holding all the files which are changed in the commit
+ */
+
 module.exports.gitCommitFileFunction = gitCommitFileFunction = async (
   parsedPayload
 ) => {
@@ -112,6 +139,11 @@ module.exports.gitCommitFileFunction = gitCommitFileFunction = async (
     gitCommitFiles: [...(await gitCommitFileApi(repoId, commitHash))],
   };
 };
+
+/**
+ * @param  {String} parsedPayload - strigified json holding repoId
+ * @returns {Object} - object holding the details of the repo
+ */
 
 module.exports.repoDetailsFunction = repoDetailsFunction = async (
   parsedPayload
@@ -124,12 +156,22 @@ module.exports.repoDetailsFunction = repoDetailsFunction = async (
   };
 };
 
+/**
+ * @param  {String} parsedPayload - strigified json holding repoId
+ * @returns {Object} - files / folders within the selected directory and the latest commit messages of the content
+ */
+
 module.exports.gitFolderContentApi = gitFolderContentApi = async (
   parsedPayload
 ) => {
   const { repoId, directoryName } = JSON.parse(parsedPayload);
   return await gitFetchFolderContentApi(repoId, directoryName);
 };
+
+/**
+ * @param  {String} parsedPayload - strigified json holding repoId
+ * @returns {Object} - returns the files that have changed from HEAD
+ */
 
 module.exports.gitChangeTrackerFunction = gitChangeTrackerFunction = async (
   parsedPayload
@@ -142,6 +184,11 @@ module.exports.gitChangeTrackerFunction = gitChangeTrackerFunction = async (
     },
   };
 };
+
+/**
+ * @param  {String} parsedPayload - strigified json holding repoId and the file name for which the git diff needs to be found
+ * @returns {Object} - returns the git diff related data and the line changes within the file
+ */
 
 module.exports.gitFileDiffFunction = gitFileDiffFunction = async (
   parsedPayload
@@ -158,6 +205,11 @@ module.exports.gitFileDiffFunction = gitFileDiffFunction = async (
     },
   };
 };
+
+/**
+ * @param  {String} parsedPayload - strigified json holding repoId
+ * @returns {Object} - list of files that are staged
+ */
 
 module.exports.gitGetStagedFiles = gitGetStagedFiles = async (payload) => {
   const { repoId } = JSON.parse(payload);
@@ -180,6 +232,11 @@ module.exports.gitGetStagedFiles = gitGetStagedFiles = async (payload) => {
   }
 };
 
+/**
+ * @param  {String} parsedPayload - strigified json holding repoId and the name of the user selected remote repo
+ * @returns {Object} - list of commits that are waiting to be pushed
+ */
+
 module.exports.gitUnpushedCommits = gitUnpushedCommits = async (payload) => {
   const { repoId, remoteName } = JSON.parse(payload);
   const unPushedCommits = await gitGetUnpushedCommits(repoId, remoteName);
@@ -199,13 +256,27 @@ module.exports.gitUnpushedCommits = gitUnpushedCommits = async (payload) => {
   }
 };
 
+/**
+ * @param  {String} repoId
+ * @param  {String} branch
+ */
+
 module.exports.gitSetBranch = gitSetBranch = async (repoId, branch) => {
   return await gitSetBranchApi(repoId, branch);
 };
 
+/**
+ * @param  {String} repoId
+ */
+
 module.exports.gitStageAllItems = gitStageAllItems = async (repoId) => {
   return await gitStageAllItemsApi(repoId);
 };
+
+/**
+ * @param  {String} repoId
+ * @param  {String} commitMessage
+ */
 
 module.exports.gitCommitChanges = gitCommitChanges = async (
   repoId,
@@ -214,6 +285,12 @@ module.exports.gitCommitChanges = gitCommitChanges = async (
   return await gitCommitChangesApi(repoId, commitMessage);
 };
 
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteHost
+ * @param  {String} branch
+ */
+
 module.exports.gitPushToRemote = gitPushToRemote = async (
   repoId,
   remoteHost,
@@ -221,6 +298,11 @@ module.exports.gitPushToRemote = gitPushToRemote = async (
 ) => {
   return await gitPushToRemoteApi(repoId, remoteHost, branch);
 };
+
+/**
+ * @param  {String} repoId
+ * @param  {String} item
+ */
 
 module.exports.gitStageItem = gitStageItemApi = async (repoId, item) => {
   return await gitStageItem(repoId, item);
@@ -234,6 +316,10 @@ module.exports.settingsGetPortDetails = settingsGetPortDetails = async () => {
   return await getPortDetails();
 };
 
+/**
+ * @param  {number} newPort
+ */
+
 module.exports.settingsUpdatePortDetail = settingsUpdatePortDetail = async (
   newPort
 ) => {
@@ -244,6 +330,11 @@ module.exports.settingsFetchRepoDetails = settingsFetchRepoDetails = async () =>
   return await fetchRepoDetails();
 };
 
+/**
+ * @param  {String} repoId
+ * @param  {String} item
+ */
+
 module.exports.gitRemoveStagedItem = gitRemoveStagedItem = async (
   repoId,
   item
@@ -251,11 +342,21 @@ module.exports.gitRemoveStagedItem = gitRemoveStagedItem = async (
   return await gitRemoveStagedItemApi(repoId, item);
 };
 
+/**
+ * @param  {String} repoId
+ */
+
 module.exports.gitRemoveAllStagedItems = gitRemoveAllStagedItems = async (
   repoId
 ) => {
   return await gitRemoveAllStagedItemApi(repoId);
 };
+
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteUrl=""
+ * @param  {String} remoteBranch=""
+ */
 
 module.exports.gitFetchFromRemote = gitFetchFromRemote = async (
   repoId,
@@ -265,6 +366,12 @@ module.exports.gitFetchFromRemote = gitFetchFromRemote = async (
   return await gitFetchApi(repoId, remoteUrl, remoteBranch);
 };
 
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteUrl
+ * @param  {String} remoteBranch
+ */
+
 module.exports.gitPullFromRemote = gitPullFromRemote = async (
   repoId,
   remoteUrl,
@@ -272,6 +379,12 @@ module.exports.gitPullFromRemote = gitPullFromRemote = async (
 ) => {
   return await gitPullApi(repoId, remoteUrl, remoteBranch);
 };
+
+/**
+ * @param  {String} repoId
+ * @param  {String} branchName
+ * @param  {Boolean} forceFlag
+ */
 
 module.exports.gitDeleteBranchApi = gitDeleteBranchFunction = async (
   repoId,
@@ -281,17 +394,36 @@ module.exports.gitDeleteBranchApi = gitDeleteBranchFunction = async (
   return gitDeleteBranchApi(repoId, branchName, forceFlag);
 };
 
+/**
+ * @param  {String} repoId
+ */
+
 module.exports.deleteRepo = deleteRepo = async (repoId) => {
   return await deleteRepoApi(repoId);
 };
+
+/**
+ * @param  {String} repoId
+ * @param  {String} branchName
+ */
 
 module.exports.addBranch = addBranch = async (repoId, branchName) => {
   return await gitAddBranchApi(repoId, branchName);
 };
 
+/**
+ * @param  {String} fileName
+ */
+
 module.exports.updateDbFileApi = updateDbFileApi = async (fileName) => {
   return await updateDbFile(fileName);
 };
+
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteName
+ * @param  {String} remoteUrl
+ */
 
 module.exports.gitAddRemoteRepoApi = gitAddRemoteRepoApi = async (
   repoId,

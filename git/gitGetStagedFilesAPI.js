@@ -5,6 +5,11 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @returns {Array} - list of all the staged items
+ */
+
 const getStagedFiles = async (repoId) => {
   return await execPromisified(`git diff --name-only --cached`, {
     cwd: fetchRepopath.getRepoPath(repoId),

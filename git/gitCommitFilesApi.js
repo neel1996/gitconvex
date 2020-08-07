@@ -3,6 +3,12 @@ const { exec } = require("child_process");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 
+/**
+ * @param  {String} repoId
+ * @param  {String} commitHash
+ * @returns {Array[type: String, fileName: String]} - fetches the list of files that are changed as part of a commit and returns the file with change type
+ */
+
 const gitCommitFileApi = async (repoId, commitHash) => {
   const repoPath = fetchRepopath.getRepoPath(repoId);
   return await execPromisified(
