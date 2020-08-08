@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/neel1996/gitconvex-server.git"
+    "url": "git+ssh://git@github.com/neel1996/gitconvex.git"
   },
   "keywords": [
     "gitconvex",
@@ -25,15 +25,13 @@
   "author": "itassistors",
   "license": "Apache License 2.0",
   "bugs": {
-    "url": "https://github.com/neel1996/gitconvex-package/issues"
+    "url": "https://github.com/neel1996/gitconvex/issues"
   },
-  "homepage": "https://github.com/neel1996/gitconvex-package#readme",
+  "homepage": "https://github.com/neel1996/gitconvex#readme",
   "dependencies": {
     "axios": "^0.19.2",
     "child_process": "^1.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
-    "envfile": "^6.8.0",
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphiql": "^0.17.5",
@@ -49,4 +47,3 @@
     ]
   }
 }
-
