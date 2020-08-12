@@ -4,7 +4,7 @@
   "description": "Git web UI client to manage your git repositories",
   "main": "server.js",
   "bin": {
-      "gitconvex":"server.js"
+    "gitconvex": "server.js"
   },
   "scripts": {
     "start": "node server.js",
