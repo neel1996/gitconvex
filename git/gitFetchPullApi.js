@@ -49,7 +49,17 @@ const gitFetchApi = async (repoId, remoteUrl = "", remoteBranch = "") => {
   const remoteName = await getRemoteName(repoId, remoteUrl);
   console.log("Selected remote name : ", remoteName);
 
-  if (!remoteName) {
+  remoteBranch = remoteBranch.trim();
+  let invalidInput = false;
+
+  if (
+    remoteUrl.match(/[^a-zA-Z0-9-_.~@#$%:/]/gi) ||
+    remoteBranch.match(/[^a-zA-Z0-9-_.:~@$^/\\s\\r\\n]/gi)
+  ) {
+    invalidInput = true;
+  }
+
+  if (!remoteName || invalidInput) {
     console.log("NO REMOTE MATCHING THE URL");
 
     return {
@@ -57,10 +67,13 @@ const gitFetchApi = async (repoId, remoteUrl = "", remoteBranch = "") => {
     };
   }
 
-  return await execPromisified(`git fetch ${remoteName} ${remoteBranch} -v`, {
-    cwd: fetchRepopath.getRepoPath(repoId),
-    windowsHide: true,
-  })
+  return await execPromisified(
+    `git fetch "${remoteName}" "${remoteBranch}" -v`,
+    {
+      cwd: fetchRepopath.getRepoPath(repoId),
+      windowsHide: true,
+    }
+  )
     .then(({ stdout, stderr }) => {
       if (stdout || stderr) {
         // Git fetch alone returns the result in the standard error stream
@@ -112,9 +125,17 @@ const gitPullApi = async (repoId, remoteUrl, remoteBranch) => {
   const remoteName = await getRemoteName(repoId, remoteUrl);
   console.log("Selected remote name : ", remoteName);
 
+  remoteBranch = remoteBranch.trim();
+
   if (!remoteName) {
     console.log("NO REMOTE MATCHING THE URL");
 
+    return {
+      status: "PULL_ERROR",
+    };
+  }
+
+  if (remoteBranch.match(/[^a-zA-Z0-9-_.:~@$^/\\s\\r\\n]/gi)) {
     return {
       status: "PULL_ERROR",
     };

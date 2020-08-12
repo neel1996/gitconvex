@@ -1,5 +1,6 @@
 const { exec } = require("child_process");
 const util = require("util");
+const fs = require("fs");
 const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
@@ -11,8 +12,19 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
  */
 
 const gitStageItem = async (repoId, item) => {
+  const repoPath = fetchRepopath.getRepoPath(repoId);
+  
+  const fileItemValid = await fs.promises
+    .stat(repoPath + "/" + item)
+    .then((res) => res.isFile());
+
+  if (!fileItemValid) {
+    console.log("Invalid item string");
+    return "ADD_ITEM_FAILED";
+  }
+
   return await execPromisified(`git add "${item}"`, {
-    cwd: fetchRepopath.getRepoPath(repoId),
+    cwd: repoPath,
     windowsHide: true,
   }).then(({ stdout, stderr }) => {
     if (stderr) {

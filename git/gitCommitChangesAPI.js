@@ -14,7 +14,7 @@ const gitCommitChangesApi = async (repoId, commitMessage) => {
   commitMessage = commitMessage.split("||").join("\n");
   commitMessage = commitMessage.replace(/"/gi, '\\"');
 
-  return await execPromisified(`git commit -m "${commitMessage}"`, {
+  return await execPromisified(`git commit -m "${commitMessage.toString()}"`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
   })

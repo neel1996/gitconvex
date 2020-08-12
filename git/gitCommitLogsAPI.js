@@ -37,7 +37,7 @@ async function gitCommitLogHandler(repoId, skipLimit = 0) {
 
   commitLogLimit = totalCommits < 10 ? totalCommits : 10;
 
-  if (!totalCommits) {
+  if (!totalCommits || typeof skipLimit !== "number") {
     return {
       hash: "",
       author: "",

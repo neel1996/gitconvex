@@ -14,59 +14,79 @@ const gitFetchFolderContentApi = async (repoId, directoryName) => {
      * @description - to get the latest commit for a file / folder
      */
 
-    const gitCommits = folderContent.map(async (item) => {
-      let commitCommand = "";
-      if (directoryName) {
-        commitCommand = `git log -1 --oneline "${directoryName + "/" + item}"`;
-      } else {
-        commitCommand = `git log -1 --oneline "${item}"`;
+    try {
+      let validInput = await fs.promises.stat(directoryName).then((res) => {
+        return res.isDirectory();
+      });
+
+      if (!validInput) {
+        throw new Error("Invalid directory string!");
       }
-      return await execPromised(commitCommand, {
-        cwd: repoPath,
-        windowsHide: true,
-      })
-        .then(({ stdout, stderr }) => {
-          if (stdout) {
-            return stdout.trim();
-          } else {
-            console.log(stderr);
-          }
+
+      const gitCommits = folderContent.map(async (item) => {
+        let commitCommand = "";
+        if (directoryName) {
+          commitCommand = `git log -1 --oneline "${
+            directoryName + "/" + item
+          }"`;
+        } else {
+          commitCommand = `git log -1 --oneline "${item}"`;
+        }
+        return await execPromised(commitCommand, {
+          cwd: repoPath,
+          windowsHide: true,
         })
-        .catch((err) => {
-          console.log(err);
-        });
-    });
-
-    /**
-     * @description - checks the type of the directory content and stores it to the object
-     */
-
-    const folderObjects = folderContent.map(async (item, index) => {
-      return await fs.promises
-        .stat(path.join(targetPath, item))
-        .then(async (content) => {
-          if (await gitCommits[index]) {
-            if (content.isFile()) {
-              return `${item}: File`;
-            } else if (content.isDirectory()) {
-              return `${path.join(directoryName, item)}: directory`;
+          .then(({ stdout, stderr }) => {
+            if (stdout) {
+              return stdout.trim();
             } else {
-              return `${item}: File`;
+              console.log(stderr);
             }
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          return [];
-        });
-    });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
 
-    return {
-      gitFolderContent: {
-        gitTrackedFiles: folderObjects,
-        gitFileBasedCommit: gitCommits,
-      },
-    };
+      /**
+       * @description - checks the type of the directory content and stores it to the object
+       */
+
+      const folderObjects = folderContent.map(async (item, index) => {
+        return await fs.promises
+          .stat(path.join(targetPath, item))
+          .then(async (content) => {
+            if (await gitCommits[index]) {
+              if (content.isFile()) {
+                return `${item}: File`;
+              } else if (content.isDirectory()) {
+                return `${path.join(directoryName, item)}: directory`;
+              } else {
+                return `${item}: File`;
+              }
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            return [];
+          });
+      });
+
+      return {
+        gitFolderContent: {
+          gitTrackedFiles: folderObjects,
+          gitFileBasedCommit: gitCommits,
+        },
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        gitFolderContent: {
+          gitTrackedFiles: [],
+          gitFileBasedCommit: [],
+        },
+      };
+    }
   });
 };
 

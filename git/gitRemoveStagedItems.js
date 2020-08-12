@@ -1,5 +1,5 @@
 const { exec } = require("child_process");
-
+const fs = require("fs");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 
@@ -13,8 +13,19 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
  */
 
 const gitRemoveStagedItemApi = async (repoId, item) => {
+  const repopath = fetchRepopath.getRepoPath(repoId);
+
+  const fileItemValid = await fs.promises
+    .stat(repopath + "/" + item)
+    .then((res) => res.isFile());
+
+  if (!fileItemValid) {
+    console.log("Invalid item string");
+    return "STAGE_REMOVE_FAILED";
+  }
+
   return await execPromisified(`git reset "${item}"`, {
-    cwd: fetchRepopath.getRepoPath(repoId),
+    cwd: repopath,
     windowsHide: true,
   })
     .then(({ stdout, stderr }) => {
