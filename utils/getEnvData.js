@@ -14,6 +14,7 @@ function getEnvData() {
   return {
     DATABASE_FILE: envData.databaseFile,
     GITCONVEX_PORT: envData.port,
+    COMMITLOG_DB: envData.commitLogDatabase,
   };
 }
 

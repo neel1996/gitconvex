@@ -4,6 +4,7 @@ const util = require("util");
 const execPromisified = util.promisify(exec);
 const fs = require("fs");
 const { getEnvData } = require("../utils/getEnvData");
+const { gitCommitLogToDb } = require("../utils/sqliteDbAccess");
 
 /**
  * @param  {String} repoName - Name of the repository
@@ -31,6 +32,7 @@ async function addRepoHandler(
   }
 
   function successResponse() {
+    gitCommitLogToDb();
     return {
       message: "REPO_DATA_UPDATED",
       repoId: id,

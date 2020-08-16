@@ -1,6 +1,7 @@
 const { healthCheckHandler } = require("../API/healthcheckApi");
 const { fetchRepoHandler } = require("../API/fetchRepoApi");
 const { addRepoHandler } = require("../API/addRepoApi");
+const { gitCommitLogDbSerchApi } = require("../API/commitLogSearchApi");
 const { getGitRepoStatus } = require("../git/gitRepoAPI");
 const { gitTrackedDiff } = require("../git/gitTrackedDiff");
 const { gitFileDifferenceHandler } = require("../git/gitFileDifferenceAPI");
@@ -123,6 +124,25 @@ module.exports.gitCommitLogsFunction = gitCommitLogsFunction = async (
       },
     };
   }
+};
+
+/**
+ * @param  {String} repoId - Unique repo ID
+ * @param  {String} searchType - Search category
+ * @param  {String} searchKey - Key for searching
+ */
+
+module.exports.gitCommitLogSearchFunction = gitCommitLogSearchFunction = async (
+  repoId,
+  searchType,
+  searchKey
+) => {
+  return await gitCommitLogDbSerchApi(repoId, searchType, searchKey).catch(
+    (err) => {
+      console.log(err);
+      return [];
+    }
+  );
 };
 
 /**

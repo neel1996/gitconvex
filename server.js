@@ -4,9 +4,8 @@ const globalAPI = require("./global/globalAPIHandler");
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-const dotenv = require("dotenv").config();
 
-const { updateDbFile } = require("./API/settingsApi");
+const { commitLogCrawler } = require("./utils/foreverProcess");
 const app = globalAPI;
 const log = console.log;
 var envConfigFilename = "env_config.json";
@@ -38,6 +37,7 @@ try {
   const configData = [
     {
       databaseFile: path.join(__dirname, "database/repo-datastore.json"),
+      commitLogDatabase: path.join(__dirname, "database/commitLogs.sqlite"),
       port: 9001,
     },
   ];
@@ -113,6 +113,8 @@ globalAPI.listen(getEnvData().GITCONVEX_PORT || 9001, async (err) => {
           });
       }
     });
+
+  commitLogCrawler();
 
   log(
     `\n## Gitconvex is running on port ${getEnvData().GITCONVEX_PORT}

@@ -15,6 +15,7 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 const gitDeleteBranchApi = async (repoId, branchName, forceFlag) => {
   try {
     branchName = branchName.trim();
+    
     if (branchName.match(/[^a-zA-Z0-9-_.:~@$^/\\s\\r\\n]/gi)) {
       throw new Error("Invalid branchName string!");
     }
