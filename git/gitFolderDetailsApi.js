@@ -15,7 +15,7 @@ const gitFetchFolderContentApi = async (repoId, directoryName) => {
      */
 
     try {
-      let validInput = await fs.promises.stat(directoryName).then((res) => {
+      let validInput = await fs.promises.stat(targetPath).then((res) => {
         return res.isDirectory();
       });
 
