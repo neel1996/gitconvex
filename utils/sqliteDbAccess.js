@@ -2,13 +2,18 @@ const { getEnvData } = require("./getEnvData");
 const { fetchRepoHandler } = require("../API/fetchRepoApi");
 const { gitCommitLogHandler } = require("../git/gitCommitLogsAPI");
 const sqlite = require("sqlite3").verbose();
+const path = require("path");
 
 async function gitCommitLogToDb() {
-  const db = new sqlite.Database(getEnvData().COMMITLOG_DB, (err) => {
-    if (err) {
-      console.log(err);
+  const db = new sqlite.Database(
+    getEnvData().COMMITLOG_DB ||
+      path.join(__dirname, "..", "/database/commitLogs.sqlite"),
+    (err) => {
+      if (err) {
+        console.log(err);
+      }
     }
-  });
+  );
 
   console.log("INFO: Initiaitng SQLite DB module for commit logs");
 

@@ -16,15 +16,76 @@ var envConfigFilePath = path.join(__dirname, envConfigFilename);
 app.use(express.static(path.join(__dirname, "build")));
 
 function getEnvData() {
-  const envFileData = fs.readFileSync(path.join(__dirname, "env_config.json"));
+  try {
+    const envFileData = fs.readFileSync(
+      path.join(__dirname, "env_config.json")
+    );
+    const envContent = envFileData.toString();
+    let envData = JSON.parse(envContent)[0];
 
-  const envContent = envFileData.toString();
-  let envData = JSON.parse(envContent)[0];
+    let insertFlag = false;
 
-  return {
-    DATABASE_FILE: envData.databaseFile,
-    GITCONVEX_PORT: envData.port,
-  };
+    if (!envData.databaseFile) {
+      envData["databaseFile"] = path.join(
+        __dirname,
+        "database/repo-datastore.json"
+      );
+      insertFlag = true;
+      log("INFO: Inserting new date --> DATABASE_FILE");
+    }
+    if (!envData.port) {
+      envData["port"] = 9001;
+      insertFlag = true;
+      log("INFO: Inserting new date --> PORT");
+    }
+    if (!envData.commitLogDatabase) {
+      envData["commitLogDatabase"] = path.join(
+        __dirname,
+        "database/commitLogs.sqlite"
+      );
+      insertFlag = true;
+      log("INFO: Inserting new date --> COMMITLOG_DATABASE");
+    }
+
+    if (insertFlag) {
+      writeConfigFile(insertFlag, envData);
+    }
+
+    return {
+      DATABASE_FILE: envData.databaseFile,
+      GITCONVEX_PORT: envData.port,
+    };
+  } catch (err) {
+    console.log("ERROR: Error occurred while reading env_config file", err);
+    writeConfigFile();
+    return {
+      DATABASE_FILE: path.join(__dirname, "database/repo-datastore.json"),
+      GITCONVEX_PORT: 9001,
+    };
+  }
+}
+
+function writeConfigFile(insertFlag = false, envData = {}) {
+  let configData = [
+    {
+      databaseFile: path.join(__dirname, "database/repo-datastore.json"),
+      commitLogDatabase: path.join(__dirname, "database/commitLogs.sqlite"),
+      port: 9001,
+    },
+  ];
+
+  if (insertFlag) {
+    log("INFO: Inserting new data to config file");
+    configData = [{ ...envData }];
+  } else {
+    log(
+      "INFO: Creating config file with default config -> " +
+        JSON.stringify(configData)
+    );
+  }
+  fs.writeFileSync(envConfigFilePath, JSON.stringify(configData), {
+    flag: "w",
+  });
 }
 
 log("INFO: Checking for config file");
@@ -34,20 +95,7 @@ try {
   configStatus = fs.accessSync(envConfigFilePath);
 } catch (e) {
   log("ERROR: No config file found. Falling back to config creation module");
-  const configData = [
-    {
-      databaseFile: path.join(__dirname, "database/repo-datastore.json"),
-      commitLogDatabase: path.join(__dirname, "database/commitLogs.sqlite"),
-      port: 9001,
-    },
-  ];
-  log(
-    "INFO: Creating config file with default config -> " +
-      JSON.stringify(configData)
-  );
-  fs.writeFileSync(envConfigFilePath, JSON.stringify(configData), {
-    flag: "w",
-  });
+  writeConfigFile();
 }
 
 log("INFO: Config file is present");
