@@ -124,33 +124,35 @@ async function inserToDbHandler(commitArray, db, repoId) {
         commitRelativeTime,
       } = commitData;
       let insertTracker = 0;
+      let errorTracker = [];
 
       commitMessage = commitMessage.split('"').join('""');
 
       if (hash) {
         db.get(
-          `SELECT hash from commitLog_${repoId} WHERE hash="${hash}" ORDER BY commit_date`,
+          `SELECT hash from commitLog_${repoId} WHERE hash="${hash}"`,
           [],
           (err, rows) => {
             if (err) {
-              console.log(err);
+              console.log("ERROR: ", err);
             }
-            if (rows && rows.length === 0) {
+            if (rows === undefined) {
               insertTracker++;
-              console.log(
-                `INFO: ${insertTracker} new commits added to the commit log Database`
-              );
-              db.run(
-                `INSERT INTO commitLog_${repoId}(hash,author,commit_date,commit_message,commit_relative_time) VALUES("${hash}", "${author}", "${commitTime}", "${commitMessage}", "${commitRelativeTime}")`,
-                (err) => {
-                  if (err) {
-                    console.log(err);
+
+              !rows &&
+                db.run(
+                  `INSERT INTO commitLog_${repoId}(hash,author,commit_date,commit_message,commit_relative_time) VALUES("${hash}", "${author}", "${commitTime}", "${commitMessage}", "${commitRelativeTime}")`,
+                  (err) => {
+                    if (err) {
+                      errorTracker.push(err);
+                    }
                   }
-                }
-              );
+                );
             }
           }
         );
+      } else {
+        console.log("ERROR: Commit hash not received for validation");
       }
     });
 }
