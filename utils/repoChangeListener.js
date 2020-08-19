@@ -8,8 +8,6 @@ async function gitRepoListener() {
   );
   const { repoPath } = await fetchRepoHandler();
 
-  repoPath.push(__dirname);
-
   if (repoPath) {
     repoPath.forEach((repo) => {
       chokidar
