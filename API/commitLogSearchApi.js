@@ -18,6 +18,9 @@ async function gitCommitLogDbSerchApi(repoId, searchCategory, searchKey) {
     case "user":
       searchQuery = `SELECT * FROM commitLog_${repoId} WHERE author LIKE "%${searchKey}%" LIMIT 10`;
       break;
+    default:
+      searchQuery = `SELECT * FROM commitLog_${repoId} WHERE commit_message LIKE "%${searchKey}%" LIMIT 10`;
+      break;
   }
 
   return new Promise((resolve, reject) => {

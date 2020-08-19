@@ -5,7 +5,8 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 
-const { commitLogCrawler } = require("./utils/foreverProcess");
+const { gitCommitLogToDb } = require("./utils/sqliteDbAccess");
+const { gitRepoListener } = require("./utils/repoChangeListener");
 const app = globalAPI;
 const log = console.log;
 var envConfigFilename = "env_config.json";
@@ -76,7 +77,11 @@ function writeConfigFile(insertFlag = false, envData = {}) {
 
   if (insertFlag) {
     log("INFO: Inserting new data to config file");
-    configData = [{ ...envData }];
+    configData = [
+      {
+        ...envData,
+      },
+    ];
   } else {
     log(
       "INFO: Creating config file with default config -> " +
@@ -116,6 +121,21 @@ globalAPI.listen(getEnvData().GITCONVEX_PORT || 9001, async (err) => {
 
   var DATABASE_FILE = getEnvData().DATABASE_FILE;
 
+  if (!fs.existsSync(DATABASE_FILE)) {
+    log("INFO: Database directory is missing");
+    await fs.promises
+      .mkdir(path.join(__dirname, ".", "/database"))
+      .then(async () => {
+        log(
+          "INFO: Created database directory\nINFO: Setting up new data file in database directory"
+        );
+        await dataFileCreator();
+      })
+      .catch((err) => {
+        log("ERROR: database directory creation failed!");
+      });
+  }
+
   await fs.promises
     .access(DATABASE_FILE)
     .then(() => {
@@ -145,24 +165,10 @@ globalAPI.listen(getEnvData().GITCONVEX_PORT || 9001, async (err) => {
       );
 
       await dataFileCreator();
-
-      if (!fs.existsSync(DATABASE_FILE)) {
-        log("INFO: Database directory is missing");
-        await fs.promises
-          .mkdir(path.join(__dirname, ".", "/database"))
-          .then(async () => {
-            log(
-              "INFO: Created database directory\nINFO: Setting up new data file in database directory"
-            );
-            await dataFileCreator();
-          })
-          .catch((err) => {
-            log("ERROR: database directory creation failed!");
-          });
-      }
     });
 
-  commitLogCrawler();
+  gitCommitLogToDb();
+  gitRepoListener();
 
   log(
     `\n## Gitconvex is running on port ${getEnvData().GITCONVEX_PORT}

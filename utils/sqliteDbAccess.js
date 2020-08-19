@@ -157,6 +157,4 @@ async function inserToDbHandler(commitArray, db, repoId) {
     });
 }
 
-gitCommitLogToDb();
-
 module.exports.gitCommitLogToDb = gitCommitLogToDb;
