@@ -98,8 +98,11 @@ The repo detail view also provides features for performing the following git ope
 
 ![repo-card-details](https://user-images.githubusercontent.com/65342122/89164057-30deb800-d594-11ea-94d6-d3a330260044.png)
 
-![commit-logs](https://user-images.githubusercontent.com/65342122/89561986-ef216c00-d836-11ea-992e-fe9b2a6dc926.png)
+### Commit logs
 
+- Any commit log can be searched using commit message, commit hash and user.
+
+![commit-logs](https://user-images.githubusercontent.com/65342122/90782955-1723cb80-e31d-11ea-9c42-d1d5a6306e6f.png)
 
 #### Add new branch
 ![new-branch](https://user-images.githubusercontent.com/65342122/87232643-23437180-c3de-11ea-9d9e-7e3c3789c32e.png)
