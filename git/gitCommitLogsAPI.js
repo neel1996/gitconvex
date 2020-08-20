@@ -3,6 +3,13 @@ const { exec } = require("child_process");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 
+/**
+ * @param  {String} repoId
+ * @param  {number} skipLimit=0 - git commit --skip limit to skip previous commits
+ * @returns {Array.<Object>} - commit details -
+ * @description Commit logs of the selected repo will be returned
+ */
+
 async function gitCommitLogHandler(repoId, skipLimit = 0) {
   const repoPath = fetchRepopath.getRepoPath(repoId);
   let commitLogLimit = 0;
@@ -18,20 +25,18 @@ async function gitCommitLogHandler(repoId, skipLimit = 0) {
         const gitLocalTotal = stdout.trim().split("\n").length;
         return gitLocalTotal;
       } else {
-        console.log(stderr);
+        console.log("Error occurred while fetching all commits");
         return 0;
       }
     })
     .catch((err) => {
-      console.log(err);
+      console.log("Error occurred while fetching all commits");
       return 0;
     });
 
-  console.log("Total commits in the repo : ", totalCommits);
-
   commitLogLimit = totalCommits < 10 ? totalCommits : 10;
 
-  if (!totalCommits) {
+  if (!totalCommits || typeof skipLimit !== "number") {
     return {
       hash: "",
       author: "",
@@ -85,12 +90,10 @@ async function gitCommitLogHandler(repoId, skipLimit = 0) {
               if (stdout) {
                 return stdout.trim().split("\n").length;
               } else {
-                console.log(stderr);
                 return 0;
               }
             })
             .catch((err) => {
-              console.log(err);
               return 0;
             });
           commit += "||" + commitFilesCount;

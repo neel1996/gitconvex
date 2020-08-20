@@ -4,13 +4,23 @@ const { exec } = require("child_process");
 const util = require("util");
 const execPromisified = util.promisify(exec);
 
+/**
+ * @param  {String} repoId
+ * @param  {String} fileName
+ */
+
 async function gitFileDifferenceHandler(repoId, fileName) {
   if (repoId && fileName) {
     var differencePayload = await getGitFileDifference(repoId, fileName);
-
     return differencePayload;
   }
 }
+
+/**
+ * @param  {String} repoId
+ * @param  {String} fileName
+ * @returns {Object} - git diff status and the lines which of the files with the change indicator
+ */
 
 async function getGitFileDifference(repoId, fileName) {
   const repoPath = fetchRepopath.getRepoPath(repoId);
@@ -25,47 +35,56 @@ async function getGitFileDifference(repoId, fileName) {
       console.log(err);
     });
 
-  const diffStat = await execPromisified(`git diff --stat "${fileName}"`, {
-    cwd: repoPath,
-    windowsHide: true,
-  })
-    .then(({ stdout, stderr }) => {
-      if (stdout) {
-        return stdout.trim().split("\n");
-      } else {
-        console.log(stderr);
-        return ["NO_STAT"];
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      return ["NO_STAT"];
-    });
+  try {
+    if (fileContentLength <= 0) {
+      throw new Error("Invalid file selection!");
+    }
 
-  const fileDiff = await execPromisified(
-    `git diff -U${fileContentLength} "${fileName}"`,
-    {
+    const diffStat = await execPromisified(`git diff --stat "${fileName}"`, {
       cwd: repoPath,
       windowsHide: true,
-    }
-  )
-    .then(({ stdout, stderr }) => {
-      if (stdout) {
-        return stdout.trim().split("\n");
-      } else {
-        console.log(stderr);
-        return ["NO_DIFF"];
-      }
     })
-    .catch((err) => {
-      console.log(err);
-      return ["NO_DIFF"];
-    });
+      .then(({ stdout, stderr }) => {
+        if (stdout) {
+          return stdout.trim().split("\n");
+        } else {
+          console.log(stderr);
+          return ["NO_STAT"];
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        return ["NO_STAT"];
+      });
 
-  return {
-    diffStat,
-    fileDiff,
-  };
+    const fileDiff = await execPromisified(
+      `git diff -U${fileContentLength} "${fileName}"`,
+      {
+        cwd: repoPath,
+        windowsHide: true,
+      }
+    )
+      .then(({ stdout, stderr }) => {
+        if (stdout) {
+          return stdout.trim().split("\n");
+        } else {
+          console.log(stderr);
+          return ["NO_DIFF"];
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        return ["NO_DIFF"];
+      });
+
+    return {
+      diffStat,
+      fileDiff,
+    };
+  } catch (err) {
+    console.log(err);
+    return ["NO_DIFF"];
+  }
 }
 
 module.exports.gitFileDifferenceHandler = gitFileDifferenceHandler;

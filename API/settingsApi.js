@@ -1,19 +1,10 @@
 const fs = require("fs");
 const path = require("path");
+const { getEnvData } = require("../utils/getEnvData");
 
-function getEnvData() {
-  const envFileData = fs.readFileSync(
-    path.join(__dirname, "..", "env_config.json")
-  );
-
-  const envContent = envFileData.toString();
-  let envData = JSON.parse(envContent)[0];
-
-  return {
-    DATABASE_FILE: envData.databaseFile,
-    GITCONVEX_PORT: envData.port,
-  };
-}
+/**
+ * @returns {Object} - Path where the Data file is stored
+ */
 
 const fetchDatabaseFile = async () => {
   const dbPath = getEnvData().DATABASE_FILE || "NO_DATABASE_FILE";
@@ -22,6 +13,10 @@ const fetchDatabaseFile = async () => {
     settingsDatabasePath: dbPath.toString(),
   };
 };
+
+/**
+ * @returns {Array} - The array containing the list of all repos stored in the data file
+ */
 
 const fetchRepoDetails = async () => {
   return await fs.promises
@@ -56,6 +51,11 @@ const fetchRepoDetails = async () => {
       }
     });
 };
+
+/**
+ * @param  {String} newFileName - A new JSON file for storing repo information
+ * @returns {String} - updates the data file in config file and returns the status as string
+ */
 
 const updateDbFile = async (newFileName) => {
   console.log("FILE NAME : ", newFileName);
@@ -94,6 +94,11 @@ const updateDbFile = async (newFileName) => {
 const getPortDetails = async () => {
   return { settingsPortDetails: Number(getEnvData().GITCONVEX_PORT) };
 };
+
+/**
+ * @param  {number} newPort - new port number for running gitconvex
+ * @returns {String} - status string for updating the port
+ */
 
 const updatePortDetails = async (newPort) => {
   if (!isNaN(newPort)) {

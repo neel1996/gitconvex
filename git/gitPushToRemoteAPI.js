@@ -4,6 +4,13 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @param  {String} remoteHost
+ * @param  {String} branch
+ * @returns {String} - status of the git push
+ */
+
 const gitPushToRemoteApi = async (repoId, remoteHost, branch) => {
   return await execPromisified(`git remote -v`, {
     cwd: fetchRepopath.getRepoPath(repoId),
@@ -23,8 +30,18 @@ const gitPushToRemoteApi = async (repoId, remoteHost, branch) => {
           .join("");
 
         const remoteName = filteredRemote.trim().split(/\s/gi)[0];
+        branch = branch.trim();
 
-        const pushCommand = `git push -u ${remoteName} ${branch}`;
+        if (branch.match(/[^a-zA-Z0-9-_.:~@$^/\\s\\n\\r]/gi)) {
+          console.log(
+            new Error("Invalid remote branch string!"),
+            branch,
+            branch.match(/[^a-zA-Z0-9-_.:~@$^/\\s\\r\\n]/gi)
+          );
+          return "PUSH_FAILED";
+        }
+
+        const pushCommand = `git push -u "${remoteName}" "${branch}"`;
 
         return await execPromisified(`${pushCommand}`, {
           cwd: fetchRepopath.getRepoPath(repoId),

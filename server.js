@@ -4,28 +4,102 @@ const globalAPI = require("./global/globalAPIHandler");
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-const dotenv = require("dotenv").config();
 
-const { updateDbFile } = require("./API/settingsApi");
+const { gitCommitLogToDb } = require("./utils/sqliteDbAccess");
+const { gitRepoListener } = require("./utils/repoChangeListener");
 const app = globalAPI;
 const log = console.log;
 var envConfigFilename = "env_config.json";
 var envConfigFilePath = path.join(__dirname, envConfigFilename);
+var isReactBundlePresent = false;
 
-// DATABASE_FILE = path.join(__dirname, ".", DATABASE_FILE);
+try {
+  fs.accessSync(path.join(__dirname, ".", "build"));
+  isReactBundlePresent = true;
+} catch (err) {
+  log("ERROR: ", err);
+  isReactBundlePresent = false;
+}
 
-app.use(express.static(path.join(__dirname, "build")));
+if (isReactBundlePresent) {
+  app.use(express.static(path.join(__dirname, "build")));
+}
 
 function getEnvData() {
-  const envFileData = fs.readFileSync(path.join(__dirname, "env_config.json"));
+  try {
+    const envFileData = fs.readFileSync(
+      path.join(__dirname, "env_config.json")
+    );
+    const envContent = envFileData.toString();
+    let envData = JSON.parse(envContent)[0];
 
-  const envContent = envFileData.toString();
-  let envData = JSON.parse(envContent)[0];
+    let insertFlag = false;
 
-  return {
-    DATABASE_FILE: envData.databaseFile,
-    GITCONVEX_PORT: envData.port,
-  };
+    if (!envData.databaseFile) {
+      envData["databaseFile"] = path.join(
+        __dirname,
+        "database/repo-datastore.json"
+      );
+      insertFlag = true;
+      log("INFO: Inserting new date --> DATABASE_FILE");
+    }
+    if (!envData.port) {
+      envData["port"] = 9001;
+      insertFlag = true;
+      log("INFO: Inserting new date --> PORT");
+    }
+    if (!envData.commitLogDatabase) {
+      envData["commitLogDatabase"] = path.join(
+        __dirname,
+        "database/commitLogs.sqlite"
+      );
+      insertFlag = true;
+      log("INFO: Inserting new date --> COMMITLOG_DATABASE");
+    }
+
+    if (insertFlag) {
+      writeConfigFile(insertFlag, envData);
+    }
+
+    return {
+      DATABASE_FILE: envData.databaseFile,
+      GITCONVEX_PORT: envData.port,
+    };
+  } catch (err) {
+    console.log("ERROR: Error occurred while reading env_config file", err);
+    writeConfigFile();
+    return {
+      DATABASE_FILE: path.join(__dirname, "database/repo-datastore.json"),
+      GITCONVEX_PORT: 9001,
+    };
+  }
+}
+
+function writeConfigFile(insertFlag = false, envData = {}) {
+  let configData = [
+    {
+      databaseFile: path.join(__dirname, "database/repo-datastore.json"),
+      commitLogDatabase: path.join(__dirname, "database/commitLogs.sqlite"),
+      port: 9001,
+    },
+  ];
+
+  if (insertFlag) {
+    log("INFO: Inserting new data to config file");
+    configData = [
+      {
+        ...envData,
+      },
+    ];
+  } else {
+    log(
+      "INFO: Creating config file with default config -> " +
+        JSON.stringify(configData)
+    );
+  }
+  fs.writeFileSync(envConfigFilePath, JSON.stringify(configData), {
+    flag: "w",
+  });
 }
 
 log("INFO: Checking for config file");
@@ -35,26 +109,16 @@ try {
   configStatus = fs.accessSync(envConfigFilePath);
 } catch (e) {
   log("ERROR: No config file found. Falling back to config creation module");
-  const configData = [
-    {
-      databaseFile: path.join(__dirname, "database/repo-datastore.json"),
-      port: 9001,
-    },
-  ];
-  log(
-    "INFO: Creating config file with default config -> " +
-      JSON.stringify(configData)
-  );
-  fs.writeFileSync(envConfigFilePath, JSON.stringify(configData), {
-    flag: "w",
-  });
+  writeConfigFile();
 }
 
 log("INFO: Config file is present");
 log("INFO: Reading from config file " + envConfigFilePath);
 
 app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
+  if (isReactBundlePresent) {
+    res.sendFile(path.join(__dirname, "build", "index.html"));
+  }
 });
 
 globalAPI.listen(getEnvData().GITCONVEX_PORT || 9001, async (err) => {
@@ -67,6 +131,21 @@ globalAPI.listen(getEnvData().GITCONVEX_PORT || 9001, async (err) => {
   log("\n#Checking data file availability...");
 
   var DATABASE_FILE = getEnvData().DATABASE_FILE;
+
+  if (!fs.existsSync(DATABASE_FILE)) {
+    log("INFO: Database directory is missing");
+    await fs.promises
+      .mkdir(path.join(__dirname, ".", "/database"))
+      .then(async () => {
+        log(
+          "INFO: Created database directory\nINFO: Setting up new data file in database directory"
+        );
+        await dataFileCreator();
+      })
+      .catch((err) => {
+        log("ERROR: database directory creation failed!");
+      });
+  }
 
   await fs.promises
     .access(DATABASE_FILE)
@@ -97,22 +176,10 @@ globalAPI.listen(getEnvData().GITCONVEX_PORT || 9001, async (err) => {
       );
 
       await dataFileCreator();
-
-      if (!fs.existsSync(DATABASE_FILE)) {
-        log("INFO: Database directory is missing");
-        await fs.promises
-          .mkdir(path.join(__dirname, ".", "/database"))
-          .then(async () => {
-            log(
-              "INFO: Created database directory\nINFO: Setting up new data file in database directory"
-            );
-            await dataFileCreator();
-          })
-          .catch((err) => {
-            log("ERROR: database directory creation failed!");
-          });
-      }
     });
+
+  gitCommitLogToDb();
+  gitRepoListener();
 
   log(
     `\n## Gitconvex is running on port ${getEnvData().GITCONVEX_PORT}

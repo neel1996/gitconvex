@@ -3,6 +3,10 @@ const util = require("util");
 const execPromise = util.promisify(exec);
 const os = require("os");
 
+/**
+ * @returns {Object} - Version of the required software and the platform on which the app is running
+ */
+
 async function healthCheckHandler() {
   let healthCheckResults = {
     osCheck: "",
@@ -23,6 +27,11 @@ async function healthCheckHandler() {
   return { ...healthCheckResults };
 }
 
+/**
+ * @param  {String} param
+ * @returns {Object} - Executes the shell command and returns the results 
+ */
+
 async function checkStatus(param) {
   var commandString = "";
 
@@ -34,7 +43,7 @@ async function checkStatus(param) {
       commandString = `node --version`;
       break;
     default:
-      commandString = `echo 'NO_COMMAND'`;
+      commandString = ` `;
   }
 
   return await execPromise(commandString, { windowsHide: true }).then((res) => {

@@ -121,6 +121,7 @@ const globalAPISchema = new buildSchema(
             deleteRepo(repoId: String!): deleteRepoStatus!
             addRemoteRepo(repoId: String!, remoteName: String!, remoteUrl: String!): String!
             deleteBranch(repoId: String!, branchName: String!, forceFlag: Boolean!): deleteBranchStatus!
+            searchCommitLogs(repoId: String!, searchType: String!, searchKey: String!): [gitCommits]
         }
 
         type addRepoStatus{
