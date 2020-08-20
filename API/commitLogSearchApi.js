@@ -10,7 +10,7 @@ async function gitCommitLogDbSerchApi(repoId, searchCategory, searchKey) {
 
   switch (searchCategory) {
     case "hash":
-      searchQuery = `SELECT * FROM commitLog_${repoId} WHERE hash LIKE "%${searchKey}%" LIMIT 10`;
+      searchQuery = `SELECT * FROM commitLog_${repoId} WHERE hash LIKE "${searchKey}%" LIMIT 10`;
       break;
     case "message":
       searchQuery = `SELECT * FROM commitLog_${repoId} WHERE commit_message LIKE "%${searchKey}%" LIMIT 10`;
