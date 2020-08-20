@@ -1,4 +1,5 @@
 const chokidar = require("chokidar");
+const path = require("path");
 const { fetchRepoHandler } = require("../API/fetchRepoApi");
 const { gitCommitLogToDb } = require("./sqliteDbAccess");
 
@@ -11,9 +12,9 @@ async function gitRepoListener() {
   if (repoPath) {
     repoPath.forEach((repo) => {
       chokidar
-        .watch(repo, { interval: 1500, usePolling: true })
-        .on("change", (path, stats) => {
-          console.log("INFO: change noticed in ", path);
+        .watch(path.join(repo, ".", ".git"))
+        .on("change", (change, stats) => {
+          console.log("INFO: change noticed in ", change);
           gitCommitLogToDb();
         });
     });

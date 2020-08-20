@@ -11,10 +11,19 @@ const app = globalAPI;
 const log = console.log;
 var envConfigFilename = "env_config.json";
 var envConfigFilePath = path.join(__dirname, envConfigFilename);
+var isReactBundlePresent = false;
 
-// DATABASE_FILE = path.join(__dirname, ".", DATABASE_FILE);
+try {
+  fs.accessSync(path.join(__dirname, ".", "build"));
+  isReactBundlePresent = true;
+} catch (err) {
+  log("ERROR: ", err);
+  isReactBundlePresent = false;
+}
 
-app.use(express.static(path.join(__dirname, "build")));
+if (isReactBundlePresent) {
+  app.use(express.static(path.join(__dirname, "build")));
+}
 
 function getEnvData() {
   try {
@@ -107,7 +116,9 @@ log("INFO: Config file is present");
 log("INFO: Reading from config file " + envConfigFilePath);
 
 app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
+  if (isReactBundlePresent) {
+    res.sendFile(path.join(__dirname, "build", "index.html"));
+  }
 });
 
 globalAPI.listen(getEnvData().GITCONVEX_PORT || 9001, async (err) => {
