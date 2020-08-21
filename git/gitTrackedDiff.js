@@ -4,6 +4,10 @@ const execPromosified = util.promisify(exec);
 const fetchRepoPath = require("../global/fetchGitRepoPath");
 const { getStagedFiles } = require("./gitGetStagedFilesAPI");
 
+/**
+ * @param  {String} repoId
+ */
+
 async function gitTrackedDiff(repoId) {
   const repoPath = fetchRepoPath.getRepoPath(repoId);
 
@@ -16,6 +20,12 @@ async function gitTrackedDiff(repoId) {
   console.log(responseObject);
   return responseObject;
 }
+
+/**
+ * @param  {String} repoPath
+ * @returns {Array}
+ * @description - gets the list of files that have deviated from the HEAD
+ */
 
 async function getGitDiff(repoPath) {
   return await execPromosified(`git diff --raw`, {
@@ -52,6 +62,12 @@ async function getGitDiff(repoPath) {
       return [];
     });
 }
+
+/**
+ * @param  {String} repoPath
+ * @returns {Array}
+ * @description - gets the list of utracked files
+ */
 
 async function getUntrackedFiles(repoPath) {
   return await execPromosified(`git ls-files --others --exclude-standard`, {

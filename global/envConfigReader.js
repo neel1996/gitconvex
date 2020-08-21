@@ -1,7 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 
-function getEnvData() {
+/**
+ * @returns {Object} - env config file content as JSON
+ */
+
+ function getEnvData() {
   const envFileData = fs.readFileSync(
     path.join(__dirname, "..", "env_config.json")
   );

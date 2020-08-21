@@ -1,2 +1,0 @@
-(this.webpackJsonpgitconvex=this.webpackJsonpgitconvex||[]).push([[168],{248:function(t,n){Prism.languages.ini={comment:/^[ \t]*[;#].*$/m,selector:/^[ \t]*\[.*?\]/m,constant:/^[ \t]*[^\s=]+?(?=[ \t]*=)/m,"attr-value":{pattern:/=.*/,inside:{punctuation:/^[=]/}}}}}]);
-//# sourceMappingURL=168.3eb5f33f.chunk.js.map

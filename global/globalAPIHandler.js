@@ -53,6 +53,7 @@ const {
   gitAddRemoteRepoApi,
   gitDeleteBranchApi,
   gitFolderContentApi,
+  gitCommitLogSearchFunction,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -173,6 +174,16 @@ app.use(
       deleteBranch: (args) => {
         const { repoId, branchName, forceFlag } = args;
         return gitDeleteBranchApi(repoId, branchName, forceFlag);
+      },
+      searchCommitLogs: async (args) => {
+        const { repoId, searchType, searchKey } = args;
+        return await gitCommitLogSearchFunction(repoId, searchType, searchKey)
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       },
     },
   })

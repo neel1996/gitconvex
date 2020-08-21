@@ -1,6 +1,11 @@
 const getGitStatus = require("./gitRepoStatus").getGitStatus;
 const fetchRepoPath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @returns {Object}
+ */
+
 async function getGitRepoStatus(repoId) {
   const repoPath = fetchRepoPath.getRepoPath(repoId);
 

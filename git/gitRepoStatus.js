@@ -3,6 +3,12 @@ const fs = require("fs");
 const util = require("util");
 const execPromised = util.promisify(exec);
 
+/**
+ * @param  {String} repoPath
+ * @returns {Object} - returns the overall status of the repo
+ * @description - Gets the basic status of the selected repo
+ */
+
 const getGitStatus = async (repoPath) => {
   console.log("Repo Path : " + repoPath);
 

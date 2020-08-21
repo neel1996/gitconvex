@@ -4,11 +4,17 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @param  {String} commitMessage
+ * @returns {Object} - commits the changes with a commit message and sends the status as JSON {String}
+ */
+
 const gitCommitChangesApi = async (repoId, commitMessage) => {
   commitMessage = commitMessage.split("||").join("\n");
   commitMessage = commitMessage.replace(/"/gi, '\\"');
 
-  return await execPromisified(`git commit -m "${commitMessage}"`, {
+  return await execPromisified(`git commit -m "${commitMessage.toString()}"`, {
     cwd: fetchRepopath.getRepoPath(repoId),
     windowsHide: true,
   })

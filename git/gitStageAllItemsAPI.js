@@ -4,6 +4,11 @@ const execPromisified = util.promisify(exec);
 
 const fetchRepopath = require("../global/fetchGitRepoPath");
 
+/**
+ * @param  {String} repoId
+ * @description - stages all changed items
+ */
+
 const gitStageAllItemsApi = async (repoId) => {
   return await execPromisified(`git add --all`, {
     cwd: fetchRepopath.getRepoPath(repoId),
