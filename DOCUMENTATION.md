@@ -100,7 +100,7 @@ The repo detail view also provides features for performing the following git ope
 
 ### Commit logs
 
-- With commit search bar any commit log can be looked up using its commit message or commit hash or author name who created that commit.
+- With commit searchbar, any commit log can be looked up using its commit message or commit hash or author name who created that commit.
 
 ![commit-logs](https://user-images.githubusercontent.com/65342122/90782955-1723cb80-e31d-11ea-9c42-d1d5a6306e6f.png)
 
