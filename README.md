@@ -1,7 +1,12 @@
 
 # Gitconvex
 
-![gitconvex_logo](https://user-images.githubusercontent.com/47709856/87170859-8bfff080-c2ef-11ea-9140-b9e5db1c17d8.png)
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/47709856/87170859-8bfff080-c2ef-11ea-9140-b9e5db1c17d8.png" width="280">
+    <p align="center">
+        <a href="https://www.producthunt.com/posts/gitconvex-2?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-gitconvex-2" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=241240&theme=light" alt="gitconvex - A web based UI client for managing git repositories | Product Hunt Embed" style="width: 250px; height: 54px;" width="250px" height="54px" /></a>
+    </p>
+</p>
 
 ## Web application for managing your git repositories
 
@@ -91,4 +96,3 @@ Refer the detailed [Documentation](DOCUMENTATION.md) for how to setup and use th
 # License
 
 See [LICENSE ](LICENSE) info for more
-
