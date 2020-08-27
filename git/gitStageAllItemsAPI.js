@@ -17,12 +17,16 @@ const gitStageAllItemsApi = async (repoId) => {
     .then(({ stdout, stderr }) => {
       if (!stderr) {
         return "ALL_STAGED";
+      } else if (stderr.match(/warning: LF will be replaced by CRLF/gi)) {
+        console.log("WARN:", stderr);
+        return "ALL_STAGED";
       } else {
-        console.log(stderr);
+        console.log("ERROR:", stderr);
         return "ERR_STAGE_ALL";
       }
     })
     .catch((err) => {
+      console.log("ERROR:", err);
       return "ERR_STAGE_ALL";
     });
 };
