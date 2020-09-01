@@ -78,10 +78,12 @@ async function getGitFileDifference(repoId, fileName) {
         return ["NO_DIFF"];
       });
 
+    const { prismIndicator } = new LangLine().withFileName(fileName);
+
     return {
       diffStat,
       fileDiff,
-      language: new LangLine().withFileName(fileName).prismIndicator,
+      language: prismIndicator ? prismIndicator : "markdown",
     };
   } catch (err) {
     console.log(err);
