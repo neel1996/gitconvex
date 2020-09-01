@@ -2,6 +2,7 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 const fs = require("fs");
 const { exec } = require("child_process");
 const util = require("util");
+const { LangLine } = require("@itassistors/langline");
 const execPromisified = util.promisify(exec);
 
 /**
@@ -80,6 +81,7 @@ async function getGitFileDifference(repoId, fileName) {
     return {
       diffStat,
       fileDiff,
+      language: new LangLine().withFileName(fileName).prismIndicator,
     };
   } catch (err) {
     console.log(err);

@@ -83,6 +83,7 @@ const globalAPISchema = new buildSchema(
         }
 
         type gitFileLineChangeResults{
+            language: String!
             diffStat: [String]
             fileDiff: [String]
         }
