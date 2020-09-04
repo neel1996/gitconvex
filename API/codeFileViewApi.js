@@ -41,7 +41,7 @@ async function codeFileViewApi(repoId, fileName) {
     } else {
       return {
         codeFileDetails: {
-          language: "",
+          language: "Invalid",
           fileData: fileContent,
           fileCommit: commit,
           prism: "markdown",

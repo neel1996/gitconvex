@@ -107,7 +107,7 @@ const globalAPISchema = new buildSchema(
         type langType{
             language: String
             fileCommit: String
-            fileData: [String!]
+            fileData: [String!]!
             prism: String
         }
 
