@@ -17,6 +17,7 @@ const {
   SETTINGS_REPODETAILS,
   SETTINGS_PORT,
   GIT_FOLDER_CONTENT,
+  CODE_FILE_VIEW,
 } = require("./globalRouteStore");
 
 const graphqlHTTP = require("express-graphql");
@@ -54,6 +55,7 @@ const {
   gitDeleteBranchApi,
   gitFolderContentApi,
   gitCommitLogSearchFunction,
+  codeFileViewFunction,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -100,6 +102,8 @@ app.use(
             return settingsFetchRepoDetails();
           case GIT_FOLDER_CONTENT:
             return gitFolderContentApi(parsedPayload);
+          case CODE_FILE_VIEW:
+            return codeFileViewFunction(parsedPayload);
           default:
             return { message: "Query Termination" };
         }
