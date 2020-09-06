@@ -88,6 +88,30 @@ $ npm start
 | <b>[Node js](https://nodejs.org/en/)</b> | <b>Tested on v12.0+ |
 |--|--|
 | <b>[Git](https://git-scm.com/)</b> | <b>Tested on v2.20+</b> |
+    
+> **Important note for windows users**
+
+If you are a windows user, then make sure that `git` is accessible from the command line without using git bash.
+
+- Open command prompt or powershell and enter `git --version` and press enter. If it displays the following output, then it is fine
+
+```
+C:\> git --version
+
+git version 2.28.0.windows.1
+```
+
+If this output is not displayed and if the command throws the following error, then it shows that `git` is not added to the 'path' environment variable and it will not be accessible directly from the command line,
+
+```
+C:\> git --version
+
+'git' is not recognized as an internal or external command,
+operable program or batch file.
+```
+
+This can be fixed by adding `git` to the PATH environment variable in windows. The process of setting this up is available [here](https://stackoverflow.com/questions/26620312/git-installing-git-in-path-with-github-client-for-windows#answer-53706956:~:text=comment-,27,Here%20is%20the%20magic)
+
 
 # Detailed documentation
 
@@ -96,4 +120,5 @@ Refer the detailed [Documentation](DOCUMENTATION.md) for how to setup and use th
 # License
 
 See [LICENSE ](LICENSE) info for more
+
 
