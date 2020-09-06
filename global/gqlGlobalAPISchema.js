@@ -20,6 +20,7 @@ const globalAPISchema = new buildSchema(
             settingsDatabasePath: String!
             settingsPortDetails: Int!
             settingsRepoDetails: [settingsFetchRepoResults]!
+            codeFileDetails: langType!
         }
 
         type healthCheckResults{
@@ -83,6 +84,7 @@ const globalAPISchema = new buildSchema(
         }
 
         type gitFileLineChangeResults{
+            language: String!
             diffStat: [String]
             fileDiff: [String]
         }
@@ -100,6 +102,13 @@ const globalAPISchema = new buildSchema(
             repoName: String!
             timeStamp: String!
             repoPath: String!
+        }
+
+        type langType{
+            language: String
+            fileCommit: String
+            fileData: [String!]!
+            prism: String
         }
 
         type GitConvexMutation{

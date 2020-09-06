@@ -17,6 +17,7 @@ const { gitStageItem } = require("../git/gitStageItem");
 const { gitAddRemoteApi } = require("../git/gitAddRemoteApi");
 const { gitDeleteBranchApi } = require("../git/gitBranchDeleteApi");
 const { gitFetchFolderContentApi } = require("../git/gitFolderDetailsApi");
+const { codeFileViewApi } = require("../API/codeFileViewApi");
 const {
   fetchDatabaseFile,
   fetchRepoDetails,
@@ -99,6 +100,13 @@ module.exports.addRepoFunction = addRepoFunction = async (
       message: "REPO_WRITE_FAILURE",
     };
   }
+};
+
+module.exports.codeFileViewFunction = codeFileViewFunction = async (
+  parsedPayload
+) => {
+  const { repoId, fileItem } = JSON.parse(parsedPayload);
+  return await codeFileViewApi(repoId, fileItem);
 };
 
 /**

@@ -1,6 +1,6 @@
 {
-  "name": "@neel1996/gitconvex",
-  "version": "1.1.4",
+  "name": "gitconvex",
+  "version": "1.1.5",
   "description": "Git web UI client to manage your git repositories",
   "main": "server.js",
   "bin": {
@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/neel1996/gitconvex#readme",
   "dependencies": {
+    "@itassistors/langline": "0.0.2",
     "axios": "^0.19.2",
     "child_process": "^1.0.2",
     "cors": "^2.8.5",

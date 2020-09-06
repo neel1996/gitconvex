@@ -18,9 +18,9 @@
 
 > Use any of the below options to get gitconvex for your system
 
-[![gitconvex npm package](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.4&color=red&style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
-[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.4&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
-[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.4&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
+[![gitconvex npm package](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.5&color=red&style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
+[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.5&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
+[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.5&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
 [![License](https://img.shields.io/static/v1?label=LICENSE&message=Apache-2.0&color=yellow&style=for-the-badge)](LICENSE)
 
 - **Option - 1** Cloning repo from **github**
@@ -88,6 +88,30 @@ $ npm start
 | <b>[Node js](https://nodejs.org/en/)</b> | <b>Tested on v12.0+ |
 |--|--|
 | <b>[Git](https://git-scm.com/)</b> | <b>Tested on v2.20+</b> |
+    
+> **Important note for windows users**
+
+If you are a windows user, then make sure that `git` is accessible from the command line without using git bash.
+
+- Open command prompt or powershell and enter `git --version` and press enter. If it displays the following output, then it is fine
+
+```
+C:\> git --version
+
+git version 2.28.0.windows.1
+```
+
+If this output is not displayed and if the command throws the following error, then it shows that `git` is not added to the 'path' environment variable and it will not be accessible directly from the command line,
+
+```
+C:\> git --version
+
+'git' is not recognized as an internal or external command,
+operable program or batch file.
+```
+
+This can be fixed by adding `git` to the PATH environment variable in windows. The process of setting this up is available [here](https://stackoverflow.com/questions/26620312/git-installing-git-in-path-with-github-client-for-windows#answer-53706956:~:text=comment-,27,Here%20is%20the%20magic)
+
 
 # Detailed documentation
 
@@ -96,4 +120,5 @@ Refer the detailed [Documentation](DOCUMENTATION.md) for how to setup and use th
 # License
 
 See [LICENSE ](LICENSE) info for more
+
 

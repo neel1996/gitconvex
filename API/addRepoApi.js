@@ -45,7 +45,7 @@ async function addRepoHandler(
         throw new Error("Invalid clone URL string!");
       }
 
-      if (repoName.match(/[^a-zA-Z0-9-_.\\s]/gi)) {
+      if (repoName.match(/[^a-zA-Z0-9-_.\s]/gi)) {
         throw new Error("Invalid repo name string!");
       }
 

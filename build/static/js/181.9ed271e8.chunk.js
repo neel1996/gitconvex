@@ -1,0 +1,2 @@
+(this.webpackJsonpgitconvex=this.webpackJsonpgitconvex||[]).push([[181],{259:function(n,e){var g;(g=Prism).languages.ignore={comment:/^#.*/m,entry:{pattern:/\S(?:.*(?:(?:\\ )|\S))?/,alias:"string",inside:{operator:/^!|\*\*?|\?/,regex:{pattern:/(^|[^\\])\[[^\[\]]*\]/,lookbehind:!0},punctuation:/\//}}},g.languages.gitignore=g.languages.ignore,g.languages.hgignore=g.languages.ignore,g.languages.npmignore=g.languages.ignore}}]);
+//# sourceMappingURL=181.9ed271e8.chunk.js.map

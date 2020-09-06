@@ -26,9 +26,10 @@ const gitFetchFolderContentApi = async (repoId, directoryName) => {
       const gitCommits = folderContent.map(async (item) => {
         let commitCommand = "";
         if (directoryName) {
-          commitCommand = `git log -1 --oneline "${
-            directoryName + "/" + item
-          }"`;
+          commitCommand = `git log -1 --oneline "${path.join(
+            directoryName,
+            item
+          )}"`;
         } else {
           commitCommand = `git log -1 --oneline "${item}"`;
         }
