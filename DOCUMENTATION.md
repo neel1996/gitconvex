@@ -86,14 +86,15 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 - Remote repo URL and host
 - Files and folders tracked by git
 ```
-The repo detail view also provides features for performing the following git operations,
+The repo detail view also provides features for performing the following operations,
 ```
 - Adding a new branch
 - Pulling changes from remote
 - Fetching changes from remote
 - Adding a new remote repo
-- Directory navigator
-- Loading commit logs on demand
+- Directory navigator to lookup all files and folders within the repo
+- Code view for valid files from the file explorer view
+- Loading commit logs dynamically
 ```
 
 ![repo-card-details](https://user-images.githubusercontent.com/65342122/89164057-30deb800-d594-11ea-94d6-d3a330260044.png)
