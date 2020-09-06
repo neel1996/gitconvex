@@ -18,9 +18,9 @@
 
 > Use any of the below options to get gitconvex for your system
 
-[![gitconvex npm package](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.4&color=red&style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
-[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.4&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
-[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.4&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
+[![gitconvex npm package](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.5&color=red&style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
+[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.5&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
+[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.5&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
 [![License](https://img.shields.io/static/v1?label=LICENSE&message=Apache-2.0&color=yellow&style=for-the-badge)](LICENSE)
 
 - **Option - 1** Cloning repo from **github**
