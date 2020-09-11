@@ -186,7 +186,7 @@ app.use(
             return res;
           })
           .catch((err) => {
-            console.log(err);
+            console.log("ERROR: Commit log search error", err);
           });
       },
     },

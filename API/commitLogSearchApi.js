@@ -1,8 +1,5 @@
 const sqlite = require("sqlite3").verbose();
 const path = require("path");
-const db = new sqlite.Database(
-  path.join(__dirname, "..", "/database/commitLogs.sqlite")
-);
 const { gitCommitLogSearchHandler } = require("../git/gitCommitLogSearchApi");
 
 async function gitCommitLogDbSerchApi(repoId, searchCategory, searchKey) {
