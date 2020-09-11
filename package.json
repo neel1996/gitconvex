@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/neel1996/gitconvex#readme",
   "dependencies": {
-    "@itassistors/langline": "0.0.2",
+    "@itassistors/langline": "^1.0.0",
     "axios": "^0.19.2",
     "child_process": "^1.0.2",
     "cors": "^2.8.5",
