@@ -18,6 +18,7 @@ const { gitAddRemoteApi } = require("../git/gitAddRemoteApi");
 const { gitDeleteBranchApi } = require("../git/gitBranchDeleteApi");
 const { gitFetchFolderContentApi } = require("../git/gitFolderDetailsApi");
 const { codeFileViewApi } = require("../API/codeFileViewApi");
+const { branchCompareApi } = require("../API/branchCompareApi");
 const {
   fetchDatabaseFile,
   fetchRepoDetails,
@@ -459,4 +460,11 @@ module.exports.gitAddRemoteRepoApi = gitAddRemoteRepoApi = async (
   remoteUrl
 ) => {
   return await gitAddRemoteApi(repoId, remoteName, remoteUrl);
+};
+
+module.exports.branchCompareApi = branchCompareFunction = async (payload) => {
+  const { repoId, baseBranch, compareBranch } = JSON.parse(payload);
+  return await {
+    branchCompare: branchCompareApi(repoId, baseBranch, compareBranch),
+  };
 };

@@ -21,6 +21,7 @@ const globalAPISchema = new buildSchema(
             settingsPortDetails: Int!
             settingsRepoDetails: [settingsFetchRepoResults]!
             codeFileDetails: langType!
+            branchCompare: [branchCompareType]!
         }
 
         type healthCheckResults{
@@ -109,6 +110,17 @@ const globalAPISchema = new buildSchema(
             fileCommit: String
             fileData: [String!]!
             prism: String
+        }
+
+        type branchCompareType{
+            date: String!
+            commits: [compareCommitType]
+        }
+
+        type compareCommitType{
+            hash: String!
+            author: String
+            commitMessage: String!
         }
 
         type GitConvexMutation{
