@@ -49,7 +49,7 @@ async function gitCommitCompare(repoPath, baseCommit, compareCommit) {
       };
     });
 
-  if (diffFileItems && diffFileItems.length > 0) {
+  if (diffFileItems) {
     console.log(diffFileItems);
     return diffFileItems;
   } else {
