@@ -49,9 +49,15 @@ async function gitCommitCompare(repoPath, baseCommit, compareCommit) {
       };
     });
 
-  console.log(diffFileItems);
-
-  return diffFileItems;
+  if (diffFileItems && diffFileItems.length > 0) {
+    console.log(diffFileItems);
+    return diffFileItems;
+  } else {
+    return {
+      message:
+        "warning: There are no file changes in the base commit. Make sure that it is not a PR merge commit!",
+    };
+  }
 }
 
 module.exports.gitCommitCompare = gitCommitCompare;
