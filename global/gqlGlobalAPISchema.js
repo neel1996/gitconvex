@@ -120,7 +120,7 @@ const globalAPISchema = new buildSchema(
 
         type commitCompareType{
             message: String
-            difference: [commitCompareFileType]!
+            difference: [commitCompareFileType!]
         }
 
         type compareCommitType{

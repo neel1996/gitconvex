@@ -13,7 +13,7 @@ async function gitCommitCompare(repoPath, baseCommit, compareCommit) {
       if (stderr) {
         console.log(stderr);
         return {
-          message: "Error occurred while fetching commit difference",
+          message: stderr,
         };
       }
 
