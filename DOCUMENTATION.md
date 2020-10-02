@@ -173,4 +173,4 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 ## Help and Support
 
 - Visit help section if you're facing an issue or need any help. If you have any queries or feedback, then discuss it in "Discord" or report an issue in GitHub.
-![help-and-support](https://user-images.githubusercontent.com/65342122/87242999-8f11f280-c44f-11ea-9a81-f6cde7b4b419.png)
+![help-and-support](https://user-images.githubusercontent.com/65342122/94940199-d2c94500-04f0-11eb-9212-16c57d642c61.png)
