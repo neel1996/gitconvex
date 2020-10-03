@@ -13,14 +13,38 @@ const fetchRepopath = require("../global/fetchGitRepoPath");
 
 const gitStageItem = async (repoId, item) => {
   const repoPath = fetchRepopath.getRepoPath(repoId);
-  
+
   const fileItemValid = await fs.promises
     .stat(repoPath + "/" + item)
-    .then((res) => res.isFile());
+    .then((res) => res.isFile())
+    .catch((err) => {
+      console.log("ERROR: ", err);
+      return undefined;
+    });
 
   if (!fileItemValid) {
-    console.log("Invalid item string");
-    return "ADD_ITEM_FAILED";
+    const isRemovedFile = await execPromisified(`git ls-files --deleted`, {
+      cwd: repoPath,
+      windowsHide: true,
+    })
+      .then(({ stdout, stderr }) => {
+        const deletedList = stdout.trim().split("\n");
+
+        if (deletedList && deletedList.includes(item)) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((err) => {
+        console.log("ERROR: ", err);
+        return false;
+      });
+
+    if (!isRemovedFile) {
+      console.log("Invalid item string");
+      return "ADD_ITEM_FAILED";
+    }
   }
 
   return await execPromisified(`git add "${item}"`, {

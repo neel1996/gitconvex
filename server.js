@@ -180,14 +180,13 @@ globalAPI.listen(getEnvData().GITCONVEX_PORT || 9001, async (err) => {
 
   try {
     fs.accessSync(path.join(__dirname, ".", "database"));
-    gitCommitLogToDb();
-    gitRepoListener();
   } catch (err) {
-    console.log(err);
+    console.log("ERROR: Server cannot find the databse directory", err);
     fs.mkdirSync(path.join(__dirname, ".", "database"));
-    gitCommitLogToDb();
-    gitRepoListener();
   }
+
+  gitCommitLogToDb();
+  gitRepoListener();
 
   log(
     `\n## Gitconvex is running on port ${getEnvData().GITCONVEX_PORT}

@@ -1,16 +1,24 @@
 const { getEnvData } = require("./getEnvData");
+const fs = require("fs");
 const { fetchRepoHandler } = require("../API/fetchRepoApi");
 const { gitCommitLogHandler } = require("../git/gitCommitLogsAPI");
 const sqlite = require("sqlite3").verbose();
 const path = require("path");
 
 async function gitCommitLogToDb() {
+  try {
+    fs.accessSync(path.join(__dirname, "..", "database"));
+  } catch (err) {
+    console.log("ERROR : Database directory missing. Creating new directory");
+    fs.mkdirSync(path.join(__dirname, "..", "database"));
+  }
+
   const db = new sqlite.Database(
     getEnvData().COMMITLOG_DB ||
       path.join(__dirname, "..", "/database/commitLogs.sqlite"),
     (err) => {
       if (err) {
-        console.log(err);
+        console.log("SQLite DB Error", err);
       }
     }
   );

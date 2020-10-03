@@ -66,6 +66,7 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 ### Left Pane Menu
 
 - **Repositories** - To check tracked files changes, line-based changes with syntax highlighting and git operations (staging, un-staging, committing changes and pushing changed to remote)
+- **Compare** - To compare the branches and commits for the selected repository.
 - **Settings** - To check and edit internal data file, to remove a repo from GitConvex and to update the active port.
 - **Help** - Includes documentation link and various options to report an issue or to submit feedback.
 
@@ -143,6 +144,17 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 
 ![git-difference](https://user-images.githubusercontent.com/65342122/89559704-ab793300-d833-11ea-88a8-28afea4b461b.png)
 
+## Compare
+- The **Compare** menu has two sections: **Branch compare** and **Commit compare**.
+
+- **Branch compare** - Compares any two branches based on the selected base branch and compare branch. It displays difference between the selected branches. 
+
+![branch-compare](https://user-images.githubusercontent.com/65342122/94800651-83a4e680-0402-11eb-9e34-1c7b53e66add.png)
+
+- **Commit compare** - Compares any two commits based on the selected base commit and compare commit. It shows file difference between the selected commits.
+
+![commit-compare](https://user-images.githubusercontent.com/65342122/94800717-9d462e00-0402-11eb-84aa-9890bfea1f78.png)
+
 ## Settings
 - Settings in the left pane has three sections (Server data file, saved repos, Active GitConvex port number).
 ![settings](https://user-images.githubusercontent.com/65342122/87243003-a4871c80-c44f-11ea-9d1a-8350bdfb0da8.png)
@@ -157,4 +169,4 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 ## Help and Support
 
 - Visit help section if you're facing an issue or need any help. If you have any queries or feedback, then discuss it in "Discord" or report an issue in GitHub.
-![help-and-support](https://user-images.githubusercontent.com/65342122/87242999-8f11f280-c44f-11ea-9a81-f6cde7b4b419.png)
+![help-and-support](https://user-images.githubusercontent.com/65342122/94940199-d2c94500-04f0-11eb-9212-16c57d642c61.png)

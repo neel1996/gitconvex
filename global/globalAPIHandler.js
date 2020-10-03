@@ -18,6 +18,8 @@ const {
   SETTINGS_PORT,
   GIT_FOLDER_CONTENT,
   CODE_FILE_VIEW,
+  BRANCH_COMPARE,
+  COMMIT_COMPARE,
 } = require("./globalRouteStore");
 
 const graphqlHTTP = require("express-graphql");
@@ -56,6 +58,8 @@ const {
   gitFolderContentApi,
   gitCommitLogSearchFunction,
   codeFileViewFunction,
+  branchCompareApi,
+  commitCompareApi,
 } = require("./globalFunctionStore");
 
 app.use(
@@ -104,6 +108,10 @@ app.use(
             return gitFolderContentApi(parsedPayload);
           case CODE_FILE_VIEW:
             return codeFileViewFunction(parsedPayload);
+          case BRANCH_COMPARE:
+            return branchCompareApi(parsedPayload);
+          case COMMIT_COMPARE:
+            return commitCompareApi(parsedPayload);
           default:
             return { message: "Query Termination" };
         }
@@ -186,7 +194,7 @@ app.use(
             return res;
           })
           .catch((err) => {
-            console.log(err);
+            console.log("ERROR: Commit log search error", err);
           });
       },
     },

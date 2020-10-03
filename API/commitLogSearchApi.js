@@ -1,12 +1,17 @@
 const sqlite = require("sqlite3").verbose();
 const path = require("path");
-const db = new sqlite.Database(
-  path.join(__dirname, "..", "/database/commitLogs.sqlite")
-);
 const { gitCommitLogSearchHandler } = require("../git/gitCommitLogSearchApi");
 
 async function gitCommitLogDbSerchApi(repoId, searchCategory, searchKey) {
   let searchQuery = "";
+  const db = new sqlite.Database(
+    path.join(__dirname, "..", "/database/commitLogs.sqlite"),
+    (err) => {
+      if (err) {
+        console.log("ERROR: Unable to open commit log SQLITE DB", err);
+      }
+    }
+  );
 
   switch (searchCategory) {
     case "hash":

@@ -18,6 +18,8 @@ const { gitAddRemoteApi } = require("../git/gitAddRemoteApi");
 const { gitDeleteBranchApi } = require("../git/gitBranchDeleteApi");
 const { gitFetchFolderContentApi } = require("../git/gitFolderDetailsApi");
 const { codeFileViewApi } = require("../API/codeFileViewApi");
+const { branchCompareApi } = require("../API/branchCompareApi");
+const { commitCompareApi } = require("../API/commitCompareApi");
 const {
   fetchDatabaseFile,
   fetchRepoDetails,
@@ -459,4 +461,28 @@ module.exports.gitAddRemoteRepoApi = gitAddRemoteRepoApi = async (
   remoteUrl
 ) => {
   return await gitAddRemoteApi(repoId, remoteName, remoteUrl);
+};
+
+/**
+ * @param {String} payload - Stringified JSON
+ * @returns {Object} branchCompare - list of all difference between two selected branches
+ */
+
+module.exports.branchCompareApi = branchCompareFunction = async (payload) => {
+  const { repoId, baseBranch, compareBranch } = JSON.parse(payload);
+  return await {
+    branchCompare: branchCompareApi(repoId, baseBranch, compareBranch),
+  };
+};
+
+/**
+ * @param {String} payload - Stringified JSON
+ * @returns {Object} branchCompare - list of all difference between two selected branches
+ */
+
+module.exports.commitCompareApi = commitCompareFunction = async (payload) => {
+  const { repoId, baseCommit, compareCommit } = JSON.parse(payload);
+  return await {
+    commitCompare: commitCompareApi(repoId, baseCommit, compareCommit),
+  };
 };
