@@ -66,7 +66,7 @@ or use `pm2` by downloading it from npm - `npm i -g pm2` and start the module by
 ### Left Pane Menu
 
 - **Repositories** - To check tracked files changes, line-based changes with syntax highlighting and git operations (staging, un-staging, committing changes and pushing changed to remote)
-- **Compare** - To compare the branches and commits with in the selected repository.
+- **Compare** - To compare the branches and commits for the selected repository.
 - **Settings** - To check and edit internal data file, to remove a repo from GitConvex and to update the active port.
 - **Help** - Includes documentation link and various options to report an issue or to submit feedback.
 
@@ -147,8 +147,6 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 ## Compare
 - The **Compare** menu has two sections: **Branch compare** and **Commit compare**.
 
-![compare-section](https://user-images.githubusercontent.com/65342122/94801121-337a5400-0403-11eb-8e8a-4bdcab69eb79.png)
-
 - **Branch compare** - Compares any two branches based on the selected base branch and compare branch. It displays difference between the selected branches. 
 
 ![branch-compare](https://user-images.githubusercontent.com/65342122/94800651-83a4e680-0402-11eb-9e34-1c7b53e66add.png)
@@ -156,8 +154,6 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 - **Commit compare** - Compares any two commits based on the selected base commit and compare commit. It shows file difference between the selected commits.
 
 ![commit-compare](https://user-images.githubusercontent.com/65342122/94800717-9d462e00-0402-11eb-84aa-9890bfea1f78.png)
-
-![commit-compare-diff](https://user-images.githubusercontent.com/65342122/94801950-6ec95280-0404-11eb-90d4-5794645c9dd6.png)
 
 ## Settings
 - Settings in the left pane has three sections (Server data file, saved repos, Active GitConvex port number).
