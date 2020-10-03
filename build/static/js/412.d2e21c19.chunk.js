@@ -1,2 +1,0 @@
-(this.webpackJsonpgitconvex=this.webpackJsonpgitconvex||[]).push([[412],{490:function(s,e){var i=Prism.util.clone(Prism.languages.typescript);Prism.languages.tsx=Prism.languages.extend("jsx",i)}}]);
-//# sourceMappingURL=412.d2e21c19.chunk.js.map
