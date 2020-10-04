@@ -124,11 +124,11 @@ This is the final production build for **gitconvex** and direct contributions wi
 
 - **Frontend repo - Build with React JS**
 
-[![gitconvex-ui](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-ui)](https://github.com/neel1996/gitconvex)
+[![gitconvex-ui](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-ui)](https://github.com/neel1996/gitconvex-ui)
 
 - **Backend repo - Build with Node JS**
 
-[![gitconvex-server](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-server)](https://github.com/neel1996/gitconvex)
+[![gitconvex-server](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-server)](https://github.com/neel1996/gitconvex-server)
 
 
 > Please make sure that you are following the contribution guidelines for the respective repos. 
