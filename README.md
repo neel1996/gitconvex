@@ -117,9 +117,30 @@ This can be fixed by adding `git` to the PATH environment variable in windows. T
 
 Refer the detailed [Documentation](DOCUMENTATION.md) for how to setup and use the platform
 
+
+# Contributions 
+
+This is the final production build for **gitconvex** and direct contributions will not be accepted to this repo. If you wish to contribute to this project, then it has to be made to the following repos which are dedicated to the frontend (React) and backend (Node JS) for the platform 
+
+- **Frontend repo - Build with React JS**
+
+[![gitconvex-ui](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-ui)](https://github.com/neel1996/gitconvex)
+
+- **Backend repo - Build with Node JS**
+
+[![gitconvex-server](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-server)](https://github.com/neel1996/gitconvex)
+
+
+> Please make sure that you are following the contribution guidelines for the respective repos. 
+
+# Help and Feedback
+
+For reporting issues or for requesting any feature use the following medium,
+
+[**Discord Channel** ](https://discord.gg/PSd2Cq9)
+
+[**Github Issue Reporting**](https://github.com/neel1996/gitconvex-package/issues)
+
 # License
 
 See [LICENSE ](LICENSE) info for more
-
-
-
