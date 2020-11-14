@@ -12,7 +12,7 @@
 
 ![open issues](https://img.shields.io/github/issues/neel1996/gitconvex?color=orange&style=for-the-badge)
 ![Gitconvex UI pipeline](https://img.shields.io/github/workflow/status/neel1996/gitconvex-ui/Gitconvex%20UI%20pipeline/master?label=gitconvex%20ui%20build&logo=github&style=for-the-badge)
-![Gitconvex Server pipeline](https://img.shields.io/github/workflow/status/neel1996/gitconvex-server/Gitconvex%20Server%20pipeline/master?label=gitconvex%20server%20build&logo=github&style=for-the-badge)
+![Gitconvex Server pipeline](https://img.shields.io/github/workflow/status/neel1996/gitconvex-server/Gitconvex%20Server%20Pipeline/main?label=gitconvex%20server%20build&logo=github&style=for-the-badge)
 
 # Download options
 
