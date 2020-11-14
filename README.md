@@ -1,6 +1,10 @@
 
 # Gitconvex
 
+# 🚧Discontinued Repo
+
+> This repo is archived and changes will not be accepted anymore. The backend for gitconvex has been rewritten in golang and build process has been updated. The latest repo with all the changes is available [here](https://github.com/neel1996/gitconvex)
+
 <p align="center">
     <img src="https://user-images.githubusercontent.com/47709856/87170859-8bfff080-c2ef-11ea-9140-b9e5db1c17d8.png" width="280">
     <p align="center">
