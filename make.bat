@@ -16,18 +16,23 @@ if "%ip%"==%BUILD% (
     git clone https://github.com/neel1996/gitconvex-ui.git ui/
     cd ui
     echo "Installing UI dependencies"
-	npm install
-	npm i -g create-react-app tailwindcss@1.6.0
-	echo "Building UI bundle"
-	npm run build:tailwind
-	npm run build
-	mv ./build ../
-	cd ..
-	mkdir -p ./dist
-	echo "Building gitconvex bundle"
-	go build -o ./dist
+    npm install
+    npm i -g create-react-app tailwindcss@1.6.0
+    echo "Building UI bundle"
+    set NODE_ENV=production
+    tailwindcss build -o src/index.css -c src/tailwind.config.js
+    npm run build
+    mv ./build ../
+    cd ..
+    mkdir -p ./dist
+    echo "Building gitconvex bundle"
+    go build -o ./dist
 )
 
 if "%ip%"==%TEST% (
     go test -v ./...
+)
+
+if "%ip%"==%RUN% (
+    go run server.go
 )
