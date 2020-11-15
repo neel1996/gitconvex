@@ -57,8 +57,7 @@ type BranchCompareResults struct {
 }
 
 type CodeFileType struct {
-	FileCommit string    `json:"fileCommit"`
-	FileData   []*string `json:"fileData"`
+	FileData []*string `json:"fileData"`
 }
 
 type DeleteStatus struct {

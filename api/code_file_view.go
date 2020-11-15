@@ -2,17 +2,16 @@ package api
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
 	"os"
 )
 
+// CodeFileView returns the lines from the target file and the latest commit corresponding to the file
 func CodeFileView(repo *git.Repository, repoPath string, fileName string) *model.CodeFileType {
 	var codeLines []*string
-	var fileCommit string
-	fileCommit = ""
 
 	targetFile := repoPath + "/" + fileName
 	logger := global.Logger{}
@@ -21,10 +20,10 @@ func CodeFileView(repo *git.Repository, repoPath string, fileName string) *model
 	if err != nil {
 		logger.Log(err.Error(), global.StatusError)
 		return &model.CodeFileType{
-			FileCommit: "",
-			FileData:   nil,
+			FileData: nil,
 		}
 	} else {
+		logger.Log(fmt.Sprintf("Reading lines from file --> %s", fileName), global.StatusInfo)
 		scanner := bufio.NewScanner(file)
 		scanner.Split(bufio.ScanLines)
 		for scanner.Scan() {
@@ -34,22 +33,7 @@ func CodeFileView(repo *git.Repository, repoPath string, fileName string) *model
 		_ = file.Close()
 	}
 
-	commitLog, commitErr := repo.Log(&git.LogOptions{
-		From:     plumbing.Hash{},
-		Order:    git.LogOrderDFSPost,
-		FileName: &fileName,
-		All:      false,
-	})
-
-	if commitErr != nil {
-		logger.Log(commitErr.Error(), global.StatusError)
-	} else {
-		nxt, _ := commitLog.Next()
-		fileCommit = nxt.Message
-	}
-
 	return &model.CodeFileType{
-		FileCommit: fileCommit,
-		FileData:   codeLines,
+		FileData: codeLines,
 	}
 }

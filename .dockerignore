@@ -3,6 +3,4 @@ start.sh
 setup.sh
 .git/
 node_modules/*
-build/
-dist/
 make.bat

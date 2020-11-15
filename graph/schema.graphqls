@@ -58,7 +58,6 @@ type gitCommitFileResult{
 }
 
 type codeFileType{
-    fileCommit: String!
     fileData: [String]!
 }
 
