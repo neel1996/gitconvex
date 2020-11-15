@@ -5,3 +5,7 @@ package-lock.json
 database/*
 tests/
 *.swp
+database/
+env_config.json
+dist/
+build/

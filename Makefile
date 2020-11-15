@@ -21,6 +21,7 @@ build:
 	export NODE_ENV=production && \
 	tailwindcss build -o ./src/index.css -c ./src/tailwind.config.js && \
 	rm package-*.json && \
+	rm -rf .git/ && \
 	npm run build && \
 	mv ./build ../ && \
 	cd ..
