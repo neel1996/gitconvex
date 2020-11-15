@@ -5,6 +5,7 @@ set INSTALL="install"
 set BUILD="build"
 set RUN="run"
 set TEST="test"
+set START="start"
 
 if "%ip%"==%INSTALL% (
     echo "Installing Go Dependencies..."
@@ -12,21 +13,29 @@ if "%ip%"==%INSTALL% (
 )
 
 if "%ip%"==%BUILD% (
-    echo "Cloning UI package from github"
+	echo "Initiating gitconvex build for windows"
+	echo "Cleaning up unwanted folders"
+	rd /s /q ui
+	rd /s /q dist
+    echo "Cloning UI package from github gitconvex-ui/master"
     git clone https://github.com/neel1996/gitconvex-ui.git ui/
     cd ui
     echo "Installing UI dependencies"
+	del package-lock.json
     npm install
-    npm i -g create-react-app tailwindcss@1.6.0
+    npm i -g tailwindcss@1.6.0
     echo "Building UI bundle"
     set NODE_ENV=production
     tailwindcss build -o src/index.css -c src/tailwind.config.js
     npm run build
-    mv ./build ../
+    move .\build ..\
     cd ..
-    mkdir -p ./dist
+    mkdir .\dist
+	echo "Removing intermediary folder ui/"
+	rd /s /q ui
     echo "Building gitconvex bundle"
     go build -o ./dist
+	echo "Run ./dist/gitconvex-server.exe to start gitconvex on port 9001"
 )
 
 if "%ip%"==%TEST% (
@@ -35,4 +44,8 @@ if "%ip%"==%TEST% (
 
 if "%ip%"==%RUN% (
     go run server.go
+)
+
+if "%ip%"==%START% (
+	.\dist\gitconvex-server.exe
 )
