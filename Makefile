@@ -14,8 +14,8 @@ build-server:
 	mkdir -p ./dist
 	go build -o ./dist
 build:
-    	echo "Initiating gitconvex build"
-    	echo "Cloning gitconvex react repo"
+	echo "Initiating gitconvex build"
+	echo "Cloning gitconvex react repo"
 	git clone https://github.com/neel1996/gitconvex-ui.git ui/
 	cd ui && \
 	npm i -g tailwindcss@1.6.0 && \
@@ -38,4 +38,4 @@ build:
 test:
 	go test -v ./...
 start:
-    ./dist/gitconvex-server
+	./dist/gitconvex-server
