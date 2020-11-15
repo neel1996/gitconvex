@@ -3,10 +3,12 @@ package git
 import (
 	"fmt"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
 	"github.com/nleeper/goment"
+	"go/types"
 	"strconv"
 	"strings"
 	"time"
@@ -128,26 +130,48 @@ func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 }
 
 // CommitLogs fetches the structured commit logs list for the target repo
-// The skipCount limit is set to limit the number of commit logs returned per invokation
+// The skipCount limit is set to limit the number of commit logs returned per invocation
 
-func CommitLogs(repo *git.Repository, skipCount int) *model.GitCommitLogResults {
+func CommitLogs(repo *git.Repository, skipCount int, referenceCommit string) *model.GitCommitLogResults {
 	var commitLogs []object.Commit
+	var logOptions *git.LogOptions
 
 	allCommitChan := make(chan AllCommitData)
 	go AllCommits(repo, allCommitChan)
 	acc := <-allCommitChan
 	totalCommits := acc.TotalCommits
 
-	head, _ := repo.Head()
-	commitItr, commitErr := repo.Log(&git.LogOptions{
-		From:  head.Hash(),
-		Order: git.LogOrderCommitterTime,
-		All:   false,
-	})
+	if referenceCommit == "" {
+		head, _ := repo.Head()
+		logOptions = &git.LogOptions{
+			From:  head.Hash(),
+			Order: git.LogOrderDFSPost,
+			All:   false,
+		}
+	} else {
+		hash := plumbing.NewHash(referenceCommit)
+		logOptions = &git.LogOptions{
+			From:  hash,
+			Order: git.LogOrderDFSPost,
+			All:   false,
+		}
+	}
+
+	commitItr, commitErr := repo.Log(logOptions)
+
+	var commitCounter int
+	commitCounter = 0
 
 	if commitErr == nil {
 		_ = commitItr.ForEach(func(commit *object.Commit) error {
-			commitLogs = append(commitLogs, *commit)
+			if commitCounter >= 10 || commit == nil {
+				return types.Error{Msg: "Commit limit reached"}
+			}
+
+			if commit.Hash.String() != referenceCommit {
+				commitLogs = append(commitLogs, *commit)
+				commitCounter++
+			}
 			return nil
 		})
 	}
@@ -159,26 +183,9 @@ func CommitLogs(repo *git.Repository, skipCount int) *model.GitCommitLogResults 
 		}
 	}
 
-	if len(commitLogs) <= 10 {
-		refinedCommits := commitOrganizer(commitLogs)
-		return &model.GitCommitLogResults{
-			TotalCommits: &totalCommits,
-			Commits:      refinedCommits,
-		}
-	} else {
-		var commitSlice []object.Commit
-
-		commitLimit := skipCount + 10
-		if commitLimit > len(commitLogs) {
-			commitLimit = skipCount
-			commitSlice = commitLogs[skipCount:]
-		} else {
-			commitSlice = commitLogs[skipCount:commitLimit]
-		}
-		refinedCommits := commitOrganizer(commitSlice)
-		return &model.GitCommitLogResults{
-			TotalCommits: &totalCommits,
-			Commits:      refinedCommits,
-		}
+	refinedCommits := commitOrganizer(commitLogs)
+	return &model.GitCommitLogResults{
+		TotalCommits: &totalCommits,
+		Commits:      refinedCommits,
 	}
 }

@@ -118,7 +118,7 @@ type ComplexityRoot struct {
 		FetchRepo          func(childComplexity int) int
 		GitChanges         func(childComplexity int, repoID string) int
 		GitCommitFiles     func(childComplexity int, repoID string, commitHash string) int
-		GitCommitLogs      func(childComplexity int, repoID string, skipLimit int) int
+		GitCommitLogs      func(childComplexity int, repoID string, skipLimit int, referenceCommit string) int
 		GitFileLineChanges func(childComplexity int, repoID string, fileName string) int
 		GitFolderContent   func(childComplexity int, repoID string, directoryName *string) int
 		GitRepoStatus      func(childComplexity int, repoID string) int
@@ -201,7 +201,7 @@ type QueryResolver interface {
 	FetchRepo(ctx context.Context) (*model.FetchRepoParams, error)
 	GitRepoStatus(ctx context.Context, repoID string) (*model.GitRepoStatusResults, error)
 	GitFolderContent(ctx context.Context, repoID string, directoryName *string) (*model.GitFolderContentResults, error)
-	GitCommitLogs(ctx context.Context, repoID string, skipLimit int) (*model.GitCommitLogResults, error)
+	GitCommitLogs(ctx context.Context, repoID string, skipLimit int, referenceCommit string) (*model.GitCommitLogResults, error)
 	GitCommitFiles(ctx context.Context, repoID string, commitHash string) ([]*model.GitCommitFileResult, error)
 	SearchCommitLogs(ctx context.Context, repoID string, searchType string, searchKey string) ([]*model.GitCommits, error)
 	CodeFileDetails(ctx context.Context, repoID string, fileName string) (*model.CodeFileType, error)
@@ -672,7 +672,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GitCommitLogs(childComplexity, args["repoId"].(string), args["skipLimit"].(int)), true
+		return e.complexity.Query.GitCommitLogs(childComplexity, args["repoId"].(string), args["skipLimit"].(int), args["referenceCommit"].(string)), true
 
 	case "Query.gitFileLineChanges":
 		if e.complexity.Query.GitFileLineChanges == nil {
@@ -1055,7 +1055,7 @@ type Query {
     fetchRepo: FetchRepoParams!
     gitRepoStatus(repoId: String!): GitRepoStatusResults!
     gitFolderContent(repoId: String!, directoryName: String): GitFolderContentResults!
-    gitCommitLogs(repoId: String!, skipLimit: Int!): gitCommitLogResults!
+    gitCommitLogs(repoId: String!, skipLimit: Int!, referenceCommit: String!): gitCommitLogResults!
     gitCommitFiles(repoId: String!, commitHash: String!): [gitCommitFileResult]!
     searchCommitLogs(repoId: String!, searchType: String!, searchKey: String!): [gitCommits]!
     codeFileDetails(repoId: String!, fileName: String!): codeFileType!
@@ -1715,6 +1715,15 @@ func (ec *executionContext) field_Query_gitCommitLogs_args(ctx context.Context, 
 		}
 	}
 	args["skipLimit"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["referenceCommit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("referenceCommit"))
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["referenceCommit"] = arg2
 	return args, nil
 }
 
@@ -3584,7 +3593,7 @@ func (ec *executionContext) _Query_gitCommitLogs(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GitCommitLogs(rctx, args["repoId"].(string), args["skipLimit"].(int))
+		return ec.resolvers.Query().GitCommitLogs(rctx, args["repoId"].(string), args["skipLimit"].(int), args["referenceCommit"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

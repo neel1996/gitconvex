@@ -6,6 +6,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
+	"go/types"
 	"regexp"
 )
 
@@ -16,15 +17,15 @@ func SearchCommitLogs(repo *git.Repository, searchType string, searchKey string)
 	logger := global.Logger{}
 
 	commitLogs, _ := repo.Log(&git.LogOptions{
-		Order: git.LogOrderDefault,
+		Order: git.LogOrderDFSPost,
 		All:   true,
 	})
 
 	logger.Log(fmt.Sprintf("Searching commit logs with %s for -> %s", searchType, searchKey), global.StatusInfo)
 
 	_ = commitLogs.ForEach(func(commit *object.Commit) error {
-		if len(searchResult) > 10 {
-			return nil
+		if len(searchResult) == 10 {
+			return types.Error{Msg: "Commit limit exceeded"}
 		}
 
 		switch searchType {
