@@ -24,6 +24,7 @@ export default function RepositoryCommitLogComponent(props) {
   const [searchKey, setSearchKey] = useState("");
   const [viewReload, setViewReload] = useState(0);
   const [searchWarning, setSearchWarning] = useState(false);
+  const [referenceCommitHash, setReferenceCommitHash] = useState("");
 
   const searchRef = useRef();
   const searchOptionRef = useRef();
@@ -44,7 +45,7 @@ export default function RepositoryCommitLogComponent(props) {
       data: {
         query: `
             query {
-              gitCommitLogs(repoId: "${props.repoId}", skipLimit: 0) {
+              gitCommitLogs(repoId: "${props.repoId}", skipLimit: 0, referenceCommit: "") {
                   totalCommits
                   commits{
                       commitTime
@@ -74,6 +75,8 @@ export default function RepositoryCommitLogComponent(props) {
           setTotalCommitCount(totalCommits);
           if (commits && commits.length > 0) {
             setCommitLogs([...commits]);
+            const len = commits.length;
+            setReferenceCommitHash(commits[len - 1].hash);
           } else {
             setIsCommitEmpty(true);
           }
@@ -104,7 +107,7 @@ export default function RepositoryCommitLogComponent(props) {
       data: {
         query: `
           query{
-            gitCommitLogs(repoId:"${props.repoId}", skipLimit: ${localLimit}){
+            gitCommitLogs(repoId:"${props.repoId}", skipLimit: ${localLimit}, referenceCommit: "${referenceCommitHash}"){
                 totalCommits
                 commits{
                     commitTime
@@ -131,6 +134,9 @@ export default function RepositoryCommitLogComponent(props) {
           setTotalCommitCount(totalCommits);
           if (commits && commits.length > 0) {
             setCommitLogs([...commitLogs, ...commits]);
+
+            const len = commits.length;
+            setReferenceCommitHash(commits[len - 1].hash);
           } else {
             setIsCommitEmpty(true);
           }
@@ -452,7 +458,7 @@ export default function RepositoryCommitLogComponent(props) {
           className="commitlogs--load-btn"
           title="Click to load commits"
           onClick={() => {
-            if (totalCommitCount - skipLimit >= 10) {
+            if (commitLogs.length > skipLimit) {
               fetchCommitLogs();
             }
           }}
