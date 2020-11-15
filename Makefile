@@ -14,9 +14,7 @@ build-server:
 	mkdir -p ./dist
 	go build -o ./dist
 build:
-	ifeq(,$(wildcard ./ui)){
-		git clone https://github.com/neel1996/gitconvex-ui.git ui/
-	}
+	git clone https://github.com/neel1996/gitconvex-ui.git ui/
 	cd ui
 	npm install
 	npm i -g create-react-app tailwindcss@1.6.0
