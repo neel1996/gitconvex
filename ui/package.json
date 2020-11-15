@@ -1,0 +1,58 @@
+{
+  "name": "gitconvex",
+  "version": "1.1.6",
+  "private": true,
+  "homepage": "",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-brands-svg-icons": "^5.13.0",
+    "@fortawesome/free-regular-svg-icons": "^5.14.0",
+    "@fortawesome/free-solid-svg-icons": "^5.13.0",
+    "@fortawesome/react-fontawesome": "^0.1.10",
+    "@itassistors/langline": "0.0.2",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/user-event": "^7.1.2",
+    "axios": "^0.19.2",
+    "graphql": "^14.6.0",
+    "lodash.debounce": "^4.0.8",
+    "moment": "^2.27.0",
+    "prismjs": "^1.20.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-router": "^5.1.2",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.4.0",
+    "react-spring": "^8.0.27",
+    "tailwindcss": "^1.8.4",
+    "uuid": "^8.0.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build:tailwind": "NODE_ENV=production tailwindcss build -o src/index.css -c src/tailwind.config.js",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "postcss": "postcss ./src/Components/styles/ --dir ./src/Components/styles/"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.3.3",
+    "@testing-library/react": "^9.5.0",
+    "dotenv": "^8.2.0",
+    "react-refresh": "^0.8.3"
+  }
+}

@@ -1,0 +1,32 @@
+::selection {
+    color: #fff;
+    background: rgba(0, 0, 125, 0.3);
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+}
+
+.splash-logo__image {
+    background: url('../assets/gitconvex.png');
+    background-size: cover;
+    width: 200px;
+    height: 200px;
+    background-repeat: no-repeat;
+}
+
+.logo-label__title-first::first-letter {
+    color: pink;
+}
+
+@media only screen and (max-width: 1500px) {
+    .dashboard-leftpane__logo {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+@media only screen and (max-width: 1080px) {
+    .dashboard-leftpane__logo {
+        width: 50px;
+        height: 50px;
+    }
+}

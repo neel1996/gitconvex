@@ -1,0 +1,60 @@
+.dashboard--leftpane {
+  --bg-opacity: 1;
+  background-color: #fff;
+  background-color: rgba(255, 255, 255, var(--bg-opacity));
+  overflow: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.25);
+  display: block;
+  padding: 0.75rem;
+}
+
+.leftpane--logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  --bg-opacity: 1;
+  background-color: #ebf8ff;
+  background-color: rgba(235, 248, 255, var(--bg-opacity));
+  cursor: pointer;
+}
+
+.dashboard-leftpane__logo {
+  background: url("../../assets/gitconvex.png");
+  background-size: cover;
+  width: 70px;
+  height: 70px;
+}
+
+.menu--link {
+  display: flex;
+  border-bottom-width: 1px;
+  padding: 0.75rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.menu--link:hover {
+  --bg-opacity: 1;
+  background-color: #f7fafc;
+  background-color: rgba(247, 250, 252, var(--bg-opacity));
+}
+
+.menu--items {
+  display: flex;
+  grid-gap: 2.5rem;
+  gap: 2.5rem;
+  vertical-align: middle;
+  align-items: center;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.menu--items__label {
+  --text-opacity: 1;
+  color: #4a5568;
+  color: rgba(74, 85, 104, var(--text-opacity));
+}

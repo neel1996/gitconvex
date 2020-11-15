@@ -1,0 +1,17 @@
+## Git ignore file for gitconvex react
+
+.vscode/
+.yarn/
+.yarn/*
+node_modules/
+src/index.css
+build
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+/.changelog
+.npm/
+yarn.lock
+.env
