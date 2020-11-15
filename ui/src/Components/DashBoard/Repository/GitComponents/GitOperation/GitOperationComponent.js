@@ -2,11 +2,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import {
-  globalAPIEndpoint,
-  ROUTE_GIT_STAGED_FILES,
-  ROUTE_REPO_TRACKED_DIFF,
-} from "../../../../../util/env_config";
+import { globalAPIEndpoint } from "../../../../../util/env_config";
 import "../../../../styles/GitOperations.css";
 import CommitComponent from "./CommitComponent";
 import PushComponent from "./PushComponent";
@@ -23,20 +19,15 @@ export default function GitOperationComponent(props) {
   const [action, setAction] = useState("");
   const [list, setList] = useState([]);
   const [viewReload, setViewReload] = useState(0);
-  const [currentStageItem, setCurrensStageitem] = useState("");
+  const [currentStageItem, setCurrentStageItem] = useState("");
   const [stageItems, setStagedItems] = useState([]);
-  const [unstageFailed, setUnstageFailed] = useState(false);
+  const [unStageFailed, setUnStageFailed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
     setStagedItems([]);
-    setCurrensStageitem("");
-    const payload = JSON.stringify(
-      JSON.stringify({
-        repoId: props.repoId,
-      })
-    );
+    setCurrentStageItem("");
 
     const cancelToken = axios.CancelToken;
     const source = cancelToken.source();
@@ -50,25 +41,23 @@ export default function GitOperationComponent(props) {
       cancelToken: source.token,
       data: {
         query: `
-            query GitConvexApi{
-              gitConvexApi(route: "${ROUTE_REPO_TRACKED_DIFF}", payload:${payload})
-              {
-                gitChanges{
+            query {
+                gitChanges(repoId: "${props.repoId}"){
                   gitUntrackedFiles
                   gitChangedFiles
                   gitStagedFiles
                 }
-              }
             }
         `,
       },
     })
       .then((res) => {
         if (res.data.data) {
-          var apiData = res.data.data.gitConvexApi.gitChanges;
+          var apiData = res.data.data.gitChanges;
 
           setGitTrackedFiles([...apiData.gitChangedFiles]);
           setGitUntrackedFiles([...apiData.gitUntrackedFiles]);
+          setStagedItems([...apiData.gitStagedFiles]);
 
           const apiTrackedFiles = [...apiData.gitChangedFiles];
           const apiUnTrackedFiles = [...apiData.gitUntrackedFiles];
@@ -104,50 +93,7 @@ export default function GitOperationComponent(props) {
     return () => {
       source.cancel();
     };
-  }, [props, viewReload, currentStageItem]);
-
-  useEffect(() => {
-    const cancelToken = axios.CancelToken;
-    const source = cancelToken.source();
-
-    const payload = JSON.stringify(
-      JSON.stringify({
-        repoId: props.repoId,
-      })
-    );
-    axios({
-      url: globalAPIEndpoint,
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      cancelToken: source.token,
-      data: {
-        query: `
-            query GitConvexApi{
-              gitConvexApi(route: "${ROUTE_GIT_STAGED_FILES}", payload:${payload})
-              {
-                gitStagedFiles{
-                    stagedFiles
-                }
-              }
-            }
-          `,
-      },
-    })
-      .then((res) => {
-        const { stagedFiles } = res.data.data.gitConvexApi.gitStagedFiles;
-
-        if (stagedFiles && stagedFiles.length > 0) {
-          setStagedItems([...stagedFiles]);
-        }
-      })
-      .catch((err) => {});
-
-    return () => {
-      return source.cancel();
-    };
-  }, [list, props.repoId, viewReload]);
+  }, [props.repoId, viewReload, currentStageItem]);
 
   const actionButtons = [
     {
@@ -187,7 +133,7 @@ export default function GitOperationComponent(props) {
       method: "POST",
       data: {
         query: `
-          mutation GitConvexMutation{
+          mutation {
             stageItem(repoId: "${repoId}", item: "${stageItem}")
           }
         `,
@@ -197,8 +143,8 @@ export default function GitOperationComponent(props) {
         setViewReload(localViewReload);
 
         if (res.data.data && !res.data.error) {
-          if (res.data.data.stageItem === "ADD_ITEM_SUCCES") {
-            setCurrensStageitem(stageItem);
+          if (res.data.data.stageItem === "ADD_ITEM_SUCCESS") {
+            setCurrentStageItem(stageItem);
           }
         }
       })
@@ -239,7 +185,7 @@ export default function GitOperationComponent(props) {
           className="git-ops--stageitem--add"
           onClick={(event) => {
             stageGitComponent(stageItem, event);
-            setUnstageFailed(false);
+            setUnStageFailed(false);
           }}
           key={`add-btn-${stageItem}`}
         >
@@ -290,7 +236,7 @@ export default function GitOperationComponent(props) {
         method: "POST",
         data: {
           query: `
-            mutation GitConvexMutation{
+            mutation{
               removeStagedItem(repoId: "${repoId}", item: "${item}")
             }
           `,
@@ -311,14 +257,14 @@ export default function GitOperationComponent(props) {
 
               setStagedItems([...localStagedItems]);
             } else {
-              setUnstageFailed(true);
+              setUnStageFailed(true);
             }
           }
         })
         .catch((err) => {
           console.log(err);
           setViewReload(localViewReload);
-          setUnstageFailed(true);
+          setUnStageFailed(true);
         });
     }
 
@@ -336,7 +282,7 @@ export default function GitOperationComponent(props) {
         method: "POST",
         data: {
           query: `
-            mutation GitConvexMutation{
+            mutation {
               removeAllStagedItem(repoId: "${repoId}")
             }
           `,
@@ -369,13 +315,13 @@ export default function GitOperationComponent(props) {
               className="git-ops--unstage--btn"
               onClick={(event) => {
                 removeAllStagedItems(event);
-                setUnstageFailed(false);
+                setUnStageFailed(false);
               }}
             >
               Remove All Items
             </div>
           </div>
-          {unstageFailed ? (
+          {unStageFailed ? (
             <div className="my-4 mx-auto text-center shadow-md rounded p-4 border border-red-200 text-red-400 font-sans font-semibold">
               Remove item failed. Note that deleted files cannot be removed as a
               single entity. Use
@@ -400,7 +346,7 @@ export default function GitOperationComponent(props) {
                         className="git-ops--unstage--remove--btn"
                         onClick={(event) => {
                           removeStagedItem(item, event);
-                          setUnstageFailed(false);
+                          setUnStageFailed(false);
                         }}
                         key={`remove-btn-${item}`}
                       >
@@ -464,7 +410,7 @@ export default function GitOperationComponent(props) {
         <div
           className="git-ops--backdrop"
           id="operation-backdrop"
-          style={{ background: "rgba(0,0,0,0.6)" }}
+          style={{ background: "rgba(0,0,0,0.6)", zIndex: "99" }}
           onClick={(event) => {
             if (event.target.id === "operation-backdrop") {
               setAction("");
@@ -525,37 +471,45 @@ export default function GitOperationComponent(props) {
             style={{ height: "400px" }}
           >
             <div>
-              {getTableData() &&
-                getTableData().map((tableData, index) => {
-                  return (
-                    <div
-                      className="git-ops--file-table--items"
-                      key={`tableItem-${index}`}
-                    >
-                      {tableData.map((data, index) => {
-                        return (
-                          <div
-                            key={`${data}-${index}`}
-                            className={`break-all items-center align-middle my-auto ${
-                              index === 0
-                                ? "w-3/4 text-left"
-                                : "w-1/4 text-center"
-                            }`}
-                          >
-                            {data}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
+              {isLoading ? (
+                <div className="text-center font-sans font-light p-4 text-2xl text-gray-600">
+                  Loading modified file items...
+                </div>
+              ) : (
+                <>
+                  {getTableData() &&
+                    getTableData().map((tableData, index) => {
+                      return (
+                        <div
+                          className="git-ops--file-table--items"
+                          key={`tableItem-${index}`}
+                        >
+                          {tableData.map((data, index) => {
+                            return (
+                              <div
+                                key={`${data}-${index}`}
+                                className={`break-all items-center align-middle my-auto ${
+                                  index === 0
+                                    ? "w-3/4 text-left"
+                                    : "w-1/4 text-center"
+                                }`}
+                              >
+                                {data}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                </>
+              )}
             </div>
           </div>
         </div>
       ) : (
         <>{noChangesComponent()}</>
       )}
-      <>{stageItems ? getStagedFilesComponent() : null}</>
+      <>{stageItems && !isLoading ? getStagedFilesComponent() : null}</>
     </>
   );
 }

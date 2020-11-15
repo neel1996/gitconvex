@@ -3,15 +3,13 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { v4 as uuid } from "uuid";
+import { getIconForFile } from "vscode-icons-js";
+import { globalAPIEndpoint } from "../../../../../util/env_config";
 import InfiniteLoader from "../../../../Animations/InfiniteLoader";
-import CodeFileViewComponent from "./RepoDetailBackdrop/CodeFileViewComponent";
-import {
-  GIT_FOLDER_CONTENT,
-  globalAPIEndpoint,
-} from "../../../../../util/env_config";
 import "../../../../styles/FileExplorer.css";
+import CodeFileViewComponent from "./RepoDetailBackdrop/CodeFileViewComponent";
 
 export default function FileExplorerComponent(props) {
   library.add(fab, fas);
@@ -21,6 +19,7 @@ export default function FileExplorerComponent(props) {
   const [gitFileBasedCommits, setGitFileBasedCommits] = useState([]);
   const [directoryNavigator, setDirectoryNavigator] = useState([]);
   const [codeViewItem, setCodeViewItem] = useState("");
+  const [selectionIndex, setSelectionIndex] = useState(0);
   const [cwd, setCwd] = useState("");
 
   const { repoIdState } = props;
@@ -30,9 +29,10 @@ export default function FileExplorerComponent(props) {
       <CodeFileViewComponent
         repoId={repoIdState}
         fileItem={codeViewItem}
+        commitMessage={gitFileBasedCommits[selectionIndex]}
       ></CodeFileViewComponent>
     );
-  }, [repoIdState, codeViewItem]);
+  }, [repoIdState, codeViewItem, gitFileBasedCommits, selectionIndex]);
 
   function filterNullCommitEntries(gitTrackedFiles, gitFileBasedCommit) {
     let localGitCommits = gitFileBasedCommit;
@@ -52,25 +52,55 @@ export default function FileExplorerComponent(props) {
   }
 
   useEffect(() => {
-    filterNullCommitEntries(props.gitRepoFiles, props.gitFileBasedCommits);
+    const repoId = props.repoIdState;
+    axios({
+      url: globalAPIEndpoint,
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      data: {
+        query: `
+          query
+          {
+            gitFolderContent(repoId:"${repoId}", directoryName: ""){
+              trackedFiles
+              fileBasedCommits   
+            }
+          }
+        `,
+      },
+    })
+      .then((res) => {
+        const {
+          trackedFiles,
+          fileBasedCommits,
+        } = res.data.data.gitFolderContent;
+        if (trackedFiles && fileBasedCommits) {
+          filterNullCommitEntries(trackedFiles, fileBasedCommits);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, [props]);
 
-  function directorySepraratorRemover(directorypath) {
-    if (directorypath.match(/.\/./gi)) {
-      directorypath = directorypath.split("/")[
-        directorypath.split("/").length - 1
+  function directorySeparatorRemover(directoryPath) {
+    if (directoryPath.match(/.\/./gi)) {
+      directoryPath = directoryPath.split("/")[
+        directoryPath.split("/").length - 1
       ];
-    } else if (directorypath.match(/[^\\]\\[^\\]/gi)) {
-      directorypath = directorypath.split("\\")[
-        directorypath.split("\\").length - 1
+    } else if (directoryPath.match(/[^\\]\\[^\\]/gi)) {
+      directoryPath = directoryPath.split("\\")[
+        directoryPath.split("\\").length - 1
       ];
-    } else if (directorypath.match(/.\\\\./gi)) {
-      directorypath = directorypath.split("\\\\")[
-        directorypath.split("\\\\").length - 1
+    } else if (directoryPath.match(/.\\\\./gi)) {
+      directoryPath = directoryPath.split("\\\\")[
+        directoryPath.split("\\\\").length - 1
       ];
     }
 
-    return directorypath;
+    return directoryPath;
   }
 
   const fetchFolderContent = (
@@ -93,10 +123,6 @@ export default function FileExplorerComponent(props) {
 
       setCwd(directoryName);
 
-      const payload = JSON.stringify(
-        JSON.stringify({ repoId: repoIdState, directoryName })
-      );
-
       axios({
         url: globalAPIEndpoint,
         method: "POST",
@@ -105,30 +131,26 @@ export default function FileExplorerComponent(props) {
         },
         data: {
           query: `
-
-          query GitConvexApi
-          {
-            gitConvexApi(route: "${GIT_FOLDER_CONTENT}", payload: ${payload}){
-              gitFolderContent{
-                gitTrackedFiles
-                gitFileBasedCommit
+            query
+            {
+              gitFolderContent(repoId:"${repoIdState}", directoryName: "${directoryName}"){
+                trackedFiles
+                fileBasedCommits   
               }
             }
-          }
-        `,
+          `,
         },
       })
         .then((res) => {
           if (res.data.data && !res.data.error) {
-            const localFolderContent =
-              res.data.data.gitConvexApi.gitFolderContent;
+            const localFolderContent = res.data.data.gitFolderContent;
 
             filterNullCommitEntries(
-              localFolderContent.gitTrackedFiles,
-              localFolderContent.gitFileBasedCommit
+              localFolderContent.trackedFiles,
+              localFolderContent.fileBasedCommits
             );
 
-            directoryName = directorySepraratorRemover(directoryName);
+            directoryName = directorySeparatorRemover(directoryName);
 
             if (homeIndicator) {
               setDirectoryNavigator([]);
@@ -162,7 +184,8 @@ export default function FileExplorerComponent(props) {
         .catch((err) => {
           if (err) {
             console.log(
-              "ERROR: Error occurred while fetching the folder content!"
+              "ERROR: Error occurred while fetching the folder content!",
+              err
             );
           }
         });
@@ -179,11 +202,11 @@ export default function FileExplorerComponent(props) {
       var directoryEntry = [];
       var fileEntry = [];
 
-      gitRepoFiles.forEach((entry, index) => {
+      gitRepoFiles.forEach(async (entry, index) => {
         const splitEntry = entry.split(":");
 
         if (splitEntry[1].includes("directory")) {
-          let directorypath = directorySepraratorRemover(splitEntry[0]);
+          let directoryPath = directorySeparatorRemover(splitEntry[0]);
 
           directoryEntry.push(
             <div
@@ -194,7 +217,7 @@ export default function FileExplorerComponent(props) {
                 <div className="w-1/6">
                   <FontAwesomeIcon
                     icon={["fas", "folder"]}
-                    className="font-sans text-xl text-blue-600"
+                    className="font-sans text-xl"
                   ></FontAwesomeIcon>
                 </div>
                 <div
@@ -203,50 +226,53 @@ export default function FileExplorerComponent(props) {
                     fetchFolderContent(splitEntry[0], 0, false);
                   }}
                 >
-                  {directorypath}
+                  {directoryPath}
                 </div>
 
                 <div className="folder-view--content--commit bg-green-200 text-green-900">
-                  {gitFileBasedCommits[index]
-                    ? gitFileBasedCommits[index]
-                        .split(" ")
-                        .filter((entry, index) => {
-                          return index !== 0 ? entry : null;
-                        })
-                        .join(" ")
-                    : null}
+                  {gitFileBasedCommits[index]}
                 </div>
               </div>
             </div>
           );
         } else if (splitEntry[1].includes("File")) {
+          let fileIcon;
+          if (splitEntry[0] === "LICENSE") {
+            fileIcon = require("../../../../../assets/icons/file_type_license.svg");
+          } else {
+            fileIcon = require("../../../../../assets/icons/" +
+              getIconForFile(splitEntry[0]));
+          }
+
           fileEntry.push(
             <div className="folder-view--content" key={`file-key-${uuid()}`}>
-              <div className="flex">
+              <div className="flex items-center align-middle">
                 <div className="w-1/6">
-                  <FontAwesomeIcon
-                    icon={["fas", "file"]}
-                    className="font-sans text-xl text-gray-700"
-                  ></FontAwesomeIcon>
+                  <img
+                    src={fileIcon}
+                    style={{
+                      width: "26px",
+                      filter: "grayscale(30%)",
+                    }}
+                    alt={fileIcon}
+                  ></img>
                 </div>
                 <div
                   className="folder-view--content--path"
                   onClick={() => {
-                    setCodeViewItem(cwd + "/" + splitEntry[0]);
+                    setSelectionIndex(index);
+                    if (cwd === "" || cwd === "/") {
+                      setCodeViewItem(splitEntry[0]);
+                    } else {
+                      setCodeViewItem(cwd + "/" + splitEntry[0]);
+                    }
                     setCodeViewToggle(true);
                   }}
                 >
                   {splitEntry[0]}
                 </div>
                 <div className="folder-view--content--commit bg-indigo-200 text-indigo-900">
-                  {gitFileBasedCommits[index]
-                    ? gitFileBasedCommits[index]
-                        .split(" ")
-                        .filter((entry, index) => {
-                          return index !== 0 ? entry : null;
-                        })
-                        .join(" ")
-                    : null}
+                  {gitFileBasedCommits[index]}
                 </div>
               </div>
             </div>
@@ -273,7 +299,7 @@ export default function FileExplorerComponent(props) {
           <div>
             <FontAwesomeIcon icon={["fas", "unlink"]}></FontAwesomeIcon>
           </div>
-          <div>No Tracked Files in the repo!</div>
+          <div>No Tracked Files in the directory!</div>
         </div>
       );
     } else {
@@ -320,22 +346,20 @@ export default function FileExplorerComponent(props) {
         </div>
       ) : null}
       <div>
-        {directoryNavigator &&
-        gitRepoFiles &&
-        gitRepoFiles[0] !== "NO_TRACKED_FILES" ? (
+        <div
+          className="folder-view--homebtn"
+          onClick={() => {
+            fetchFolderContent("", 0, false, true);
+          }}
+        >
+          <div>
+            <FontAwesomeIcon icon={["fas", "home"]}></FontAwesomeIcon>
+          </div>
+          <div>Home</div>
+          <div className="text-2xl font-sans text-blue-400">./</div>
+        </div>
+        {directoryNavigator && gitRepoFiles && gitRepoFiles.length > 0 ? (
           <div className="folder-view">
-            <div
-              className="folder-view--homebtn"
-              onClick={() => {
-                fetchFolderContent("", 0, false, true);
-              }}
-            >
-              <div>
-                <FontAwesomeIcon icon={["fas", "home"]}></FontAwesomeIcon>
-              </div>
-              <div>Home</div>
-              <div className="text-2xl font-sans text-blue-400">./</div>
-            </div>
             <div className="folder-view--navigator" id="repoFolderNavigator">
               {directoryNavigator.map((item, index) => {
                 return (

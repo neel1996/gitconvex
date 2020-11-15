@@ -1,16 +1,12 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import {
-  globalAPIEndpoint,
-  ROUTE_REPO_DETAILS,
-} from "../../../../../../util/env_config";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { globalAPIEndpoint } from "../../../../../../util/env_config";
 
 export default function BranchListComponent({ repoId, currentBranch }) {
   library.add(fas);
-  const payload = JSON.stringify(JSON.stringify({ repoId: repoId }));
 
   const [branchList, setBranchList] = useState([]);
   const [listError, setListError] = useState(false);
@@ -43,13 +39,11 @@ export default function BranchListComponent({ repoId, currentBranch }) {
       cancelToken: source.token,
       data: {
         query: `
-
-          query GitConvexApi
+          query
           {
-            gitConvexApi(route: "${ROUTE_REPO_DETAILS}", payload: ${payload}){
-              gitRepoStatus {
+            gitRepoStatus(repoId:"${repoId}"){
                 gitAllBranchList  
-              }
+                gitCurrentBranch
             }
           }
         `,
@@ -57,7 +51,18 @@ export default function BranchListComponent({ repoId, currentBranch }) {
     })
       .then((res) => {
         if (res.data.data && !res.data.error) {
-          let { gitAllBranchList } = res.data.data.gitConvexApi.gitRepoStatus;
+          let {
+            gitAllBranchList,
+            gitCurrentBranch,
+          } = res.data.data.gitRepoStatus;
+
+          gitAllBranchList = gitAllBranchList.map((branch) => {
+            if (branch === gitCurrentBranch) {
+              return "*" + branch;
+            }
+            return branch;
+          });
+
           setBranchList([...gitAllBranchList]);
         } else {
           setListError(true);
@@ -71,7 +76,7 @@ export default function BranchListComponent({ repoId, currentBranch }) {
       });
 
     return () => source.cancel;
-  }, [repoId, payload, switchedBranch]);
+  }, [repoId, switchedBranch]);
 
   function switchBranchHandler(branchName) {
     resetStates();
@@ -82,7 +87,7 @@ export default function BranchListComponent({ repoId, currentBranch }) {
       data: {
         query: `
             mutation{
-              setBranch(repoId: "${repoId}", branch: "${branchName}")
+              checkoutBranch(repoId: "${repoId}", branchName: "${branchName}")
             }
           `,
       },
@@ -186,8 +191,6 @@ export default function BranchListComponent({ repoId, currentBranch }) {
         {!listError &&
           branchList &&
           branchList.map((branch) => {
-            branch = branch.replace(/\s/gi, "");
-
             const branchPickerComponent = (icon, branchType, branchName) => {
               let activeSwitchStyle = "";
               let activeBranchFlag = false;
@@ -278,10 +281,6 @@ export default function BranchListComponent({ repoId, currentBranch }) {
               );
             };
 
-            if (branch.includes("->") || branch === currentBranch) {
-              return null;
-            }
-
             if (!branch.includes("remotes/")) {
               return branchPickerComponent(
                 "code-branch",
@@ -290,6 +289,9 @@ export default function BranchListComponent({ repoId, currentBranch }) {
               );
             } else {
               const splitBranch = branch.split("/");
+              if (splitBranch.length <= 2) {
+                return null;
+              }
               const remoteName = splitBranch[1];
               const remoteBranch = splitBranch
                 .slice(2, splitBranch.length)

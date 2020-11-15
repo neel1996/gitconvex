@@ -3,7 +3,7 @@ import RepoComponent from "../Repository/RepoComponents/RepoComponent";
 import "../../styles/RightPane.css";
 
 export default function RightPane(props) {
-  const { platform, gitVersion, nodeVersion } = props.params;
+  const { platform, gitVersion } = props.params;
 
   const hcParams = [
     {
@@ -13,10 +13,6 @@ export default function RightPane(props) {
     {
       label: "Git",
       value: gitVersion,
-    },
-    {
-      label: "Node",
-      value: nodeVersion,
     },
   ];
 
@@ -52,7 +48,7 @@ export default function RightPane(props) {
   );
 
   function repoEntry() {
-    if (platform && gitVersion && nodeVersion) {
+    if (platform && gitVersion) {
       return <RepoComponent parentProps={props}></RepoComponent>;
     }
   }

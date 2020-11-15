@@ -4,15 +4,12 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import moment from "moment";
-import React, { useEffect, useState, useRef } from "react";
-import ReactDOM from "react-dom";
-import InfiniteLoader from "../../../../../Animations/InfiniteLoader";
 import debounce from "lodash.debounce";
-import {
-  globalAPIEndpoint,
-  ROUTE_REPO_COMMIT_LOGS,
-} from "../../../../../../util/env_config";
+import moment from "moment";
+import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
+import { globalAPIEndpoint } from "../../../../../../util/env_config";
+import InfiniteLoader from "../../../../../Animations/InfiniteLoader";
 import CommitLogFileCard from "./CommitLogFileCard";
 
 export default function RepositoryCommitLogComponent(props) {
@@ -40,29 +37,23 @@ export default function RepositoryCommitLogComponent(props) {
   useEffect(() => {
     setIsLoading(true);
     setSearchWarning(false);
-    const payload = JSON.stringify(
-      JSON.stringify({ repoId: props.repoId, skipLimit: 0 })
-    );
 
     axios({
       url: globalAPIEndpoint,
       method: "POST",
       data: {
         query: `
-          query GitConvexApi
-          {
-              gitConvexApi(route: "${ROUTE_REPO_COMMIT_LOGS}", payload: ${payload}){
-                  gitCommitLogs {
-                      totalCommits
-                      commits{
-                          commitTime
-                          hash
-                          author
-                          commitMessage
-                          commitRelativeTime
-                          commitFilesCount
-                      }  
-                  }
+            query {
+              gitCommitLogs(repoId: "${props.repoId}", skipLimit: 0) {
+                  totalCommits
+                  commits{
+                      commitTime
+                      hash
+                      author
+                      commitMessage
+                      commitRelativeTime
+                      commitFilesCount
+                  }  
               }
           }
           `,
@@ -72,10 +63,7 @@ export default function RepositoryCommitLogComponent(props) {
         setIsLoading(false);
 
         if (res.data.data) {
-          const {
-            commits,
-            totalCommits,
-          } = res.data.data.gitConvexApi.gitCommitLogs;
+          const { commits, totalCommits } = res.data.data.gitCommitLogs;
 
           if (totalCommits <= 10) {
             setExcessCommit(false);
@@ -108,10 +96,6 @@ export default function RepositoryCommitLogComponent(props) {
     let localLimit = 0;
     localLimit = skipLimit + 10;
 
-    const payload = JSON.stringify(
-      JSON.stringify({ repoId: props.repoId, skipLimit: localLimit })
-    );
-
     setSkipLimit(localLimit);
 
     axios({
@@ -119,37 +103,31 @@ export default function RepositoryCommitLogComponent(props) {
       method: "POST",
       data: {
         query: `
-          query GitConvexApi
-          {
-              gitConvexApi(route: "${ROUTE_REPO_COMMIT_LOGS}", payload: ${payload}){
-                  gitCommitLogs {
-                      totalCommits
-                      commits{
-                          commitTime
-                          hash
-                          author
-                          commitMessage
-                          commitRelativeTime
-                          commitFilesCount
-                      }  
-                  }
-              }
-          }
+          query{
+            gitCommitLogs(repoId:"${props.repoId}", skipLimit: ${localLimit}){
+                totalCommits
+                commits{
+                    commitTime
+                    hash
+                    author
+                    commitMessage
+                    commitRelativeTime
+                    commitFilesCount
+                }  
+            }
+        }
           `,
       },
     })
       .then((res) => {
         setIsLoading(false);
 
-        if (totalCommitCount - localLimit < 10) {
+        if (totalCommitCount - localLimit <= 10) {
           setExcessCommit(false);
         }
 
         if (res.data.data) {
-          const {
-            commits,
-            totalCommits,
-          } = res.data.data.gitConvexApi.gitCommitLogs;
+          const { commits, totalCommits } = res.data.data.gitCommitLogs;
           setTotalCommitCount(totalCommits);
           if (commits && commits.length > 0) {
             setCommitLogs([...commitLogs, ...commits]);
@@ -242,7 +220,7 @@ export default function RepositoryCommitLogComponent(props) {
         method: "POST",
         data: {
           query: `
-            mutation{
+            query{
               searchCommitLogs(repoId:"${props.repoId}",searchType:"${searchOption}",searchKey:"${searchQuery}"){
                 hash
                 author
@@ -294,9 +272,8 @@ export default function RepositoryCommitLogComponent(props) {
             </div>
             {searchWarning ? (
               <div className="my-4 mx-auto rounded shadow p-4 text-center font-sans text-orange-900 font-light bg-orange-100 border-b-4  border-dashed border-orange-300 text-md">
-                If you are looking for some newly added commits or if this is a
-                freshly added repo, then please wait for a few minutes and
-                search again
+                Make sure if you are searching with the right category and the
+                right search query
               </div>
             ) : null}
             {isLoading ? (
@@ -398,7 +375,9 @@ export default function RepositoryCommitLogComponent(props) {
                   <FontAwesomeIcon
                     icon={["fab", "slack-hash"]}
                   ></FontAwesomeIcon>
-                  <span className="commitlogs--toppane--data">{hash}</span>
+                  <span className="commitlogs--toppane--data">
+                    {hash.substring(0, 7)}
+                  </span>
                 </div>
                 <div className="commitlogs--toppane--divider"></div>
                 <div className="commitlogs--toppane--label">

@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from "react";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
+import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  ROUTE_COMMIT_FILES,
-  globalAPIEndpoint,
-} from "../../../../../../util/env_config";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { globalAPIEndpoint } from "../../../../../../util/env_config";
 export default function CommitLogFileCard({
   repoId,
   commitHash,
@@ -21,32 +18,26 @@ export default function CommitLogFileCard({
     const token = axios.CancelToken;
     const source = token.source();
 
-    const payload = JSON.stringify(
-      JSON.stringify({ repoId: repoId, commitHash: commitHash })
-    );
-
     axios({
       url: globalAPIEndpoint,
       method: "POST",
       cancelToken: source.token,
       data: {
         query: `
-                query GitConvexApi
-                {
-                    gitConvexApi(route: "${ROUTE_COMMIT_FILES}", payload: ${payload}){
-                        gitCommitFiles {
-                            type
-                            fileName
-                        }
-                    }
+            query
+            {
+              gitCommitFiles(repoId: "${repoId}", commitHash: "${commitHash}"){
+                    type
+                    fileName
                 }
-            `,
+              }
+          `,
       },
     })
       .then((res) => {
         setIsLoading(false);
         if (res.data.data && !res.data.err) {
-          setCommitFiles([...res.data.data.gitConvexApi.gitCommitFiles]);
+          setCommitFiles([...res.data.data.gitCommitFiles]);
         }
       })
       .catch((err) => {
@@ -109,7 +100,10 @@ export default function CommitLogFileCard({
                     icon={["far", iconSelector]}
                   ></FontAwesomeIcon>
                 </div>
-                <div className="commitlogs--files--list--filename">
+                <div
+                  className="commitlogs--files--list--filename"
+                  title={fileName}
+                >
                   {fileName}
                 </div>
               </div>

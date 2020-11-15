@@ -1,22 +1,21 @@
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import {
   ADD_FORM_CLOSE,
   DELETE_PRESENT_REPO,
-  PRESENT_REPO,
+  PRESENT_REPO
 } from "../../../../actionStore";
 import { ContextProvider } from "../../../../context";
 import {
-  globalAPIEndpoint,
-  ROUTE_FETCH_REPO,
+  globalAPIEndpoint
 } from "../../../../util/env_config";
 import InfiniteLoader from "../../../Animations/InfiniteLoader";
 import "../../../styles/RepoComponent.css";
 import AddRepoFormComponent from "./AddRepoForm";
 import RepoCard from "./RepoCard";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function RepoComponent(props) {
   library.add(fas);
@@ -39,20 +38,18 @@ export default function RepoComponent(props) {
       cancelToken: source.token,
       data: {
         query: `
-          query GitConvexResults{
-            gitConvexApi(route: "${ROUTE_FETCH_REPO}"){
-              fetchRepo{
-                repoId
-                repoName
-                repoPath
-              }
+          query {
+            fetchRepo{
+              repoId
+              repoName
+              repoPath
             }
           }
         `,
       },
     })
       .then((res) => {
-        const apiResponse = res.data.data.gitConvexApi.fetchRepo;
+        const apiResponse = res.data.data.fetchRepo;
         setLoading(false);
 
         if (apiResponse) {

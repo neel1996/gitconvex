@@ -53,15 +53,15 @@ export default function AddRemoteRepoComponent({ repoId }) {
         method: "POST",
         data: {
           query: `
-              mutation GitConvexMutation{
-                addRemoteRepo(repoId: "${repoId}", remoteName: "${repoName}", remoteUrl: "${repoUrl}")
+              mutation {
+                addRemote(repoId: "${repoId}", remoteName: "${repoName}", remoteUrl: "${repoUrl}")
               }
             `,
         },
       })
         .then((res) => {
           if (res.data.data && !res.data.error) {
-            const remoteAddStatus = res.data.data.addRemoteRepo;
+            const remoteAddStatus = res.data.data.addRemote;
 
             if (remoteAddStatus === "REMOTE_ADD_SUCCESS") {
               setAddRemoteStatus("success");

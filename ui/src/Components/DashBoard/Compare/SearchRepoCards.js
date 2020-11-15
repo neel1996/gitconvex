@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { globalAPIEndpoint, ROUTE_FETCH_REPO } from "../../../util/env_config";
+import { globalAPIEndpoint } from "../../../util/env_config";
 
 export default function SearchRepoCards(props) {
   const [repo, setRepo] = useState([]);
@@ -15,20 +15,18 @@ export default function SearchRepoCards(props) {
       cancelToken: source.token,
       data: {
         query: `
-          query GitConvexResults{
-            gitConvexApi(route: "${ROUTE_FETCH_REPO}"){
+          query {
               fetchRepo{
                 repoId
                 repoName
                 repoPath
               }
-            }
           }
         `,
       },
     })
       .then((res) => {
-        const apiResponse = res.data.data.gitConvexApi.fetchRepo;
+        const apiResponse = res.data.data.fetchRepo;
 
         if (apiResponse) {
           const { repoId, repoName, repoPath } = apiResponse;

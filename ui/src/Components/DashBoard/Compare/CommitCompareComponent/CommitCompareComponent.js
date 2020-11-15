@@ -3,10 +3,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  globalAPIEndpoint,
-  ROUTE_REPO_COMMIT_LOGS,
-} from "../../../../util/env_config";
+import { globalAPIEndpoint } from "../../../../util/env_config";
 import CommitFileDifferenceComponent from "./CommitFileDifferenceComponent";
 import CommitLogCardComponent from "./CommitLogCardComponent";
 
@@ -30,29 +27,23 @@ export default function CommitCompareComponent(props) {
   }, [props.repoId, baseCommit, compareCommit]);
 
   useEffect(() => {
-    const payload = JSON.stringify(
-      JSON.stringify({ repoId: props.repoId, skipLimit: skipCount })
-    );
-
     axios({
       url: globalAPIEndpoint,
       method: "POST",
       data: {
         query: `
-            query GitConvexApi
+            query
             {
-                gitConvexApi(route: "${ROUTE_REPO_COMMIT_LOGS}", payload: ${payload}){
-                    gitCommitLogs {
-                        totalCommits
-                        commits{
-                            commitTime
-                            hash
-                            author
-                            commitMessage
-                            commitRelativeTime
-                            commitFilesCount
-                        }  
-                    }
+                gitCommitLogs (repoId: "${props.repoId}", skipLimit: ${skipCount}){
+                    totalCommits
+                    commits{
+                        commitTime
+                        hash
+                        author
+                        commitMessage
+                        commitRelativeTime
+                        commitFilesCount
+                    }  
                 }
             }
             `,
@@ -60,10 +51,7 @@ export default function CommitCompareComponent(props) {
     })
       .then((res) => {
         if (res.data.data) {
-          const {
-            commits,
-            totalCommits,
-          } = res.data.data.gitConvexApi.gitCommitLogs;
+          const { commits, totalCommits } = res.data.data.gitCommitLogs;
           setTotalCommitCount(totalCommits);
 
           setCommitData((data) => {
@@ -117,7 +105,7 @@ export default function CommitCompareComponent(props) {
               Base Commit
             </div>
             <div className="text-xl font-sans font-semibold p-3 rounded-lg shadow text-gray-600 border-indigo-300 border-2 border-dashed">
-              {baseCommit}
+              {baseCommit.substring(0, 7)}
             </div>
             <div
               className="p-2 rounded border-b-2 border-dashed shadow cursor-pointer hover:bg-gray-100"
@@ -138,7 +126,7 @@ export default function CommitCompareComponent(props) {
               Commit to Compare
             </div>
             <div className="text-xl font-sans font-semibold p-3 rounded-lg shadow text-gray-600 border-orange-400 border-2 border-dashed">
-              {compareCommit}
+              {compareCommit.substring(0, 7)}
             </div>
             <div
               className="p-2 rounded border-b-2 border-dashed shadow cursor-pointer hover:bg-gray-100"

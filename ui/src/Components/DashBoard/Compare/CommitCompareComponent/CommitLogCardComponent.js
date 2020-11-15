@@ -17,9 +17,9 @@ export default function CommitLogCardComponent(props) {
     >
       <div className="block p-2 font-sans font-light text-gray-800">
         <div className="my-2 font-sans text-xl font-light text-blue-600 border-b border-dashed">
-          {item.commitTime}
+          {item.commitTime.split(" ")[0]}
         </div>
-        <div>{item.commitMessage}</div>
+        <div className="w-3/4">{item.commitMessage}</div>
         <div className="flex items-center gap-4 my-2 align-middle">
           <div>
             <FontAwesomeIcon
@@ -32,7 +32,7 @@ export default function CommitLogCardComponent(props) {
       </div>
       <div className="block">
         <div className="shadow border rounded text-sm p-2 bg-indigo-100 font-mono font-semibold text-indigo-800">
-          #{item.hash}
+          #{item.hash.substring(0, 7)}
         </div>
         <div className="my-2 shadow border rounded text-sm p-2 bg-orange-100 font-sans font-semibold">
           {item.commitRelativeTime}

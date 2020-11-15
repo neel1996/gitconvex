@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { globalAPIEndpoint, BRANCH_COMPARE } from "../../../../util/env_config";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { globalAPIEndpoint } from "../../../../util/env_config";
 
 export default function BranchCommitLogChanges(props) {
   library.add(fas);
@@ -22,29 +22,19 @@ export default function BranchCommitLogChanges(props) {
       return;
     }
 
-    const payload = JSON.stringify(
-      JSON.stringify({
-        repoId: repoId,
-        baseBranch: baseBranch,
-        compareBranch: compareBranch,
-      })
-    );
-
     axios({
       url: globalAPIEndpoint,
       method: "POST",
       data: {
         query: `
           query GitConvexApi {
-            gitConvexApi(route: "${BRANCH_COMPARE}", payload: ${payload}) {
-              branchCompare {
+              branchCompare ( repoId: "${repoId}", baseBranch: "${baseBranch}", compareBranch: "${compareBranch}"){
                 date
                 commits{
                   hash
                   author
                   commitMessage
                 }
-              }
             }
           }
         `,
@@ -53,7 +43,7 @@ export default function BranchCommitLogChanges(props) {
       .then((res) => {
         setLoading(false);
         if (res.data.data) {
-          const { branchCompare } = res.data.data.gitConvexApi;
+          const { branchCompare } = res.data.data;
           setCommitLogs([...branchCompare]);
         }
       })

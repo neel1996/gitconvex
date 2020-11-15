@@ -5,19 +5,16 @@ import axios from "axios";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { GIT_GLOBAL_REPOID, PRESENT_REPO } from "../../../../actionStore";
 import { ContextProvider } from "../../../../context";
-import {
-  globalAPIEndpoint,
-  ROUTE_FETCH_REPO,
-  ROUTE_REPO_DETAILS,
-} from "../../../../util/env_config";
-import GitTrackedComponent from "../GitComponents/GitTrackedComponent";
+import { globalAPIEndpoint } from "../../../../util/env_config";
 import "../../../styles/RepositoryAction.css";
+import GitTrackedComponent from "../GitComponents/GitTrackedComponent";
 
 export default function RepositoryAction() {
   library.add(fas);
 
   const { state, dispatch } = useContext(ContextProvider);
   const { presentRepo } = state;
+  const [loading, setLoading] = useState(false);
   const [selectedFlag, setSelectedFlag] = useState(false);
   const [defaultRepo, setDefaultRepo] = useState({});
   const [availableRepos, setAvailableRepos] = useState([]);
@@ -39,7 +36,6 @@ export default function RepositoryAction() {
   }, [defaultRepo]);
 
   useEffect(() => {
-    //Effect dep function
     const token = axios.CancelToken;
     const source = token.source();
 
@@ -47,8 +43,7 @@ export default function RepositoryAction() {
       const repoId = defaultRepo && defaultRepo.id;
 
       if (repoId) {
-        const payload = JSON.stringify(JSON.stringify({ repoId: repoId }));
-
+        setLoading(true);
         axios({
           url: globalAPIEndpoint,
           method: "POST",
@@ -58,27 +53,27 @@ export default function RepositoryAction() {
           cancelToken: source.token,
           data: {
             query: `
-              query GitConvexApi
+              query 
               {
-                gitConvexApi(route: "${ROUTE_REPO_DETAILS}", payload: ${payload}){
-                  gitRepoStatus {
+                  gitRepoStatus(repoId: "${repoId}") {
                     gitBranchList
                     gitCurrentBranch
                     gitTotalCommits
                     gitTotalTrackedFiles 
                   }
-                }
               }
             `,
           },
         })
           .then((res) => {
-            setSelectedRepoDetails(res.data.data.gitConvexApi.gitRepoStatus);
-            setActiveBranch(
-              res.data.data.gitConvexApi.gitRepoStatus.gitCurrentBranch
-            );
+            setLoading(false);
+
+            setSelectedRepoDetails(res.data.data.gitRepoStatus);
+            setActiveBranch(res.data.data.gitRepoStatus.gitCurrentBranch);
           })
           .catch((err) => {
+            setLoading(false);
+
             if (err) {
               console.log("API GitStatus error occurred : " + err);
             }
@@ -88,25 +83,26 @@ export default function RepositoryAction() {
 
     //Effect dep function
     async function invokeRepoFetchAPI() {
+      setLoading(true);
       return await axios({
         url: globalAPIEndpoint,
         method: "POST",
         cancelToken: source.token,
         data: {
           query: `
-              query GitConvexApi{
-                gitConvexApi(route: "${ROUTE_FETCH_REPO}"){
+              query {
                   fetchRepo{
                     repoId
                     repoName
                     repoPath
                   }
-                }
               }
           `,
         },
       }).then((res) => {
-        const apiResponse = res.data.data.gitConvexApi.fetchRepo;
+        setLoading(false);
+
+        const apiResponse = res.data.data.fetchRepo;
 
         if (apiResponse) {
           const repoContent = apiResponse.repoId.map((entry, index) => {
@@ -143,6 +139,7 @@ export default function RepositoryAction() {
   }, [defaultRepo, activeBranch, presentRepo, dispatch, branchError]);
 
   function setTrackingBranch(branchName, event) {
+    setLoading(true);
     axios({
       url: globalAPIEndpoint,
       method: "POST",
@@ -155,11 +152,15 @@ export default function RepositoryAction() {
       },
     })
       .then((res) => {
+        setLoading(false);
+
         if (res.data.data && !res.data.error) {
           setActiveBranch(branchName);
         }
       })
       .catch((err) => {
+        setLoading(false);
+
         if (err) {
           setBranchError(true);
           event.target.selectedIndex = 0;
@@ -176,6 +177,13 @@ export default function RepositoryAction() {
             className="top-pane--select bg-green-100 text-green-700 border-green-400"
             defaultValue={"checked"}
             onChange={(event) => {
+              if (event.currentTarget.value !== defaultRepo.repoName) {
+                setSelectedRepoDetails({
+                  ...selectedRepoDetails,
+                  gitCurrentBranch: "",
+                  gitBranchList: ["..."],
+                });
+              }
               setSelectedFlag(true);
               availableRepos.length &&
                 availableRepos.forEach((elm) => {
@@ -262,30 +270,39 @@ export default function RepositoryAction() {
             {activeRepoPane()}
             {selectedRepoDetails && selectedFlag ? (
               <div className="my-auto flex justify-around p-3 mx-auto">
-                {getTopPaneComponent(
-                  "code-branch",
-                  selectedRepoDetails.gitBranchList &&
-                    selectedRepoDetails.gitBranchList.length > 0 &&
-                    !selectedRepoDetails.gitBranchList[0].match(
-                      /NO_BRANCH/gi
-                    ) ? (
-                    <>
-                      {selectedRepoDetails.gitBranchList.length === 1
-                        ? 1 + " branch"
-                        : selectedRepoDetails.gitBranchList.length +
-                          " branches"}
-                    </>
-                  ) : (
-                    "No Branches"
-                  )
-                )}
-                {getTopPaneComponent(
-                  "sort-amount-up",
-                  selectedRepoDetails.gitTotalCommits + " Commits"
-                )}
-                {getTopPaneComponent(
-                  "archive",
-                  selectedRepoDetails.gitTotalTrackedFiles + " Tracked Files"
+                {loading ? (
+                  <div className="text-center font-sans font-semibold text-gray-600 text-xl">
+                    Loading repo details...
+                  </div>
+                ) : (
+                  <>
+                    {getTopPaneComponent(
+                      "code-branch",
+                      selectedRepoDetails.gitBranchList &&
+                        selectedRepoDetails.gitBranchList.length > 0 &&
+                        !selectedRepoDetails.gitBranchList[0].match(
+                          /NO_BRANCH/gi
+                        ) ? (
+                        <>
+                          {selectedRepoDetails.gitBranchList.length === 1
+                            ? 1 + " branch"
+                            : selectedRepoDetails.gitBranchList.length +
+                              " branches"}
+                        </>
+                      ) : (
+                        "No Branches"
+                      )
+                    )}
+                    {getTopPaneComponent(
+                      "sort-amount-up",
+                      selectedRepoDetails.gitTotalCommits + " Commits"
+                    )}
+                    {getTopPaneComponent(
+                      "archive",
+                      selectedRepoDetails.gitTotalTrackedFiles +
+                        " Tracked Files"
+                    )}
+                  </>
                 )}
               </div>
             ) : null}

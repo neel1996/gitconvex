@@ -20,6 +20,11 @@ export default function AddRepoForm(props) {
   const [repoAddSuccess, setRepoAddSuccess] = useState(false);
   const [inputInvalid, setInputInvalid] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [authOption, setAuthOption] = useState("noauth");
+  const [authInputs, setAuthInputs] = useState({
+    userName: "",
+    password: "",
+  });
 
   const [cloneSwitch, setCloneSwitch] = useState(false);
   const [initSwitch, setInitSwitch] = useState(false);
@@ -44,7 +49,24 @@ export default function AddRepoForm(props) {
     },
   });
 
+  const authRadio = [
+    {
+      key: "noauth",
+      label: "No Authentication",
+    },
+    {
+      key: "ssh",
+      label: "SSH Authentication",
+    },
+    {
+      key: "https",
+      label: "HTTPS Authentication",
+    },
+  ];
+
   useEffect(() => {
+    setAuthOption("noauth");
+    setAuthInputs({ userName: "", password: "" });
     if (state.shouldAddFormClose) {
       props.formEnable(false);
     }
@@ -74,10 +96,17 @@ export default function AddRepoForm(props) {
         return;
       }
 
+      let userName = "";
+      let password = "";
+
       if (initSwitch) {
         initCheck = true;
       } else if (cloneSwitch && cloneUrl) {
         cloneCheck = true;
+        if (authOption === "https") {
+          userName = authInputs.userName;
+          password = authInputs.password;
+        }
       }
 
       setLoading(true);
@@ -87,10 +116,10 @@ export default function AddRepoForm(props) {
         method: "POST",
         data: {
           query: `
-              mutation GitConvexMutation{
-                addRepo(repoName: "${repoName}", repoPath: "${repoPath}", initSwitch: ${initCheck}, cloneSwitch: ${cloneCheck}, cloneUrl: "${cloneUrl}"){
-                  message
+              mutation {
+                addRepo(repoName: "${repoName}", repoPath: "${repoPath}", initSwitch: ${initCheck}, cloneSwitch: ${cloneCheck}, repoURL: "${cloneUrl}", authOption: "${authOption}", userName: "${userName}", password: "${password}"){
                   repoId
+                  status
                 }
               }
             `,
@@ -101,9 +130,9 @@ export default function AddRepoForm(props) {
           setInputInvalid(false);
 
           if (res.data.data && !res.data.error) {
-            const { message } = res.data.data.addRepo;
+            const { status } = res.data.data.addRepo;
 
-            if (message && !message.match(/FAIL/g)) {
+            if (status && !status.match(/Failed/g)) {
               setRepoAddSuccess(true);
               setRepoAddFailed(false);
               setCloneSwitch("");
@@ -267,24 +296,100 @@ export default function AddRepoForm(props) {
           </div>
         </div>
         {cloneSwitch ? (
-          <div className="option--clone">
-            <div className="option--clone--icon">
-              <FontAwesomeIcon icon={["fas", "link"]}></FontAwesomeIcon>
+          <>
+            <div className="option--clone">
+              <div className="option--clone--icon">
+                <FontAwesomeIcon icon={["fas", "link"]}></FontAwesomeIcon>
+              </div>
+              <div className="w-5/6">
+                <input
+                  value={cloneUrlState}
+                  className="border-0 outline-none w-full p-2"
+                  placeholder="Enter the remote repo URL"
+                  onClick={() => {
+                    setRepoAddFailed(false);
+                  }}
+                  onChange={(event) => {
+                    setCloneUrlState(event.target.value);
+                  }}
+                ></input>
+              </div>
             </div>
-            <div className="w-5/6">
-              <input
-                value={cloneUrlState}
-                className="border-0 outline-none w-full p-2"
-                placeholder="Enter the remote repo URL"
-                onClick={() => {
-                  setRepoAddFailed(false);
-                }}
-                onChange={(event) => {
-                  setCloneUrlState(event.target.value);
-                }}
-              ></input>
+            <div className="my-3 mx-auto text-center">
+              <div className="font-sans font-light my-4 mx-auto w-11/12 text-gray-600">
+                If the repo is secured / private then choose the appropriate
+                authentication option
+              </div>
+              <div className="flex gap-4 justify-center mx-auto items-center align-middle">
+                {authRadio.map((item) => {
+                  return (
+                    <div
+                      className="flex gap-4 items-center align-middle"
+                      key={item.key}
+                    >
+                      <input
+                        type="radio"
+                        name="authRadio"
+                        id={item.key}
+                        value={item.key}
+                        onChange={(e) => {
+                          setAuthOption(e.target.value);
+                        }}
+                      ></input>
+                      <label
+                        htmlFor={item.key}
+                        className="font-sans text-sm font-light cursor-pointer"
+                      >
+                        {item.label}
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+              {authOption === "https" ? (
+                <div className="my-4 mx-auto">
+                  <div className="text-sm font-sans font-light my-1 text-center mx-auto text-pink-500">
+                    Basic Authentication will not work if 2-Factor
+                    Authentication is enabled
+                  </div>
+                  <div className="my-2">
+                    <input
+                      id="repoNameText"
+                      type="text"
+                      placeholder="User Name"
+                      className="repo-form--input"
+                      onChange={(event) => {
+                        setAuthInputs({
+                          userName: event.currentTarget.value,
+                          password: authInputs.password,
+                        });
+                      }}
+                      onClick={() => {
+                        resetAlertBanner();
+                      }}
+                    ></input>
+                  </div>
+                  <div className="my-2">
+                    <input
+                      id="repoNameText"
+                      type="password"
+                      placeholder="Password"
+                      className="repo-form--input"
+                      onChange={(event) => {
+                        setAuthInputs({
+                          userName: authInputs.userName,
+                          password: event.currentTarget.value,
+                        });
+                      }}
+                      onClick={() => {
+                        resetAlertBanner();
+                      }}
+                    ></input>
+                  </div>
+                </div>
+              ) : null}
             </div>
-          </div>
+          </>
         ) : null}
         <div className="repo-form--action">
           <div

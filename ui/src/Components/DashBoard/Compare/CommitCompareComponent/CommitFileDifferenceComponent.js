@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { COMMIT_COMPARE, globalAPIEndpoint } from "../../../../util/env_config";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
+import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { globalAPIEndpoint } from "../../../../util/env_config";
 
 export default function CommitFileDifferenceComponent(props) {
   library.add(fas, far);
@@ -26,29 +26,16 @@ export default function CommitFileDifferenceComponent(props) {
       return;
     }
 
-    const payload = JSON.stringify(
-      JSON.stringify({
-        repoId: repoId,
-        baseCommit: baseCommit,
-        compareCommit: compareCommit,
-      })
-    );
-
     axios({
       url: globalAPIEndpoint,
       method: "POST",
       data: {
         query: `
-            query GitConvexApi {
-              gitConvexApi(route: "${COMMIT_COMPARE}", payload: ${payload}) {
-                commitCompare {
-                  message
-                  difference{
-                    status
+            query {
+                commitCompare (repoId: "${repoId}", baseCommit: "${baseCommit}", compareCommit: "${compareCommit}"){
+                    type
                     fileName
-                  }
                 }
-              }
             }
           `,
       },
@@ -56,21 +43,12 @@ export default function CommitFileDifferenceComponent(props) {
       .then((res) => {
         setLoading(false);
 
-        const {
-          difference,
-          message,
-        } = res.data.data.gitConvexApi.commitCompare;
-
-        if (message && message.includes("Error")) {
-          setError(true);
-          return;
-        } else if (message && message.includes("warning")) {
-          setWarn(message.split("\n"));
-          setError(true);
-        }
-
+        const difference = res.data.data.commitCompare;
         if (difference) {
           setFileDifference([...difference]);
+        } else {
+          setError(true);
+          setWarn("Error occurred while comparing the selected commits!");
         }
       })
       .catch((err) => {
@@ -122,11 +100,11 @@ export default function CommitFileDifferenceComponent(props) {
             Differing Files
           </div>
           {fileDifference.map((diff) => {
-            const { status, fileName } = diff;
+            const { type, fileName } = diff;
             let iconSelector = "";
             let colorSelector = "";
             let title = "";
-            switch (status[0]) {
+            switch (type[0]) {
               case "M":
                 iconSelector = "plus-square";
                 colorSelector = "text-yellow-600";
@@ -157,7 +135,7 @@ export default function CommitFileDifferenceComponent(props) {
             return (
               <div
                 className="flex items-center align-middle justify-center gap-4"
-                key={status + "-" + fileName}
+                key={type + "-" + fileName}
               >
                 <div
                   className={`text-2xl cursor-pointer ${colorSelector}`}

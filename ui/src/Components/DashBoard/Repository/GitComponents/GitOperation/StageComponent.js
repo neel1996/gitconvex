@@ -23,7 +23,7 @@ export default function StageComponent(props) {
       method: "POST",
       data: {
         query: `
-          mutation GitConvexMutation{
+          mutation {
             stageAllItems(repoId: "${repoId}")
           }
         `,

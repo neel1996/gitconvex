@@ -6,12 +6,7 @@ import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { DELETE_PRESENT_REPO } from "../../../actionStore";
 import { ContextProvider } from "../../../context";
-import {
-  globalAPIEndpoint,
-  ROUTE_SETTINGS_DBPATH,
-  ROUTE_SETTINGS_PORT,
-  ROUTE_SETTINGS_REPODETAILS,
-} from "../../../util/env_config";
+import { globalAPIEndpoint } from "../../../util/env_config";
 
 export default function Settings(props) {
   library.add(fab, fas);
@@ -24,7 +19,7 @@ export default function Settings(props) {
   const [dbPath, setDbPath] = useState("");
   const [port, setPort] = useState(0);
   const [repoDetails, setRepoDetails] = useState([]);
-  const [backdropToggle, setBacldropToggle] = useState(false);
+  const [backdropToggle, setBackdropToggle] = useState(false);
   const [deleteRepo, setDeleteRepo] = useState({});
   const [deleteRepoStatus, setDeleteRepoStatus] = useState("");
   const [viewReload, setViewReload] = useState(0);
@@ -38,9 +33,10 @@ export default function Settings(props) {
       method: "POST",
       data: {
         query: `
-          query GitConvexResults{
-            gitConvexApi(route: "${ROUTE_SETTINGS_DBPATH}"){
+          query {
+            settingsData{
               settingsDatabasePath
+              settingsPortDetails
             }
           }
         `,
@@ -48,11 +44,16 @@ export default function Settings(props) {
     })
       .then((res) => {
         if (res.data.data && !res.data.error) {
-          const dbPathText = res.data.data.gitConvexApi.settingsDatabasePath;
-          setDbPath(dbPathText);
-          setNewDbPath(dbPathText);
+          const {
+            settingsDatabasePath,
+            settingsPortDetails,
+          } = res.data.data.settingsData;
 
-          dbPathTextRef.current.value = dbPathText;
+          setDbPath(settingsDatabasePath);
+          setNewDbPath(settingsDatabasePath);
+          setPort(settingsPortDetails);
+
+          dbPathTextRef.current.value = settingsDatabasePath;
         }
       })
       .catch((err) => {
@@ -64,14 +65,12 @@ export default function Settings(props) {
       method: "POST",
       data: {
         query: `
-            query GitConvexResults{
-              gitConvexApi(route: "${ROUTE_SETTINGS_REPODETAILS}"){
-                settingsRepoDetails{
-                  id
-                  repoPath
-                  repoName
-                  timeStamp
-                }
+            query {
+              fetchRepo{
+                repoId
+                repoName
+                repoPath
+                timeStamp
               }
             }
           `,
@@ -79,33 +78,13 @@ export default function Settings(props) {
     })
       .then((res) => {
         if (res.data.data && !res.data.error) {
-          const repoDetailsArray =
-            res.data.data.gitConvexApi.settingsRepoDetails;
-          setRepoDetails([...repoDetailsArray]);
+          const repoDetails = res.data.data.fetchRepo;
+          setRepoDetails(repoDetails);
         }
       })
       .catch((err) => {
         console.log(err);
       });
-
-    axios({
-      url: globalAPIEndpoint,
-      method: "POST",
-      data: {
-        query: `
-            query GitConvexResults{
-              gitConvexApi(route: "${ROUTE_SETTINGS_PORT}"){
-                settingsPortDetails
-              }
-            }
-          `,
-      },
-    }).then((res) => {
-      if (res.data.data && !res.data.error) {
-        const localPort = res.data.data.gitConvexApi.settingsPortDetails;
-        setPort(localPort);
-      }
-    });
   }, [props, viewReload]);
 
   const databasePathSettings = () => {
@@ -118,7 +97,7 @@ export default function Settings(props) {
           method: "POST",
           data: {
             query: `
-              mutation GitConvexMutation{
+              mutation {
                 updateRepoDataFile(newDbFile: "${newDbPath.toString()}")
               }
             `,
@@ -227,6 +206,7 @@ export default function Settings(props) {
             className="cursor-pointer mx-auto my-4 text-center p-3 rounded shadow bg-red-400 hover:bg-red-500 text-white text-xl"
             onClick={() => {
               deleteRepoApiHandler();
+              setDeleteRepoStatus("");
             }}
           >
             Confirm Delete
@@ -254,14 +234,14 @@ export default function Settings(props) {
 
   function deleteRepoApiHandler() {
     setDeleteRepoStatus("loading");
-    const { id } = deleteRepo;
+    const { repoId } = deleteRepo;
     axios({
       url: globalAPIEndpoint,
       method: "POST",
       data: {
         query: `
-          mutation GitConvexMutation{
-            deleteRepo(repoId: "${id}"){
+          mutation {
+            deleteRepo(repoId: "${repoId}"){
               status
               repoId
             }
@@ -309,7 +289,7 @@ export default function Settings(props) {
           Saved Repos
         </div>
         <>
-          {repoDetails && repoDetails.length > 0 ? (
+          {repoDetails && repoDetails.repoId ? (
             <>
               <div className="flex my-4 bg-indigo-500 my-1 w-full rounded text-white bg-white shadow p-3 font-sand text-xl font-semibold">
                 <div className="w-1/2 border-r text-center">Repo ID</div>
@@ -318,30 +298,35 @@ export default function Settings(props) {
                 <div className="w-1/2 border-r text-center">Timestamp</div>
                 <div className="w-1/2 border-r text-center">Action</div>
               </div>
-              {repoDetails.map((repo) => {
+              {repoDetails.repoId.map((repoId, idx) => {
                 return (
                   <div
                     className="flex my-1 w-full rounded bg-white shadow p-3 font-sans text-gray-800"
-                    key={repo.id}
+                    key={repoId}
                   >
                     <div className="w-1/2 px-2 border-r font-sans break-all">
-                      {repo.id}
+                      {repoId}
                     </div>
                     <div className="w-1/2 px-2 border-r font-bold font-sans break-all">
-                      {repo.repoName}
+                      {repoDetails.repoName[idx]}
                     </div>
                     <div className="w-1/2 px-2 border-r font-sans break-all text-sm font-light text-blue-600">
-                      {repo.repoPath}
+                      {repoDetails.repoPath[idx]}
                     </div>
                     <div className="w-1/2 px-2 border-r font-sans break-all text-sm font-light">
-                      {repo.timeStamp}
+                      {repoDetails.timeStamp[idx]}
                     </div>
                     <div className="w-1/2 px-2 border-r font-sans break-all">
                       <div
                         className="bg-red-600 p-2 mx-auto my-auto rounded shadow text-center w-1/2 hover:bg-red-400 cursor-pointer"
                         onClick={(event) => {
-                          setBacldropToggle(true);
-                          setDeleteRepo(repo);
+                          setBackdropToggle(true);
+                          setDeleteRepo({
+                            repoId: repoId,
+                            repoName: repoDetails.repoName[idx],
+                            repoPath: repoDetails.repoPath[idx],
+                            timeStamp: repoDetails.timeStamp[idx],
+                          });
                         }}
                       >
                         <FontAwesomeIcon
@@ -373,15 +358,17 @@ export default function Settings(props) {
           method: "POST",
           data: {
             query: `
-              mutation GitConvexMutation{
-                settingsEditPort(newPort: ${port})
+              mutation {
+                settingsEditPort(newPort: "${port}")
               }
             `,
           },
         })
           .then((res) => {
-            if (res.data.data && !res.data.error) {
-              console.log(res.data.data.settingsEditPort);
+            const { settingsEditPort } = res.data.data;
+            if (settingsEditPort === "PORT_UPDATED") {
+              console.log("Port updated!");
+              window.location.reload();
             } else {
               portUpdateFailed(true);
             }
@@ -439,7 +426,7 @@ export default function Settings(props) {
           onClick={(event) => {
             if (event.target.id === "settings-backdrop") {
               setDeleteRepoStatus("");
-              setBacldropToggle(false);
+              setBackdropToggle(false);
               let localViewReload = viewReload + 1;
               setViewReload(localViewReload);
             }
@@ -447,10 +434,10 @@ export default function Settings(props) {
         >
           {deleteRepo ? deleteRepoHandler() : null}
           <div
-            className="top-0 right-0 fixed float-right font-semibold my-2 bg-red-500 text-3xl cursor-pointer text-center text-white my-5 align-middle rounded-full w-12 h-12 items-center align-middle shadow-md mr-5"
+            className="top-0 right-0 fixed float-right font-semibold my-2 bg-red-500 text-3xl cursor-pointer text-center text-white align-middle rounded-full w-12 h-12 items-center shadow-md mr-5"
             onClick={() => {
               setDeleteRepoStatus("");
-              setBacldropToggle(false);
+              setBackdropToggle(false);
               let localViewReload = viewReload + 1;
               setViewReload(localViewReload);
             }}

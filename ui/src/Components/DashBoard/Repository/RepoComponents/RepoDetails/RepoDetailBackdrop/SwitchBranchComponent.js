@@ -16,7 +16,7 @@ export default function SwitchBranchComponent({
       data: {
         query: `
             mutation{
-              setBranch(repoId: "${repoId}", branch: "${branchName}")
+              checkoutBranch(repoId: "${repoId}", branchName: "${branchName}")
             }
           `,
       },
@@ -36,12 +36,12 @@ export default function SwitchBranchComponent({
   return (
     <div className="xl:w-3/4 lg:w-3/4 md:w-11/12 sm:w-11/12 repo-backdrop--switchbranch">
       <div className="switchbranch--alert--success">
-        Switching to branch -{" "}
+        Switching to branch -
         <span className="switchbranch--name">{branchName}</span>...
       </div>
       {branchError ? (
         <div className="switchbranch--alert--failed">
-          Switching to branch -{" "}
+          Switching to branch -
           <span className="switchbranch--name">{branchName}</span> Failed!
         </div>
       ) : null}

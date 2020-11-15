@@ -18,22 +18,16 @@ export default function reducer(state, action) {
         hcDone: action.payload,
       };
     case HC_PARAM_ACTION:
-      const { osCheck, gitCheck, nodeCheck } = action.payload;
+      const { os, git } = action.payload;
 
-      const parseValue = (payload) => {
-        return JSON.parse(JSON.parse(JSON.stringify(payload))).message;
-      };
-
-      localStorage.setItem("OS_TYPE", parseValue(osCheck));
-      localStorage.setItem("GIT_VERSION", parseValue(gitCheck));
-      localStorage.setItem("NODE_VERSION", parseValue(nodeCheck));
+      localStorage.setItem("OS_TYPE", os);
+      localStorage.setItem("GIT_VERSION", git);
 
       return {
         ...state,
         hcParams: {
-          osCheck: parseValue(osCheck),
-          gitCheck: parseValue(gitCheck),
-          nodeCheck: parseValue(nodeCheck),
+          osCheck: os,
+          gitCheck: git,
         },
       };
     case PRESENT_REPO:

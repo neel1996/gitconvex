@@ -84,17 +84,6 @@
   font-size: 1.25rem
 }
 
-.folder-view--homebtn:hover {
-  --text-opacity: 1;
-  color: #000;
-  color: rgba(0, 0, 0, var(--text-opacity));
-  --border-opacity: 1;
-  border-color: #000;
-  border-color: rgba(0, 0, 0, var(--border-opacity));
-  --transform-scale-x: 1.1;
-  --transform-scale-y: 1.1
-}
-
 .folder-view--navigator {
   display: flex;
   padding: 1rem;
@@ -197,14 +186,7 @@
   justify-content: center;
   padding: 0.5rem;
   --text-opacity: 1;
-  color: #3182ce;
-  color: rgba(49, 130, 206, var(--text-opacity))
-}
-
-.folder-view--tracked--entries:hover {
-  --text-opacity: 1;
-  color: #2b6cb0;
-  color: rgba(43, 108, 176, var(--text-opacity))
+  color: #79b8ff;
 }
 
 .tracked--entries--header {

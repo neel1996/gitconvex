@@ -1,3 +1,4 @@
+import { LangLine } from "@itassistors/langline";
 import axios from "axios";
 import * as Prism from "prismjs";
 import React, { useContext, useEffect, useState } from "react";
@@ -5,11 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { GIT_TRACKED_FILES } from "../../../../actionStore";
 import { ContextProvider } from "../../../../context";
 import "../../../../prism.css";
-import {
-  globalAPIEndpoint,
-  ROUTE_REPO_FILE_DIFF,
-  ROUTE_REPO_TRACKED_DIFF,
-} from "../../../../util/env_config";
+import { globalAPIEndpoint } from "../../../../util/env_config";
 import "../../../styles/GitDiffView.css";
 
 export default function GitDiffViewComponent() {
@@ -34,8 +31,6 @@ export default function GitDiffViewComponent() {
     setDiffStatState("Click on a file item to see the difference");
     let apiEndPoint = globalAPIEndpoint;
     if (repoId) {
-      const payload = JSON.stringify(JSON.stringify({ repoId: repoId }));
-
       axios({
         url: apiEndPoint,
         method: "POST",
@@ -44,12 +39,9 @@ export default function GitDiffViewComponent() {
         },
         data: {
           query: `
-            query GitConvexApi{
-              gitConvexApi(route: "${ROUTE_REPO_TRACKED_DIFF}", payload:${payload})
-              {
-                gitChanges{
-                  gitChangedFiles
-                }
+            query {
+              gitChanges(repoId: "${repoId}"){
+                gitChangedFiles
               }
             }
           `,
@@ -58,7 +50,7 @@ export default function GitDiffViewComponent() {
         .then((res) => {
           if (res) {
             if (res.data.data && !res.data.error) {
-              var apiData = res.data.data.gitConvexApi.gitChanges;
+              var apiData = res.data.data.gitChanges;
               let { gitChangedFiles } = apiData;
 
               gitChangedFiles = gitChangedFiles.filter((fileEntry) => {
@@ -149,11 +141,7 @@ export default function GitDiffViewComponent() {
 
   function fileDiffStatComponent(repoId, fileName) {
     const apiEndPoint = globalAPIEndpoint;
-    setWarnStatus("");
-
-    const payload = JSON.stringify(
-      JSON.stringify({ repoId: repoId, fileName: fileName })
-    );
+    setWarnStatus("Loading file difference...");
 
     axios({
       url: apiEndPoint,
@@ -163,34 +151,36 @@ export default function GitDiffViewComponent() {
       },
       data: {
         query: `
-          query GitConvexApi{
-            gitConvexApi(route: "${ROUTE_REPO_FILE_DIFF}", payload:${payload})
-            {
-              gitFileLineChanges{
+          query{
+              gitFileLineChanges(repoId: "${repoId}", fileName: "${fileName}"){
                 diffStat
                 fileDiff
-                language
               }
-            }
           }
         `,
       },
     })
       .then(async (res) => {
         if (res.data.data && !res.data.error) {
-          const {
-            diffStat,
-            fileDiff,
-            language,
-          } = res.data.data.gitConvexApi.gitFileLineChanges;
+          const { diffStat, fileDiff } = res.data.data.gitFileLineChanges;
 
-          if (diffStat[0] === "NO_STAT" || fileDiff[0] === "NO_DIFF") {
+          if (diffStat === "NO_STAT" || fileDiff[0] === "NO_DIFF") {
             setWarnStatus(
               "No difference could be found. Please check if the file is present in the repo!"
             );
           } else {
-            setDiffStatState(diffStat[1]);
+            setWarnStatus("");
+            setDiffStatState(diffStat);
             setFileLineDiffState(fileDiff);
+
+            let language;
+            let langName = new LangLine().withFileName(fileName).prismIndicator;
+
+            if (langName && typeof langName != undefined) {
+              language = langName;
+            } else {
+              language = "markdown";
+            }
 
             if (language) {
               await import("prismjs/components/prism-" + language + ".js")
@@ -218,17 +208,16 @@ export default function GitDiffViewComponent() {
   }
 
   function statFormat() {
-    if (diffStatState && diffStatState.includes(",")) {
+    if (diffStatState) {
       let splitStat = diffStatState.split(",");
 
       return (
         <div className="text-xl text-center w-3/4 mx-auto block p-2 border border-gray-500 rounded-md shadow-md border-dotted">
-          <span className="font-sans font-bold px-1">{splitStat[0]}</span>
-          {splitStat.slice(1, splitStat.length).map((parts) => {
+          {splitStat.map((parts) => {
             if (parts.match(/insert/i)) {
               return (
                 <span key={`${parts}-${new Date().getTime()}`}>
-                  <span className="px-2">{parts.toString().split(" ")[1]}</span>
+                  <span className="px-2">{parts.toString().split(" ")[0]}</span>
                   <span className="text-green-700 font-sans font-semibold">
                     insertions (+)
                   </span>
@@ -237,7 +226,7 @@ export default function GitDiffViewComponent() {
             } else {
               return (
                 <span key={`${parts}-${new Date().getTime()}`}>
-                  <span className="px-2">{parts.toString().split(" ")[1]}</span>
+                  <span className="px-2">{parts.toString().split(" ")[0]}</span>
                   <span className="text-red-700 font-sans font-semibold">
                     deletions (-)
                   </span>
@@ -253,17 +242,8 @@ export default function GitDiffViewComponent() {
   function fileLineDiffComponent() {
     let splitLines = [];
     let lineCounter = 0;
-    if (
-      fileLineDiffState &&
-      fileLineDiffState.join("").split(/@@.*@@/gi) &&
-      lang
-    ) {
-      let partFile = fileLineDiffState
-        .join("|__HASH_SEPARATOR__|")
-        .split(/@@.*@@/gi)[1]
-        .split("|__HASH_SEPARATOR__|");
-
-      splitLines = partFile.map((line) => {
+    if (fileLineDiffState && lang) {
+      splitLines = fileLineDiffState.map((line) => {
         if (line.match(/\\ No newline at end of file/gi)) {
           return "";
         }

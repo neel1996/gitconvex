@@ -1,9 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  globalAPIEndpoint,
-  ROUTE_GIT_STAGED_FILES,
-} from "../../../../../util/env_config";
+import { globalAPIEndpoint } from "../../../../../util/env_config";
 import "../../../../styles/GitOperations.css";
 
 export default function CommitComponent(props) {
@@ -20,7 +17,6 @@ export default function CommitComponent(props) {
   useEffect(() => {
     setLoading(true);
 
-    const payload = JSON.stringify(JSON.stringify({ repoId: props.repoId }));
     const cancelToken = axios.CancelToken;
     const source = cancelToken.source();
 
@@ -33,27 +29,27 @@ export default function CommitComponent(props) {
       cancelToken: source.token,
       data: {
         query: `
-            query GitConvexApi{
-              gitConvexApi(route: "${ROUTE_GIT_STAGED_FILES}", payload:${payload})
-              {
-                gitStagedFiles{
-                    stagedFiles
-                }
-              }
+          query {
+            gitChanges(repoId: "${props.repoId}"){
+              gitStagedFiles
             }
+          }
           `,
       },
     })
       .then((res) => {
-        const { stagedFiles } = res.data.data.gitConvexApi.gitStagedFiles;
+        const { gitStagedFiles } = res.data.data.gitChanges;
         setLoading(false);
 
-        if (stagedFiles && stagedFiles.length > 0) {
-          setStagedFilesState([...stagedFiles]);
+        console.log(gitStagedFiles);
+
+        if (gitStagedFiles && gitStagedFiles.length > 0) {
+          setStagedFilesState([...gitStagedFiles]);
         }
       })
       .catch((err) => {
         setLoading(false);
+        console.log(err);
       });
 
     return () => {
@@ -73,7 +69,7 @@ export default function CommitComponent(props) {
       method: "POST",
       data: {
         query: `
-          mutation GitConvexMutation{
+          mutation {
             commitChanges(repoId: "${repoId}", commitMessage: "${commitMsg}")
           }
         `,

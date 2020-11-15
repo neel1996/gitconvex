@@ -3,10 +3,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  globalAPIEndpoint,
-  ROUTE_REPO_DETAILS,
-} from "../../../../util/env_config";
+import { globalAPIEndpoint } from "../../../../util/env_config";
 import BranchCommitLogChanges from "./BranchCommitLogChanges";
 
 export default function BranchCompareComponent(props) {
@@ -30,31 +27,24 @@ export default function BranchCompareComponent(props) {
     const token = axios.CancelToken;
     const source = token.source();
 
-    const payload = JSON.stringify(JSON.stringify({ repoId: props.repoId }));
-
     axios({
       url: globalAPIEndpoint,
       method: "POST",
       cancelToken: source.token,
       data: {
         query: `
-            query GitConvexApi
+            query 
             {
-              gitConvexApi(route: "${ROUTE_REPO_DETAILS}", payload: ${payload}){
-                gitRepoStatus {
+                gitRepoStatus(repoId: "${props.repoId}") {
                     gitBranchList  
                     gitCurrentBranch
                 }
-              }
             }
           `,
       },
     })
       .then((res) => {
-        let {
-          gitBranchList,
-          gitCurrentBranch,
-        } = res.data.data.gitConvexApi.gitRepoStatus;
+        let { gitBranchList, gitCurrentBranch } = res.data.data.gitRepoStatus;
 
         gitBranchList =
           gitBranchList &&
@@ -158,7 +148,7 @@ export default function BranchCompareComponent(props) {
       {branchList.length === 1 ? (
         noBranchToCompare()
       ) : branchList.length === 0 ? (
-        <div className="mx-auto my-20 text-center flex justify-center text-4xl font-sans text-center text-gray-300">
+        <div className="mx-auto my-20 text-center flex justify-center text-4xl font-sans text-gray-300">
           Loading Branch Info...
         </div>
       ) : (

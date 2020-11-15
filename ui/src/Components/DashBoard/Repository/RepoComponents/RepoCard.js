@@ -1,15 +1,12 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
-import {
-  globalAPIEndpoint,
-  ROUTE_REPO_DETAILS,
-} from "../../../../util/env_config";
-import InfiniteLoader from "../../../Animations/InfiniteLoader";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { globalAPIEndpoint } from "../../../../util/env_config";
+import InfiniteLoader from "../../../Animations/InfiniteLoader";
 import "../../../styles/RepoCard.css";
 
 export default function RepoCard(props) {
@@ -22,8 +19,6 @@ export default function RepoCard(props) {
   useEffect(() => {
     setLoading(true);
     let repoId = props.repoData.id;
-    const payload = JSON.stringify(JSON.stringify({ repoId: repoId }));
-
     const token = axios.CancelToken;
     const source = token.source();
 
@@ -36,23 +31,20 @@ export default function RepoCard(props) {
       cancelToken: source.token,
       data: {
         query: `
-    
-                query GitConvexApi
-                {
-                  gitConvexApi(route: "${ROUTE_REPO_DETAILS}", payload: ${payload}){
-                    gitRepoStatus {
-                      gitTotalCommits
-                      gitTotalTrackedFiles  
-                      gitCurrentBranch  
-                    }
-                  }
-                }
-              `,
+          query 
+          {
+            gitRepoStatus(repoId:"${repoId}"){
+              gitCurrentBranch
+              gitTotalCommits
+              gitTotalTrackedFiles
+            }
+          }
+        `,
       },
     })
       .then((res) => {
         setLoading(false);
-        setRepoFooterData(res.data.data.gitConvexApi.gitRepoStatus);
+        setRepoFooterData(res.data.data.gitRepoStatus);
       })
       .catch((err) => {
         setLoading(false);
@@ -61,7 +53,7 @@ export default function RepoCard(props) {
     return () => {
       source.cancel();
     };
-  }, [props]);
+  }, [props.repoData.id]);
 
   const repoName = repoData.repoName;
   var avatar = "";

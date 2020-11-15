@@ -4,7 +4,6 @@ const contextValues = {
   hcDone: false,
   platform: "",
   git: "",
-  node: "",
   shouldAddFormClose: false,
   globalRepoId: "",
   hcParams: {},

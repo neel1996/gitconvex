@@ -1,15 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
-import {
-  globalAPIEndpoint,
-  ROUTE_REPO_DETAILS,
-} from "../../../../../../util/env_config";
-import InfiniteLoader from "../../../../../Animations/InfiniteLoader";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
+import { globalAPIEndpoint } from "../../../../../../util/env_config";
+import InfiniteLoader from "../../../../../Animations/InfiniteLoader";
 
 export default function FetchFromRemoteComponent(props) {
   library.add(fas);
@@ -25,7 +21,6 @@ export default function FetchFromRemoteComponent(props) {
   const branchRef = useRef();
 
   useEffect(() => {
-    let payload = JSON.stringify(JSON.stringify({ repoId: props.repoId }));
     const cancelToken = axios.CancelToken;
     const source = cancelToken.source();
 
@@ -38,22 +33,20 @@ export default function FetchFromRemoteComponent(props) {
       },
       data: {
         query: `
-                query GitConvexApi
+                query
                 {
-                  gitConvexApi(route: "${ROUTE_REPO_DETAILS}", payload: ${payload}){
-                    gitRepoStatus {
+                    gitRepoStatus(repoId:"${props.repoId}") {
                       gitRemoteData
                       gitCurrentBranch
                       gitRemoteHost
                       gitBranchList 
                     }
-                  }
                 }
               `,
       },
     })
       .then((res) => {
-        const repoDetails = res.data.data.gitConvexApi.gitRepoStatus;
+        const repoDetails = res.data.data.gitRepoStatus;
         setRemoteData(repoDetails);
       })
       .catch((err) => {
@@ -105,7 +98,7 @@ export default function FetchFromRemoteComponent(props) {
     const getAxiosRequestBody = (remote, branch) => {
       let gqlQuery = "";
       if (actionType === "fetch") {
-        gqlQuery = `mutation GitConvexMutation{
+        gqlQuery = `mutation {
           fetchFromRemote(repoId: "${repoId}", remoteUrl: "${remote}", remoteBranch: "${branch}"){
             status
             fetchedItems
@@ -113,7 +106,7 @@ export default function FetchFromRemoteComponent(props) {
         }
       `;
       } else {
-        gqlQuery = `mutation GitConvexMutation{
+        gqlQuery = `mutation {
           pullFromRemote(repoId: "${repoId}", remoteUrl: "${remote}", remoteBranch: "${branch}"){
             status
             pulledItems
@@ -145,7 +138,7 @@ export default function FetchFromRemoteComponent(props) {
 
           if (actionResponse.status.match(/ABSENT/gi)) {
             setResult([
-              <div className="text-xl p-2 text-gray-900 font-semibold">
+              <div className="text-xl text-center border-2 border-dashed border-gray-800 p-2 text-gray-700 font-semibold">
                 No changes to {actionType === "fetch" ? "Fetch" : "Pull"} from
                 remote
               </div>,
@@ -164,7 +157,11 @@ export default function FetchFromRemoteComponent(props) {
             } else {
               resArray = actionResponse.pulledItems;
             }
-            setResult([...resArray]);
+            setResult([
+              <div className="text-xl text-center border-2 border-dashed border-green-600 p-2 text-green-700 bg-green-200 font-semibold rounded shadow">
+                {resArray[0]}
+              </div>,
+            ]);
           }
         }
       })
@@ -282,7 +279,7 @@ export default function FetchFromRemoteComponent(props) {
               {result.map((result) => {
                 return (
                   <div
-                    className="my-1 mx-2 break-normal"
+                    className="my-1 mx-2 text-center text-xl font-sans shadow bg-gray-300"
                     key={result + `-${uuid()}`}
                   >
                     {result}

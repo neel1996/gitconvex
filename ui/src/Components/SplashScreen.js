@@ -15,15 +15,16 @@ export default function SplashScreen(props) {
     axios({
       url: apiURL,
       method: "POST",
+      headers:{
+        "Content-type":"application/json",
+        Accept: "application/json"
+      },
       data: {
         query: `
-          query GitConvexAPI{
-            gitConvexApi(route:"HEALTH_CHECK"){
-              healthCheck{
-                osCheck
-                gitCheck
-                nodeCheck
-              }
+          query{
+            healthCheck{
+              os
+              git
             }
           }
         `,
@@ -32,17 +33,15 @@ export default function SplashScreen(props) {
       .then((res) => {
         if (res.data.data) {
           const {
-            osCheck,
-            gitCheck,
-            nodeCheck,
-          } = res.data.data.gitConvexApi.healthCheck;
+            os,
+            git,
+          } = res.data.data.healthCheck;
 
           dispatch({
             type: HC_PARAM_ACTION,
             payload: {
-              osCheck,
-              gitCheck,
-              nodeCheck,
+              os,
+              git,
             },
           });
           setHcCheck(true);
