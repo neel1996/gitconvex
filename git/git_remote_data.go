@@ -45,9 +45,19 @@ func RemoteData(repo *git.Repository, remoteChan chan RemoteDataModel) {
 	}()
 
 	logger.Log(fmt.Sprintf("Available remotes in repo : \n%v", remoteURL), global.StatusInfo)
-	remoteChan <- RemoteDataModel{
-		RemoteHost: GetRemoteHost(*remoteURL[0]),
-		RemoteURL:  remoteURL,
+
+	if len(remoteURL) == 0 {
+		nilRemote := "No Remote Host Available"
+		nilRemoteURL := ""
+		remoteChan <- RemoteDataModel{
+			RemoteHost: &nilRemote,
+			RemoteURL:  []*string{&nilRemoteURL},
+		}
+	} else {
+		remoteChan <- RemoteDataModel{
+			RemoteHost: GetRemoteHost(*remoteURL[0]),
+			RemoteURL:  remoteURL,
+		}
 	}
 
 	close(remoteChan)

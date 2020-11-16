@@ -4,6 +4,7 @@ import (
 	"github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/neel1996/gitconvex-server/utils"
 	"strings"
 )
 
@@ -29,8 +30,21 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	go git.RemoteData(repo, remoteChan)
 	remoteData := <-remoteChan
 	remotes := remoteData.RemoteURL
-	sRemote := strings.Split(*remotes[0], "/")
-	repoName = &sRemote[len(sRemote)-1]
+
+	if len(remotes) > 0 && *remotes[0] != "" {
+		sRemote := strings.Split(*remotes[0], "/")
+		repoName = &sRemote[len(sRemote)-1]
+	} else {
+		nilRemote := "No Remotes Available"
+		remotes[0] = &nilRemote
+		repoData := utils.DataStoreFileReader()
+
+		for _, repo := range repoData {
+			if repo.RepoId == repoId {
+				repoName = &repo.RepoName
+			}
+		}
+	}
 
 	if len(remotes) > 1 {
 		var tempRemoteArray []string
