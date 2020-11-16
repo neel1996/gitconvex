@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -12,15 +13,19 @@ import (
 	"github.com/rs/cors"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 const defaultPort = "9001"
 
 var (
-	Port string
+	Port int
 )
 
 func main() {
+	var portErr error
+	Port = 0
+
 	logger := global.Logger{}
 	logger.Log("Starting Gitconvex server modules", global.StatusInfo)
 
@@ -30,7 +35,11 @@ func main() {
 	if envError := utils.EnvConfigValidator(); envError == nil {
 		logger.Log("Using available env config file", global.StatusInfo)
 		envConfig := *utils.EnvConfigFileReader()
-		Port = envConfig.Port
+		Port, portErr = strconv.Atoi(envConfig.Port)
+		if portErr != nil {
+			Port = 9001
+			portErr = nil
+		}
 	} else {
 		logger.Log("No env config file is present. Falling back to default config data", global.StatusWarning)
 		envGeneratorError := utils.EnvConfigFileGenerator()
@@ -56,9 +65,21 @@ func main() {
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./build/")))
 
-	if Port != "" && len(Port) > 0 {
+	// Checking and Assigning port received from the command line ( --port args )
+	argFlag := flag.String("port", "", "To define the port dynamically while starting gitconvex")
+	flag.Parse()
+
+	if *argFlag != "" {
+		logger.Log(fmt.Sprintf("Setting port received from the command line -> %s", *argFlag), global.StatusInfo)
+		Port, portErr = strconv.Atoi(*argFlag)
+		if portErr != nil {
+			Port = 9001
+		}
+	}
+
+	if Port > 0 {
 		logger.Log(fmt.Sprintf("Gitconvex started on  http://localhost:%v", Port), global.StatusInfo)
-		log.Fatal(http.ListenAndServe(":"+Port, cors.Default().Handler(router)))
+		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(Port), cors.Default().Handler(router)))
 	} else {
 		logger.Log(fmt.Sprintf("Gitconvex started on  http://localhost:%v", defaultPort), global.StatusInfo)
 		log.Fatal(http.ListenAndServe(":"+defaultPort, cors.Default().Handler(router)))
