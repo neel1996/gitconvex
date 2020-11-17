@@ -93,10 +93,10 @@ export default function RepoCard(props) {
                 icon={["fas", "grip-lines"]}
               ></FontAwesomeIcon>
               <div className="footer--items--label">
-                {repoFooterData ? (
+                {repoFooterData && repoFooterData.gitTotalCommits ? (
                   <>{repoFooterData.gitTotalCommits} Commits</>
                 ) : (
-                  "..."
+                  <>0 Commits</>
                 )}
               </div>
             </div>
@@ -106,10 +106,10 @@ export default function RepoCard(props) {
                 icon={["fas", "file-alt"]}
               ></FontAwesomeIcon>
               <div className="footer--items--label">
-                {repoFooterData ? (
+                {repoFooterData && repoFooterData.gitTotalTrackedFiles ? (
                   <>{repoFooterData.gitTotalTrackedFiles} Tracked Files</>
                 ) : (
-                  "..."
+                  <>0 Tracked Files</>
                 )}
               </div>
             </div>
@@ -119,10 +119,10 @@ export default function RepoCard(props) {
                 icon={["fas", "code-branch"]}
               ></FontAwesomeIcon>
               <div className="footer--items--label font-semibold">
-                {repoFooterData ? (
+                {repoFooterData && repoFooterData.gitCurrentBranch ? (
                   <>{repoFooterData.gitCurrentBranch}</>
                 ) : (
-                  "..."
+                  <>No Branches Available</>
                 )}
               </div>
             </div>

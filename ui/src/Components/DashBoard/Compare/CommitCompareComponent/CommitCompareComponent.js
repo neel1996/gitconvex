@@ -15,6 +15,7 @@ export default function CommitCompareComponent(props) {
   const [commitData, setCommitData] = useState([]);
   const [baseCommit, setBaseCommit] = useState("");
   const [compareCommit, setCompareCommit] = useState("");
+  const [errState, setErrState] = useState(false);
 
   const memoizedCommitFileDifference = useMemo(() => {
     return (
@@ -27,6 +28,7 @@ export default function CommitCompareComponent(props) {
   }, [props.repoId, baseCommit, compareCommit]);
 
   useEffect(() => {
+    setErrState(false);
     axios({
       url: globalAPIEndpoint,
       method: "POST",
@@ -52,6 +54,11 @@ export default function CommitCompareComponent(props) {
       .then((res) => {
         if (res.data.data) {
           const { commits, totalCommits } = res.data.data.gitCommitLogs;
+
+          if (totalCommits === 0 || totalCommits == null) {
+            setErrState(true);
+          }
+
           setTotalCommitCount(totalCommits);
 
           setCommitData((data) => {
@@ -65,6 +72,7 @@ export default function CommitCompareComponent(props) {
       })
       .catch((err) => {
         console.log(err);
+        setErrState(true);
       });
   }, [props.repoId, skipCount]);
 
@@ -148,11 +156,11 @@ export default function CommitCompareComponent(props) {
   return (
     <>
       {baseAndCompareCommitComponent()}
-      {commitData.length === 0 ? (
+      {commitData.length === 0 && !errState ? (
         <div className="text-3xl text-center font-sans text-gray-300">
           Loading Commits...
         </div>
-      ) : (
+      ) : !errState ? (
         <div className="w-11/12 mx-auto flex gap-10 justify-around">
           {!baseCommit ? (
             <div className="w-1/2 p-2 shadow border rounded">
@@ -170,6 +178,11 @@ export default function CommitCompareComponent(props) {
               {commitCardComponent(setCompareCommit)}
             </div>
           ) : null}
+        </div>
+      ) : (
+        <div className="mx-auto text-center text-2xl text-gray-500 font-sans font-semibold p-4 border-b border-dashed border-gray-400">
+          Error occurred while fetching results. Please verify if the repo has
+          valid branches
         </div>
       )}
       {baseCommit && compareCommit ? memoizedCommitFileDifference : null}

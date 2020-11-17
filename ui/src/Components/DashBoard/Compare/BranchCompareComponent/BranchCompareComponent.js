@@ -12,6 +12,7 @@ export default function BranchCompareComponent(props) {
   const [currentBranch, setCurrentBranch] = useState("");
   const [compareBranch, setCompareBranch] = useState("");
   const [baseBranch, setBaseBranch] = useState("");
+  const [errState, setErrState] = useState(false);
 
   const memoizedBranchCommitLogChangesComponent = useMemo(() => {
     return (
@@ -26,6 +27,7 @@ export default function BranchCompareComponent(props) {
   useEffect(() => {
     const token = axios.CancelToken;
     const source = token.source();
+    setErrState(false);
 
     axios({
       url: globalAPIEndpoint,
@@ -46,6 +48,10 @@ export default function BranchCompareComponent(props) {
       .then((res) => {
         let { gitBranchList, gitCurrentBranch } = res.data.data.gitRepoStatus;
 
+        if (gitBranchList.length <= 0 || gitCurrentBranch === "") {
+          setErrState(true);
+        }
+
         gitBranchList =
           gitBranchList &&
           gitBranchList.map((branch) => {
@@ -62,6 +68,7 @@ export default function BranchCompareComponent(props) {
       })
       .catch((err) => {
         console.log(err);
+        setErrState(true);
       });
 
     return () => {
@@ -147,16 +154,23 @@ export default function BranchCompareComponent(props) {
     <div>
       {branchList.length === 1 ? (
         noBranchToCompare()
-      ) : branchList.length === 0 ? (
+      ) : branchList.length === 0 && !errState ? (
         <div className="mx-auto my-20 text-center flex justify-center text-4xl font-sans text-gray-300">
           Loading Branch Info...
         </div>
-      ) : (
+      ) : !errState ? (
         compareBranchSelectPane()
-      )}
-      {baseBranch && compareBranch
+      ) : null}
+      {baseBranch && compareBranch && !errState
         ? memoizedBranchCommitLogChangesComponent
         : null}
+
+      {errState ? (
+        <div className="mx-auto text-center text-2xl text-gray-500 font-sans font-semibold p-4 border-b border-dashed border-gray-400">
+          Error occurred while fetching results. Please verify if the repo has
+          valid branches
+        </div>
+      ) : null}
     </div>
   );
 }

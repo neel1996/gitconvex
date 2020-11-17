@@ -1,6 +1,7 @@
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
@@ -310,6 +311,25 @@ export default function RepositoryDetails(props) {
             {!loading && gitRepoStatus && repoIdState
               ? memoizedFolderExplorer
               : null}
+          </div>
+        ) : !loading ? (
+          <div className="w-full h-full mx-auto text-center flex justify-center items-center">
+            <div className="block mx-auto w-11/12">
+              <div className="rounded-lg shadow border-2 border-dashed border-pink-400 text-red-300 text-3xl font-sans font-semibold p-4">
+                Unable to fetch repo details
+              </div>
+              <div className="font-sans font-light text-xl my-4 text-gray-600">
+                Please check if the repo is a valid git repo. If it is not a git
+                repo, delete the entry from "Settings" menu and add the repo
+                again by checking "Initialize a new repo" option
+              </div>
+              <div className="my-10 text-gray-200">
+                <FontAwesomeIcon
+                  icon={["fas", "unlink"]}
+                  size="10x"
+                ></FontAwesomeIcon>
+              </div>
+            </div>
           </div>
         ) : null}
       </>
