@@ -56,6 +56,12 @@ export default function BranchListComponent({ repoId, currentBranch }) {
             gitCurrentBranch,
           } = res.data.data.gitRepoStatus;
 
+          if (gitCurrentBranch === "Repo HEAD is nil") {
+            setBranchList([]);
+            setListError(true);
+            return;
+          }
+
           gitAllBranchList = gitAllBranchList.map((branch) => {
             if (branch === gitCurrentBranch) {
               return "*" + branch;
@@ -185,8 +191,10 @@ export default function BranchListComponent({ repoId, currentBranch }) {
         Click on a branch to checkout to that branch
       </div>
       <div className="branchlist--list-area" style={{ height: "400px" }}>
-        {branchList.length === 0 ? (
-          <div className="list-area--message">Collecting branch list...</div>
+        {branchList.length === 0 && !listError ? (
+          <div className="text-center font-sans font-light text-xl my-2 text-gray-600 border-b border-dotted">
+            Collecting branch list...
+          </div>
         ) : null}
         {!listError &&
           branchList &&
