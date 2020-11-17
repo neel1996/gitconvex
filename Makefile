@@ -25,12 +25,13 @@ build:
 	echo "Generating production ready css" && \
 	tailwindcss build -o ./src/index.css -c ./src/tailwind.config.js && \
 	rm package-*.json && \
-    	rm -rf .git/ && \
-    	echo "Building react UI bundle" && \
+    rm -rf .git/ && \
+    echo "Building react UI bundle" && \
 	npm run build && \
 	mv ./build ../ && \
 	cd .. && \
 	mkdir -p ./dist && \
+	mv build/ ./dist/ && \
 	echo "Building final go source with UI bundle" && \
 	go build -o ./dist && \
 	echo "Gitconvex build completed!" && \

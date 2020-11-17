@@ -32,6 +32,7 @@ if "%ip%"==%BUILD% (
     move .\build ..\
     cd ..
     mkdir .\dist
+    move build\ .\dist\
 	echo "Removing intermediary folder ui/"
 	rd /s /q ui
     echo "Building gitconvex bundle"
