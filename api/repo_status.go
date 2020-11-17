@@ -24,6 +24,20 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	r := <-repoChan
 	repo := r.GitRepo
 
+	if repo == nil {
+		return &model.GitRepoStatusResults{
+			GitRemoteData:        nil,
+			GitRepoName:          nil,
+			GitBranchList:        nil,
+			GitAllBranchList:     nil,
+			GitCurrentBranch:     nil,
+			GitRemoteHost:        nil,
+			GitTotalCommits:      nil,
+			GitLatestCommit:      nil,
+			GitTotalTrackedFiles: nil,
+		}
+	}
+
 	remote := ""
 	var remoteURL *string
 	remoteURL = &remote

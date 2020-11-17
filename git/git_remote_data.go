@@ -28,7 +28,6 @@ func GetRemoteHost(remoteURL string) *string {
 }
 
 // RemoteData returns the remote host name and the remote URL of the target repo
-
 func RemoteData(repo *git.Repository, remoteChan chan RemoteDataModel) {
 	logger := global.Logger{}
 	var remoteURL []*string

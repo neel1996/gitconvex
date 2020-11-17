@@ -22,7 +22,15 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 	targetRefPsec := "refs/heads/" + remoteBranch + ":refs/remotes/" + remoteBranch
 	b := new(bytes.Buffer)
 	var fetchErr error
-	gitSSHAuth, _ := ssh.NewSSHAgentAuth("git")
+	gitSSHAuth, sshErr := ssh.NewSSHAgentAuth("git")
+
+	if sshErr != nil {
+		logger.Log("Authentication method failed -> "+sshErr.Error(), global.StatusError)
+		return &model.FetchResult{
+			Status:       "FETCH ERROR",
+			FetchedItems: nil,
+		}
+	}
 
 	logger.Log(fmt.Sprintf("Fetching changes from -> %s : %s", remoteURL, targetRefPsec), global.StatusInfo)
 

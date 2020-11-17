@@ -22,7 +22,6 @@ func handlePanic() {
 }
 
 // Repo function gets the repoId and returns the respective git.Repository object along with additional repo metadata
-
 func Repo(repoId string, repoChan chan RepoDetails) {
 	var repoData []utils.RepoData
 	var repoPath string
@@ -49,6 +48,11 @@ func Repo(repoId string, repoChan chan RepoDetails) {
 
 	if err != nil {
 		logger.Log(err.Error(), global.StatusError)
+		repoChan <- RepoDetails{
+			RepoId:   repoId,
+			RepoPath: repoPath,
+			GitRepo:  nil,
+		}
 	} else {
 		repoChan <- RepoDetails{
 			RepoId:   repoId,

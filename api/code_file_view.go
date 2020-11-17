@@ -3,14 +3,13 @@ package api
 import (
 	"bufio"
 	"fmt"
-	"github.com/go-git/go-git/v5"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
 	"os"
 )
 
 // CodeFileView returns the lines from the target file and the latest commit corresponding to the file
-func CodeFileView(repo *git.Repository, repoPath string, fileName string) *model.CodeFileType {
+func CodeFileView(repoPath string, fileName string) *model.CodeFileType {
 	var codeLines []*string
 
 	targetFile := repoPath + "/" + fileName

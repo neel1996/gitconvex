@@ -61,9 +61,14 @@ func main() {
 	router.Handle("/query", srv)
 	router.Handle("/gitconvexapi", srv)
 
-	// Static file supplier for hosting the react application
+	// Static file supplier for hosting the react static assets and scripts
+	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("./build/static/"))))
 
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./build/")))
+	// A default fallback route for handling all routes with '/' prefix.
+	// For making it compatible with react router
+	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/index.html")
+	})
 
 	// Checking and Assigning port received from the command line ( --port args )
 	argFlag := flag.String("port", "", "To define the port dynamically while starting gitconvex")

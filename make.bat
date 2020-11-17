@@ -17,6 +17,7 @@ if "%ip%"==%BUILD% (
 	echo "Cleaning up unwanted folders"
 	rd /s /q ui
 	rd /s /q dist
+	rd /s /q build
     echo "Cloning UI package from github gitconvex-ui/master"
     git clone https://github.com/neel1996/gitconvex-ui.git ui/
     cd ui

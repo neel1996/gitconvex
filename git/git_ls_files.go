@@ -22,31 +22,11 @@ type LsFileInfo struct {
 	TotalTrackedCount *int
 }
 
-type dirCommitDataModel struct {
-	dirNameList   []*string
-	dirCommitList []*string
-}
-
-type fileCommitDataModel struct {
-	fileNameList   []*string
-	fileCommitList []*string
-}
-
 var logger global.Logger
 var selectedDir string
 var waitGroup sync.WaitGroup
 
-// pathFilterCheck validates if the path held by the log iterator is tracked by the repo
-
-func pathFilterCheck(filterPath string) bool {
-	if strings.Contains(filterPath, selectedDir) {
-		return true
-	}
-	return false
-}
-
-// dirCommitHandler collects the commit messages for the directories present in the target repo
-
+// DirCommitHandler collects the commit messages for the directories present in the target repo
 func DirCommitHandler(dirName *string, repoPath string, fileChan chan string, commitChan chan string, waitGroup *sync.WaitGroup) {
 	args := []string{"log", "--oneline", "-1", "--pretty=format:%s", *dirName}
 	cmd := utils.GetGitClient(repoPath, args)
@@ -58,6 +38,7 @@ func DirCommitHandler(dirName *string, repoPath string, fileChan chan string, co
 		if err != nil {
 			logger.Log(fmt.Sprintf("Command execution for -> {{%s}} failed with error %v", cmd.String(), err.Error()), global.StatusError)
 			fmt.Println(commitLog)
+			waitGroup.Done()
 		} else {
 			commitMsg := string(commitLog)
 			logger.Log(fmt.Sprintf("Fetching commits for file -> %s --> %s", *dirName, commitLog), global.StatusInfo)
@@ -68,8 +49,7 @@ func DirCommitHandler(dirName *string, repoPath string, fileChan chan string, co
 	}
 }
 
-// fileCommitHandler collects the commit messages for the files present in the target repo
-
+// FileCommitHandler collects the commit messages for the files present in the target repo
 func FileCommitHandler(file *string, repoPath string, fileChan chan string, commitChan chan string, waitGroup *sync.WaitGroup) {
 	args := []string{"log", "--oneline", "-1", "--pretty=format:%s", *file}
 	cmd := utils.GetGitClient(repoPath, args)
@@ -87,6 +67,7 @@ func FileCommitHandler(file *string, repoPath string, fileChan chan string, comm
 		commitLog, err := cmd.Output()
 		if err != nil {
 			logger.Log(err.Error(), global.StatusError)
+			waitGroup.Done()
 		} else {
 			commitMsg := string(commitLog)
 			logger.Log(fmt.Sprintf("Fetching commits for file -> %v --> %s", *file, commitLog), global.StatusInfo)
@@ -99,40 +80,42 @@ func FileCommitHandler(file *string, repoPath string, fileChan chan string, comm
 }
 
 // TrackedFileCount returns the total number of files tracked by the target git repo
-
 func TrackedFileCount(repo *git.Repository, trackedFileCountChan chan int) {
 	var totalFileCount int
 	logger := global.Logger{}
 
-	head, _ := repo.Head()
-	hash := head.Hash()
-
-	allCommits, _ := repo.CommitObject(hash)
-	tObj, _ := allCommits.Tree()
-
-	err := tObj.Files().ForEach(func(file *object.File) error {
-		if file != nil {
-			totalFileCount++
-			return nil
-		} else {
-			return types.Error{Msg: "File from the tree is empty"}
-		}
-	})
-	tObj.Files().Close()
-
-	if err != nil {
-		logger.Log(err.Error(), global.StatusError)
+	head, headErr := repo.Head()
+	if headErr != nil {
+		logger.Log(fmt.Sprintf("Repo head is invalid -> %s", headErr.Error()), global.StatusError)
 		trackedFileCountChan <- 0
 	} else {
-		logger.Log(fmt.Sprintf("Total Tracked Files : %v", totalFileCount), global.StatusInfo)
-		trackedFileCountChan <- totalFileCount
+		hash := head.Hash()
+		allCommits, _ := repo.CommitObject(hash)
+		tObj, _ := allCommits.Tree()
+
+		err := tObj.Files().ForEach(func(file *object.File) error {
+			if file != nil {
+				totalFileCount++
+				return nil
+			} else {
+				return types.Error{Msg: "File from the tree is empty"}
+			}
+		})
+		tObj.Files().Close()
+
+		if err != nil {
+			logger.Log(err.Error(), global.StatusError)
+			trackedFileCountChan <- 0
+		} else {
+			logger.Log(fmt.Sprintf("Total Tracked Files : %v", totalFileCount), global.StatusInfo)
+			trackedFileCountChan <- totalFileCount
+		}
 	}
 	close(trackedFileCountChan)
 }
 
 // ListFiles collects the list of tracked files and their latest respective commit messages
 // Used to visualize the git repo in the front-end file explorer in a github explorer based fashion
-
 func ListFiles(repo *git.Repository, repoPath string, directoryName string) *model.GitFolderContentResults {
 	logger := global.Logger{}
 	logger.Log("Collecting tracked file list from the repo", global.StatusInfo)

@@ -31,7 +31,16 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 		pullErr = types.Error{Msg: "branch reference does not exist"}
 	} else {
 		logger.Log(fmt.Sprintf("Pulling changes from -> %s : %s", remoteURL, ref.Name()), global.StatusInfo)
-		gitSSHAuth, _ := ssh.NewSSHAgentAuth("git")
+		gitSSHAuth, sshErr := ssh.NewSSHAgentAuth("git")
+
+		if sshErr != nil {
+			logger.Log("Authentication method failed -> "+sshErr.Error(), global.StatusError)
+			return &model.PullResult{
+				Status:      "PULL ERROR",
+				PulledItems: nil,
+			}
+		}
+
 		pullErr = w.Pull(&git.PullOptions{
 			RemoteName:    remoteName,
 			Auth:          gitSSHAuth,
@@ -43,6 +52,7 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 		})
 	}
 
+	// Logging the pull message stream sent from the remote server
 	logger.Log(b.String(), global.StatusInfo)
 
 	if pullErr != nil {

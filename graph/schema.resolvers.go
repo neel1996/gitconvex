@@ -29,6 +29,10 @@ func (r *mutationResolver) AddBranch(ctx context.Context, repoID string, branchN
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if repo.GitRepo == nil {
+		return "BRANCH_ADD_FAILED", nil
+	}
+
 	return git.AddBranch(repo.GitRepo, branchName), nil
 }
 
@@ -36,6 +40,10 @@ func (r *mutationResolver) CheckoutBranch(ctx context.Context, repoID string, br
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return "Failed to checkout branch", nil
+	}
+
 	return git.CheckoutBranch(repo.GitRepo, branchName), nil
 }
 
@@ -43,6 +51,11 @@ func (r *mutationResolver) DeleteBranch(ctx context.Context, repoID string, bran
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return &model.BranchDeleteStatus{
+			Status: "BRANCH_DELETE_FAILED",
+		}, nil
+	}
 	return git.DeleteBranch(repo.GitRepo, branchName, forceFlag), nil
 }
 
@@ -50,6 +63,9 @@ func (r *mutationResolver) AddRemote(ctx context.Context, repoID string, remoteN
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if repo.GitRepo == nil {
+		return "REMOTE_ADD_FAILED", nil
+	}
 	return git.AddRemote(repo.GitRepo, remoteName, remoteURL), nil
 }
 
@@ -57,6 +73,12 @@ func (r *mutationResolver) FetchFromRemote(ctx context.Context, repoID string, r
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return &model.FetchResult{
+			Status:       "FETCH ERROR",
+			FetchedItems: nil,
+		}, nil
+	}
 	return git.FetchFromRemote(repo.GitRepo, *remoteURL, *remoteBranch), nil
 }
 
@@ -64,6 +86,13 @@ func (r *mutationResolver) PullFromRemote(ctx context.Context, repoID string, re
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return &model.PullResult{
+			Status:      "PULL ERROR",
+			PulledItems: nil,
+		}, nil
+	}
+
 	return git.PullFromRemote(repo.GitRepo, *remoteURL, *remoteBranch), nil
 }
 
@@ -71,6 +100,10 @@ func (r *mutationResolver) StageItem(ctx context.Context, repoID string, item st
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return "ADD_ITEM_FAILED", nil
+	}
+
 	return git.StageItem(repo.GitRepo, item), nil
 }
 
@@ -78,6 +111,9 @@ func (r *mutationResolver) RemoveStagedItem(ctx context.Context, repoID string, 
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return "STAGE_REMOVE_FAILED", nil
+	}
 	return git.RemoveItem(repo.RepoPath, item), nil
 }
 
@@ -85,6 +121,9 @@ func (r *mutationResolver) RemoveAllStagedItem(ctx context.Context, repoID strin
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return "STAGE_ALL_REMOVE_FAILED", nil
+	}
 	return git.ResetAllItems(repo.GitRepo), nil
 }
 
@@ -92,7 +131,9 @@ func (r *mutationResolver) StageAllItems(ctx context.Context, repoID string) (st
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return "ALL_STAGE_FAILED", nil
+	}
 	return git.StageAllItems(repo.GitRepo), nil
 }
 
@@ -100,6 +141,9 @@ func (r *mutationResolver) CommitChanges(ctx context.Context, repoID string, com
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return "COMMIT_FAILED", nil
+	}
 
 	return git.CommitChanges(repo.GitRepo, commitMessage), nil
 }
@@ -108,6 +152,9 @@ func (r *mutationResolver) PushToRemote(ctx context.Context, repoID string, remo
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return "PUSH_FAILED", nil
+	}
 
 	remoteName := git.GetRemoteName(repo.GitRepo, remoteHost)
 	return git.PushToRemote(repo.GitRepo, remoteName, branch), nil
@@ -142,6 +189,13 @@ func (r *queryResolver) GitFolderContent(ctx context.Context, repoID string, dir
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
 
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return &model.GitFolderContentResults{
+			TrackedFiles:     nil,
+			FileBasedCommits: nil,
+		}, nil
+	}
+
 	tmp := &model.GitFolderContentResults{}
 	tmp.FileBasedCommits = nil
 	tmp.TrackedFiles = nil
@@ -154,6 +208,12 @@ func (r *queryResolver) GitCommitLogs(ctx context.Context, repoID string, skipLi
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
 
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return &model.GitCommitLogResults{
+			TotalCommits: nil,
+			Commits:      nil,
+		}, nil
+	}
 	return git.CommitLogs(repo.GitRepo, skipLimit, referenceCommit), nil
 }
 
@@ -161,7 +221,14 @@ func (r *queryResolver) GitCommitFiles(ctx context.Context, repoID string, commi
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return []*model.GitCommitFileResult{
+			{
+				Type:     "",
+				FileName: "",
+			},
+		}, nil
+	}
 	return git.CommitFileList(repo.GitRepo, commitHash), nil
 }
 
@@ -169,7 +236,18 @@ func (r *queryResolver) SearchCommitLogs(ctx context.Context, repoID string, sea
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return []*model.GitCommits{
+			{
+				Hash:               nil,
+				Author:             nil,
+				CommitTime:         nil,
+				CommitMessage:      nil,
+				CommitRelativeTime: nil,
+				CommitFilesCount:   nil,
+			},
+		}, nil
+	}
 	return git.SearchCommitLogs(repo.GitRepo, searchType, searchKey), nil
 }
 
@@ -177,15 +255,25 @@ func (r *queryResolver) CodeFileDetails(ctx context.Context, repoID string, file
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-
-	return api.CodeFileView(repo.GitRepo, repo.RepoPath, fileName), nil
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return &model.CodeFileType{
+			FileData: nil,
+		}, nil
+	}
+	return api.CodeFileView(repo.RepoPath, fileName), nil
 }
 
 func (r *queryResolver) GitChanges(ctx context.Context, repoID string) (*model.GitChangeResults, error) {
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return &model.GitChangeResults{
+			GitUntrackedFiles: nil,
+			GitChangedFiles:   nil,
+			GitStagedFiles:    nil,
+		}, nil
+	}
 	return git.ChangedFiles(repo.GitRepo), nil
 }
 
@@ -193,6 +281,9 @@ func (r *queryResolver) GitUnPushedCommits(ctx context.Context, repoID string, r
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return nil, nil
+	}
 
 	remoteName := git.GetRemoteName(repo.GitRepo, remoteURL)
 	remoteRef := remoteName + "/" + remoteBranch
@@ -205,7 +296,14 @@ func (r *queryResolver) GitFileLineChanges(ctx context.Context, repoID string, f
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
 
-	fileContent := api.CodeFileView(repo.GitRepo, repo.RepoPath, fileName)
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return &model.FileLineChangeResult{
+			DiffStat: "",
+			FileDiff: nil,
+		}, nil
+	}
+
+	fileContent := api.CodeFileView(repo.RepoPath, fileName)
 	return git.FileLineDiff(repo.GitRepo, fileName, fileContent.FileData), nil
 }
 
@@ -217,6 +315,14 @@ func (r *queryResolver) CommitCompare(ctx context.Context, repoID string, baseCo
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return []*model.GitCommitFileResult{
+			{
+				Type:     "",
+				FileName: "",
+			},
+		}, nil
+	}
 
 	return git.CompareCommit(repo.GitRepo, baseCommit, compareCommit), nil
 }
@@ -225,7 +331,14 @@ func (r *queryResolver) BranchCompare(ctx context.Context, repoID string, baseBr
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+		return []*model.BranchCompareResults{
+			{
+				Date: "",
+				Commits: nil,
+			},
+		}, nil
+	}
 	return git.CompareBranch(repo.GitRepo, baseBranch, compareBranch), nil
 }
 
