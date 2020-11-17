@@ -14,8 +14,13 @@ import (
 func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) string {
 	targetRefPsec := "refs/heads/" + remoteBranch + ":refs/heads/" + remoteBranch
 	b := new(bytes.Buffer)
-	sshAuth, _ := ssh.NewSSHAgentAuth("git")
+	sshAuth, sshErr := ssh.NewSSHAgentAuth("git")
 	logger.Log(fmt.Sprintf("Pushing changes to remote -> %s : %s", remoteName, targetRefPsec), global.StatusInfo)
+
+	if sshErr != nil {
+		logger.Log(fmt.Sprintf("Authentication failed -> %s", sshErr.Error()), global.StatusError)
+		return "PUSH_FAILED"
+	}
 
 	remote, remoteErr := repo.Remote(remoteName)
 	if remoteErr != nil {
