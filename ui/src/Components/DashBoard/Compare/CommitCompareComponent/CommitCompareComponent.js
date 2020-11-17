@@ -164,7 +164,7 @@ export default function CommitCompareComponent(props) {
         <div className="w-11/12 mx-auto flex gap-10 justify-around">
           {!baseCommit ? (
             <div className="w-1/2 p-2 shadow border rounded">
-              <div className="p-2 font-sans font-semibold text-xl font-semibold">
+              <div className="p-2 font-sans font-semibold text-xl">
                 Select the base Commit
               </div>
               {commitCardComponent(setBaseCommit)}
@@ -172,7 +172,7 @@ export default function CommitCompareComponent(props) {
           ) : null}
           {!compareCommit ? (
             <div className="w-1/2 p-2 shadow border rounded">
-              <div className="p-2 font-sans font-semibold text-xl font-semibold">
+              <div className="p-2 font-sans text-xl font-semibold">
                 Select the Commit to compare
               </div>
               {commitCardComponent(setCompareCommit)}

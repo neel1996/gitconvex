@@ -20,6 +20,8 @@ export default function FileExplorerComponent(props) {
   const [directoryNavigator, setDirectoryNavigator] = useState([]);
   const [codeViewItem, setCodeViewItem] = useState("");
   const [selectionIndex, setSelectionIndex] = useState(0);
+  const [isEmpty, setIsEmpty] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [cwd, setCwd] = useState("");
 
   const { repoIdState } = props;
@@ -53,6 +55,8 @@ export default function FileExplorerComponent(props) {
 
   useEffect(() => {
     const repoId = props.repoIdState;
+    setIsEmpty(false);
+    setIsLoading(true);
     axios({
       url: globalAPIEndpoint,
       method: "POST",
@@ -72,16 +76,24 @@ export default function FileExplorerComponent(props) {
       },
     })
       .then((res) => {
+        setIsLoading(false);
         const {
           trackedFiles,
           fileBasedCommits,
         } = res.data.data.gitFolderContent;
+
+        if (trackedFiles.length === 0 || fileBasedCommits.length === 0) {
+          setIsEmpty(true);
+          return;
+        }
+
         if (trackedFiles && fileBasedCommits) {
           filterNullCommitEntries(trackedFiles, fileBasedCommits);
         }
       })
       .catch((err) => {
         console.log(err);
+        setIsLoading(false);
       });
   }, [props]);
 
@@ -193,11 +205,7 @@ export default function FileExplorerComponent(props) {
   };
 
   const gitTrackedFileComponent = () => {
-    if (
-      gitRepoFiles &&
-      gitRepoFiles.length > 0 &&
-      gitRepoFiles[0] !== "NO_TRACKED_FILES"
-    ) {
+    if (gitRepoFiles && gitRepoFiles.length > 0) {
       var formattedFiles = [];
       var directoryEntry = [];
       var fileEntry = [];
@@ -293,17 +301,12 @@ export default function FileExplorerComponent(props) {
           {formattedFiles}
         </div>
       );
-    } else if (gitRepoFiles && gitRepoFiles[0] === "NO_TRACKED_FILES") {
-      return (
-        <div className="folder-view--nofiles">
-          <div>
-            <FontAwesomeIcon icon={["fas", "unlink"]}></FontAwesomeIcon>
-          </div>
-          <div>No Tracked Files in the directory!</div>
-        </div>
-      );
-    } else {
-      return (
+    }
+  };
+
+  return (
+    <>
+      {isLoading ? (
         <>
           <div className="folder-view--loader">
             <div className="folder-view--loader--label">
@@ -316,82 +319,96 @@ export default function FileExplorerComponent(props) {
             ></InfiniteLoader>
           </div>
         </>
-      );
-    }
-  };
+      ) : (
+        <>
+          {codeViewToggle ? (
+            <div
+              className="code-view"
+              id="code-view__backdrop"
+              style={{ background: "rgba(0,0,0,0.5)", zIndex: 99 }}
+              onClick={(event) => {
+                if (event.target.id === "code-view__backdrop") {
+                  setCodeViewToggle(false);
+                }
+              }}
+            >
+              <div
+                className="close-btn-round"
+                onClick={() => {
+                  setCodeViewToggle(false);
+                }}
+              >
+                X
+              </div>
 
-  return (
-    <>
-      {codeViewToggle ? (
-        <div
-          className="code-view"
-          id="code-view__backdrop"
-          style={{ background: "rgba(0,0,0,0.5)", zIndex: 99 }}
-          onClick={(event) => {
-            if (event.target.id === "code-view__backdrop") {
-              setCodeViewToggle(false);
-            }
-          }}
-        >
-          <div
-            className="close-btn-round"
-            onClick={() => {
-              setCodeViewToggle(false);
-            }}
-          >
-            X
-          </div>
+              <div className="code-view-area">
+                {memoizedCodeFileViewComponent}
+              </div>
+            </div>
+          ) : null}
 
-          <div className="code-view-area">{memoizedCodeFileViewComponent}</div>
-        </div>
-      ) : null}
-      <div>
-        <div
-          className="folder-view--homebtn"
-          onClick={() => {
-            fetchFolderContent("", 0, false, true);
-          }}
-        >
           <div>
-            <FontAwesomeIcon icon={["fas", "home"]}></FontAwesomeIcon>
-          </div>
-          <div>Home</div>
-          <div className="text-2xl font-sans text-blue-400">./</div>
-        </div>
-        {directoryNavigator && gitRepoFiles && gitRepoFiles.length > 0 ? (
-          <div className="folder-view">
-            <div className="folder-view--navigator" id="repoFolderNavigator">
-              {directoryNavigator.map((item, index) => {
-                return (
-                  <div
-                    className="folder-view--navigator--label"
-                    key={item + "-" + index}
-                  >
-                    <div
-                      className={`${
-                        index !== directoryNavigator.length - 1
-                          ? "folder-view--navigator--label__active"
-                          : ""
-                      } text-xl`}
-                      onClick={() => {
-                        if (index !== directoryNavigator.length - 1) {
-                          fetchFolderContent(item, index, true);
-                        }
-                      }}
-                    >
-                      {item}
-                    </div>
-                    <div>/</div>
+            <div
+              className="folder-view--homebtn"
+              onClick={() => {
+                fetchFolderContent("", 0, false, true);
+              }}
+            >
+              <div>
+                <FontAwesomeIcon icon={["fas", "home"]}></FontAwesomeIcon>
+              </div>
+              <div>Home</div>
+              <div className="text-2xl font-sans text-blue-400">./</div>
+            </div>
+            {directoryNavigator && gitRepoFiles && gitRepoFiles.length > 0 ? (
+              <div className="folder-view">
+                <div
+                  className="folder-view--navigator"
+                  id="repoFolderNavigator"
+                >
+                  {directoryNavigator.map((item, index) => {
+                    return (
+                      <div
+                        className="folder-view--navigator--label"
+                        key={item + "-" + index}
+                      >
+                        <div
+                          className={`${
+                            index !== directoryNavigator.length - 1
+                              ? "folder-view--navigator--label__active"
+                              : ""
+                          } text-xl`}
+                          onClick={() => {
+                            if (index !== directoryNavigator.length - 1) {
+                              fetchFolderContent(item, index, true);
+                            }
+                          }}
+                        >
+                          {item}
+                        </div>
+                        <div>/</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="folder-view--tracked-content">
+              {!isEmpty ? (
+                gitTrackedFileComponent()
+              ) : (
+                <div className="folder-view--nofiles">
+                  <div>
+                    <FontAwesomeIcon icon={["fas", "unlink"]}></FontAwesomeIcon>
                   </div>
-                );
-              })}
+                  <div>No Tracked Files in the directory!</div>
+                </div>
+              )}
             </div>
           </div>
-        ) : null}
-        <div className="folder-view--tracked-content">
-          {gitTrackedFileComponent()}
-        </div>
-      </div>
+        </>
+      )}
     </>
   );
 }
