@@ -160,7 +160,7 @@ func AddRepo(inputs model.NewRepoInputs) *model.AddRepoParams {
 
 	_, invalidRepoErr := git.RepoValidator(repoPath)
 
-	if invalidRepoErr != nil {
+	if invalidRepoErr != nil && !initSwitch {
 		localLogger(fmt.Sprintf("The repo is not a valid git repo\n%v", invalidRepoErr), global.StatusError)
 
 		return &model.AddRepoParams{

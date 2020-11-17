@@ -11,15 +11,21 @@ import (
 
 func AddBranch(repo *git.Repository, branchName string) string {
 	logger := global.Logger{}
-	headRef, _ := repo.Head()
-	ref := plumbing.NewHashReference(plumbing.ReferenceName(fmt.Sprintf("refs/heads/%v", branchName)), headRef.Hash())
-	branchErr := repo.Storer.SetReference(ref)
+	headRef, headErr := repo.Head()
 
-	if branchErr != nil {
-		logger.Log(fmt.Sprintf("Failed to add branch - %s - %s", branchName, branchErr.Error()), global.StatusError)
+	if headErr != nil {
+		logger.Log(fmt.Sprintf("Unable to fetch HEAD -> %s", headErr.Error()), global.StatusError)
 		return "BRANCH_ADD_FAILED"
-	}
+	} else {
+		ref := plumbing.NewHashReference(plumbing.ReferenceName(fmt.Sprintf("refs/heads/%v", branchName)), headRef.Hash())
+		branchErr := repo.Storer.SetReference(ref)
 
-	logger.Log(fmt.Sprintf("Added new branch - %s to the repo", branchName), global.StatusInfo)
-	return "BRANCH_CREATION_SUCCESS"
+		if branchErr != nil {
+			logger.Log(fmt.Sprintf("Failed to add branch - %s - %s", branchName, branchErr.Error()), global.StatusError)
+			return "BRANCH_ADD_FAILED"
+		}
+
+		logger.Log(fmt.Sprintf("Added new branch - %s to the repo", branchName), global.StatusInfo)
+		return "BRANCH_CREATION_SUCCESS"
+	}
 }

@@ -334,7 +334,7 @@ func (r *queryResolver) BranchCompare(ctx context.Context, repoID string, baseBr
 	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
 		return []*model.BranchCompareResults{
 			{
-				Date: "",
+				Date:    "",
 				Commits: nil,
 			},
 		}, nil
