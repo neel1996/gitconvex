@@ -34,6 +34,13 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 
 	logger.Log(fmt.Sprintf("Fetching changes from -> %s : %s", remoteURL, targetRefPsec), global.StatusInfo)
 
+	if remoteName == "" {
+		return &model.FetchResult{
+			Status:       "FETCH ERROR",
+			FetchedItems: nil,
+		}
+	}
+
 	if remoteURL != "" && remoteBranch != "" {
 		fetchErr = repo.Fetch(&git.FetchOptions{
 			RemoteName: remoteName,

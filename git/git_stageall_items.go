@@ -17,6 +17,7 @@ func StageAllItems(repo *git.Repository) string {
 		logger.Log(fmt.Sprintf("Error occurred while fetching worktree -> %s", wErr.Error()), global.StatusError)
 		return "ALL_STAGE_FAILED"
 	} else {
+		logger.Log("Proceeding with staging all changes", global.StatusInfo)
 		args := []string{"add", "--all"}
 		cmd := utils.GetGitClient(w.Filesystem.Root(), args)
 		cmdStr, cmdErr := cmd.Output()

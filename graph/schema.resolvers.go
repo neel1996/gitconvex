@@ -73,7 +73,7 @@ func (r *mutationResolver) FetchFromRemote(ctx context.Context, repoID string, r
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+	if repo.GitRepo == nil {
 		return &model.FetchResult{
 			Status:       "FETCH ERROR",
 			FetchedItems: nil,
@@ -100,7 +100,7 @@ func (r *mutationResolver) StageItem(ctx context.Context, repoID string, item st
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+	if repo.GitRepo == nil {
 		return "ADD_ITEM_FAILED", nil
 	}
 
@@ -111,7 +111,7 @@ func (r *mutationResolver) RemoveStagedItem(ctx context.Context, repoID string, 
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+	if repo.GitRepo == nil {
 		return "STAGE_REMOVE_FAILED", nil
 	}
 	return git.RemoveItem(repo.RepoPath, item), nil
@@ -121,7 +121,7 @@ func (r *mutationResolver) RemoveAllStagedItem(ctx context.Context, repoID strin
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+	if repo.GitRepo == nil {
 		return "STAGE_ALL_REMOVE_FAILED", nil
 	}
 	return git.ResetAllItems(repo.GitRepo), nil
@@ -131,7 +131,7 @@ func (r *mutationResolver) StageAllItems(ctx context.Context, repoID string) (st
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+	if repo.GitRepo == nil {
 		return "ALL_STAGE_FAILED", nil
 	}
 	return git.StageAllItems(repo.GitRepo), nil
@@ -267,7 +267,7 @@ func (r *queryResolver) GitChanges(ctx context.Context, repoID string) (*model.G
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+	if repo.GitRepo == nil {
 		return &model.GitChangeResults{
 			GitUntrackedFiles: nil,
 			GitChangedFiles:   nil,
