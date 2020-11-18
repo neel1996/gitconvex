@@ -41,8 +41,6 @@ export default function CommitComponent(props) {
         const { gitStagedFiles } = res.data.data.gitChanges;
         setLoading(false);
 
-        console.log(gitStagedFiles);
-
         if (gitStagedFiles && gitStagedFiles.length > 0) {
           setStagedFilesState([...gitStagedFiles]);
         }

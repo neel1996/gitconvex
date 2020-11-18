@@ -104,6 +104,10 @@ export default function GitTrackedComponent(props) {
               setNoChangeMarker(true);
               setIsLoading(false);
             }
+
+            if (gitStagedFiles.length > 0) {
+              setIsLoading(false);
+            }
           }
         }
       })
@@ -159,7 +163,7 @@ export default function GitTrackedComponent(props) {
       );
     } else {
       return (
-        <div className="mx-auto w-3/4 my-4 p-2 border-b-4 border-dashed border-pink-300 rounded-md mx-auto text-center font-sans font-semibold text-xl">
+        <div className="mx-auto w-3/4 my-4 p-2 border-b-4 border-dashed border-pink-300 rounded-md text-center font-sans font-semibold text-xl">
           {isLoading ? (
             <span className="text-gray-400">
               Fetching results from the server...

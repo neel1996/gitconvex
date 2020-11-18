@@ -29,6 +29,9 @@ export default function GitDiffViewComponent() {
     setActiveFileName("");
     setFileLineDiffState("Click on a file item to see the difference");
     setDiffStatState("Click on a file item to see the difference");
+    setWarnStatus("");
+    setChangedFiles([]);
+
     let apiEndPoint = globalAPIEndpoint;
     if (repoId) {
       axios({
