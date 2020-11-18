@@ -30,6 +30,8 @@ jobs:
           make build
           mv dist/ windows/
           zip -r gitconvex-v2.0.0-win64.zip windows/
+          mkdir -p windows-zip
+          mv gitconvex-v2.0.0-win64.zip windows-zip/
     
       - name: deploy gitconvex windows build bundles to S3
         uses: shallwefootball/upload-s3-action@v1.1.2
@@ -37,7 +39,7 @@ jobs:
           aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
           aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
           aws_bucket: ${{ secrets.AWS_BUCKET_NAME }}
-          source_dir: 'gitconvex-v2.0.0-win64.zip'
+          source_dir: 'windows-zip'
           destination_dir: 'windows' 
           
       # Building for Linux
@@ -48,6 +50,9 @@ jobs:
           make build
           mv dist/ linux/
           tar -cvzf gitconvex-v2.0.0-linux64.tar.gz linux/
+          
+          mkdir -p linux-zip
+          mv gitconvex-v2.0.0-linux64.tar.gz linux-zip/
     
       - name: deploy gitconvex linux build bundles to S3
         uses: shallwefootball/upload-s3-action@v1.1.2
@@ -55,7 +60,7 @@ jobs:
           aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
           aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
           aws_bucket: ${{ secrets.AWS_BUCKET_NAME }}
-          source_dir: 'gitconvex-v2.0.0-linux64.tar.gz'
+          source_dir: 'linux-zip'
           destination_dir: 'linux' 
 
       # Building for MacOS
@@ -66,6 +71,8 @@ jobs:
           make build
           mv dist/ macos/
           tar -cvzf gitconvex-v2.0.0-macos-amd64.tar.gz macos/
+          mkdir -p mac-zip
+          mv gitconvex-v2.0.0-macos-amd64.tar.gz mac-zip/
     
       - name: deploy gitconvex linux build bundles to S3
         uses: shallwefootball/upload-s3-action@v1.1.2
@@ -73,6 +80,6 @@ jobs:
           aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
           aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
           aws_bucket: ${{ secrets.AWS_BUCKET_NAME }}
-          source_dir: 'gitconvex-v2.0.0-macos-amd64.tar.gz'
+          source_dir: 'mac-zip'
           destination_dir: 'macos' 
 
