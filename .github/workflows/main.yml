@@ -37,7 +37,7 @@ jobs:
           aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
           aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
           aws_bucket: ${{ secrets.AWS_BUCKET_NAME }}
-          source_dir: 'windows'
+          source_dir: 'gitconvex-v2.0.0-win64.zip'
           destination_dir: 'windows' 
           
       # Building for Linux
@@ -55,7 +55,7 @@ jobs:
           aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
           aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
           aws_bucket: ${{ secrets.AWS_BUCKET_NAME }}
-          source_dir: 'linux'
+          source_dir: 'gitconvex-v2.0.0-linux64.tar.gz'
           destination_dir: 'linux' 
 
       # Building for MacOS
@@ -73,6 +73,6 @@ jobs:
           aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
           aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
           aws_bucket: ${{ secrets.AWS_BUCKET_NAME }}
-          source_dir: 'macos'
+          source_dir: 'gitconvex-v2.0.0-macos-amd64.tar.gz'
           destination_dir: 'macos' 
 
