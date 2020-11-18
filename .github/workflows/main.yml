@@ -22,25 +22,57 @@ jobs:
         run: |
           go get -v -t -d ./...
 
+      # Building for Windows
       - name: Build for windows 
         run: |
           export GOOS=windows && export GOARCH=amd64
           mkdir -p ./windows
           make build
           mv dist/ windows/
+          zip -r gitconvex-v2.0.0-win64.zip windows/
     
       - name: deploy gitconvex windows build bundles to S3
         uses: shallwefootball/upload-s3-action@v1.1.2
         with:
           aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
           aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
-          aws_bucket: ${{ secrets.AWS_BUCKET_URL }}
+          aws_bucket: ${{ secrets.AWS_BUCKET_NAME }}
           source_dir: 'windows'
           destination_dir: 'windows' 
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+          
+      # Building for Linux
+      - name: Build for Linux 
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          export GOOS=linux && export GOARCH=amd64
+          mkdir -p ./linux
+          make build
+          mv dist/ linux/
+          tar -cvzf gitconvex-v2.0.0-linux64.tar.gz linux/
+    
+      - name: deploy gitconvex linux build bundles to S3
+        uses: shallwefootball/upload-s3-action@v1.1.2
+        with:
+          aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
+          aws_bucket: ${{ secrets.AWS_BUCKET_NAME }}
+          source_dir: 'linux'
+          destination_dir: 'linux' 
+
+      # Building for MacOS
+      - name: Build for MacOS 
+        run: |
+          export GOOS=darwin && export GOARCH=amd64
+          mkdir -p ./macos
+          make build
+          mv dist/ macos/
+          tar -cvzf gitconvex-v2.0.0-macos-amd64.tar.gz macos/
+    
+      - name: deploy gitconvex linux build bundles to S3
+        uses: shallwefootball/upload-s3-action@v1.1.2
+        with:
+          aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
+          aws_bucket: ${{ secrets.AWS_BUCKET_NAME }}
+          source_dir: 'macos'
+          destination_dir: 'macos' 
 
