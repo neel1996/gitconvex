@@ -4,13 +4,43 @@ import (
 	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/neel1996/gitconvex-server/global"
+	"github.com/neel1996/gitconvex-server/utils"
+	"runtime"
+	"time"
 )
 
+// windowsCommit is used for committing changes using the git client if the platform is windows
+// go-git commit fails with an access denied error for windows platform
+func windowsCommit(repoPath string, msg string) string {
+	args := []string{"commit", "-m", msg}
+	cmd := utils.GetGitClient(repoPath, args)
+	cmdStr, cmdErr := cmd.Output()
+
+	if cmdErr != nil {
+		logger.Log(fmt.Sprintf("Commit failed -> %s", cmdErr.Error()), global.StatusError)
+		return "COMMIT_FAILED"
+	} else {
+		logger.Log(fmt.Sprintf("Changes committed to the repo -> %s", cmdStr), global.StatusInfo)
+		return "COMMIT_DONE"
+	}
+}
+
+// CommitChanges commits the staged changes to the repo
+// The function relies on the native git client to commit the changes due to an existing bug in the go-git library which
+// blocks commits in windows platform
 func CommitChanges(repo *git.Repository, commitMessage string) string {
 	logger := global.Logger{}
 	w, wErr := repo.Worktree()
+
+	// Checking OS platform for switching to git client for Windows systems
+	platform := runtime.GOOS
+	if platform == "windows" && w != nil {
+		logger.Log(fmt.Sprintf("OS is %s -- Switching to native git client", platform), global.StatusWarning)
+		return windowsCommit(w.Filesystem.Root(), commitMessage)
+	}
 
 	// Logic to check if the repo / global config has proper user information setup
 	// Commit will be signed by default user if no user config is present
@@ -27,6 +57,9 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 		} else if localConfig.User.Name != "" {
 			author = localConfig.User.Name
 		}
+	} else {
+		logger.Log(fmt.Sprintf("Unable to fetch repo config -> %v || %v", gCfgErr, lCfgErr), global.StatusError)
+		return "COMMIT_FAILED"
 	}
 
 	if wErr != nil {
@@ -34,6 +67,14 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 		return "COMMIT_FAILED"
 	} else {
 		var commitOptions *git.CommitOptions
+		var parentHash plumbing.Hash
+		head, headErr := repo.Head()
+		if headErr != nil {
+			logger.Log(headErr.Error(), global.StatusError)
+		} else {
+			parentHash = head.Hash()
+		}
+
 		if author == "" {
 			logger.Log(fmt.Sprintf("No author name is available for the repo.\nSetting default signature for the commit"), global.StatusWarning)
 			logger.Log("You can set the author details using git config commands --> https://support.atlassian.com/bitbucket-cloud/docs/configure-your-dvcs-username-for-commits/", global.StatusWarning)
@@ -42,17 +83,20 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 				Author: &object.Signature{
 					Name:  "gitconvex",
 					Email: "help@gitconvex.com",
+					When:  time.Now(),
 				},
+				Parents: []plumbing.Hash{parentHash},
 			}
 		} else {
 			logger.Log(fmt.Sprintf("Commiting changes with author -> %s", author), global.StatusInfo)
 			commitOptions = &git.CommitOptions{
-				All: false,
+				All:     false,
+				Parents: []plumbing.Hash{parentHash},
 			}
 		}
 		hash, err := w.Commit(commitMessage, commitOptions)
 		if err != nil {
-			logger.Log(fmt.Sprintf("Error occurred while committing changes -> %s", err.Error()), global.StatusError)
+			logger.Log(fmt.Sprintf("Error occurred while committing changes -> %s\n%v", err.Error(), err), global.StatusError)
 			return "COMMIT_FAILED"
 		} else {
 			logger.Log(fmt.Sprintf("Staged changes have been comitted - %s", hash.String()), global.StatusInfo)

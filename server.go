@@ -64,6 +64,11 @@ func main() {
 	// Static file supplier for hosting the react static assets and scripts
 	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("./build/static/"))))
 
+	// Route for serving the webpage logo from the reach build bundle
+	router.PathPrefix("/gitconvex.png").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/gitconvex.png")
+	})
+
 	// A default fallback route for handling all routes with '/' prefix.
 	// For making it compatible with react router
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
