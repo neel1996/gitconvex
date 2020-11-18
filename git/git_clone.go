@@ -9,13 +9,33 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/neel1996/gitconvex-server/utils"
 	"go/types"
 	"io"
 )
 
+// fallbackClone performs a git clone using the native git client
+// If the go-git based clone fails due to an authentication issue, then this function will be invoked to perform a clone
+func fallbackClone(repoPath string, repoURL string) (*model.ResponseModel, error) {
+	args := []string{"clone", repoURL, repoPath}
+	cmd := utils.GetGitClient(".", args)
+	cmdStr, cmdErr := cmd.Output()
+
+	if cmdErr != nil {
+		logger.Log(fmt.Sprintf("Fallback clone failed -> %s", cmdErr.Error()), global.StatusError)
+		return nil, cmdErr
+	} else {
+		logger.Log(fmt.Sprintf("New repo has been cloned to -> %s -> %s", repoPath, cmdStr), global.StatusInfo)
+		return &model.ResponseModel{
+			Status:    "success",
+			Message:   "Git clone completed",
+			HasFailed: false,
+		}, nil
+	}
+}
+
 // CloneHandler clones the remote repo to the target directory
 // It supports options for SSH and HTTPS authentications
-
 func CloneHandler(repoPath string, repoURL string, authOption string, userName *string, password *string) (*model.ResponseModel, error) {
 	logger := global.Logger{}
 
@@ -23,7 +43,9 @@ func CloneHandler(repoPath string, repoURL string, authOption string, userName *
 
 	if authOption == "ssh" && authErr != nil {
 		logger.Log(authErr.Error(), global.StatusError)
-		return nil, authErr
+		logger.Log("Auth failed. Retrying with native git client based clone", global.StatusWarning)
+
+		return fallbackClone(repoPath, repoURL)
 	} else {
 		logger.Log(fmt.Sprintf("Initiating repo clone with - %v auth option", authOption), global.StatusInfo)
 		var err error

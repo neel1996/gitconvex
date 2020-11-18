@@ -16,7 +16,7 @@ func TestCommitLogs(t *testing.T) {
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
-	expectedTotalCommits := float64(18)
+	expectedTotalCommits := float64(19)
 
 	if currentEnv == "ci" {
 		repoPath = "/home/runner/work/gitconvex-server/starfleet"

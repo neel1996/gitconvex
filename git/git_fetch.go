@@ -9,8 +9,34 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/neel1996/gitconvex-server/utils"
 	"io"
 )
+
+// windowsFetch is used for fetching changes using the git client if the platform is windows
+// go-git fetch fails in windows due to SSH authentication error
+func windowsFetch(repoPath string, remoteName string, branch string) *model.FetchResult {
+	args := []string{"fetch", remoteName, branch}
+	cmd := utils.GetGitClient(repoPath, args)
+	cmdStr, cmdErr := cmd.Output()
+
+	if cmdErr != nil {
+		logger.Log(fmt.Sprintf("Fetch failed -> %s", cmdErr.Error()), global.StatusError)
+
+		return &model.FetchResult{
+			Status:       "FETCH ERROR",
+			FetchedItems: nil,
+		}
+	} else {
+		logger.Log(fmt.Sprintf("Changes fetch from remote - %s -> %s", remoteName, cmdStr), global.StatusInfo)
+
+		msg := fmt.Sprintf("Changes fetched from %v", remoteName)
+		return &model.FetchResult{
+			Status:       "CHANGES FETCHED FROM REMOTE",
+			FetchedItems: []*string{&msg},
+		}
+	}
+}
 
 // FetchFromRemote performs a git fetch for the supplied remote and branch (e.g. `git fetch origin main`)
 // If the remoteBranch is empty, then a fetch is performed with no branch name (similar to `git fetch`)
@@ -25,22 +51,27 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 
 	if sshErr != nil {
 		logger.Log("Authentication method failed -> "+sshErr.Error(), global.StatusError)
-		return &model.FetchResult{
-			Status:       "FETCH ERROR",
-			FetchedItems: nil,
+		w, _ := repo.Worktree()
+		if w == nil {
+			return &model.FetchResult{
+				Status:       "FETCH ERROR",
+				FetchedItems: nil,
+			}
 		}
+		logger.Log("Retrying fetch with fallback module using git client", global.StatusWarning)
+		return windowsFetch(w.Filesystem.Root(), remoteName, remoteBranch)
 	}
 
 	logger.Log(fmt.Sprintf("Fetching changes from -> %s : %s", remoteURL, targetRefPsec), global.StatusInfo)
 
-	if remoteName == "" {
-		return &model.FetchResult{
-			Status:       "FETCH ERROR",
-			FetchedItems: nil,
-		}
-	}
-
 	if remoteURL != "" && remoteBranch != "" {
+		if remoteName == "" {
+			return &model.FetchResult{
+				Status:       "FETCH ERROR",
+				FetchedItems: nil,
+			}
+		}
+
 		fetchErr = repo.Fetch(&git.FetchOptions{
 			RemoteName: remoteName,
 			Auth:       gitSSHAuth,

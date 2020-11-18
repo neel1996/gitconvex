@@ -9,9 +9,35 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/neel1996/gitconvex-server/utils"
 	"go/types"
 	"io"
 )
+
+// windowsPull is used for pulling changes using the git client if the platform is windows
+// go-git pull fails in windows due to SSH authentication error
+func windowsPull(repoPath string, remoteName string, branch string) *model.PullResult {
+	args := []string{"pull", remoteName, branch}
+	cmd := utils.GetGitClient(repoPath, args)
+	cmdStr, cmdErr := cmd.Output()
+
+	if cmdErr != nil {
+		logger.Log(fmt.Sprintf("Pull failed -> %s", cmdErr.Error()), global.StatusError)
+
+		return &model.PullResult{
+			Status:      "PULL ERROR",
+			PulledItems: nil,
+		}
+	} else {
+		msg := "New Items Pulled from remote " + remoteName
+		logger.Log(fmt.Sprintf("Changes pulled from remote -> %s", cmdStr), global.StatusInfo)
+
+		return &model.PullResult{
+			Status:      "PULL SUCCESS",
+			PulledItems: []*string{&msg},
+		}
+	}
+}
 
 // PullFromRemote pulls the changes from the remote repository using the remote URL and branch name received
 func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string) *model.PullResult {
@@ -32,12 +58,23 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 		logger.Log(fmt.Sprintf("Pulling changes from -> %s : %s", remoteURL, ref.Name()), global.StatusInfo)
 		gitSSHAuth, sshErr := ssh.NewSSHAgentAuth("git")
 
-		if sshErr != nil {
-			logger.Log("Authentication method failed -> "+sshErr.Error(), global.StatusError)
+		if remoteName == "" {
 			return &model.PullResult{
 				Status:      "PULL ERROR",
 				PulledItems: nil,
 			}
+		}
+
+		if sshErr != nil {
+			logger.Log("Authentication method failed -> "+sshErr.Error(), global.StatusError)
+			w, _ := repo.Worktree()
+			if w == nil {
+				return &model.PullResult{
+					Status:      "PULL ERROR",
+					PulledItems: nil,
+				}
+			}
+			return windowsPull(w.Filesystem.Root(), remoteName, remoteBranch)
 		}
 
 		pullErr = w.Pull(&git.PullOptions{
