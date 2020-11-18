@@ -1,0 +1,51 @@
+name: Gitconvex build deploy
+
+on:
+  push:
+    branches: [ v2.0.0 ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.13
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+          
+      - name: Running Test Cases
+        run: |
+          export GOTESTENV=ci
+          go test -v ./...
+
+      - name: Build for windows 
+        run: |
+          export GOOS=windows && export GOARCH=amd64
+          mkdir -p ./windows
+          make build
+          mv dist/ windows/
+    
+      - name: deploy gitconvex windows build bundles to S3
+        uses: shallwefootball/upload-s3-action@v1.1.2
+        with:
+          aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
+          aws_bucket: ${{ secrets.AWS_BUCKET_URL }}
+          source_dir: 'windows'
+          destination_dir: 'windows' 
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
+
