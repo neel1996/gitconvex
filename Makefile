@@ -15,6 +15,8 @@ build-server:
 	go build -o ./dist
 build:
 	echo "Initiating gitconvex build"
+	echo "Cleaning up old directories"
+	rm -rf ui/ dist/ build/
 	echo "Cloning gitconvex react repo"
 	git clone https://github.com/neel1996/gitconvex-ui.git ui/ && \
 	cd ui && \
