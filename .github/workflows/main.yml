@@ -21,11 +21,6 @@ jobs:
       - name: Get dependencies
         run: |
           go get -v -t -d ./...
-          
-      - name: Running Test Cases
-        run: |
-          export GOTESTENV=ci
-          go test -v ./...
 
       - name: Build for windows 
         run: |
