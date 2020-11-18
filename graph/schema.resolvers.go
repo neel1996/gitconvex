@@ -203,7 +203,7 @@ func (r *queryResolver) GitFolderContent(ctx context.Context, repoID string, dir
 	return git.ListFiles(repo.GitRepo, repo.RepoPath, *directoryName), nil
 }
 
-func (r *queryResolver) GitCommitLogs(ctx context.Context, repoID string, skipLimit int, referenceCommit string) (*model.GitCommitLogResults, error) {
+func (r *queryResolver) GitCommitLogs(ctx context.Context, repoID string, referenceCommit string) (*model.GitCommitLogResults, error) {
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
@@ -214,7 +214,7 @@ func (r *queryResolver) GitCommitLogs(ctx context.Context, repoID string, skipLi
 			Commits:      nil,
 		}, nil
 	}
-	return git.CommitLogs(repo.GitRepo, skipLimit, referenceCommit), nil
+	return git.CommitLogs(repo.GitRepo, referenceCommit), nil
 }
 
 func (r *queryResolver) GitCommitFiles(ctx context.Context, repoID string, commitHash string) ([]*model.GitCommitFileResult, error) {

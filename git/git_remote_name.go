@@ -6,7 +6,6 @@ import (
 )
 
 // GetRemoteName function returns the name of the remote based on the supplied remote URL
-
 func GetRemoteName(repo *git.Repository, remoteURL string) string {
 	var remoteName string
 	logger := global.Logger{}

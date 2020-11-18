@@ -14,7 +14,6 @@ import (
 )
 
 // PullFromRemote pulls the changes from the remote repository using the remote URL and branch name received
-
 func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string) *model.PullResult {
 	var pullErr error
 	logger := global.Logger{}

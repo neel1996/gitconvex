@@ -115,7 +115,8 @@ func TrackedFileCount(repo *git.Repository, trackedFileCountChan chan int) {
 }
 
 // ListFiles collects the list of tracked files and their latest respective commit messages
-// Used to visualize the git repo in the front-end file explorer in a github explorer based fashion
+//
+// Used to display the git repo structure in the front-end file explorer in a github explorer based fashion
 func ListFiles(repo *git.Repository, repoPath string, directoryName string) *model.GitFolderContentResults {
 	logger := global.Logger{}
 	logger.Log("Collecting tracked file list from the repo", global.StatusInfo)

@@ -23,14 +23,12 @@ type RepoData struct {
 }
 
 // localLogger logs messages to the global logger module
-
 func localLogger(message string, status string) {
 	logger := &global.Logger{Message: message}
 	logger.Log(logger.Message, status)
 }
 
 // repoIdGenerator generates a unique ID for the newly added repo
-
 func repoIdGenerator(c chan string) {
 	newUUID, _ := uuid.NewUUID()
 	repoId := strings.Split(newUUID.String(), "-")[0]
@@ -38,7 +36,6 @@ func repoIdGenerator(c chan string) {
 }
 
 // repoDataCreator creates a new datastore directory and file if repo data does not exist
-
 func repoDataCreator(dbFile string) error {
 	sliceDbFile := strings.Split(dbFile, "/")
 	dbDir := strings.Join(sliceDbFile[0:len(sliceDbFile)-1], "/")
@@ -74,7 +71,6 @@ func dataFileWriteHandler(dbFile string, repoDataArray []RepoData) error {
 }
 
 // repoDataFileWriter writes the new repo details to the repo_datastore.json file
-
 func repoDataFileWriter(repoId string, repoName string, repoPath string, repoAddStatus chan string) {
 	rArray := make([]RepoData, 1)
 
@@ -120,7 +116,6 @@ func repoDataFileWriter(repoId string, repoName string, repoPath string, repoAdd
 // AddRepo function gets the repository details and includes a record to the gitconvex repo datastore file
 // If initSwitch is 'true' then the git repo init function will be invoked to initialize a new repo
 // If cloneSwitch is 'true' then the repo will be cloned to the file system using the repoURL field
-
 func AddRepo(inputs model.NewRepoInputs) *model.AddRepoParams {
 	var repoIdChannel = make(chan string)
 

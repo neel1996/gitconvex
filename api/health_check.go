@@ -25,6 +25,8 @@ func getGitVersion() string {
 	return strings.Split(string(gitVersion), "\n")[0]
 }
 
+// HealthCheckApi returns the current version of git installed in the host and the platform
+// gitconvex is running on
 func HealthCheckApi() *model.HealthCheckParams {
 
 	logger := global.Logger{Message: fmt.Sprintf("Obtained host information : %v -- %v", getOs(), getGitVersion())}

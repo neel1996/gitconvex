@@ -13,8 +13,7 @@ func removeErr(fileItem string, errMsg string) string {
 }
 
 // RemoveItem performs a git rest 'file' to remove the item from the staged area
-// Used the gitclient module as go-git does not support selective reset
-
+// Uses the gitclient module, as go-git does not support selective reset
 func RemoveItem(repoPath string, fileItem string) string {
 	args := []string{"reset", fileItem}
 	cmd := utils.GetGitClient(repoPath, args)

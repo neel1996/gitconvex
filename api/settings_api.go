@@ -85,6 +85,8 @@ func reportError(repoId string, errMsg string, errString string) *model.DeleteSt
 	}
 }
 
+// DeleteRepo deletes a repo entry from the env_config json file
+// This will just remove the record for gitconvex alone and disturbs the repo in no other way
 func DeleteRepo(repoId string) *model.DeleteStatus {
 	var repoData []RepoData
 	var newRepoData []RepoData

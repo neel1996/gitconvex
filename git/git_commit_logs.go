@@ -14,8 +14,7 @@ import (
 	"time"
 )
 
-// commitOrganizer collects and organizes the commit related information in the commit GitCommits struct
-
+// commitOrganizer collects and organizes the commit related information in the GitCommits struct
 func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 	logger := global.Logger{}
 	var commitList []*model.GitCommits
@@ -130,9 +129,9 @@ func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 }
 
 // CommitLogs fetches the structured commit logs list for the target repo
-// The skipCount limit is set to limit the number of commit logs returned per invocation
-
-func CommitLogs(repo *git.Repository, skipCount int, referenceCommit string) *model.GitCommitLogResults {
+// Limits the length of commits to 10 for a single function call
+// The referenceCommit is used as a reference to fetch the commits in a linear manner
+func CommitLogs(repo *git.Repository, referenceCommit string) *model.GitCommitLogResults {
 	var commitLogs []object.Commit
 	var logOptions *git.LogOptions
 

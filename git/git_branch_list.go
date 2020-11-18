@@ -17,7 +17,6 @@ type Branch struct {
 
 // GetBranchList fetches all the branches from the target repository
 // The result will be returned as a struct with the current branch and all the available branches
-
 func GetBranchList(repo *git.Repository, branchChan chan Branch) {
 	var (
 		branches      []*string

@@ -87,7 +87,7 @@ type Query {
     fetchRepo: FetchRepoParams!
     gitRepoStatus(repoId: String!): GitRepoStatusResults!
     gitFolderContent(repoId: String!, directoryName: String): GitFolderContentResults!
-    gitCommitLogs(repoId: String!, skipLimit: Int!, referenceCommit: String!): gitCommitLogResults!
+    gitCommitLogs(repoId: String!, referenceCommit: String!): gitCommitLogResults!
     gitCommitFiles(repoId: String!, commitHash: String!): [gitCommitFileResult]!
     searchCommitLogs(repoId: String!, searchType: String!, searchKey: String!): [gitCommits]!
     codeFileDetails(repoId: String!, fileName: String!): codeFileType!

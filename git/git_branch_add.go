@@ -8,7 +8,6 @@ import (
 )
 
 // AddBranch adds a new branch to the target repo
-
 func AddBranch(repo *git.Repository, branchName string) string {
 	logger := global.Logger{}
 	headRef, headErr := repo.Head()

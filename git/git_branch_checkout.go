@@ -8,7 +8,6 @@ import (
 )
 
 // CheckoutBranch checks out the branchName received as argument
-
 func CheckoutBranch(repo *git.Repository, branchName string) string {
 	logger := global.Logger{}
 

@@ -7,7 +7,6 @@ import (
 )
 
 // AddRemote adds a new remote to the target git repo
-
 func AddRemote(repo *git.Repository, remoteName string, remoteURL string) string {
 	logger := global.Logger{}
 	remote, err := repo.CreateRemote(&config.RemoteConfig{

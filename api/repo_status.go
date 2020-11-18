@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// RepoStatus collects the basic details of the target repo and returns the consolidated result
 func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	logger := global.Logger{}
 	logger.Log("Collecting repo status information", global.StatusInfo)

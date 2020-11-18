@@ -11,7 +11,8 @@ import (
 )
 
 // SearchCommitLogs searches for the required commits matching the searchKey with the respective searchType
-
+//
+// The UI uses 'message' as the default search type to look up based on commit messages
 func SearchCommitLogs(repo *git.Repository, searchType string, searchKey string) []*model.GitCommits {
 	var searchResult []*model.GitCommits
 	logger := global.Logger{}

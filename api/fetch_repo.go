@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+// FetchRepo reads the gitconvex datafile (repo_datastore.json) and returns the stored information
+// in the form of categorized array items
 func FetchRepo() *model.FetchRepoParams {
 	var (
 		repoId    []*string

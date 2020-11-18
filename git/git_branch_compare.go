@@ -36,7 +36,7 @@ func CompareBranch(repo *git.Repository, baseBranch string, compareBranch string
 		outputStr := string(cmdStr)
 		splitLines := strings.Split(outputStr, "\n")
 
-		if len(splitLines) == 0 {
+		if len(splitLines) == 0 || splitLines[0] == "" {
 			logger.Log("No difference could be arrived between the base and compare branch", global.StatusWarning)
 			return []*model.BranchCompareResults{}
 		}

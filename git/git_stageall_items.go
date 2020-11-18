@@ -8,6 +8,7 @@ import (
 )
 
 // StageAllItems stages all the modified and untracked items to the worktree
+//
 // The function relies on the native git client to stage an item, as go-git staging is time consuming for huge repos
 func StageAllItems(repo *git.Repository) string {
 	w, wErr := repo.Worktree()

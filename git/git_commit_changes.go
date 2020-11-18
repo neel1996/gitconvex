@@ -29,7 +29,8 @@ func windowsCommit(repoPath string, msg string) string {
 }
 
 // CommitChanges commits the staged changes to the repo
-// The function relies on the native git client to commit the changes due to an existing bug in the go-git library which
+//
+// The function falls back to the native git client for Windows platform due to an existing bug in the go-git library which
 // blocks commits in windows platform
 func CommitChanges(repo *git.Repository, commitMessage string) string {
 	logger := global.Logger{}

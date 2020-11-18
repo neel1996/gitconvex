@@ -7,6 +7,10 @@ import (
 	"github.com/neel1996/gitconvex-server/utils"
 )
 
+// ResetAllItems removes all the staged items back to the staging area.
+//
+// go-git fails to reset all changes for a newly initialized repo, so the function falls back
+// to the git client for resetting all items if the go-git Reset fails
 func ResetAllItems(repo *git.Repository) string {
 	w, wErr := repo.Worktree()
 

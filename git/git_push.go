@@ -11,6 +11,8 @@ import (
 	"io"
 )
 
+// PushToRemote pushed the commits to the selected remote repository
+// By default it will choose the current branch and pushes to the matching remote branch
 func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) string {
 	targetRefPsec := "refs/heads/" + remoteBranch + ":refs/heads/" + remoteBranch
 	b := new(bytes.Buffer)
