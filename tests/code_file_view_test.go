@@ -32,7 +32,7 @@ func TestCodeFileView(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := api.CodeFileView(tt.args.repoPath, tt.args.fileName); *got.FileData[0] != *tt.want.FileData[0] {
-				t.Errorf("CodeFileView() = %v, want %v", got, tt.want)
+				t.Errorf("CodeFileView() = %v, want %v", *got.FileData[0], *tt.want.FileData[0])
 			}
 		})
 	}
