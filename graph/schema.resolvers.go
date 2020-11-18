@@ -152,11 +152,12 @@ func (r *mutationResolver) PushToRemote(ctx context.Context, repoID string, remo
 	repoChan := make(chan git.RepoDetails)
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
+	remoteName := git.GetRemoteName(repo.GitRepo, remoteHost)
+
+	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil || remoteName == "" {
 		return "PUSH_FAILED", nil
 	}
 
-	remoteName := git.GetRemoteName(repo.GitRepo, remoteHost)
 	return git.PushToRemote(repo.GitRepo, remoteName, branch), nil
 }
 

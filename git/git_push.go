@@ -8,8 +8,25 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/neel1996/gitconvex-server/global"
+	"github.com/neel1996/gitconvex-server/utils"
 	"io"
 )
+
+// windowsPush is used for pushing changes using the git client if the platform is windows
+// go-git push fails in windows due to SSH authentication error
+func windowsPush(repoPath string, remoteName string, branch string) string {
+	args := []string{"push", "-u", remoteName, branch}
+	cmd := utils.GetGitClient(repoPath, args)
+	cmdStr, cmdErr := cmd.Output()
+
+	if cmdErr != nil {
+		logger.Log(fmt.Sprintf("Push failed -> %s", cmdErr.Error()), global.StatusError)
+		return "PUSH_FAILED"
+	} else {
+		logger.Log(fmt.Sprintf("Changes pushed to remote -> %s", cmdStr), global.StatusInfo)
+		return "PUSH_SUCCESS"
+	}
+}
 
 // PushToRemote pushed the commits to the selected remote repository
 // By default it will choose the current branch and pushes to the matching remote branch
@@ -21,7 +38,13 @@ func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) 
 
 	if sshErr != nil {
 		logger.Log(fmt.Sprintf("Authentication failed -> %s", sshErr.Error()), global.StatusError)
-		return "PUSH_FAILED"
+		w, _ := repo.Worktree()
+
+		if w == nil {
+			return "PUSH_FAILED"
+		}
+		logger.Log("Falling back to native git client for pushing changes", global.StatusWarning)
+		return windowsPush(w.Filesystem.Root(), remoteName, remoteBranch)
 	}
 
 	remote, remoteErr := repo.Remote(remoteName)
