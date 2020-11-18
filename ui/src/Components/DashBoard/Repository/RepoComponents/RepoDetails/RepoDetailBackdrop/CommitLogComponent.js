@@ -45,7 +45,7 @@ export default function RepositoryCommitLogComponent(props) {
       data: {
         query: `
             query {
-              gitCommitLogs(repoId: "${props.repoId}", skipLimit: 0, referenceCommit: "") {
+              gitCommitLogs(repoId: "${props.repoId}", referenceCommit: "") {
                   totalCommits
                   commits{
                       commitTime
@@ -107,7 +107,7 @@ export default function RepositoryCommitLogComponent(props) {
       data: {
         query: `
           query{
-            gitCommitLogs(repoId:"${props.repoId}", skipLimit: ${localLimit}, referenceCommit: "${referenceCommitHash}"){
+            gitCommitLogs(repoId:"${props.repoId}", referenceCommit: "${referenceCommitHash}"){
                 totalCommits
                 commits{
                     commitTime

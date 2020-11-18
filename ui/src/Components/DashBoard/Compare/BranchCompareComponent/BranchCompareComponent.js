@@ -107,12 +107,15 @@ export default function BranchCompareComponent(props) {
               }}
             >
               <option value={currentBranch}>{currentBranch}</option>
-              {branchList.slice(1).map((branch) => {
-                return (
-                  <option value={branch} key={branch}>
-                    {branch}
-                  </option>
-                );
+              {branchList.map((branch) => {
+                if (branch !== currentBranch) {
+                  return (
+                    <option value={branch} key={branch}>
+                      {branch}
+                    </option>
+                  );
+                }
+                return null;
               })}
             </select>
           </div>

@@ -10,12 +10,12 @@ import CommitLogCardComponent from "./CommitLogCardComponent";
 export default function CommitCompareComponent(props) {
   library.add(fas);
 
-  const [skipCount, setSkipCount] = useState(0);
   const [totalCommitCount, setTotalCommitCount] = useState(0);
   const [commitData, setCommitData] = useState([]);
   const [baseCommit, setBaseCommit] = useState("");
   const [compareCommit, setCompareCommit] = useState("");
   const [errState, setErrState] = useState(false);
+  const [referenceCommit, setReferenceCommit] = useState("");
 
   const memoizedCommitFileDifference = useMemo(() => {
     return (
@@ -36,7 +36,7 @@ export default function CommitCompareComponent(props) {
         query: `
             query
             {
-                gitCommitLogs (repoId: "${props.repoId}", skipLimit: ${skipCount}){
+                gitCommitLogs (repoId: "${props.repoId}", referenceCommit:"${referenceCommit}"){
                     totalCommits
                     commits{
                         commitTime
@@ -54,7 +54,6 @@ export default function CommitCompareComponent(props) {
       .then((res) => {
         if (res.data.data) {
           const { commits, totalCommits } = res.data.data.gitCommitLogs;
-
           if (totalCommits === 0 || totalCommits == null) {
             setErrState(true);
           }
@@ -74,7 +73,7 @@ export default function CommitCompareComponent(props) {
         console.log(err);
         setErrState(true);
       });
-  }, [props.repoId, skipCount]);
+  }, [props.repoId, referenceCommit]);
 
   function commitCardComponent(setCommitType) {
     return (
@@ -89,12 +88,15 @@ export default function CommitCompareComponent(props) {
               ></CommitLogCardComponent>
             );
           })}
-        {(skipCount >= 10 || skipCount === 0) &&
-        skipCount <= totalCommitCount ? (
+        {totalCommitCount > commitData.length ? (
           <div
             className="p-3 border cursor-pointer hover:bg-gray-100 text-center font-sans font-semibold"
             onClick={() => {
-              setSkipCount(skipCount + 10);
+              const len = commitData.length;
+
+              if (len >= 1) {
+                setReferenceCommit(commitData[len - 1].hash);
+              }
             }}
           >
             Load More commits

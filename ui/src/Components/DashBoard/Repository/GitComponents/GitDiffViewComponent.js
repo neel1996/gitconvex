@@ -166,7 +166,16 @@ export default function GitDiffViewComponent() {
 
           if (diffStat === "NO_STAT" || fileDiff[0] === "NO_DIFF") {
             setWarnStatus(
-              "No difference could be found. Please check if the file is present in the repo!"
+              <>
+                <div>
+                  No difference could be found. Please check if the file is
+                  present.
+                </div>
+                <div className="font-sans text-sm font-light text-yellow-700">
+                  Note : Space based changes will not be displayed here even if
+                  it is considered as a change!
+                </div>
+              </>
             );
           } else {
             setWarnStatus("");
