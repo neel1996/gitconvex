@@ -24,7 +24,7 @@ jobs:
           
       - name: Run test cases
         run: |
-          go test -v ./...
+          export GOTESTENV=ci && go test -v ./...
       
       - name: Run sample build
         run: |
