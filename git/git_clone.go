@@ -44,7 +44,6 @@ func CloneHandler(repoPath string, repoURL string, authOption string, userName *
 	if authOption == "ssh" && authErr != nil {
 		logger.Log(authErr.Error(), global.StatusError)
 		logger.Log("Auth failed. Retrying with native git client based clone", global.StatusWarning)
-
 		return fallbackClone(repoPath, repoURL)
 	} else {
 		logger.Log(fmt.Sprintf("Initiating repo clone with - %v auth option", authOption), global.StatusInfo)
@@ -86,7 +85,14 @@ func CloneHandler(repoPath string, repoURL string, authOption string, userName *
 		}
 
 		fmt.Println(b.String())
-		logger.Log(fmt.Sprintf("Reop %v - Cloned to target directory", r), global.StatusInfo)
+
+		var repoRoot string
+		w, _ := r.Worktree()
+		if w != nil {
+			repoRoot = w.Filesystem.Root()
+		}
+
+		logger.Log(fmt.Sprintf("Repo %v - Cloned to target directory - %s", r, repoRoot), global.StatusInfo)
 
 		return &model.ResponseModel{
 			Status:    "success",

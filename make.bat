@@ -24,10 +24,9 @@ if "%ip%"==%BUILD% (
     echo "Installing UI dependencies"
 	del package-lock.json
     npm install
-    npm i -g tailwindcss@1.6.0
     echo "Building UI bundle"
     set NODE_ENV=production
-    tailwindcss build -o src/index.css -c src/tailwind.config.js
+    npx tailwindcss build -o src/index.css -c src/tailwind.config.js
     npm run build
     move .\build ..\
     cd ..

@@ -11,7 +11,7 @@ func TestCodeFileView(t *testing.T) {
 	r, _ := git.PlainOpen("..")
 	w, _ := r.Worktree()
 	repoPath := w.Filesystem.Root()
-	expectedLine := "# gitconvex GoLang project"
+	expectedLine := "# Gitconvex"
 
 	type args struct {
 		repo     *git.Repository

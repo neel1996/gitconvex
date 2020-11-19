@@ -6,17 +6,20 @@ COPY . .
 
 RUN apk update && apk upgrade
 RUN apk add --update nodejs nodejs-npm
+RUN apk add git
+
 RUN cd ui/ && \
     npm install && \
-    npm i -g tailwindcss@1.6.0 && \
     export NODE_ENV=production && \
-    tailwindcss build -o src/index.css -c src/tailwind.config.js && \
+    npx tailwindcss build -o src/index.css -c src/tailwind.config.js && \
     npm run build && \
-    cp ./build ../ 
+    mv ./build ../ 
 
+RUN cd /opt/workroom/gitconvex
 RUN mkdir dist/ 
 RUN go build -o ./dist/
+RUN mv build/ dist/
 
 EXPOSE 9001
 
-CMD ./dist/gitconvex-server
+CMD cd ./dist && ./gitconvex-server
