@@ -40,4 +40,7 @@ jobs:
           key: ${{ secrets.DROPLET_PRIVATE_KEY }}
           port: ${{ secrets.DROPLET_PORT }}
           script: |
-            /opt/workroom/aws-build/aws-deploy.sh
+            /opt/workroom/aws-build/init-deploy.sh
+            /opt/workroom/aws-build/windows-deploy.sh
+            /opt/workroom/aws-build/linux-deploy.sh
+            /opt/workroom/aws-build/macos-deploy.sh
