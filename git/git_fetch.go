@@ -16,7 +16,12 @@ import (
 // windowsFetch is used for fetching changes using the git client if the platform is windows
 // go-git fetch fails in windows due to SSH authentication error
 func windowsFetch(repoPath string, remoteName string, branch string) *model.FetchResult {
-	args := []string{"fetch", remoteName, branch}
+	var args []string
+	if remoteName == "" && branch == "" {
+		args = []string{"fetch"}
+	} else {
+		args = []string{"fetch", remoteName, branch}
+	}
 	cmd := utils.GetGitClient(repoPath, args)
 	cmdStr, cmdErr := cmd.Output()
 
