@@ -50,17 +50,19 @@ func GetBranchList(repo *git.Repository, branchChan chan Branch) {
 					refNamePtr *string
 				)
 
-				if reference.Name().String() != "HEAD" && strings.Contains(reference.Name().String(), "refs/") {
-					refNameSplit := strings.Split(reference.Name().String(), "refs/")
-					if len(refNameSplit) == 2 {
-						logger.Log(fmt.Sprintf("Available Branch : %v", refNameSplit[1]), global.StatusInfo)
-						if strings.Contains(refNameSplit[1], "heads/") {
-							headBranch := strings.Split(refNameSplit[1], "heads/")[1]
-							refNamePtr = &headBranch
-						} else {
-							refNamePtr = &refNameSplit[1]
+				if ref != nil {
+					if reference.Name().String() != "HEAD" && strings.Contains(reference.Name().String(), "refs/") {
+						refNameSplit := strings.Split(reference.Name().String(), "refs/")
+						if len(refNameSplit) == 2 {
+							logger.Log(fmt.Sprintf("Available Branch : %v", refNameSplit[1]), global.StatusInfo)
+							if strings.Contains(refNameSplit[1], "heads/") {
+								headBranch := strings.Split(refNameSplit[1], "heads/")[1]
+								refNamePtr = &headBranch
+							} else {
+								refNamePtr = &refNameSplit[1]
+							}
+							allBranchList = append(allBranchList, refNamePtr)
 						}
-						allBranchList = append(allBranchList, refNamePtr)
 					}
 				}
 

@@ -81,9 +81,9 @@ $ ./make.bat build
 
 | Software | Purpose |
 | -- | -- |
-| <b>[Git v2.20+](https://git-scm.com/)</b> | <b>Required for handling some intense git operations with the target repo</b> |
-| <b>[Go v1.15](https://golang.org/)</b> | <b>For building the backend from the source</b> |
-| <b>[npm v6+](https://nodejs.org/en/)</b> | <b>For building the react UI bundle from scratch</b> |
+| <b>[Git](https://git-scm.com/)</b> | <b>Required for handling some intense git operations with the target repo</b> |
+| <b>[Go](https://golang.org/)</b> | <b>For building the backend from the source</b> |
+| <b>[Node JS](https://nodejs.org/en/)</b> | <b>For building the react UI bundle from scratch</b> |
     
 > **Important note for windows users**
 

@@ -12,6 +12,7 @@ func AddBranch(repo *git.Repository, branchName string) string {
 	logger := global.Logger{}
 	headRef, headErr := repo.Head()
 
+	logger.Log(fmt.Sprintf("Adding new branch -> %s", branchName), global.StatusInfo)
 	if headErr != nil {
 		logger.Log(fmt.Sprintf("Unable to fetch HEAD -> %s", headErr.Error()), global.StatusError)
 		return "BRANCH_ADD_FAILED"

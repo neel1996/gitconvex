@@ -22,7 +22,7 @@ func CodeFileView(repoPath string, fileName string) *model.CodeFileType {
 			FileData: nil,
 		}
 	} else {
-		logger.Log(fmt.Sprintf("Reading lines from file --> %s", fileName), global.StatusInfo)
+		logger.Log(fmt.Sprintf("Reading lines from file --> %s", targetFile), global.StatusInfo)
 		scanner := bufio.NewScanner(file)
 		scanner.Split(bufio.ScanLines)
 		for scanner.Scan() {

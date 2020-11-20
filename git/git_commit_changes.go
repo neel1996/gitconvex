@@ -9,6 +9,7 @@ import (
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/utils"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -33,40 +34,55 @@ func windowsCommit(repoPath string, msg string) string {
 // The function falls back to the native git client for Windows platform due to an existing bug in the go-git library which
 // blocks commits in windows platform
 func CommitChanges(repo *git.Repository, commitMessage string) string {
+	var formattedMessage = commitMessage
 	logger := global.Logger{}
 	w, wErr := repo.Worktree()
-
-	// Checking OS platform for switching to git client for Windows systems
-	platform := runtime.GOOS
-	if platform == "windows" && w != nil {
-		logger.Log(fmt.Sprintf("OS is %s -- Switching to native git client", platform), global.StatusWarning)
-		return windowsCommit(w.Filesystem.Root(), commitMessage)
-	}
-
-	// Logic to check if the repo / global config has proper user information setup
-	// Commit will be signed by default user if no user config is present
-	globalConfig, gCfgErr := repo.ConfigScoped(config.GlobalScope)
-	localConfig, lCfgErr := repo.ConfigScoped(config.LocalScope)
-	var author string
-
-	if gCfgErr == nil && lCfgErr == nil {
-		fmt.Println(localConfig.User)
-		fmt.Println(globalConfig.User)
-
-		if globalConfig.User.Name != "" {
-			author = globalConfig.User.Name
-		} else if localConfig.User.Name != "" {
-			author = localConfig.User.Name
-		}
-	} else {
-		logger.Log(fmt.Sprintf("Unable to fetch repo config -> %v || %v", gCfgErr, lCfgErr), global.StatusError)
-		return "COMMIT_FAILED"
-	}
 
 	if wErr != nil {
 		logger.Log(fmt.Sprintf("Error occurred while fetching repo worktree -> %s", wErr.Error()), global.StatusError)
 		return "COMMIT_FAILED"
 	} else {
+		//Checking and splitting multi-line commit messages
+		if strings.Contains(commitMessage, "||") {
+			splitMessage := strings.Split(commitMessage, "||")
+			formattedMessage = strings.Join(splitMessage, "\n")
+		}
+
+		// Checking OS platform for switching to git client for Windows systems
+		platform := runtime.GOOS
+		if platform == "windows" && w != nil {
+			logger.Log(fmt.Sprintf("OS is %s -- Switching to native git client", platform), global.StatusWarning)
+			return windowsCommit(w.Filesystem.Root(), formattedMessage)
+		}
+
+		// Checking if repo is a fresh repo with no branches
+		// fallback function will be used to commit with git if no branches are present
+		head, _ := repo.Head()
+		if head == nil {
+			logger.Log("Repo with no HEAD", global.StatusWarning)
+			return windowsCommit(w.Filesystem.Root(), formattedMessage)
+		}
+
+		// Logic to check if the repo / global config has proper user information setup
+		// Commit will be signed by default user if no user config is present
+		globalConfig, gCfgErr := repo.ConfigScoped(config.GlobalScope)
+		localConfig, lCfgErr := repo.ConfigScoped(config.LocalScope)
+		var author string
+
+		if gCfgErr == nil && lCfgErr == nil {
+			fmt.Println(localConfig.User)
+			fmt.Println(globalConfig.User)
+
+			if globalConfig.User.Name != "" {
+				author = globalConfig.User.Name
+			} else if localConfig.User.Name != "" {
+				author = localConfig.User.Name
+			}
+		} else {
+			logger.Log(fmt.Sprintf("Unable to fetch repo config -> %v || %v", gCfgErr, lCfgErr), global.StatusError)
+			return "COMMIT_FAILED"
+		}
+
 		var commitOptions *git.CommitOptions
 		var parentHash plumbing.Hash
 		head, headErr := repo.Head()
@@ -89,13 +105,18 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 				Parents: []plumbing.Hash{parentHash},
 			}
 		} else {
-			logger.Log(fmt.Sprintf("Commiting changes with author -> %s", author), global.StatusInfo)
+			logger.Log(fmt.Sprintf("Commiting changes with author -> %s, message -> %s", author, formattedMessage), global.StatusInfo)
 			commitOptions = &git.CommitOptions{
 				All:     false,
 				Parents: []plumbing.Hash{parentHash},
 			}
 		}
-		hash, err := w.Commit(commitMessage, commitOptions)
+
+		if formattedMessage == "" {
+			return "COMMIT_FAILED"
+		}
+
+		hash, err := w.Commit(formattedMessage, commitOptions)
 		if err != nil {
 			logger.Log(fmt.Sprintf("Error occurred while committing changes -> %s\n%v", err.Error(), err), global.StatusError)
 			return "COMMIT_FAILED"
