@@ -12,6 +12,7 @@ import (
 	"github.com/neel1996/gitconvex-server/utils"
 	"go/types"
 	"io"
+	"strings"
 )
 
 // windowsPull is used for pulling changes using the git client if the platform is windows
@@ -100,6 +101,10 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 				PulledItems: []*string{&msg},
 			}
 		} else {
+			if strings.Contains(pullErr.Error(), "ssh: handshake failed: ssh:") {
+				logger.Log("Pull failed. Retrying pull with git client", global.StatusWarning)
+				return windowsPull(w.Filesystem.Root(), remoteName, remoteBranch)
+			}
 			logger.Log(pullErr.Error(), global.StatusError)
 			return &model.PullResult{
 				Status:      "PULL ERROR",

@@ -10,6 +10,7 @@ import (
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/utils"
 	"io"
+	"strings"
 )
 
 // windowsPush is used for pushing changes using the git client if the platform is windows
@@ -32,13 +33,14 @@ func windowsPush(repoPath string, remoteName string, branch string) string {
 // By default it will choose the current branch and pushes to the matching remote branch
 func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) string {
 	targetRefPsec := "refs/heads/" + remoteBranch + ":refs/heads/" + remoteBranch
+	w, _ := repo.Worktree()
+
 	b := new(bytes.Buffer)
 	sshAuth, sshErr := ssh.NewSSHAgentAuth("git")
 	logger.Log(fmt.Sprintf("Pushing changes to remote -> %s : %s", remoteName, targetRefPsec), global.StatusInfo)
 
 	if sshErr != nil {
 		logger.Log(fmt.Sprintf("Authentication failed -> %s", sshErr.Error()), global.StatusError)
-		w, _ := repo.Worktree()
 
 		if w == nil {
 			return "PUSH_FAILED"
@@ -63,6 +65,10 @@ func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) 
 	})
 
 	if err != nil {
+		if strings.Contains(err.Error(), "ssh: handshake failed: ssh:") {
+			logger.Log("push failed. Retrying push with git client", global.StatusWarning)
+			return windowsPush(w.Filesystem.Root(), remoteName, remoteBranch)
+		}
 		logger.Log(fmt.Sprintf("Error occurred while pushing changes to -> %s : %s\n%s", remoteName, targetRefPsec, err.Error()), global.StatusError)
 		return "PUSH_FAILED"
 	} else {
