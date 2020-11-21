@@ -4,9 +4,7 @@ go 1.15
 
 require (
 	github.com/99designs/gqlgen v0.13.0
-	github.com/GeertJohan/go.rice v1.0.0 // indirect
 	github.com/TwinProduction/go-color v0.0.2
-	github.com/daaku/go.zipexe v1.0.1 // indirect
 	github.com/go-git/go-git/v5 v5.2.0
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0

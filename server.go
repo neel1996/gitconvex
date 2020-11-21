@@ -13,6 +13,8 @@ import (
 	"github.com/rs/cors"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -61,18 +63,32 @@ func main() {
 	router.Handle("/query", srv)
 	router.Handle("/gitconvexapi", srv)
 
+	execName, _ := os.Executable()
+	var (
+		staticPath string
+		buildPath  string
+	)
+	if execName != "" {
+		currentDir := filepath.Dir(execName)
+		buildPath = fmt.Sprintf("%s/build", currentDir)
+		staticPath = fmt.Sprintf("%s/static", buildPath)
+	}
+
 	// Static file supplier for hosting the react static assets and scripts
-	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir("./build/static/"))))
+	logger.Log(fmt.Sprintf("Serving static files from -> %s", staticPath), global.StatusInfo)
+	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(staticPath))))
 
 	// Route for serving the webpage logo from the reach build bundle
 	router.PathPrefix("/gitconvex.png").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/gitconvex.png")
+		logger.Log(fmt.Sprintf("Serving logo from directory -> %s", buildPath), global.StatusInfo)
+		http.ServeFile(w, r, buildPath+"/gitconvex.png")
 	})
 
 	// A default fallback route for handling all routes with '/' prefix.
 	// For making it compatible with react router
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/index.html")
+		logger.Log(fmt.Sprintf("Serving UI from directory -> %s", buildPath), global.StatusInfo)
+		http.ServeFile(w, r, buildPath+"/index.html")
 	})
 
 	// Checking and Assigning port received from the command line ( --port args )
