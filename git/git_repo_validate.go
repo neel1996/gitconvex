@@ -3,6 +3,7 @@ package git
 import (
 	"fmt"
 	"github.com/go-git/go-git/v5"
+	"github.com/neel1996/gitconvex-server/global"
 	"go/types"
 	"os"
 )
@@ -22,7 +23,7 @@ func RepoValidator(repoPath string) (string, error) {
 
 	_, headErr := repo.Head()
 	if headErr != nil {
-		return "", types.Error{Msg: "The selected folder is not a valid git repo"}
+		logger.Log(fmt.Sprintf("Mind that the repo has no HEAD and a fresh commit is required -> %s", headErr.Error()), global.StatusWarning)
 	}
 
 	return "Repo is valid!", nil

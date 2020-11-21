@@ -63,8 +63,8 @@ func UnPushedCommits(repo *git.Repository, remoteRef string) []*string {
 	revHash, _ := repo.ResolveRevision(plumbing.Revision(remoteRef))
 	remoteCommit, _ := repo.CommitObject(*revHash)
 
+	// Retuning nil commit response if repo has no HEAD
 	head, _ := repo.Head()
-
 	if head == nil {
 		return nilCommit()
 	}
@@ -94,6 +94,14 @@ func UnPushedCommits(repo *git.Repository, remoteRef string) []*string {
 			if commit == nil {
 				logger.Log("Commit object is nil", global.StatusError)
 				return types.Error{Msg: "Commit object is nil"}
+			}
+
+			// If the remote branch has no commits to compare, then the first local commit will be returned
+			if remoteCommit == nil {
+				commitString := commitModel(*commit)
+				logger.Log(fmt.Sprintf("New commit available for pushing to remote -> %s", commitString), global.StatusInfo)
+				commitArray = append(commitArray, &commitString)
+				return nil
 			}
 			if commit.Hash == remoteCommit.Hash {
 				logger.Log(fmt.Sprintf("Same commits found in remote and local trees -> %s", commit.Hash.String()), global.StatusInfo)
