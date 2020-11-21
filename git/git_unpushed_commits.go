@@ -49,6 +49,11 @@ func commitModel(commit object.Commit) string {
 	return commitString
 }
 
+func nilCommit() []*string {
+	logger.Log("No new commits available to push", global.StatusWarning)
+	return nil
+}
+
 // UnPushedCommits compares the local branch and the remote branch to extract the commits which are not pushed to the remote
 func UnPushedCommits(repo *git.Repository, remoteRef string) []*string {
 	var commitArray []*string
@@ -59,8 +64,12 @@ func UnPushedCommits(repo *git.Repository, remoteRef string) []*string {
 	remoteCommit, _ := repo.CommitObject(*revHash)
 
 	head, _ := repo.Head()
-	localCommit, _ := repo.CommitObject(head.Hash())
 
+	if head == nil {
+		return nilCommit()
+	}
+
+	localCommit, _ := repo.CommitObject(head.Hash())
 	isAncestor, _ = localCommit.IsAncestor(remoteCommit)
 
 	if !isAncestor {
@@ -70,7 +79,22 @@ func UnPushedCommits(repo *git.Repository, remoteRef string) []*string {
 			All:   false,
 		})
 
+		if logItr == nil {
+			if localCommit != nil {
+				commitString := commitModel(*localCommit)
+				logger.Log(fmt.Sprintf("New commit available for pushing to remote -> %s", commitString), global.StatusInfo)
+				commitArray = append(commitArray, &commitString)
+				return commitArray
+			} else {
+				return nilCommit()
+			}
+		}
+
 		_ = logItr.ForEach(func(commit *object.Commit) error {
+			if commit == nil {
+				logger.Log("Commit object is nil", global.StatusError)
+				return types.Error{Msg: "Commit object is nil"}
+			}
 			if commit.Hash == remoteCommit.Hash {
 				logger.Log(fmt.Sprintf("Same commits found in remote and local trees -> %s", commit.Hash.String()), global.StatusInfo)
 				return types.Error{Msg: "Same commit"}
@@ -84,8 +108,7 @@ func UnPushedCommits(repo *git.Repository, remoteRef string) []*string {
 		logItr.Close()
 		return commitArray
 	} else {
-		logger.Log("No new commits available to push", global.StatusWarning)
-		return nil
+		return nilCommit()
 	}
 
 }
