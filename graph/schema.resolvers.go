@@ -142,9 +142,13 @@ func (r *mutationResolver) CommitChanges(ctx context.Context, repoID string, com
 	go git.Repo(repoID, repoChan)
 	repo := <-repoChan
 	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
-		return "COMMIT_FAILED", nil
+		w, _ := repo.GitRepo.Worktree()
+		if w != nil {
+			return git.CommitChanges(repo.GitRepo, commitMessage), nil
+		} else {
+			return "COMMIT_FAILED", nil
+		}
 	}
-
 	return git.CommitChanges(repo.GitRepo, commitMessage), nil
 }
 
