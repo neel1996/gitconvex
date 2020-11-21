@@ -85,8 +85,13 @@ export default function Help() {
       measurementId: "G-ZJ3KLZT0EF",
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    if (firebase.apps[0] && firebase.apps[0].name === "update-app") {
+      firebase.apps[0].delete();
+      return;
+    }
+
+    const app = firebase.initializeApp(firebaseConfig, "update-app");
+    const db = app.database();
     const ref = db.ref("/");
 
     ref.on("value", (val) => {
@@ -213,6 +218,14 @@ export default function Help() {
                 paddingRight: "-15px",
               }}
               onClick={() => {
+                if (
+                  firebase.apps[0] &&
+                  firebase.apps[0].name === "update-app"
+                ) {
+                  firebase.apps[0].delete();
+                  resetStates();
+                  return;
+                }
                 resetStates();
               }}
             >
