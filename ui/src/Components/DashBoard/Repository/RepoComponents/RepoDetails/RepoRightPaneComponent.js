@@ -38,31 +38,34 @@ export default function RepoRightPaneComponent(props) {
 
               <div className="branch-list">
                 <div className="w-3/4 my-auto">
+                  <div
+                    className="branch-list--current"
+                    key={`${gitCurrentBranch}-${uuid()}`}
+                  >
+                    {gitCurrentBranch}
+                  </div>
                   {gitBranchList &&
                     gitCurrentBranch &&
                     gitBranchList
                       .slice(0, 3)
                       .map((entry) => {
                         if (entry) {
-                          return entry === gitCurrentBranch ? (
-                            <div
-                              className="branch-list--current"
-                              key={`${entry}-${uuid()}`}
-                            >
-                              {entry}
-                            </div>
-                          ) : (
-                            <div
-                              className="branch-list--branches"
-                              key={`entry-key-${uuid()}`}
-                              onClick={() => {
-                                switchBranchHandler(entry);
-                                actionTrigger(actionType.SWITCH_BRANCH);
-                              }}
-                            >
-                              {entry}
-                            </div>
-                          );
+                          if (entry !== gitCurrentBranch) {
+                            return (
+                              <div
+                                className="branch-list--branches"
+                                key={`entry-key-${uuid()}`}
+                                onClick={() => {
+                                  switchBranchHandler(entry);
+                                  actionTrigger(actionType.SWITCH_BRANCH);
+                                }}
+                              >
+                                {entry}
+                              </div>
+                            );
+                          } else {
+                            return null;
+                          }
                         }
                         return null;
                       })

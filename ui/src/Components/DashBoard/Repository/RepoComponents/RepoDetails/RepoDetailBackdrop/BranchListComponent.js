@@ -86,7 +86,6 @@ export default function BranchListComponent({ repoId, currentBranch }) {
 
   function switchBranchHandler(branchName) {
     resetStates();
-
     axios({
       url: globalAPIEndpoint,
       method: "POST",
@@ -100,10 +99,19 @@ export default function BranchListComponent({ repoId, currentBranch }) {
     })
       .then((res) => {
         if (res.data.data && !res.data.error) {
-          setSwitchSuccess(true);
-          setSwitchedBranch(branchName);
+          const checkoutStatus = res.data.data.checkoutBranch;
+          if (checkoutStatus === "CHECKOUT_FAILED") {
+            setSwitchSuccess(false);
+            setErrorBranch(branchName);
+            setSwitchError(true);
+            return;
+          } else {
+            setSwitchSuccess(true);
+            setSwitchedBranch(branchName);
+          }
         } else {
           setSwitchError(true);
+          setErrorBranch(branchName);
         }
       })
       .catch((err) => {
@@ -227,7 +235,11 @@ export default function BranchListComponent({ repoId, currentBranch }) {
                     title={branchName}
                     onClick={() => {
                       if (!activeBranchFlag) {
-                        switchBranchHandler(branchName);
+                        if (branchType !== "Local Branch") {
+                          switchBranchHandler(branch);
+                        } else {
+                          switchBranchHandler(branchName);
+                        }
                       }
                     }}
                   >
@@ -317,7 +329,7 @@ export default function BranchListComponent({ repoId, currentBranch }) {
         ? errorComponent("Error occurred while switching to", true)
         : null}
 
-      {switchedBranch && switchSuccess
+      {switchedBranch.length > 0 && switchSuccess
         ? successComponent("Active branch has been switched to")
         : null}
 
