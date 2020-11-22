@@ -94,14 +94,14 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 
 	if pullErr != nil {
 		if pullErr.Error() == git.NoErrAlreadyUpToDate.Error() {
-			logger.Log(pullErr.Error(), global.StatusWarning)
+			logger.Log("Pull failed with error : "+pullErr.Error(), global.StatusWarning)
 			msg := "No changes to pull from " + remoteName
 			return &model.PullResult{
 				Status:      "NEW CHANGES ABSENT",
 				PulledItems: []*string{&msg},
 			}
 		} else {
-			if strings.Contains(pullErr.Error(), "ssh: handshake failed: ssh:") {
+			if strings.Contains(pullErr.Error(), "ssh: handshake failed: ssh:") || strings.Contains(pullErr.Error(), "invalid auth method") {
 				logger.Log("Pull failed. Retrying pull with git client", global.StatusWarning)
 				return windowsPull(w.Filesystem.Root(), remoteName, remoteBranch)
 			}
