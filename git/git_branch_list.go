@@ -52,7 +52,7 @@ func GetBranchList(repo *git.Repository, branchChan chan Branch) {
 					if ref != nil {
 						if reference.Name().String() != "HEAD" && strings.Contains(reference.Name().String(), "refs/") {
 							refNameSplit := strings.Split(reference.Name().String(), "refs/")
-							if len(refNameSplit) == 2 {
+							if len(refNameSplit) == 2 && strings.Contains(refNameSplit[1], "/") && !strings.Contains(refNameSplit[1], "remotes/"+git.DefaultRemoteName+"/HEAD") {
 								logger.Log(fmt.Sprintf("Available Branch : %v", refNameSplit[1]), global.StatusInfo)
 								if strings.Contains(refNameSplit[1], "heads/") {
 									headBranch := strings.Split(refNameSplit[1], "heads/")[1]
