@@ -44,3 +44,4 @@ jobs:
             /opt/workroom/aws-build/windows-deploy.sh
             /opt/workroom/aws-build/linux-deploy.sh
             /opt/workroom/aws-build/macos-deploy.sh
+            /opt/workroom/aws-build/cleanup.sh
