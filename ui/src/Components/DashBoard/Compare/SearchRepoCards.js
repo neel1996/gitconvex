@@ -75,7 +75,10 @@ export default function SearchRepoCards(props) {
                 <div className="bg-blue-100 border shadow rounded p-2">
                   PATH
                 </div>
-                <div className="my-2 text-lg font-light text-gray-700">
+                <div
+                  className="my-2 font-light break-words text-gray-700"
+                  title={item.repoPath}
+                >
                   {item.repoPath}
                 </div>
               </div>

@@ -22,4 +22,5 @@ RUN mv build/ dist/
 
 EXPOSE 9001
 
-CMD cd ./dist && ./gitconvex-server
+# CMD cd /opt/workroom/gitconvex/dist && ./gitconvex-server
+CMD go run server.go
