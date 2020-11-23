@@ -22,7 +22,7 @@ func windowsCommit(repoPath string, msg string) string {
 
 	if cmdErr != nil {
 		logger.Log(fmt.Sprintf("Commit failed -> %s", cmdErr.Error()), global.StatusError)
-		return "COMMIT_FAILED"
+		return global.CommitChangeError
 	} else {
 		logger.Log(fmt.Sprintf("Changes committed to the repo -> %s", cmdStr), global.StatusInfo)
 		return "COMMIT_DONE"
@@ -40,7 +40,7 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 
 	if wErr != nil {
 		logger.Log(fmt.Sprintf("Error occurred while fetching repo worktree -> %s", wErr.Error()), global.StatusError)
-		return "COMMIT_FAILED"
+		return global.CommitChangeError
 	} else {
 		//Checking and splitting multi-line commit messages
 		if strings.Contains(commitMessage, "||") {
@@ -80,7 +80,7 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 			}
 		} else {
 			logger.Log(fmt.Sprintf("Unable to fetch repo config -> %v || %v", gCfgErr, lCfgErr), global.StatusError)
-			return "COMMIT_FAILED"
+			return global.CommitChangeError
 		}
 
 		var commitOptions *git.CommitOptions
@@ -113,13 +113,13 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 		}
 
 		if formattedMessage == "" {
-			return "COMMIT_FAILED"
+			return global.CommitChangeError
 		}
 
 		hash, err := w.Commit(formattedMessage, commitOptions)
 		if err != nil {
 			logger.Log(fmt.Sprintf("Error occurred while committing changes -> %s\n%v", err.Error(), err), global.StatusError)
-			return "COMMIT_FAILED"
+			return global.CommitChangeError
 		} else {
 			logger.Log(fmt.Sprintf("Staged changes have been comitted - %s", hash.String()), global.StatusInfo)
 			return "COMMIT_DONE"

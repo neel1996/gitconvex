@@ -19,6 +19,6 @@ func AddRemote(repo *git.Repository, remoteName string, remoteURL string) string
 		return "REMOTE_ADD_SUCCESS"
 	} else {
 		logger.Log("Remote addition Failed!", global.StatusError)
-		return "REMOTE_ADD_FAILED"
+		return global.RemoteAddError
 	}
 }

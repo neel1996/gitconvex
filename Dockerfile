@@ -15,12 +15,14 @@ RUN cd ui/ && \
     npm run build && \
     mv ./build ../ 
 
-RUN cd /opt/workroom/gitconvex
-RUN mkdir dist/ 
-RUN go build -o ./dist/
-RUN mv build/ dist/
+RUN cd /opt/workroom/gitconvex && \
+    mkdir dist/ && \
+    go build -o ./dist/ && \
+    mv build/ dist/ 
+
+RUN pwd
+RUN ls -ltr
 
 EXPOSE 9001
 
-# CMD cd /opt/workroom/gitconvex/dist && ./gitconvex-server
-CMD go run server.go
+CMD go run /opt/workroom/gitconvex/dist/gitconvex-server

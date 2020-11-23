@@ -37,9 +37,19 @@ func FetchRepo() *model.FetchRepoParams {
 	}
 
 	logger := global.Logger{}
-	jsonContent, _ := json.MarshalIndent(repoData, "", " ")
-	logger.Log(fmt.Sprintf("Reading data file content \n%v", string(jsonContent)), global.StatusInfo)
+	jsonContent, err := json.MarshalIndent(repoData, "", " ")
 
+	if err != nil {
+		logger.Log(fmt.Sprintf("Data file could not be parsed -> %s", err.Error()), global.StatusError)
+		return &model.FetchRepoParams{
+			RepoID:    nil,
+			RepoName:  nil,
+			RepoPath:  nil,
+			TimeStamp: nil,
+		}
+	}
+
+	logger.Log(fmt.Sprintf("Available data file content \n%v", string(jsonContent)), global.StatusInfo)
 	return &model.FetchRepoParams{
 		RepoID:    repoId,
 		RepoName:  repoName,

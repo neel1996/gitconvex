@@ -9,7 +9,7 @@ import (
 func removeErr(fileItem string, errMsg string) string {
 	logger := global.Logger{}
 	logger.Log(fmt.Sprintf("Error occurred while removeing item %s -> %s", fileItem, errMsg), global.StatusError)
-	return "STAGE_REMOVE_FAILED"
+	return global.RemoveItemError
 }
 
 // RemoveItem performs a git rest 'file' to remove the item from the staged area

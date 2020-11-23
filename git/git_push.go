@@ -22,7 +22,7 @@ func windowsPush(repoPath string, remoteName string, branch string) string {
 
 	if cmdErr != nil {
 		logger.Log(fmt.Sprintf("Push failed -> %s", cmdErr.Error()), global.StatusError)
-		return "PUSH_FAILED"
+		return global.PushToRemoteError
 	} else {
 		logger.Log(fmt.Sprintf("Changes pushed to remote -> %s", cmdStr), global.StatusInfo)
 		return "PUSH_SUCCESS"
@@ -43,7 +43,7 @@ func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) 
 		logger.Log(fmt.Sprintf("Authentication failed -> %s", sshErr.Error()), global.StatusError)
 
 		if w == nil {
-			return "PUSH_FAILED"
+			return global.PushToRemoteError
 		}
 		logger.Log("Falling back to native git client for pushing changes", global.StatusWarning)
 		return windowsPush(w.Filesystem.Root(), remoteName, remoteBranch)
@@ -52,7 +52,7 @@ func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) 
 	remote, remoteErr := repo.Remote(remoteName)
 	if remoteErr != nil {
 		logger.Log(remoteErr.Error(), global.StatusError)
-		return "PUSH_FAILED"
+		return global.PushToRemoteError
 	}
 
 	err := remote.Push(&git.PushOptions{
@@ -70,7 +70,7 @@ func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) 
 			return windowsPush(w.Filesystem.Root(), remoteName, remoteBranch)
 		}
 		logger.Log(fmt.Sprintf("Error occurred while pushing changes to -> %s : %s\n%s", remoteName, targetRefPsec, err.Error()), global.StatusError)
-		return "PUSH_FAILED"
+		return global.PushToRemoteError
 	} else {
 		logger.Log(fmt.Sprintf("commits pushed to remote -> %s : %s\n%v", remoteName, targetRefPsec, b.String()), global.StatusInfo)
 		return "PUSH_SUCCESS"

@@ -15,14 +15,14 @@ func AddBranch(repo *git.Repository, branchName string) string {
 	logger.Log(fmt.Sprintf("Adding new branch -> %s", branchName), global.StatusInfo)
 	if headErr != nil {
 		logger.Log(fmt.Sprintf("Unable to fetch HEAD -> %s", headErr.Error()), global.StatusError)
-		return "BRANCH_ADD_FAILED"
+		return global.BranchAddError
 	} else {
 		ref := plumbing.NewHashReference(plumbing.ReferenceName(fmt.Sprintf("refs/heads/%v", branchName)), headRef.Hash())
 		branchErr := repo.Storer.SetReference(ref)
 
 		if branchErr != nil {
 			logger.Log(fmt.Sprintf("Failed to add branch - %s - %s", branchName, branchErr.Error()), global.StatusError)
-			return "BRANCH_ADD_FAILED"
+			return global.BranchAddError
 		}
 
 		logger.Log(fmt.Sprintf("Added new branch - %s to the repo", branchName), global.StatusInfo)

@@ -26,7 +26,7 @@ func windowsPull(repoPath string, remoteName string, branch string) *model.PullR
 		logger.Log(fmt.Sprintf("Pull failed -> %s", cmdErr.Error()), global.StatusError)
 
 		return &model.PullResult{
-			Status:      "PULL ERROR",
+			Status:      global.PullFromRemoteError,
 			PulledItems: nil,
 		}
 	} else {
@@ -61,7 +61,7 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 
 		if remoteName == "" {
 			return &model.PullResult{
-				Status:      "PULL ERROR",
+				Status:      global.PullFromRemoteError,
 				PulledItems: nil,
 			}
 		}
@@ -71,7 +71,7 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 			w, _ := repo.Worktree()
 			if w == nil {
 				return &model.PullResult{
-					Status:      "PULL ERROR",
+					Status:      global.PullFromRemoteError,
 					PulledItems: nil,
 				}
 			}
@@ -107,7 +107,7 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 			}
 			logger.Log(pullErr.Error(), global.StatusError)
 			return &model.PullResult{
-				Status:      "PULL ERROR",
+				Status:      global.PullFromRemoteError,
 				PulledItems: nil,
 			}
 		}

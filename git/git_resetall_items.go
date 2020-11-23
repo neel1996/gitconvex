@@ -31,7 +31,7 @@ func ResetAllItems(repo *git.Repository) string {
 			removeMsg, err := cmd.Output()
 
 			if err != nil {
-				return "STAGE_ALL_REMOVE_FAILED"
+				return global.RemoveAllItemsError
 			} else {
 				logger.Log("All staged items have been removed from staging area -> "+string(removeMsg), global.StatusInfo)
 				return "STAGE_ALL_REMOVE_SUCCESS"

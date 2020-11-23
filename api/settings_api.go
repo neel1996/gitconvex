@@ -43,12 +43,12 @@ func UpdatePortNumber(newPort string) string {
 
 		if writeErr != nil {
 			logger.Log(writeErr.Error(), global.StatusError)
-			return "PORT_UPDATE_FAILED"
+			return global.PortUpdateError
 		} else {
 			return "PORT_UPDATED"
 		}
 	} else {
-		return "PORT_UPDATE_FAILED"
+		return global.PortUpdateError
 	}
 }
 
@@ -68,19 +68,19 @@ func UpdateDBFilePath(newFilePath string) string {
 
 		if writeErr != nil {
 			logger.Log(writeErr.Error(), global.StatusError)
-			return "DATAFILE_UPDATE_FAILED"
+			return global.DataFileUpdateError
 		} else {
 			return "DATAFILE_UPDATE_SUCCESS"
 		}
 	} else {
-		return "DATAFILE_UPDATE_FAILED"
+		return global.DataFileUpdateError
 	}
 }
 
 func reportError(repoId string, errMsg string, errString string) *model.DeleteStatus {
 	logger.Log(fmt.Sprintf("%s -> %s", errMsg, errString), global.StatusError)
 	return &model.DeleteStatus{
-		Status: "DELETE_FAILED",
+		Status: global.RepoDeleteError,
 		RepoID: repoId,
 	}
 }

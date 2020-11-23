@@ -19,14 +19,13 @@ func getGitVersion() string {
 	gitVersion, err := gitCmd.Output()
 
 	if err != nil {
-		fmt.Printf("Git version could not be obtained \n %v", err)
+		logger.Log(fmt.Sprintf("Git version could not be obtained \n %v", err), global.StatusError)
 	}
 
 	return strings.Split(string(gitVersion), "\n")[0]
 }
 
-// HealthCheckApi returns the current version of git installed in the host and the platform
-// gitconvex is running on
+// HealthCheckApi returns the current version of git installed in the host and the platform gitconvex is running on
 func HealthCheckApi() *model.HealthCheckParams {
 
 	logger := global.Logger{Message: fmt.Sprintf("Obtained host information : %v -- %v", getOs(), getGitVersion())}

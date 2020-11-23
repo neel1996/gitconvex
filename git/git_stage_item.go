@@ -10,7 +10,7 @@ import (
 func addError(fileItem string, errMsg string) string {
 	logger := global.Logger{}
 	logger.Log(fmt.Sprintf("Error occurred while staging %s -> %s", fileItem, errMsg), global.StatusError)
-	return "ADD_ITEM_FAILED"
+	return global.StageItemError
 }
 
 // StageItem stages a selected file from the target repo

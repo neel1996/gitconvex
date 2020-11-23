@@ -30,7 +30,7 @@ func windowsFetch(repoPath string, remoteName string, branch string) *model.Fetc
 		logger.Log(fmt.Sprintf("Fetch failed -> %s", cmdErr.Error()), global.StatusError)
 
 		return &model.FetchResult{
-			Status:       "FETCH ERROR",
+			Status:       global.FetchFromRemoteError,
 			FetchedItems: nil,
 		}
 	} else {
@@ -60,7 +60,7 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 		logger.Log("Authentication method failed -> "+sshErr.Error(), global.StatusError)
 		if w == nil {
 			return &model.FetchResult{
-				Status:       "FETCH ERROR",
+				Status:       global.FetchFromRemoteError,
 				FetchedItems: nil,
 			}
 		}
@@ -73,7 +73,7 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 	if remoteURL != "" && remoteBranch != "" {
 		if remoteName == "" {
 			return &model.FetchResult{
-				Status:       "FETCH ERROR",
+				Status:       global.FetchFromRemoteError,
 				FetchedItems: nil,
 			}
 		}
@@ -110,7 +110,7 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 			}
 			logger.Log(fetchErr.Error(), global.StatusError)
 			return &model.FetchResult{
-				Status:       "FETCH ERROR",
+				Status:       global.FetchFromRemoteError,
 				FetchedItems: nil,
 			}
 		}
