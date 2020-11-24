@@ -188,6 +188,9 @@ export default function PushComponent(props) {
       {!pushDone ? (
         <>
           <div className="git-ops--push">
+            <div className="text-center font-sans font-semibold mx-auto w-full p-3 text-2xl border-b-2 border-dashed text-gray-800">
+              Push To Remote
+            </div>
             <div className="flex mx-auto justify-around items-center align-middle gap-4">
               <div className="w-2/3 font-sans text-xl font-semibold text-gray-600">
                 Available remotes

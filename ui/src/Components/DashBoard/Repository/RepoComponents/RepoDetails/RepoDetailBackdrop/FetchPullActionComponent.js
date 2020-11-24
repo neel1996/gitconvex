@@ -179,71 +179,88 @@ export default function FetchFromRemoteComponent(props) {
 
   return (
     <>
-      <div className="repo-backdrop--fetchpull">
+      <div className="repo-backdrop--fetchpull pt-4">
         {actionType === "fetch" ? (
-          <div
-            className="fetchpull--fetch-global xl:w-3/5 lg:w-3/4 md:w-3/4 sm:w-11/12"
-            onClick={() => {
-              actionHandler();
-            }}
-          >
-            <div className="text-2xl text-indigo-800 mx-4">
-              <FontAwesomeIcon
-                icon={["fas", "exclamation-circle"]}
-              ></FontAwesomeIcon>
+          <div>
+            <div className="text-center font-sans font-semibold mx-auto w-full p-3 text-2xl border-b-2 border-dashed text-gray-800">
+              Fetch from Remote
             </div>
-            <div>Click to Fetch without branch selection</div>
+            <div
+              className="fetchpull--fetch-global xl:w-3/5 lg:w-3/4 md:w-3/4 sm:w-11/12"
+              onClick={() => {
+                actionHandler();
+              }}
+            >
+              <div className="text-2xl text-indigo-800 mx-4">
+                <FontAwesomeIcon
+                  icon={["fas", "exclamation-circle"]}
+                ></FontAwesomeIcon>
+              </div>
+              <div>Click to Fetch from default remote and branch</div>
+            </div>
           </div>
         ) : null}
-        <div className="m-3 text-2xl font-sans text-gray-800">
-          Available remote repos
-        </div>
-        <div>
-          <select
-            className="fetchpull--select"
-            defaultValue="checked"
-            disabled={remoteData ? false : true}
-            onChange={() => {
-              setIsRemoteSet(true);
-            }}
-            onClick={() => {
-              setResult([]);
-            }}
-            ref={remoteRef}
-          >
-            <option disabled hidden value="checked">
-              {remoteData
-                ? "Select the remote repo"
-                : "Loading available remotes..."}
-            </option>
-            {remoteData ? remoteHostGenerator() : null}
-          </select>
-        </div>
-
-        {isRemoteSet ? (
-          <div>
+        {actionType === "pull" ? (
+          <div className="text-center font-sans font-semibold mx-auto w-full p-3 text-2xl border-b-2 border-dashed text-gray-800">
+            Pull from Remote
+          </div>
+        ) : null}
+        <div className="flex flex-wrap w-3/4 mx-auto my-4 justify-around items-center align-middle gap-4">
+          <div className="w-full font-sans text-xl font-semibold text-gray-600">
+            Available remotes
+          </div>
+          <div className="w-full mb-6">
             <select
               className="fetchpull--select"
               defaultValue="checked"
+              disabled={remoteData ? false : true}
               onChange={() => {
-                setIsBranchSet(true);
+                setIsRemoteSet(true);
               }}
               onClick={() => {
                 setResult([]);
               }}
-              ref={branchRef}
+              ref={remoteRef}
             >
               <option disabled hidden value="checked">
-                Select upstream branch
+                {remoteData
+                  ? "Select the remote repo"
+                  : "Loading available remotes..."}
               </option>
-              {remoteData ? branchListGenerator() : null}
+              {remoteData ? remoteHostGenerator() : null}
             </select>
+          </div>
+        </div>
+
+        {isRemoteSet ? (
+          <div className="flex flex-wrap w-3/4 mx-auto my-4 justify-around items-center align-middle gap-4">
+            <div className="w-full font-sans text-xl font-semibold text-gray-600">
+              Available Branches
+            </div>
+            <div className="w-full mb-6">
+              <select
+                className="fetchpull--select"
+                defaultValue="checked"
+                onChange={() => {
+                  setIsBranchSet(true);
+                }}
+                onClick={() => {
+                  setResult([]);
+                }}
+                ref={branchRef}
+              >
+                <option disabled hidden value="checked">
+                  Select upstream branch
+                </option>
+                {remoteData ? branchListGenerator() : null}
+              </select>
+            </div>
           </div>
         ) : null}
 
         {isRemoteSet && isBranchSet && !loading ? (
           <div
-            className="fetchpull--btn"
+            className="fetchpull--btn mt-10 rounded-b"
             onClick={(event) => {
               const remoteHost = remoteRef.current.value;
               const branchName = branchRef.current.value;

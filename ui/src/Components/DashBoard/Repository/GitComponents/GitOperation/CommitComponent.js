@@ -57,7 +57,7 @@ export default function CommitComponent(props) {
 
   function commitHandler(commitMsg) {
     setLoadingCommit(true);
-    commitMsg = commitMsg.replace(/"/gi, '\\"');
+    commitMsg = commitMsg.replace(/"/gi, '"');
     if (commitMsg.split("\n") && commitMsg.split("\n").length > 0) {
       commitMsg = commitMsg.toString().split("\n").join("||");
     }

@@ -134,6 +134,7 @@ export default function FileExplorerComponent(props) {
       }
 
       setCwd(directoryName);
+      setIsLoading(true);
 
       axios({
         url: globalAPIEndpoint,
@@ -154,6 +155,7 @@ export default function FileExplorerComponent(props) {
         },
       })
         .then((res) => {
+          setIsLoading(false);
           if (res.data.data && !res.data.error) {
             const localFolderContent = res.data.data.gitFolderContent;
 
@@ -188,12 +190,14 @@ export default function FileExplorerComponent(props) {
               }
             }
           } else {
+            setIsLoading(false);
             console.log(
               "ERROR: Error occurred while fetching the folder content!"
             );
           }
         })
         .catch((err) => {
+          setIsLoading(false);
           if (err) {
             console.log(
               "ERROR: Error occurred while fetching the folder content!",
