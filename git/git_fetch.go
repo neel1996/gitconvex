@@ -34,7 +34,7 @@ func windowsFetch(repoPath string, remoteName string, branch string) *model.Fetc
 			FetchedItems: nil,
 		}
 	} else {
-		logger.Log(fmt.Sprintf("Changes fetch from remote - %s -> %s", remoteName, cmdStr), global.StatusInfo)
+		logger.Log(fmt.Sprintf("Changes fetched from remote - %s -> %s", remoteName, cmdStr), global.StatusInfo)
 
 		msg := fmt.Sprintf("Changes fetched from %v", remoteName)
 		return &model.FetchResult{
@@ -118,7 +118,8 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 	} else {
 		logger.Log(b.String(), global.StatusInfo)
 		logger.Log("Changes fetched from remote", global.StatusInfo)
-		msg := fmt.Sprintf("Changes fetched from %v", git.DefaultRemoteName)
+
+		msg := fmt.Sprintf("Changes fetched from remote %v", remoteName)
 		return &model.FetchResult{
 			Status:       "CHANGES FETCHED FROM REMOTE",
 			FetchedItems: []*string{&msg},

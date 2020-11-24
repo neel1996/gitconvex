@@ -28,7 +28,7 @@ var waitGroup sync.WaitGroup
 
 // DirCommitHandler collects the commit messages for the directories present in the target repo
 func DirCommitHandler(dirName *string, repoPath string, fileChan chan string, commitChan chan string, waitGroup *sync.WaitGroup) {
-	args := []string{"log", "--oneline", "-1", "--pretty=format:%s", *dirName}
+	args := []string{"log", "--oneline", "-1", "--pretty=format:%s", *dirName + "/"}
 	cmd := utils.GetGitClient(repoPath, args)
 
 	if cmd.String() != "" {
@@ -38,6 +38,8 @@ func DirCommitHandler(dirName *string, repoPath string, fileChan chan string, co
 		if err != nil {
 			logger.Log(fmt.Sprintf("Command execution for -> {{%s}} failed with error %v", cmd.String(), err.Error()), global.StatusError)
 			fmt.Println(commitLog)
+			fileChan <- ""
+			commitChan <- ""
 			waitGroup.Done()
 		} else {
 			commitMsg := string(commitLog)
