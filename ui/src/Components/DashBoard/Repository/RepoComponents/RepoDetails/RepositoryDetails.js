@@ -85,6 +85,9 @@ export default function RepositoryDetails(props) {
         repoId={repoIdState}
         branchName={selectedBranch}
         closeBackdrop={closeBackdrop}
+        switchReloadView={() => {
+          setReloadView(true);
+        }}
       ></SwitchBranchComponent>
     );
   }, [repoIdState, selectedBranch]);
@@ -185,7 +188,6 @@ export default function RepositoryDetails(props) {
     setBackdropToggle(true);
     setAction("switchbranch");
     setSelectedBranch(branchName);
-    setReloadView(true);
   };
 
   const actionComponentPicker = () => {

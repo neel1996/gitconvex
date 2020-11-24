@@ -6,6 +6,7 @@ export default function SwitchBranchComponent({
   repoId,
   branchName,
   closeBackdrop,
+  switchReloadView,
 }) {
   const [branchError, setBranchError] = useState(false);
 
@@ -23,6 +24,7 @@ export default function SwitchBranchComponent({
     })
       .then((res) => {
         if (res.data.data && !res.data.error) {
+          switchReloadView();
           closeBackdrop(true);
         }
       })
@@ -31,7 +33,7 @@ export default function SwitchBranchComponent({
           setBranchError(true);
         }
       });
-  }, [branchName, closeBackdrop, repoId]);
+  }, [branchName, closeBackdrop, repoId, switchReloadView]);
 
   return (
     <div className="xl:w-3/4 lg:w-3/4 md:w-11/12 sm:w-11/12 repo-backdrop--switchbranch">
