@@ -28,15 +28,21 @@ if "%ip%"==%BUILD% (
     set NODE_ENV=production
     npx tailwindcss build -o src/index.css -c src/tailwind.config.js
     npm run build
-    move .\build ..\
+	echo "Moving react bundle to gitconvex-ui"
+    move .\build gitconvex-ui
+    move .\gitconvex-ui ..\
     cd ..
     mkdir .\dist
-    move .\build .\dist\
+	echo "Moving UI artifacts to dist folder"
+    move .\gitconvex-ui .\dist\
 	echo "Removing intermediary folder ui/"
 	rd /s /q ui
     echo "Building gitconvex bundle"
     go build -o ./dist
-	echo "Run ./dist/gitconvex-server.exe to start gitconvex on port 9001"
+	cd .\dist
+    rename gitconvex-server.exe gitconvex.exe
+	echo "Run ./dist/gitconvex.exe to start gitconvex on port 9001"
+	cd ..
 )
 
 if "%ip%"==%TEST% (

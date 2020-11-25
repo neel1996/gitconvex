@@ -20,9 +20,6 @@ RUN cd /opt/workroom/gitconvex && \
     go build -o ./dist/ && \
     mv build/ dist/ 
 
-RUN pwd
-RUN ls -ltr
-
 EXPOSE 9001
 
 CMD go run /opt/workroom/gitconvex/dist/gitconvex-server

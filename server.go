@@ -58,7 +58,6 @@ func main() {
 	router := mux.NewRouter()
 
 	// http route handler for provisioning graphql playground UI when the API is directly opened from the browser
-
 	router.Path("/gitconvexapi/graph").Handler(playground.Handler("GraphQL", "/query"))
 	router.Handle("/query", srv)
 	router.Handle("/gitconvexapi", srv)
@@ -70,7 +69,7 @@ func main() {
 	)
 	if execName != "" {
 		currentDir := filepath.Dir(execName)
-		buildPath = fmt.Sprintf("%s/build", currentDir)
+		buildPath = fmt.Sprintf("%s/gitconvex-ui", currentDir)
 		staticPath = fmt.Sprintf("%s/static", buildPath)
 	}
 

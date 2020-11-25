@@ -33,10 +33,12 @@ build:
 	cd .. && \
 	mkdir -p ./dist && \
 	mv build/ ./dist/ && \
+	mv ./dist/build ./dist/gitconvex-ui
 	echo "Building final go source with UI bundle" && \
 	go build -o ./dist && \
 	echo "Gitconvex build completed!" && \
-	echo "Use ./dist/gitconvex-server to start Gitconvex on port 9001"
+	mv ./dist/gitconvex-server ./dist/gitconvex
+	echo "Use ./dist/gitconvex to start Gitconvex on port 9001"
 test:
 	go test -v ./...
 start:
