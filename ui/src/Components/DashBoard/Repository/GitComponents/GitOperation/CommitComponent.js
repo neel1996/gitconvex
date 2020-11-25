@@ -11,6 +11,7 @@ export default function CommitComponent(props) {
   const [commitDone, setCommitDone] = useState(false);
   const [commitError, setCommitError] = useState(false);
   const [loadingCommit, setLoadingCommit] = useState(false);
+  const [commitMessageWarning, setCommitMessageWarning] = useState(false);
 
   const commitRef = useRef();
 
@@ -101,7 +102,8 @@ export default function CommitComponent(props) {
           {!commitDone ? (
             <div className="git-ops--commit--wrapper">
               <div className="git-ops--commit--header">
-                {stagedCount} Changes to commit...
+                {stagedCount} {stagedCount > 1 ? "Changes" : "Change"} to
+                commit...
               </div>
               <div className="overflow-auto" style={{ height: "300px" }}>
                 {stagedFilesState.map((stagedFile) => {
@@ -116,12 +118,36 @@ export default function CommitComponent(props) {
                 })}
               </div>
               <div className="text-xl my-4">Commit Message</div>
+              {commitMessageWarning ? (
+                <div className="font-sans font-semibold italic p-2 border-b border-dotted border-orange-500 text-yellow-600">
+                  <span role="img" aria-label="suggestion">
+                    💡
+                  </span>
+                  <span className="mx-1">
+                    It is usually a good practice to limit the commit message to
+                    50 characters
+                  </span>
+                  <div className="my-1 font-sans text-sm font-semibold text-yellow-700">
+                    For additional content, include a line break and enter the
+                    messages
+                  </div>
+                </div>
+              ) : null}
               <textarea
                 className="git-ops--commit--message"
                 placeholder="Enter commit message"
                 cols="20"
                 rows="5"
                 ref={commitRef}
+                onChange={(e) => {
+                  const content = e.currentTarget.value;
+                  const len = content.split("\n")[0].length;
+                  if (len > 50) {
+                    setCommitMessageWarning(true);
+                  } else {
+                    setCommitMessageWarning(false);
+                  }
+                }}
               ></textarea>
               {commitError ? (
                 <div className="git-ops--commit--alert--failed">
