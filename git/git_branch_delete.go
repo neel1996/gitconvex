@@ -24,7 +24,8 @@ func DeleteBranch(repo *git.Repository, branchName string, forceFlag bool) *mode
 	} else {
 		b, bErr := repo.Branch(branchName)
 		if bErr != nil {
-			fmt.Println(bErr.Error())
+			logger.Log(fmt.Sprintf("Failed to delete branch %s -> %v", branchName, bErr.Error()), global.StatusError)
+			return &model.BranchDeleteStatus{Status: global.BranchDeleteError}
 		} else {
 			logger.Log("Deleting branch "+b.Name, global.StatusInfo)
 			branchErr = repo.Storer.RemoveReference(ref.Name())

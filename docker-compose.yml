@@ -1,0 +1,31 @@
+services:
+  gitconvex:
+    container_name: gitconvex
+    entrypoint:
+    - go run /opt/workroom/gitconvex/dist/gitconvex-server
+    environment:
+      NODE_ENV: production
+    expose:
+    - 9001
+    healthcheck:
+      interval: 1m30s
+      retries: 3
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://localhost
+      timeout: 10s
+    hostname: gitconvex-container
+    image: itassistors/gitconvex
+    labels:
+      generated: by 8gwifi.org
+    ports:
+    - '9001'
+    volumes:
+    - primary:/opt
+    working_dir: /opt/workroom/gitconvex
+version: '3'
+volumes:
+  primary: null
+

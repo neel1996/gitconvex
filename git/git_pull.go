@@ -30,9 +30,17 @@ func windowsPull(repoPath string, remoteName string, branch string) *model.PullR
 			PulledItems: nil,
 		}
 	} else {
+		if strings.Contains(string(cmdStr), "Already up to date") {
+			logger.Log(fmt.Sprintf("No new changes available -> %s", cmdStr), global.StatusInfo)
+
+			msg := "No changes to pull from " + remoteName
+			return &model.PullResult{
+				Status:      "NEW CHANGES ABSENT",
+				PulledItems: []*string{&msg},
+			}
+		}
 		msg := "New Items Pulled from remote " + remoteName
 		logger.Log(fmt.Sprintf("Changes pulled from remote -> %s", cmdStr), global.StatusInfo)
-
 		return &model.PullResult{
 			Status:      "PULL SUCCESS",
 			PulledItems: []*string{&msg},
