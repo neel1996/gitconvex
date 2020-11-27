@@ -15,6 +15,28 @@ type Branch struct {
 	AllBranchList []*string
 }
 
+// isBranchNameValid function checks if the branch name is valid to be return as an eligible branch
+//
+// The function filters out Tags and stashes returned as references
+func isBranchNameValid(branchName string) bool {
+	var branchNameValid bool
+	branchNameValid = true
+
+	if branchName == "HEAD" {
+		branchNameValid = false
+	}
+
+	if !strings.Contains(branchName, "refs/") {
+		branchNameValid = false
+	}
+
+	if strings.Contains(branchName, "tags/") {
+		branchNameValid = false
+	}
+
+	return branchNameValid
+}
+
 // GetBranchList fetches all the branches from the target repository
 // The result will be returned as a struct with the current branch and all the available branches
 func GetBranchList(repo *git.Repository, branchChan chan Branch) {
@@ -50,7 +72,8 @@ func GetBranchList(repo *git.Repository, branchChan chan Branch) {
 						refNamePtr *string
 					)
 					if ref != nil {
-						if reference.Name().String() != "HEAD" && strings.Contains(reference.Name().String(), "refs/") {
+						referenceName := reference.Name().String()
+						if isBranchNameValid(referenceName) {
 							refNameSplit := strings.Split(reference.Name().String(), "refs/")
 							if len(refNameSplit) == 2 && strings.Contains(refNameSplit[1], "/") && !strings.Contains(refNameSplit[1], "remotes/"+git.DefaultRemoteName+"/HEAD") {
 								logger.Log(fmt.Sprintf("Available Branch : %v", refNameSplit[1]), global.StatusInfo)
@@ -74,12 +97,15 @@ func GetBranchList(repo *git.Repository, branchChan chan Branch) {
 
 			if bIter != nil {
 				_ = bIter.ForEach(func(reference *plumbing.Reference) error {
-					if reference != nil {
-						localBranch := reference.String()
-						splitBranch := strings.Split(localBranch, "/")
-						localBranch = splitBranch[len(splitBranch)-1]
+					if reference != nil && !strings.Contains(reference.Name().String(), "tags/") {
+						localBranch := reference.Name().String()
+						if isBranchNameValid(localBranch) {
+							splitBranch := strings.Split(localBranch, "/")
+							localBranch = splitBranch[len(splitBranch)-1]
 
-						branches = append(branches, &localBranch)
+							logger.Log("Available Branch : "+localBranch, global.StatusInfo)
+							branches = append(branches, &localBranch)
+						}
 						return nil
 					} else {
 						return types.Error{Msg: "Empty reference"}

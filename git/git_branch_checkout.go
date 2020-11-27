@@ -39,7 +39,7 @@ func CheckoutBranch(repo *git.Repository, branchName string) string {
 		})
 		if checkoutErr != nil {
 			logger.Log(checkoutErr.Error(), global.StatusError)
-			return "CHECKOUT_FAILED"
+			return global.BranchCheckoutError
 		}
 	}
 
@@ -49,7 +49,7 @@ func CheckoutBranch(repo *git.Repository, branchName string) string {
 	})
 	if checkoutErr != nil {
 		logger.Log(checkoutErr.Error(), global.StatusError)
-		return "CHECKOUT_FAILED"
+		return global.BranchCheckoutError
 	}
 
 	logger.Log(fmt.Sprintf("Current branch checked out to -> %s", branchName), global.StatusInfo)

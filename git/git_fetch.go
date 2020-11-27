@@ -36,7 +36,7 @@ func windowsFetch(repoPath string, remoteName string, branch string) *model.Fetc
 	} else {
 		logger.Log(fmt.Sprintf("Changes fetched from remote - %s -> %s", remoteName, cmdStr), global.StatusInfo)
 
-		msg := fmt.Sprintf("Changes fetched from %v", remoteName)
+		msg := fmt.Sprintf("Changes fetched from remote %v", remoteName)
 		return &model.FetchResult{
 			Status:       "CHANGES FETCHED FROM REMOTE",
 			FetchedItems: []*string{&msg},

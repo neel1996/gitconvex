@@ -71,6 +71,8 @@ func main() {
 		currentDir := filepath.Dir(execName)
 		buildPath = fmt.Sprintf("%s/gitconvex-ui", currentDir)
 		staticPath = fmt.Sprintf("%s/static", buildPath)
+	} else {
+		logger.Log("Unable to serve UI bundle", global.StatusError)
 	}
 
 	// Static file supplier for hosting the react static assets and scripts

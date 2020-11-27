@@ -6,6 +6,7 @@ import (
 	"go/types"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 type EnvConfig struct {
@@ -20,13 +21,13 @@ func localLogger(message string, status string) {
 
 // EnvConfigValidator checks if the env_config json file is present and accessible
 // If the file is missing or unable to access, then an error will be thrown
-
 func EnvConfigValidator() error {
-	cwd, wdErr := os.Getwd()
+	execName, execErr := os.Executable()
+	cwd := filepath.Dir(execName)
 
-	if wdErr != nil {
-		localLogger(wdErr.Error(), global.StatusError)
-		return wdErr
+	if execErr != nil {
+		localLogger(execErr.Error(), global.StatusError)
+		return execErr
 	}
 
 	fileString := cwd + "/env_config.json"
@@ -45,9 +46,15 @@ func EnvConfigValidator() error {
 }
 
 // EnvConfigFileReader reads the env_config json file and returns the config data as a struct
-
 func EnvConfigFileReader() *EnvConfig {
-	cwd, _ := os.Getwd()
+	execName, execErr := os.Executable()
+	cwd := filepath.Dir(execName)
+
+	if execErr != nil {
+		localLogger(execErr.Error(), global.StatusError)
+		return nil
+	}
+
 	fileString := cwd + "/env_config.json"
 	envFile, err := os.Open(fileString)
 
@@ -72,9 +79,15 @@ func EnvConfigFileReader() *EnvConfig {
 
 // EnvConfigFileGenerator will be invoked when the EnvConfigValidator returns an error or if EnvConfigFileReader returns no data
 // The function generates a new env_config.json file and populates it with the default config data
-
 func EnvConfigFileGenerator() error {
-	cwd, _ := os.Getwd()
+	execName, execErr := os.Executable()
+	cwd := filepath.Dir(execName)
+
+	if execErr != nil {
+		localLogger(execErr.Error(), global.StatusError)
+		return types.Error{Msg: execErr.Error()}
+	}
+
 	fileString := cwd + "/env_config.json"
 
 	envContent, _ := json.MarshalIndent(&EnvConfig{
