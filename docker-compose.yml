@@ -17,7 +17,7 @@ services:
       - http://localhost
       timeout: 10s
     hostname: gitconvex-container
-    image: itassistors/gitconvex
+    image: itassistors/gitconvex:2.0.0-beta
     labels:
       generated: by 8gwifi.org
     ports:

@@ -146,8 +146,6 @@ export default function AddRepoForm(props) {
                 action: DELETE_PRESENT_REPO,
                 payload: [],
               });
-
-              console.log(state.presentRepo);
             } else {
               setRepoAddFailed(true);
               setRepoAddSuccess(false);

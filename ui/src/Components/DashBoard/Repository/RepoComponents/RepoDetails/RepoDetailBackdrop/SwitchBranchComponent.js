@@ -24,8 +24,16 @@ export default function SwitchBranchComponent({
     })
       .then((res) => {
         if (res.data.data && !res.data.error) {
-          switchReloadView();
-          closeBackdrop(true);
+          const status = res.data.data.checkoutBranch;
+          console.log(status);
+          if (status === "CHECKOUT_FAILED") {
+            setBranchError(true);
+          } else {
+            switchReloadView();
+            closeBackdrop(true);
+          }
+        } else {
+          setBranchError(true);
         }
       })
       .catch((err) => {

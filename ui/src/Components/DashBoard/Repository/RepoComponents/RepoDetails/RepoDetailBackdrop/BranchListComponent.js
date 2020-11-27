@@ -16,6 +16,7 @@ export default function BranchListComponent({ repoId, currentBranch }) {
   const [errorBranch, setErrorBranch] = useState("");
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   function resetStates() {
     setListError(false);
@@ -31,6 +32,7 @@ export default function BranchListComponent({ repoId, currentBranch }) {
     const token = axios.CancelToken;
     const source = token.source();
 
+    setLoading(true);
     setBranchList([]);
 
     axios({
@@ -50,6 +52,8 @@ export default function BranchListComponent({ repoId, currentBranch }) {
       },
     })
       .then((res) => {
+        setLoading(false);
+
         if (res.data.data && !res.data.error) {
           let {
             gitAllBranchList,
@@ -75,6 +79,8 @@ export default function BranchListComponent({ repoId, currentBranch }) {
         }
       })
       .catch((err) => {
+        setLoading(false);
+
         if (err) {
           console.log("API error occurred : " + err);
           setListError(true);
@@ -86,6 +92,8 @@ export default function BranchListComponent({ repoId, currentBranch }) {
 
   function switchBranchHandler(branchName) {
     resetStates();
+    setLoading(true);
+    setBranchList([]);
     axios({
       url: globalAPIEndpoint,
       method: "POST",
@@ -98,6 +106,8 @@ export default function BranchListComponent({ repoId, currentBranch }) {
       },
     })
       .then((res) => {
+        setLoading(false);
+
         if (res.data.data && !res.data.error) {
           const checkoutStatus = res.data.data.checkoutBranch;
           if (checkoutStatus === "CHECKOUT_FAILED") {
@@ -115,6 +125,8 @@ export default function BranchListComponent({ repoId, currentBranch }) {
         }
       })
       .catch((err) => {
+        setLoading(false);
+
         if (err) {
           setSwitchError(true);
           setErrorBranch(branchName);
@@ -124,6 +136,7 @@ export default function BranchListComponent({ repoId, currentBranch }) {
 
   function deleteBranchHandler(branchName, forceFlag) {
     resetStates();
+    setLoading(true);
 
     axios({
       url: globalAPIEndpoint,
@@ -139,6 +152,8 @@ export default function BranchListComponent({ repoId, currentBranch }) {
       },
     })
       .then((res) => {
+        setLoading(false);
+
         if (res.data.data && !res.data.error) {
           if (res.data.data.deleteBranch.status === "BRANCH_DELETE_SUCCESS") {
             setDeleteSuccess(true);
@@ -150,6 +165,8 @@ export default function BranchListComponent({ repoId, currentBranch }) {
         }
       })
       .catch((err) => {
+        setLoading(false);
+
         if (err) {
           setDeleteError(true);
           setErrorBranch(branchName);
@@ -199,7 +216,7 @@ export default function BranchListComponent({ repoId, currentBranch }) {
         Click on a branch to checkout to that branch
       </div>
       <div className="branchlist--list-area" style={{ height: "400px" }}>
-        {branchList.length === 0 && !listError ? (
+        {loading ? (
           <div className="text-center font-sans font-light text-xl my-2 text-gray-600 border-b border-dotted">
             Collecting branch list...
           </div>
