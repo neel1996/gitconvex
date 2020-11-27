@@ -240,7 +240,13 @@ export default function PushComponent(props) {
             {unpushedCommits && unpushedCommits.length > 0 ? (
               <div className="git-ops--push--unpushed">
                 <div className="git-ops--push--unpushed--label">
-                  Commits to be pushed
+                  {unpushedCommits.length !== 0 ? (
+                    <span className="mx-1 border-b border-dashed border-gray-600">
+                      {unpushedCommits.length}
+                    </span>
+                  ) : null}
+                  {unpushedCommits.length === 1 ? "Commit " : "Commits "}
+                  to be pushed
                 </div>
                 <div className="overflow-auto" style={{ height: "200px" }}>
                   {unpushedCommits.map((commits, index) => {
