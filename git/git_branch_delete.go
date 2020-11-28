@@ -38,6 +38,6 @@ func DeleteBranch(repo *git.Repository, branchName string, forceFlag bool) *mode
 	}
 
 	return &model.BranchDeleteStatus{
-		Status: "BRANCH_DELETE_SUCCESS",
+		Status: global.BranchDeleteSuccess,
 	}
 }

@@ -35,14 +35,14 @@ func windowsPull(repoPath string, remoteName string, branch string) *model.PullR
 
 			msg := "No changes to pull from " + remoteName
 			return &model.PullResult{
-				Status:      "NEW CHANGES ABSENT",
+				Status:      global.PullNoNewChanges,
 				PulledItems: []*string{&msg},
 			}
 		}
 		msg := "New Items Pulled from remote " + remoteName
 		logger.Log(fmt.Sprintf("Changes pulled from remote -> %s", cmdStr), global.StatusInfo)
 		return &model.PullResult{
-			Status:      "PULL SUCCESS",
+			Status:      global.PullFromRemoteSuccess,
 			PulledItems: []*string{&msg},
 		}
 	}
@@ -105,7 +105,7 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 			logger.Log("Pull failed with error : "+pullErr.Error(), global.StatusWarning)
 			msg := "No changes to pull from " + remoteName
 			return &model.PullResult{
-				Status:      "NEW CHANGES ABSENT",
+				Status:      global.PullNoNewChanges,
 				PulledItems: []*string{&msg},
 			}
 		} else {
@@ -123,7 +123,7 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 		logger.Log("New items pulled from remote", global.StatusInfo)
 		msg := "New Items Pulled from remote " + remoteName
 		return &model.PullResult{
-			Status:      "PULL SUCCESS",
+			Status:      global.PullFromRemoteSuccess,
 			PulledItems: []*string{&msg},
 		}
 	}

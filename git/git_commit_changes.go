@@ -25,7 +25,7 @@ func windowsCommit(repoPath string, msg string) string {
 		return global.CommitChangeError
 	} else {
 		logger.Log(fmt.Sprintf("Changes committed to the repo -> %s", cmdStr), global.StatusInfo)
-		return "COMMIT_DONE"
+		return global.CommitChangeSuccess
 	}
 }
 
@@ -122,7 +122,7 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 			return global.CommitChangeError
 		} else {
 			logger.Log(fmt.Sprintf("Staged changes have been comitted - %s", hash.String()), global.StatusInfo)
-			return "COMMIT_DONE"
+			return global.CommitChangeSuccess
 		}
 	}
 }

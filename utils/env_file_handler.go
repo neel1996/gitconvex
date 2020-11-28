@@ -30,7 +30,7 @@ func EnvConfigValidator() error {
 		return execErr
 	}
 
-	fileString := cwd + "/env_config.json"
+	fileString := cwd + "/" + global.EnvFileName
 	_, openErr := os.Open(fileString)
 
 	if openErr != nil {
@@ -55,7 +55,7 @@ func EnvConfigFileReader() *EnvConfig {
 		return nil
 	}
 
-	fileString := cwd + "/env_config.json"
+	fileString := cwd + "/" + global.EnvFileName
 	envFile, err := os.Open(fileString)
 
 	var envConfig *EnvConfig
@@ -88,11 +88,11 @@ func EnvConfigFileGenerator() error {
 		return types.Error{Msg: execErr.Error()}
 	}
 
-	fileString := cwd + "/env_config.json"
+	fileString := cwd + "/" + global.EnvFileName
 
 	envContent, _ := json.MarshalIndent(&EnvConfig{
-		DataBaseFile: cwd + "/database/repo_datastore.json",
-		Port:         "9001",
+		DataBaseFile: cwd + "/" + global.DatabaseFilePath,
+		Port:         global.DefaultPort,
 	}, "", " ")
 
 	return ioutil.WriteFile(fileString, envContent, 0755)

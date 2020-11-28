@@ -18,8 +18,6 @@ import (
 	"strconv"
 )
 
-const defaultPort = "9001"
-
 var (
 	Port int
 )
@@ -100,7 +98,7 @@ func main() {
 		logger.Log(fmt.Sprintf("Setting port received from the command line -> %s", *argFlag), global.StatusInfo)
 		Port, portErr = strconv.Atoi(*argFlag)
 		if portErr != nil {
-			Port = 9001
+			Port, _ = strconv.Atoi(global.DefaultPort)
 		}
 	}
 
@@ -108,7 +106,7 @@ func main() {
 		logger.Log(fmt.Sprintf("Gitconvex started on  http://localhost:%v", Port), global.StatusInfo)
 		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(Port), cors.Default().Handler(router)))
 	} else {
-		logger.Log(fmt.Sprintf("Gitconvex started on  http://localhost:%v", defaultPort), global.StatusInfo)
-		log.Fatal(http.ListenAndServe(":"+defaultPort, cors.Default().Handler(router)))
+		logger.Log(fmt.Sprintf("Gitconvex started on  http://localhost:%v", global.DefaultPort), global.StatusInfo)
+		log.Fatal(http.ListenAndServe(":"+global.DefaultPort, cors.Default().Handler(router)))
 	}
 }

@@ -100,7 +100,7 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 		if fetchErr.Error() == "already up-to-date" {
 			logger.Log(fetchErr.Error(), global.StatusWarning)
 			return &model.FetchResult{
-				Status:       "NEW CHANGES ABSENT",
+				Status:       global.FetchNoNewChanges,
 				FetchedItems: nil,
 			}
 		} else {
@@ -121,7 +121,7 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 
 		msg := fmt.Sprintf("Changes fetched from remote %v", remoteName)
 		return &model.FetchResult{
-			Status:       "CHANGES FETCHED FROM REMOTE",
+			Status:       global.FetchFromRemoteSuccess,
 			FetchedItems: []*string{&msg},
 		}
 	}

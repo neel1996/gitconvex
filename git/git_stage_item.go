@@ -29,7 +29,7 @@ func StageItem(repo *git.Repository, fileItem string) string {
 			return addError(fileItem, cmdErr.Error())
 		} else {
 			logger.Log(fmt.Sprintf("File -> %s staged \n%s", fileItem, cmdString), global.StatusInfo)
-			return "ADD_ITEM_SUCCESS"
+			return global.StageItemSuccess
 		}
 	}
 }

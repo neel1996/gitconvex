@@ -27,7 +27,7 @@ func StageAllItems(repo *git.Repository) string {
 			return global.StageAllItemsError
 		} else {
 			logger.Log(fmt.Sprintf("All changes staged -> %s", cmdStr), global.StatusInfo)
-			return "ALL_STAGED"
+			return global.StageAllSuccess
 		}
 	}
 }

@@ -26,6 +26,6 @@ func AddBranch(repo *git.Repository, branchName string) string {
 		}
 
 		logger.Log(fmt.Sprintf("Added new branch - %s to the repo", branchName), global.StatusInfo)
-		return "BRANCH_CREATION_SUCCESS"
+		return global.BranchAddSuccess
 	}
 }

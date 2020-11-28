@@ -37,7 +37,7 @@ func UpdatePortNumber(newPort string) string {
 		newEnvData.DataBaseFile = envData.DataBaseFile
 
 		cwd, _ := os.Getwd()
-		fileString := cwd + "/env_config.json"
+		fileString := cwd + "/" + global.EnvFileName
 		envContent, _ := json.MarshalIndent(&newEnvData, "", " ")
 		writeErr := ioutil.WriteFile(fileString, envContent, 0755)
 
@@ -45,7 +45,7 @@ func UpdatePortNumber(newPort string) string {
 			logger.Log(writeErr.Error(), global.StatusError)
 			return global.PortUpdateError
 		} else {
-			return "PORT_UPDATED"
+			return global.PortUpdateSuccess
 		}
 	} else {
 		return global.PortUpdateError
@@ -62,7 +62,7 @@ func UpdateDBFilePath(newFilePath string) string {
 		newEnvData.DataBaseFile = newFilePath
 
 		cwd, _ := os.Getwd()
-		fileString := cwd + "/env_config.json"
+		fileString := cwd + "/" + global.EnvFileName
 		envContent, _ := json.MarshalIndent(&newEnvData, "", " ")
 		writeErr := ioutil.WriteFile(fileString, envContent, 0755)
 
@@ -70,7 +70,7 @@ func UpdateDBFilePath(newFilePath string) string {
 			logger.Log(writeErr.Error(), global.StatusError)
 			return global.DataFileUpdateError
 		} else {
-			return "DATAFILE_UPDATE_SUCCESS"
+			return global.DataFileUpdateSuccess
 		}
 	} else {
 		return global.DataFileUpdateError
@@ -122,7 +122,7 @@ func DeleteRepo(repoId string) *model.DeleteStatus {
 				return reportError(repoId, "Failed to update DB file", err.Error())
 			}
 			return &model.DeleteStatus{
-				Status: "DELETE_SUCCESS",
+				Status: global.RepoDeleteSuccess,
 				RepoID: repoId,
 			}
 		} else {

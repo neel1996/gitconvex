@@ -16,7 +16,7 @@ func AddRemote(repo *git.Repository, remoteName string, remoteURL string) string
 
 	if err == nil {
 		logger.Log("Remoted addition completed for"+remote.String(), global.StatusInfo)
-		return "REMOTE_ADD_SUCCESS"
+		return global.RemoteAddSuccess
 	} else {
 		logger.Log("Remote addition Failed!", global.StatusError)
 		return global.RemoteAddError

@@ -16,7 +16,7 @@ func ResetAllItems(repo *git.Repository) string {
 
 	if wErr != nil {
 		logger.Log(fmt.Sprintf("Error occurred while fetching repo worktree -> %s", wErr.Error()), global.StatusError)
-		return "STAGE_ALL_REMOVE_FAILED"
+		return global.RemoveAllItemsError
 	} else {
 		logger.Log("Proceeding with removing all changes", global.StatusInfo)
 		err := w.Reset(&git.ResetOptions{
@@ -34,11 +34,11 @@ func ResetAllItems(repo *git.Repository) string {
 				return global.RemoveAllItemsError
 			} else {
 				logger.Log("All staged items have been removed from staging area -> "+string(removeMsg), global.StatusInfo)
-				return "STAGE_ALL_REMOVE_SUCCESS"
+				return global.ResetAllSuccess
 			}
 		} else {
 			logger.Log("All staged items have been removed from staging area", global.StatusInfo)
-			return "STAGE_ALL_REMOVE_SUCCESS"
+			return global.ResetAllSuccess
 		}
 	}
 

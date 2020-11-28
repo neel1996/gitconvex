@@ -27,7 +27,7 @@ func RemoveItem(repoPath string, fileItem string) string {
 			return removeErr(fileItem, err.Error())
 		} else {
 			logger.Log(fmt.Sprintf("Staged item -> %s removed from the staging area\n%s", fileItem, string(removeMsg)), global.StatusInfo)
-			return "STAGE_REMOVE_SUCCESS"
+			return global.RemoveItemSuccess
 		}
 	}
 }

@@ -25,7 +25,7 @@ func windowsPush(repoPath string, remoteName string, branch string) string {
 		return global.PushToRemoteError
 	} else {
 		logger.Log(fmt.Sprintf("Changes pushed to remote -> %s", cmdStr), global.StatusInfo)
-		return "PUSH_SUCCESS"
+		return global.PushToRemoteSuccess
 	}
 }
 
@@ -73,6 +73,6 @@ func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) 
 		return global.PushToRemoteError
 	} else {
 		logger.Log(fmt.Sprintf("commits pushed to remote -> %s : %s\n%v", remoteName, targetRefPsec, b.String()), global.StatusInfo)
-		return "PUSH_SUCCESS"
+		return global.PushToRemoteSuccess
 	}
 }
