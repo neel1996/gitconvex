@@ -47,7 +47,7 @@ export default function RepoRightPaneComponent(props) {
                   {gitBranchList &&
                     gitCurrentBranch &&
                     gitBranchList
-                      .slice(0, 3)
+                      .slice(0, 2)
                       .map((entry) => {
                         if (entry) {
                           if (entry !== gitCurrentBranch) {
