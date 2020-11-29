@@ -11,7 +11,6 @@ import (
 	"github.com/neel1996/gitconvex-server/graph/model"
 	"github.com/neel1996/gitconvex-server/utils"
 	"io"
-	"strings"
 )
 
 // windowsFetch is used for fetching changes using the git client if the platform is windows
@@ -21,7 +20,8 @@ func windowsFetch(repoPath string, remoteName string, branch string) *model.Fetc
 	if remoteName == "" && branch == "" {
 		args = []string{"fetch"}
 	} else {
-		args = []string{"fetch", remoteName, branch}
+		branchReference := branch + ":" + branch
+		args = []string{"fetch", remoteName, branchReference}
 	}
 	cmd := utils.GetGitClient(repoPath, args)
 	cmdStr, cmdErr := cmd.Output()
@@ -34,7 +34,7 @@ func windowsFetch(repoPath string, remoteName string, branch string) *model.Fetc
 			FetchedItems: nil,
 		}
 	} else {
-		logger.Log(fmt.Sprintf("Changes fetched from remote - %s -> %s", remoteName, cmdStr), global.StatusInfo)
+		logger.Log(fmt.Sprintf("Changes fetched from remote - %s\n%s", remoteName, cmdStr), global.StatusInfo)
 
 		msg := fmt.Sprintf("Changes fetched from remote %v", remoteName)
 		return &model.FetchResult{
@@ -104,15 +104,9 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 				FetchedItems: nil,
 			}
 		} else {
-			if strings.Contains(fetchErr.Error(), "ssh: handshake failed: ssh:") {
-				logger.Log("Fetch failed. Retrying fetch with git client", global.StatusWarning)
-				return windowsFetch(w.Filesystem.Root(), remoteName, remoteBranch)
-			}
 			logger.Log(fetchErr.Error(), global.StatusError)
-			return &model.FetchResult{
-				Status:       global.FetchFromRemoteError,
-				FetchedItems: nil,
-			}
+			logger.Log("Fetch failed. Retrying fetch with git client", global.StatusWarning)
+			return windowsFetch(w.Filesystem.Root(), remoteName, remoteBranch)
 		}
 
 	} else {

@@ -37,13 +37,12 @@ func RemoteData(repo *git.Repository, remoteChan chan RemoteDataModel) {
 		var rUrl []*string
 		for _, i := range remote {
 			for _, tempUrl := range i.Config().URLs {
+				logger.Log(fmt.Sprintf("Available remotes in repo : \n%v", tempUrl), global.StatusInfo)
 				rUrl = append(rUrl, &tempUrl)
 			}
 		}
 		return rUrl
 	}()
-
-	logger.Log(fmt.Sprintf("Available remotes in repo : \n%v", remoteURL), global.StatusInfo)
 
 	if len(remoteURL) == 0 {
 		nilRemote := "No Remote Host Available"
