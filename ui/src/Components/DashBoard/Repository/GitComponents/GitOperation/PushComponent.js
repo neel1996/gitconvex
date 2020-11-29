@@ -310,8 +310,8 @@ export default function PushComponent(props) {
           </div>
         </>
       ) : (
-        <div className="git-ops--push--success">
-          <div className="git-ops--commit--alert--success">
+        <div className="w-11/12 mx-auto my-auto p-6 bg-white rounded">
+          <div className="p-6 border-b-4 border-dashed bg-green-200 border-green-500 text-center rounded-lg shadow font-sans text-green-500 text-2xl font-semibold">
             Changes have been pushed to remote
           </div>
         </div>
