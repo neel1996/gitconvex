@@ -2,6 +2,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import firebase from "firebase/app";
 import "firebase/database";
 import React, { useEffect, useState } from "react";
@@ -73,38 +74,30 @@ export default function Help() {
     setShowUpdatePane(true);
     setLoading(true);
 
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-    const firebaseConfig = {
-      apiKey: "AIzaSyB8KGsL5Fom0EvM3bsZYj4m08Dp7sqiLCY",
-      authDomain: "gitconvex.firebaseapp.com",
-      databaseURL: "https://gitconvex.firebaseio.com",
-      projectId: "gitconvex",
-      storageBucket: "gitconvex.appspot.com",
-      messagingSenderId: "719815446646",
-      appId: "1:719815446646:web:53d2d2627eb549b7120f57",
-      measurementId: "G-ZJ3KLZT0EF",
-    };
+    const firebaseEndpoint =
+      "https://us-central1-gitconvex.cloudfunctions.net/gitconvexVersion";
 
-    if (firebase.apps[0] && firebase.apps[0].name === "update-app") {
-      firebase.apps[0].delete();
-      return;
-    }
+    axios({
+      url: firebaseEndpoint,
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((res) => {
+        const { version } = res.data;
+        setLoading(false);
 
-    const app = firebase.initializeApp(firebaseConfig, "update-app");
-    const db = app.database();
-    const ref = db.ref("/");
-
-    ref.on("value", (val) => {
-      const { version } = val.val();
-      setLoading(false);
-
-      if (currentVersion === version) {
-        setIsLatest(true);
-        setAvailableUpdate("");
-      } else {
-        setAvailableUpdate(version);
-      }
-    });
+        if (currentVersion === version) {
+          setIsLatest(true);
+          setAvailableUpdate("");
+        } else {
+          setAvailableUpdate(version);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   return (

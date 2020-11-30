@@ -7,7 +7,7 @@ export default function StageComponent(props) {
   const { stageComponents, repoId } = props;
 
   const [allStaged, setAllStaged] = useState(false);
-  const [loading, setLodaing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [errorInd, setErrorInd] = useState(false);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export default function StageComponent(props) {
   }, [props]);
 
   function stageAllChanges() {
-    setLodaing(true);
+    setLoading(true);
     axios({
       url: globalAPIEndpoint,
       method: "POST",
@@ -30,7 +30,7 @@ export default function StageComponent(props) {
       },
     })
       .then((res) => {
-        setLodaing(false);
+        setLoading(false);
         if (res.data.data && !res.data.error) {
           if (res.data.data.stageAllItems === "ALL_STAGED") {
             setAllStaged(true);
@@ -39,7 +39,7 @@ export default function StageComponent(props) {
       })
       .catch((err) => {
         console.log(err);
-        setLodaing(false);
+        setLoading(false);
         setErrorInd(true);
       });
   }

@@ -429,6 +429,8 @@ export default function GitOperationComponent(props) {
             className="git-ops--backdrop--close"
             onClick={() => {
               setAction("");
+              const localReload = viewReload + 1;
+              setViewReload(localReload);
             }}
           >
             X

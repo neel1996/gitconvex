@@ -13,12 +13,13 @@ RUN cd ui/ && \
     export NODE_ENV=production && \
     npx tailwindcss build -o src/index.css -c src/tailwind.config.js && \
     npm run build && \
-    mv ./build ../ 
+    mv build/ gitconvex-ui/ && \
+    mv gitconvex-ui/ ../ 
 
 RUN cd /opt/workroom/gitconvex && \
     mkdir dist/ && \
     go build -o ./dist/ && \
-    mv build/ dist/ 
+    mv gitconvex-ui/ dist/ 
 
 EXPOSE 9001
 
