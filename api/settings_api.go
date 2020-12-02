@@ -8,6 +8,7 @@ import (
 	"github.com/neel1996/gitconvex-server/utils"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 var logger global.Logger
@@ -36,7 +37,14 @@ func UpdatePortNumber(newPort string) string {
 		newEnvData.Port = newPort
 		newEnvData.DataBaseFile = envData.DataBaseFile
 
-		cwd, _ := os.Getwd()
+		execName, execErr := os.Executable()
+		if execErr != nil {
+			logger.Log(execErr.Error(), global.StatusError)
+			return global.PortUpdateError
+		}
+
+		cwd := filepath.Dir(execName)
+
 		fileString := cwd + "/" + global.EnvFileName
 		envContent, _ := json.MarshalIndent(&newEnvData, "", " ")
 		writeErr := ioutil.WriteFile(fileString, envContent, 0755)
@@ -61,7 +69,14 @@ func UpdateDBFilePath(newFilePath string) string {
 		newEnvData.Port = envData.Port
 		newEnvData.DataBaseFile = newFilePath
 
-		cwd, _ := os.Getwd()
+		execName, execErr := os.Executable()
+		if execErr != nil {
+			logger.Log(execErr.Error(), global.StatusError)
+			return global.DataFileUpdateError
+		}
+
+		cwd := filepath.Dir(execName)
+
 		fileString := cwd + "/" + global.EnvFileName
 		envContent, _ := json.MarshalIndent(&newEnvData, "", " ")
 		writeErr := ioutil.WriteFile(fileString, envContent, 0755)

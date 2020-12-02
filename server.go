@@ -73,6 +73,18 @@ func main() {
 		logger.Log("Unable to serve UI bundle", global.StatusError)
 	}
 
+	// Setting the server to use the UI bundle from the current directory if the bundle is unavailable in the executable directory
+	// Resolved UI file server issue when running docker containers
+	_, uiOpenErr := os.Open(buildPath)
+	if uiOpenErr != nil {
+		logger.Log(uiOpenErr.Error(), global.StatusError)
+		cwd, _ := os.Getwd()
+		if cwd != "" {
+			logger.Log("Using UI bundle from the current directory -> "+cwd, global.StatusInfo)
+			buildPath = fmt.Sprintf("%s/gitconvex-ui", cwd)
+		}
+	}
+
 	// Static file supplier for hosting the react static assets and scripts
 	logger.Log(fmt.Sprintf("Serving static files from -> %s", staticPath), global.StatusInfo)
 	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(staticPath))))
