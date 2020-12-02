@@ -82,6 +82,7 @@ func main() {
 		if cwd != "" {
 			logger.Log("Using UI bundle from the current directory -> "+cwd, global.StatusInfo)
 			buildPath = fmt.Sprintf("%s/gitconvex-ui", cwd)
+			staticPath = fmt.Sprintf("%s/static", buildPath)
 		}
 	}
 
