@@ -255,8 +255,11 @@ export default function GitTrackedComponent(props) {
               <div
                 className={`git-tracked--menu-default ${styleSelector}`}
                 key={item}
-                onClick={(event) => {
+                onClick={() => {
                   setTopMenuItemState(item);
+                  // Resetting branch error in top bar component to prevent the error banner from getting displayed after \
+                  // switching the menu
+                  props.resetBranchError();
                 }}
               >
                 {item}

@@ -212,7 +212,7 @@ export default function Settings(props) {
         ) : null}
 
         {deleteRepoStatus === "loading" ? (
-          <div className="cursor-pointer mx-auto my-4 text-center p-3 text-white rounded shadow bg-gray-400 hover:bg-gray-500 text-white text-xl">
+          <div className="cursor-pointer mx-auto my-4 text-center p-3 rounded shadow bg-gray-400 hover:bg-gray-500 text-white text-xl">
             Deletion in progress
           </div>
         ) : null}

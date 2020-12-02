@@ -30,7 +30,12 @@ export default function RepositoryAction() {
   const memoizedGitTracker = useMemo(() => {
     if (defaultRepo && defaultRepo.id) {
       return (
-        <GitTrackedComponent repoId={defaultRepo.id}></GitTrackedComponent>
+        <GitTrackedComponent
+          repoId={defaultRepo.id}
+          resetBranchError={() => {
+            setBranchError(false);
+          }}
+        ></GitTrackedComponent>
       );
     }
   }, [defaultRepo]);
@@ -176,7 +181,11 @@ export default function RepositoryAction() {
           <select
             className="top-pane--select bg-green-100 text-green-700 border-green-400"
             defaultValue={"checked"}
+            onClick={() => {
+              setBranchError(false);
+            }}
             onChange={(event) => {
+              setActiveBranch("...");
               if (event.currentTarget.value !== defaultRepo.repoName) {
                 setSelectedRepoDetails({
                   ...selectedRepoDetails,
@@ -211,18 +220,22 @@ export default function RepositoryAction() {
           <div className="flex items-center">
             <div className="select--label">Branch</div>
             <select
-              className="top-pane--select bg-indigo-100 border-indigo-400 text-indigo-700 "
               value={activeBranch}
+              defaultChecked={activeBranch}
+              className="top-pane--select bg-indigo-100 border-indigo-400 text-indigo-700"
               disabled={activeBranch ? false : true}
               onChange={(event) => {
                 event.persist();
-                setActiveBranch("");
+                setActiveBranch("...");
                 setTrackingBranch(event.target.value, event);
               }}
               onClick={() => {
                 setBranchError(false);
               }}
             >
+              <option key={activeBranch} value={activeBranch}>
+                {activeBranch}
+              </option>
               {availableBranch()}
             </select>
           </div>
@@ -249,7 +262,7 @@ export default function RepositoryAction() {
       const { gitBranchList } = selectedRepoDetails;
 
       return gitBranchList.map((branch, index) => {
-        if (branch !== "NO_BRANCH") {
+        if (branch !== "NO_BRANCH" && branch !== activeBranch) {
           return (
             <option key={branch} value={branch}>
               {branch}
