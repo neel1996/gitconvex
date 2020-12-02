@@ -105,13 +105,11 @@ export default function Settings(props) {
         })
           .then((res) => {
             if (res.data.data && !res.data.error) {
-              //DATAFILE_UPDATE_SUCCESS
               const updateStatus = res.data.data.updateRepoDataFile;
 
               if (updateStatus === "DATAFILE_UPDATE_SUCCESS") {
                 setDbUpdateFailed(false);
                 setViewReload(localViewReload);
-                window.location.reload();
               } else {
                 setDbUpdateFailed(true);
                 setViewReload(localViewReload);
@@ -289,9 +287,9 @@ export default function Settings(props) {
           Saved Repos
         </div>
         <>
-          {repoDetails && repoDetails.repoId ? (
+          {repoDetails && repoDetails.repoId && repoDetails.repoId.length ? (
             <>
-              <div className="flex my-4 bg-indigo-500 my-1 w-full rounded text-white bg-white shadow p-3 font-sand text-xl font-semibold">
+              <div className="flex my-4 bg-indigo-500 w-full rounded text-white shadow p-3 font-sand text-xl font-semibold">
                 <div className="w-1/2 border-r text-center">Repo ID</div>
                 <div className="w-1/2 border-r text-center">Repo Name</div>
                 <div className="w-1/2 border-r text-center">Repo Path</div>

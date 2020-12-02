@@ -1,6 +1,6 @@
 FROM golang:1.15.5-alpine
 
-WORKDIR /opt/workroom/gitconvex
+WORKDIR /go/src/github.com/neel1996/gitconvex-server
 
 COPY . .
 
@@ -14,13 +14,8 @@ RUN cd ui/ && \
     npx tailwindcss build -o src/index.css -c src/tailwind.config.js && \
     npm run build && \
     mv build/ gitconvex-ui/ && \
-    mv gitconvex-ui/ ../ 
-
-RUN cd /opt/workroom/gitconvex && \
-    mkdir dist/ && \
-    go build -o ./dist/ && \
-    mv gitconvex-ui/ dist/ 
+    mv gitconvex-ui/ ../  
 
 EXPOSE 9001
 
-CMD go run /opt/workroom/gitconvex/dist/gitconvex-server
+CMD go run /go/src/github.com/neel1996/gitconvex-server/server.go
