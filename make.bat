@@ -54,5 +54,5 @@ if "%ip%"==%RUN% (
 )
 
 if "%ip%"==%START% (
-	.\dist\gitconvex-server.exe
+	.\dist\gitconvex.exe
 )

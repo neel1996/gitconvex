@@ -42,4 +42,4 @@ build:
 test:
 	go test -v ./...
 start:
-	./dist/gitconvex-server
+	./dist/gitconvex
