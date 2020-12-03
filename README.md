@@ -108,6 +108,11 @@ operable program or batch file.
 
 This can be fixed by adding `git` to the PATH environment variable in windows. The process of setting this up is available [here](https://stackoverflow.com/questions/26620312/git-installing-git-in-path-with-github-client-for-windows#answer-53706956:~:text=comment-,27,Here%20is%20the%20magic)
 
+> **🍎 Important note for MacOS users**
+
+The pre-built bundle for MacOS is not a verfieid or signed bundle. So gatekeeper could warn your or even prevent you from using gitconvex on you Mac devices. If this is the case then I recommend building the application from scratch using the `Makefile` included in the repo. Follow **Option - 1** mentioned above to build the application from scratch.
+
+**Reason** - Enrolling in the apple developer program for making the application a verfied one will cost me 100 USD anually. So I will do it once the project gets enough reach 
 
 # Detailed documentation
 
@@ -140,4 +145,5 @@ For reporting issues or for requesting any feature use the following medium,
 # License
 
 See [LICENSE ](LICENSE) info for more
+
 
