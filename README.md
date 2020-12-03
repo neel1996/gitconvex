@@ -110,7 +110,7 @@ This can be fixed by adding `git` to the PATH environment variable in windows. T
 
 > **🍎 Important note for MacOS users**
 
-The pre-built bundle for MacOS is not a verfieid or signed bundle. So gatekeeper could warn your or even prevent you from using gitconvex on you Mac devices. If this is the case then I recommend building the application from scratch using the `Makefile` included in the repo. Follow **Option - 1** mentioned above to build the application from scratch.
+The pre-built bundle for MacOS is not a verfieid or signed bundle. So gatekeeper could warn you or even prevent you from using gitconvex on your Mac devices. If this is the case then I recommend building the application from scratch using the `Makefile` included in the repo. Follow **[Option - 1](#download-options)** mentioned above to build the application from scratch.
 
 **Reason** - Enrolling in the apple developer program for making the application a verfied one will cost me 100 USD anually. So I will do it once the project gets enough reach 
 
