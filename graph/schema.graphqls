@@ -48,7 +48,6 @@ type gitCommits {
     author: String
     commitTime: String
     commitMessage: String
-    commitRelativeTime: String
     commitFilesCount: Int
 }
 

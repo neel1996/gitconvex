@@ -146,4 +146,3 @@ For reporting issues or for requesting any feature use the following medium,
 
 See [LICENSE ](LICENSE) info for more
 
-

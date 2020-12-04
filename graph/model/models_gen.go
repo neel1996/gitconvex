@@ -87,12 +87,11 @@ type GitCommitLogResults struct {
 }
 
 type GitCommits struct {
-	Hash               *string `json:"hash"`
-	Author             *string `json:"author"`
-	CommitTime         *string `json:"commitTime"`
-	CommitMessage      *string `json:"commitMessage"`
-	CommitRelativeTime *string `json:"commitRelativeTime"`
-	CommitFilesCount   *int    `json:"commitFilesCount"`
+	Hash             *string `json:"hash"`
+	Author           *string `json:"author"`
+	CommitTime       *string `json:"commitTime"`
+	CommitMessage    *string `json:"commitMessage"`
+	CommitFilesCount *int    `json:"commitFilesCount"`
 }
 
 type SettingsDataResults struct {

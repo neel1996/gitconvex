@@ -164,12 +164,11 @@ type ComplexityRoot struct {
 	}
 
 	GitCommits struct {
-		Author             func(childComplexity int) int
-		CommitFilesCount   func(childComplexity int) int
-		CommitMessage      func(childComplexity int) int
-		CommitRelativeTime func(childComplexity int) int
-		CommitTime         func(childComplexity int) int
-		Hash               func(childComplexity int) int
+		Author           func(childComplexity int) int
+		CommitFilesCount func(childComplexity int) int
+		CommitMessage    func(childComplexity int) int
+		CommitTime       func(childComplexity int) int
+		Hash             func(childComplexity int) int
 	}
 
 	SettingsDataResults struct {
@@ -867,13 +866,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GitCommits.CommitMessage(childComplexity), true
 
-	case "gitCommits.commitRelativeTime":
-		if e.complexity.GitCommits.CommitRelativeTime == nil {
-			break
-		}
-
-		return e.complexity.GitCommits.CommitRelativeTime(childComplexity), true
-
 	case "gitCommits.commitTime":
 		if e.complexity.GitCommits.CommitTime == nil {
 			break
@@ -1016,7 +1008,6 @@ type gitCommits {
     author: String
     commitTime: String
     commitMessage: String
-    commitRelativeTime: String
     commitFilesCount: Int
 }
 
@@ -5738,38 +5729,6 @@ func (ec *executionContext) _gitCommits_commitMessage(ctx context.Context, field
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _gitCommits_commitRelativeTime(ctx context.Context, field graphql.CollectedField, obj *model.GitCommits) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "gitCommits",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CommitRelativeTime, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _gitCommits_commitFilesCount(ctx context.Context, field graphql.CollectedField, obj *model.GitCommits) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6968,8 +6927,6 @@ func (ec *executionContext) _gitCommits(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = ec._gitCommits_commitTime(ctx, field, obj)
 		case "commitMessage":
 			out.Values[i] = ec._gitCommits_commitMessage(ctx, field, obj)
-		case "commitRelativeTime":
-			out.Values[i] = ec._gitCommits_commitRelativeTime(ctx, field, obj)
 		case "commitFilesCount":
 			out.Values[i] = ec._gitCommits_commitFilesCount(ctx, field, obj)
 		default:

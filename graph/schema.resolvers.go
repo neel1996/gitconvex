@@ -5,15 +5,13 @@ package graph
 
 import (
 	"context"
-	"github.com/neel1996/gitconvex-server/global"
 
 	"github.com/neel1996/gitconvex-server/api"
 	"github.com/neel1996/gitconvex-server/git"
+	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/generated"
 	"github.com/neel1996/gitconvex-server/graph/model"
 )
-
-var logger global.Logger
 
 func (r *mutationResolver) AddRepo(ctx context.Context, repoName string, repoPath string, cloneSwitch bool, repoURL *string, initSwitch bool, authOption string, userName *string, password *string) (*model.AddRepoParams, error) {
 	return api.AddRepo(model.NewRepoInputs{
@@ -304,7 +302,6 @@ func (r *queryResolver) SearchCommitLogs(ctx context.Context, repoID string, sea
 				Author:             nil,
 				CommitTime:         nil,
 				CommitMessage:      nil,
-				CommitRelativeTime: nil,
 				CommitFilesCount:   nil,
 			},
 		}, nil
@@ -430,3 +427,11 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+var logger global.Logger

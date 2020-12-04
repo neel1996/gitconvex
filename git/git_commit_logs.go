@@ -7,9 +7,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
-	"github.com/nleeper/goment"
 	"go/types"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -26,7 +24,6 @@ func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 			commitFilesItr, err := commit.Files()
 			commitFileCount := 0
 			commitDate := ""
-			commitRelativeTime := ""
 
 			logger.Log(fmt.Sprintf("Fetching commit details for -> %s", commitHash), global.StatusInfo)
 
@@ -61,47 +58,6 @@ func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 						logger.Log(convErr.Error(), global.StatusError)
 					} else {
 						commitDate = cTime.String()
-						gTime, gTimeErr := goment.New(cTime)
-						if gTimeErr != nil {
-							logger.Log(gTimeErr.Error(), global.StatusError)
-						} else {
-							commitRelativeTime = gTime.FromNow()
-
-							// Conditional logic to find time diff to bypass goment bug
-							if strings.Contains(commitRelativeTime, "in") {
-								aTime := time.Now().String()
-
-								a, _ := time.Parse("2006-01-02 15:04:05", aTime[:19])
-								b, _ := time.Parse("2006-01-02 15:04:05", cTime.String()[:19])
-								diff := a.Sub(b)
-
-								h := diff.Hours()
-								m := diff.Minutes()
-								s := diff.Seconds()
-
-								if h != float64(0) {
-									hStr := strconv.Itoa(int(h))
-									if hStr == "1" {
-										commitRelativeTime = hStr + " hour ago"
-									} else {
-										commitRelativeTime = hStr + " hours ago"
-									}
-								} else {
-									if m != float64(0) {
-										mStr := strconv.Itoa(int(m))
-										commitRelativeTime = mStr + " minutes ago"
-									} else {
-										if s != float64(0) {
-											sStr := strconv.Itoa(int(s))
-											commitRelativeTime = sStr + " seconds ago"
-										} else {
-											commitRelativeTime = "recent commit"
-
-										}
-									}
-								}
-							}
-						}
 					}
 				}
 			}
@@ -115,12 +71,11 @@ func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 			}
 
 			commitList = append(commitList, &model.GitCommits{
-				Hash:               &commitHash,
-				Author:             &commitAuthor,
-				CommitTime:         &commitDate,
-				CommitMessage:      &commitMessage,
-				CommitRelativeTime: &commitRelativeTime,
-				CommitFilesCount:   &commitFileCount,
+				Hash:             &commitHash,
+				Author:           &commitAuthor,
+				CommitTime:       &commitDate,
+				CommitMessage:    &commitMessage,
+				CommitFilesCount: &commitFileCount,
 			})
 		}
 	}
