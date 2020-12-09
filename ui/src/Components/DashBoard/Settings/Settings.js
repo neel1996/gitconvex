@@ -365,7 +365,6 @@ export default function Settings(props) {
           .then((res) => {
             const { settingsEditPort } = res.data.data;
             if (settingsEditPort === "PORT_UPDATED") {
-              console.log("Port updated!");
               window.location.reload();
             } else {
               portUpdateFailed(true);

@@ -74,7 +74,6 @@ export default function AddBranchComponent(props) {
           className="addbranch--btn"
           onClick={(event) => {
             if (branchName) {
-              console.log(branchName);
               addBranchClickHandler();
             } else {
               setBranchAddStatus("BRANCH_ADD_FAILED");

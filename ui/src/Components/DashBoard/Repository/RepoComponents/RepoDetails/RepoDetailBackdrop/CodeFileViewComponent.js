@@ -50,8 +50,6 @@ export default function CodeFileViewComponent(props) {
           let lang = l.withFileName(fileItem);
           let prism;
 
-          console.log(lang);
-
           if (lang.prismIndicator === "" || !lang.prismIndicator) {
             prism = "go";
           } else {

@@ -18,7 +18,6 @@ export default function BranchCommitLogChanges(props) {
 
     if (compareBranch === baseBranch) {
       setLoading(false);
-      console.log("Same");
       return;
     }
 
