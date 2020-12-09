@@ -2,6 +2,7 @@ import React from "react";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { relativeCommitTimeCalculator } from "../../../../util/relativeCommitTimeCalculator";
 
 export default function CommitLogCardComponent(props) {
   library.add(fas);
@@ -35,7 +36,7 @@ export default function CommitLogCardComponent(props) {
           #{item.hash.substring(0, 7)}
         </div>
         <div className="my-2 shadow border rounded text-sm p-2 bg-orange-100 font-sans font-semibold">
-          {item.commitRelativeTime}
+          {relativeCommitTimeCalculator(item.commitTime)}
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@ export default function CommitCompareComponent(props) {
   const [compareCommit, setCompareCommit] = useState("");
   const [errState, setErrState] = useState(false);
   const [referenceCommit, setReferenceCommit] = useState("");
+  const [loadingCommits, setLoadingCommits] = useState(false);
 
   const memoizedCommitFileDifference = useMemo(() => {
     return (
@@ -28,6 +29,7 @@ export default function CommitCompareComponent(props) {
   }, [props.repoId, baseCommit, compareCommit]);
 
   useEffect(() => {
+    setLoadingCommits(true);
     setErrState(false);
     axios({
       url: globalAPIEndpoint,
@@ -43,7 +45,6 @@ export default function CommitCompareComponent(props) {
                         hash
                         author
                         commitMessage
-                        commitRelativeTime
                         commitFilesCount
                     }  
                 }
@@ -52,6 +53,7 @@ export default function CommitCompareComponent(props) {
       },
     })
       .then((res) => {
+        setLoadingCommits(false);
         if (res.data.data) {
           const { commits, totalCommits } = res.data.data.gitCommitLogs;
           if (totalCommits === 0 || totalCommits == null) {
@@ -70,6 +72,7 @@ export default function CommitCompareComponent(props) {
         }
       })
       .catch((err) => {
+        setLoadingCommits(false);
         console.log(err);
         setErrState(true);
       });
@@ -90,16 +93,19 @@ export default function CommitCompareComponent(props) {
           })}
         {totalCommitCount > commitData.length ? (
           <div
-            className="p-3 border cursor-pointer hover:bg-gray-100 text-center font-sans font-semibold"
+            className={`p-3 border cursor-pointer hover:bg-gray-100 text-center font-sans ${
+              loadingCommits ? "text-gray-500" : "text-gray-800"
+            } font-semibold`}
             onClick={() => {
-              const len = commitData.length;
-
-              if (len >= 1) {
-                setReferenceCommit(commitData[len - 1].hash);
+              if (!loadingCommits) {
+                const len = commitData.length;
+                if (len >= 1) {
+                  setReferenceCommit(commitData[len - 1].hash);
+                }
               }
             }}
           >
-            Load More commits
+            {loadingCommits ? "Loading more commits..." : "Load More commits"}
           </div>
         ) : null}
       </>
