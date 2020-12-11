@@ -74,25 +74,25 @@ export default function Help() {
     setShowUpdatePane(true);
     setLoading(true);
 
-    const firebaseEndpoint =
-      "https://us-central1-gitconvex.cloudfunctions.net/gitconvexVersion";
+    const githubEndpoint =
+      "https://api.github.com/repos/neel1996/gitconvex/releases/latest";
 
     axios({
-      url: firebaseEndpoint,
+      url: githubEndpoint,
       method: "GET",
       headers: {
         Accept: "application/json",
       },
     })
       .then((res) => {
-        const { version } = res.data;
+        const { tag_name } = res.data;
         setLoading(false);
 
-        if (currentVersion === version) {
+        if (currentVersion === tag_name) {
           setIsLatest(true);
           setAvailableUpdate("");
         } else {
-          setAvailableUpdate(version);
+          setAvailableUpdate(tag_name);
         }
       })
       .catch((err) => {
