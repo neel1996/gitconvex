@@ -40,6 +40,7 @@ build:
 	echo "Gitconvex build completed!" && \
 	mv ./dist/gitconvex-server ./dist/gitconvex
 	echo "Use ./dist/gitconvex to start Gitconvex on port 9001"
+	echo "Try ./dist/gitconvex --port PORT_NUMBER to run gitconvex on the desired port"
 test:
 	go test -v ./...
 start:

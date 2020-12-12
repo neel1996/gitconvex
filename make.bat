@@ -43,6 +43,7 @@ if "%ip%"==%BUILD% (
 	cd .\dist
     rename gitconvex-server.exe gitconvex.exe
 	echo "Run ./dist/gitconvex.exe to start gitconvex on port 9001"
+	echo "Try ./dist/gitconvex.exe --port PORT_NUMBER to run gitconvex on the desired port"
 	cd ..
 )
 
