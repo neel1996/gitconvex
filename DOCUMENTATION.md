@@ -4,7 +4,6 @@ The main goal of this platform is to act as a web-based alternative for Github d
 ## Table of Contents
 [Requirements](#requirements)<br>
 [Download Options](#download-options)<br>
-[Setup](#setup)<br>
 [Features available](#features-available)<br>
 [How to use](#how-to-use)
 - [Adding a new repo](#adding-a-new-repo)
@@ -34,25 +33,12 @@ $ cd gitconvex
 
 # for Mac & Linux
 $ make build
+$ ./dist/gitconvex
 
 # for Windows
 $ ./make.bat build
-
+$ ./dist/gitconvex.exe
 ```
-
-## Setup
-$ git clone https://github.com/neel1996/gitconvex.git
-<br>
-$ cd gitconvex
-
-# For Mac & Linux
-$ make build
-
-# For Windows
-$ ./make.bat build
-
-## After build completion...
-$ ./dist/gitconvex-server
 
 ## Features available
 - Visualizing basic repo stats such as active branch, active remotes, number of files tracked etc
@@ -81,7 +67,7 @@ $ ./dist/gitconvex-server
 ![add-a-repo](https://user-images.githubusercontent.com/65342122/88536126-db9d2680-d028-11ea-890f-c5fc11cd7cf0.png)
 
 - Enter repo name and paste the repo path. If the folder is not a git repo then check the "*Check this if the folder is not a git repo*" checkbox to initialize git.
-![repo-details](https://user-images.githubusercontent.com/65342122/101984594-80eb2b00-3ca8-11eb-97e5-5804ddfaed61.png)
+![repo-details](https://user-images.githubusercontent.com/65342122/101985829-556c3e80-3cb0-11eb-8449-ed9a05621c8e.png)
 
 - The newly added repo will be displayed as a card in the dashboard
 ![repo-card](https://user-images.githubusercontent.com/65342122/89167157-ab113b80-d598-11ea-8985-2469e7ad261e.png)
@@ -175,4 +161,4 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 ## Help and Support
 
 - Visit help section if you're facing an issue or need any help. If you have any queries or feedback, then discuss it in "Discord" or report an issue in GitHub.
-![help-and-support](https://user-images.githubusercontent.com/65342122/101984821-d96ef800-3ca9-11eb-913e-f1cc062fae56.png)
+![help-and-support](https://user-images.githubusercontent.com/65342122/101987492-5efaa400-3cba-11eb-87fb-6d8cb19ae9d2.png)
