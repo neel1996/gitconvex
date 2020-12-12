@@ -24,6 +24,7 @@ build:
 	npm install && \
 	export NODE_ENV=production && \
 	echo "Generating production ready css" && \
+	npm install tailwindcss postcss autoprefixer && \
 	npx tailwindcss build -o ./src/index.css -c ./src/tailwind.config.js && \
 	rm package-*.json && \
     rm -rf .git/ && \

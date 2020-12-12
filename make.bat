@@ -26,6 +26,7 @@ if "%ip%"==%BUILD% (
     npm install
     echo "Building UI bundle"
     set NODE_ENV=production
+    npm install tailwindcss postcss autoprefixer
     npx tailwindcss build -o src/index.css -c src/tailwind.config.js
     npm run build
 	echo "Moving react bundle to gitconvex-ui"

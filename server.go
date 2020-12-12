@@ -25,6 +25,7 @@ var (
 func main() {
 	// To get the current version of gitconvex
 	versionFlag := flag.Bool("version", false, "To get the current version of gitconvex")
+	argFlag := flag.String("port", "", "To define the port dynamically while starting gitconvex")
 	flag.Parse()
 
 	if *versionFlag == true {
@@ -113,7 +114,6 @@ func main() {
 	})
 
 	// Checking and Assigning port received from the command line ( --port args )
-	argFlag := flag.String("port", "", "To define the port dynamically while starting gitconvex")
 	flag.Parse()
 
 	if *argFlag != "" {
