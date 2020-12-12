@@ -179,7 +179,7 @@ export default function RepositoryAction() {
         <div className="flex items-center">
           <div className="select--label">Choose saved repository</div>
           <select
-            className="top-pane--select bg-green-100 text-green-700 border-green-400"
+            className="top-pane--select bg-green-50 text-green-700 border-green-400"
             defaultValue={"checked"}
             onClick={() => {
               setBranchError(false);
@@ -222,7 +222,7 @@ export default function RepositoryAction() {
             <select
               value={activeBranch}
               defaultChecked={activeBranch}
-              className="top-pane--select bg-indigo-100 border-indigo-400 text-indigo-700"
+              className="top-pane--select bg-indigo-100 border-indigo-300 text-indigo-700"
               disabled={activeBranch ? false : true}
               onChange={(event) => {
                 event.persist();

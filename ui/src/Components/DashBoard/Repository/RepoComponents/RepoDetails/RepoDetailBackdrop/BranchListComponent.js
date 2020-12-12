@@ -308,7 +308,7 @@ export default function BranchListComponent({ repoId, currentBranch }) {
                           Active
                         </div>
                       ) : (
-                        <div className="list-area--branches--pill bg-orange-200 border-orange-800">
+                        <div className="list-area--branches--pill bg-yellow-100 border-yellow-700">
                           Remote
                         </div>
                       )}

@@ -119,7 +119,7 @@ export default function GitDiffViewComponent() {
           changedFiles.map((entry) => {
             if (entry && entry.split(",")[0] === "M") {
               let fileEntry = entry.split(",")[1];
-              const styleSelector = " bg-indigo-100 border-b border-indigo-400";
+              const styleSelector = " bg-indigo-100 border-b border-indigo-300";
               return (
                 <div
                   className={`p-2 text-sm break-words hover:bg-indigo-100 cursor-pointer ${
@@ -262,10 +262,10 @@ export default function GitDiffViewComponent() {
         if (line[0] && line[0] === "+") {
           return (
             <div
-              className="git-diff--codeview--change bg-green-200"
+              className="git-diff--codeview--change bg-green-100"
               key={`${line}-${uuidv4()}`}
             >
-              <div className="git-diff--codeview--linenumber border-green-500 text-green-500">
+              <div className="git-diff--codeview--linenumber border-green-400 text-green-500">
                 {++lineCounter}
               </div>
               <pre className="w-5/6 mx-2">
@@ -284,10 +284,10 @@ export default function GitDiffViewComponent() {
         } else if (line[0] && line[0] === "-") {
           return (
             <div
-              className="git-diff--codeview--change bg-red-200"
+              className="git-diff--codeview--change bg-red-100"
               key={`${line}-${uuidv4()}`}
             >
-              <div className="git-diff--codeview--linenumber border-red-500 text-red-500">
+              <div className="git-diff--codeview--linenumber border-red-400 text-red-400">
                 -
               </div>
               <pre className="w-5/6 mx-2">

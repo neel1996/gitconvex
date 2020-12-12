@@ -17,7 +17,7 @@ export default function LeftPane(props) {
       icon: (
         <FontAwesomeIcon
           icon={["far", "folder"]}
-          className="text-3xl text-gray-600"
+          className="text-3xl text-gray-500"
         ></FontAwesomeIcon>
       ),
       label: "Repositories",
@@ -27,7 +27,7 @@ export default function LeftPane(props) {
       icon: (
         <FontAwesomeIcon
           icon={["fas", "object-group"]}
-          className="text-3xl text-gray-600"
+          className="text-3xl text-gray-500"
         ></FontAwesomeIcon>
       ),
       label: "Compare",
@@ -37,7 +37,7 @@ export default function LeftPane(props) {
       icon: (
         <FontAwesomeIcon
           icon={["fas", "cog"]}
-          className="text-3xl text-gray-600"
+          className="text-3xl text-gray-500"
         ></FontAwesomeIcon>
       ),
       label: "Settings",
@@ -47,7 +47,7 @@ export default function LeftPane(props) {
       icon: (
         <FontAwesomeIcon
           icon={["far", "question-circle"]}
-          className="text-3xl text-gray-600"
+          className="text-3xl text-gray-500"
         ></FontAwesomeIcon>
       ),
       label: "Help",
@@ -75,7 +75,7 @@ export default function LeftPane(props) {
             <NavLink
               to={`${entry.link}`}
               exact
-              activeClassName="bg-gray-300"
+              activeClassName="bg-gray-200"
               className="menu--link xl:justify-between lg:justify-between md:justify-center sm:justify-center justify-center xl:my-0 lg:my-0 md:my-6 sm:my-6 my-6"
               key={entry.label}
             >

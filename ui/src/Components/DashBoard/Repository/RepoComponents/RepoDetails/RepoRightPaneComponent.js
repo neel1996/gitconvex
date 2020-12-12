@@ -106,7 +106,7 @@ export default function RepoRightPaneComponent(props) {
 
             <div className="flex justify-around mx-auto mt-4">
               <div
-                className="w-1/3 rounded text-center cursor-pointer p-2 bg-indigo-500 hover:bg-indigo-600 text-white font-sans nowrap"
+                className="w-1/3 rounded text-center cursor-pointer p-2 bg-indigo-400 hover:bg-indigo-500 text-white font-sans nowrap"
                 onClick={() => {
                   actionTrigger(actionType.FETCH);
                 }}
@@ -114,7 +114,7 @@ export default function RepoRightPaneComponent(props) {
                 Fetch from remote
               </div>
               <div
-                className="w-1/3 text-center cursor-pointer rounded text-white p-2 bg-blue-500 hover:bg-blue-600 font-sans"
+                className="w-1/3 text-center cursor-pointer rounded text-white p-2 bg-blue-400 hover:bg-blue-500 font-sans"
                 onClick={() => {
                   actionTrigger(actionType.PULL);
                 }}

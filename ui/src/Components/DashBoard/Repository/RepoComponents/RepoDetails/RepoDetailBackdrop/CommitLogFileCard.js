@@ -74,7 +74,7 @@ export default function CommitLogFileCard({
             switch (type) {
               case "M":
                 iconSelector = "plus-square";
-                colorSelector = "text-yellow-600";
+                colorSelector = "text-yellow-400";
                 break;
               case "A":
                 iconSelector = "plus-square";

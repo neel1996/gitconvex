@@ -275,7 +275,7 @@ export default function RepositoryCommitLogComponent(props) {
               {message}
             </div>
             {searchWarning ? (
-              <div className="my-4 mx-auto rounded shadow p-4 text-center font-sans text-orange-900 font-light bg-orange-100 border-b-4  border-dashed border-orange-300 text-md">
+              <div className="my-4 mx-auto rounded shadow p-4 text-center font-sans text-yellow-800 font-light bg-yellow-50 border-b-4  border-dashed border-yellow-200 text-md">
                 Make sure if you are searching with the right category and the
                 right search query
               </div>
@@ -298,7 +298,7 @@ export default function RepositoryCommitLogComponent(props) {
           defaultValue="default-search"
           id="searchOption"
           ref={searchOptionRef}
-          className="w-1/4 flex p-4 items-center bg-indigo-500 text-white cursor-pointer rounded-l-md text-lg font-sans font-semibold outline-none"
+          className="w-1/4 flex p-4 items-center bg-indigo-400 text-white cursor-pointer rounded-l-md text-lg font-sans font-semibold outline-none"
         >
           <option value="default-search" hidden disabled>
             Search for...

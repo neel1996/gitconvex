@@ -141,7 +141,7 @@ export default function CommitCompareComponent(props) {
             <div className="font-sans font-semibold text-xl border-b border-dashed">
               Commit to Compare
             </div>
-            <div className="text-xl font-sans font-semibold p-3 rounded-lg shadow text-gray-600 border-orange-400 border-2 border-dashed">
+            <div className="text-xl font-sans font-semibold p-3 rounded-lg shadow text-gray-600 border-yellow-300 border-2 border-dashed">
               {compareCommit.substring(0, 7)}
             </div>
             <div

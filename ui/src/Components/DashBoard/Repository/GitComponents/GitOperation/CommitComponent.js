@@ -119,7 +119,7 @@ export default function CommitComponent(props) {
               </div>
               <div className="text-xl my-4">Commit Message</div>
               {commitMessageWarning ? (
-                <div className="font-sans font-semibold italic p-2 border-b border-dotted border-orange-500 text-yellow-600">
+                <div className="font-sans font-semibold italic p-2 border-b border-dotted border-yellow-400 text-yellow-600">
                   <span role="img" aria-label="suggestion">
                     💡
                   </span>

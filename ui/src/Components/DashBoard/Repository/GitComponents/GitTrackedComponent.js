@@ -129,7 +129,7 @@ export default function GitTrackedComponent(props) {
         var styleSelector = "p-1 ";
         switch (flag) {
           case "M":
-            styleSelector += "text-yellow-900 bg-yellow-200";
+            styleSelector += "text-yellow-900 bg-yellow-100";
             modifiedArtifacts.push(
               <div className="git-tracked--changes" key={name}>
                 <div className={`${styleSelector} w-11/12 break-all`}>
@@ -247,9 +247,9 @@ export default function GitTrackedComponent(props) {
             let styleSelector = "git-tracked--menu-default ";
             if (item === topMenuItemState) {
               styleSelector +=
-                "bg-blue-100 text-blue-800 border-b border-blue-700";
+                "bg-blue-100 text-blue-700 border-b border-blue-600";
             } else {
-              styleSelector += "bg-blue-600 text-white";
+              styleSelector += "bg-blue-500 text-white";
             }
             return (
               <div

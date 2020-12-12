@@ -57,7 +57,7 @@ export default function Help() {
       label: "Gitconvex react project",
       link: "https://github.com/neel1996/gitconvex-ui",
       icon: ["fab", "react"],
-      color: ["bg-blue-500"],
+      color: ["bg-blue-400"],
       ind: "",
     },
     {
@@ -250,7 +250,7 @@ export default function Help() {
                 <div className="text-xl text-gray-800 text-left">
                   New update v{availableUpdate} available.
                 </div>
-                <div className="p-4 rounded-lg my-2 text-lg font-sans text-center bg-pink-600 text-white">
+                <div className="p-4 rounded-lg my-2 text-lg font-sans text-center bg-pink-500 text-white">
                   <a
                     href={`https://github.com/neel1996/gitconvex/releases/tag/${availableUpdate}`}
                     target="_blank"
@@ -265,7 +265,7 @@ export default function Help() {
         ) : null}
 
         <div
-          className="bg-indigo-500 shadow-lg w-20 h-20 rounded-full text-center cursor-pointer hover:bg-indigo-400 border-8 border-indigo-200"
+          className="bg-indigo-400 shadow-lg w-20 h-20 rounded-full text-center cursor-pointer hover:bg-indigo-300 border-8 border-indigo-200"
           onClick={() => {
             checkUpdateHandler();
           }}

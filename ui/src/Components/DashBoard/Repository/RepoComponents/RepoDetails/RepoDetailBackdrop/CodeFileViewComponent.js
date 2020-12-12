@@ -137,8 +137,8 @@ export default function CodeFileViewComponent(props) {
                     : null}
                   {numberOfLines
                     ? topPanePills("Lines", numberOfLines, {
-                        text: "text-orange-500",
-                        bg: "bg-orange-200",
+                        text: "text-yellow-400",
+                        bg: "bg-yellow-100",
                       })
                     : null}
                 </div>

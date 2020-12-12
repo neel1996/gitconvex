@@ -160,7 +160,7 @@ export default function GitOperationComponent(props) {
     let statusPill = (status) => {
       if (status === "M") {
         return (
-          <div className="git-ops--file--status text-yellow-700 border-yellow-500 ">
+          <div className="git-ops--file--status text-yellow-400 border-yellow-400 ">
             Modified
           </div>
         );

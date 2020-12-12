@@ -108,7 +108,7 @@ export default function AddRemoteRepoComponent({ repoId }) {
       </div>
       {paramMissing
         ? statusPillComponent(
-            "orange",
+            "yellow",
             "One or more required parameters are empty!"
           )
         : null}

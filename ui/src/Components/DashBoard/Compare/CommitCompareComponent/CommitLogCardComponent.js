@@ -35,7 +35,7 @@ export default function CommitLogCardComponent(props) {
         <div className="shadow border rounded text-sm p-2 bg-indigo-100 font-mono font-semibold text-indigo-800">
           #{item.hash.substring(0, 7)}
         </div>
-        <div className="my-2 shadow border rounded text-sm p-2 bg-orange-100 font-sans font-semibold">
+        <div className="my-2 shadow border rounded text-sm p-2 bg-yellow-50 font-sans font-semibold">
           {relativeCommitTimeCalculator(item.commitTime)}
         </div>
       </div>

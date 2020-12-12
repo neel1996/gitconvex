@@ -59,7 +59,7 @@ export default function BranchCommitLogChanges(props) {
         commitLogs.map((commit) => {
           return (
             <div
-              className="my-4 border-b p-3 border border-gray-400 shadow-md rounded"
+              className="my-4 border-b p-3 border border-gray-200 shadow-md rounded"
               key={commit.date}
             >
               <div className="flex items-center gap-10 text-xl font-sans font-semibold text-gray-800 border-b">

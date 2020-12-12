@@ -11,6 +11,7 @@ RUN apk add git
 RUN cd ui/ && \
     npm install && \
     export NODE_ENV=production && \
+    npm install tailwindcss postcss autoprefixer && \
     npx tailwindcss build -o src/index.css -c src/tailwind.config.js && \
     npm run build && \
     mv build/ gitconvex-ui/ && \
