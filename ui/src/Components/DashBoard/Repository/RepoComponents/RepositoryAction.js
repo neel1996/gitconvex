@@ -222,7 +222,7 @@ export default function RepositoryAction() {
             <select
               value={activeBranch}
               defaultChecked={activeBranch}
-              className="top-pane--select bg-indigo-100 border-indigo-300 text-indigo-700"
+              className="top-pane--select bg-indigo-50 border-indigo-300 text-indigo-700"
               disabled={activeBranch ? false : true}
               onChange={(event) => {
                 event.persist();

@@ -119,10 +119,10 @@ export default function GitDiffViewComponent() {
           changedFiles.map((entry) => {
             if (entry && entry.split(",")[0] === "M") {
               let fileEntry = entry.split(",")[1];
-              const styleSelector = " bg-indigo-100 border-b border-indigo-300";
+              const styleSelector = " bg-indigo-50 border-b border-indigo-300";
               return (
                 <div
-                  className={`p-2 text-sm break-words hover:bg-indigo-100 cursor-pointer ${
+                  className={`p-2 text-sm break-words hover:bg-indigo-50 cursor-pointer ${
                     fileEntry === activeFileName ? styleSelector : ""
                   }`}
                   onClick={() => {
