@@ -23,6 +23,15 @@ var (
 )
 
 func main() {
+	// To get the current version of gitconvex
+	versionFlag := flag.Bool("version", false, "To get the current version of gitconvex")
+	flag.Parse()
+
+	if *versionFlag == true {
+		fmt.Println(global.GetCurrentVersion())
+		os.Exit(0)
+	}
+
 	var portErr error
 	Port = 0
 
