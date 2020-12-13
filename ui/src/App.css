@@ -1,0 +1,21 @@
+html,
+body {
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    margin: 0px !important;
+}
+
+::-webkit-scrollbar {
+    padding: 0px;
+    margin: 0px;
+    background: rgba(0, 0, 0, 0.1);
+    width: 10px;
+    height: 10px;
+    border: solid 1px rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: rgba(0,0,0,0.3);
+}

@@ -1,0 +1,24 @@
+version: "3.3"
+services:
+  gitconvex:
+    build:
+      context: .
+    container_name: gitconvex
+    ports:
+     - "9001:9001"
+    networks:
+     - gitconvex-network
+    image: itassistors/gitconvex
+    working_dir: /go/src/github.com/neel1996/gitconvex-server
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+    volumes: 
+      - /:/opt
+    entrypoint: /go/src/github.com/neel1996/gitconvex-server/dist/gitconvex-server
+networks:
+  gitconvex-network:
+    driver: bridge

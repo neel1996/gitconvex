@@ -1,4 +1,3 @@
-
 # Gitconvex
 
 <p align="center">
@@ -18,9 +17,8 @@
 
 > Use any of the below options to get gitconvex for your system
 
-[![gitconvex npm package](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.6&color=red&style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@itassistors/gitconvex)
-[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.6&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
-[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v1.1.6&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
+[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v2.0.0&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
+[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v2.0.0&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
 [![License](https://img.shields.io/static/v1?label=LICENSE&message=Apache-2.0&color=yellow&style=for-the-badge)](LICENSE)
 
 - **Option - 1** Cloning repo from **github**
@@ -29,51 +27,47 @@
 
 ```
 
-$ git clone https://github.com/neel1996/gitconvex-package.git
-$ cd gitconvex-package
-$ npm start
+$ git clone https://github.com/neel1996/gitconvex.git
+$ cd gitconvex
+
+# for Mac & Linux
+
+$ make build
+
+# for Windows
+
+$ ./make.bat build
+
+## After build completion...
+
+$ ./dist/gitconvex-server
+
+2020/11/14 22:57:47 INFO: Starting Gitconvex server modules
+2020/11/14 22:57:47 INFO: Using available env config file
+2020/11/14 22:57:47 INFO: Gitconvex started on  http://localhost:9001
 
 ```
 
-- **Option - 2**  Downloading package from **npm**
-
-`npm i -g @itassistors/gitconvex`
-
-This will install **gitconvex** as a global module and it can be started straight away from the command line with `gitconvex` command
-
-```
-$ gitconvex
-
-INFO: Checking for config file
-INFO: Config file is present
-INFO: Reading from config file /usr/lib/node_modules/@itassistors/gitconvex/env_config.json
-GitConvex API connected!
-
-Checking data file availability...
-INFO: Data file /usr/lib/node_modules/@itassistors/gitconvex/database/repo-datastore.json is present and it will be used as the active data file!
-
-You can change this under the settings menu
-
-Gitconvex is running on port 9001
-
-    Open http://localhost:9001/ to access gitconvex
-```
-
-- **Option - 3** If you are into **docker**, then there is also a docker image available for gitconvex 
+- **Option - 2** If you are into **docker**, then there is also a docker image available for gitconvex 
 
 `docker pull itassistors/gitconvex`
 
 **Note:** Make sure you mount the host volume to the container to access the git repos from the host system. If you have git repos stored within your containers, then this is not required
 
-- **Option - 4** Downloading the zip file from the tagged github [**release**](https://github.com/neel1996/gitconvex-package/releases)
+- **Option - 3** Downloading the zip file from the tagged github [**release**](https://github.com/neel1996/gitconvex/releases)
 
 ```
 ## Extract the downloaded zip file and execute the commands
 
-$ cd gitconvex-package
-$ npm start
-```
+$ cd gitconvex
 
+# for Mac & Linux
+$ make build
+
+# for Windows
+$ ./make.bat build
+
+```
 
 # Platforms
 
@@ -85,9 +79,11 @@ $ npm start
 
 ## Requirements
 
-| <b>[Node js](https://nodejs.org/en/)</b> | <b>Tested on v12.0+ |
-|--|--|
-| <b>[Git](https://git-scm.com/)</b> | <b>Tested on v2.20+</b> |
+| Software | Purpose |
+| -- | -- |
+| <b>[Git](https://git-scm.com/)</b> | <b>Required for handling some intense git operations with the target repo</b> |
+| <b>[Go](https://golang.org/)</b> | <b>For building the backend from the source</b> |
+| <b>[Node JS](https://nodejs.org/en/)</b> | <b>For building the react UI bundle from scratch</b> |
     
 > **Important note for windows users**
 
@@ -112,6 +108,11 @@ operable program or batch file.
 
 This can be fixed by adding `git` to the PATH environment variable in windows. The process of setting this up is available [here](https://stackoverflow.com/questions/26620312/git-installing-git-in-path-with-github-client-for-windows#answer-53706956:~:text=comment-,27,Here%20is%20the%20magic)
 
+> **🍎 Important note for MacOS users**
+
+The pre-built bundle for MacOS is not a verfieid or signed bundle. So gatekeeper could warn you or even prevent you from using gitconvex on your Mac devices. If this is the case then I recommend building the application from scratch using the `Makefile` included in the repo. Follow **[Option - 1](#download-options)** mentioned above to build the application from scratch.
+
+**Reason** - Enrolling in the apple developer program for making the application a verfied one will cost me 100 USD anually. So I will do it once the project gets enough reach 
 
 # Detailed documentation
 
@@ -120,13 +121,13 @@ Refer the detailed [Documentation](DOCUMENTATION.md) for how to setup and use th
 
 # Contributions 
 
-This is the final production build for **gitconvex** and direct contributions will not be accepted to this repo. If you wish to contribute to this project, then it has to be made to the following repos which are dedicated to the frontend (React) and backend (Node JS) for the platform 
+This is the final production build for **gitconvex** and direct contributions will not be accepted to this repo. If you wish to contribute to this project, then it has to be made to the following repos which are dedicated to the frontend (React) and backend (Go) for the platform 
 
 - **Frontend repo - Build with React JS**
 
 [![gitconvex-ui](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-ui)](https://github.com/neel1996/gitconvex-ui)
 
-- **Backend repo - Build with Node JS**
+- **Backend repo - Build with GoLang**
 
 [![gitconvex-server](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-server)](https://github.com/neel1996/gitconvex-server)
 
@@ -139,8 +140,9 @@ For reporting issues or for requesting any feature use the following medium,
 
 [**Discord Channel** ](https://discord.gg/PSd2Cq9)
 
-[**Github Issue Reporting**](https://github.com/neel1996/gitconvex-package/issues)
+[**Github Issue Reporting**](https://github.com/neel1996/gitconvex/issues)
 
 # License
 
 See [LICENSE ](LICENSE) info for more
+

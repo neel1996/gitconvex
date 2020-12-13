@@ -2,11 +2,12 @@ name: Gitconvex build deploy
 
 on:
   push:
-    branches: [ master ]
+    branches: [ v2.0.0 ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
     
       - name: Set up Go 1.x
@@ -22,27 +23,25 @@ jobs:
         run: |
           go get -v -t -d ./...
           
-      - name: Running Test Cases
-        run: export GOTESTENV=ci && go test -v ./...
-
-      - name: Build for windows 
+      - name: Run test cases
         run: |
-          export GOOS=windows && GOARCH=amd64
-          mkdir -p ./windows
-          make build
-          mv dist/ windows/
-    
-      - name: deploy gitconvex windows build bundles to S3
-        uses: shallwefootball/upload-s3-action@v1.1.2
+          export GOTESTENV=ci && go test -v ./...
+      
+      - name: Run sample build
+        run: |
+          go build -v
+
+      # Initiating build and S# deployment 
+      - name: Starting S3 deployment script from droplet
+        uses: appleboy/ssh-action@master
         with:
-          aws_key_id: ${{ secrets.AWS_ACCESS_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_ACCESS_SECRET }}
-          aws_bucket: ${{ secrets.AWS_BUCKET_URL }}
-          source_dir: 'windows'
-          destination_dir: 'windows' 
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USERNAME }}
+          key: ${{ secrets.DROPLET_PRIVATE_KEY }}
+          port: ${{ secrets.DROPLET_PORT }}
+          script: |
+            /opt/workroom/aws-build/init-deploy.sh
+            /opt/workroom/aws-build/windows-deploy.sh
+            /opt/workroom/aws-build/linux-deploy.sh
+            /opt/workroom/aws-build/macos-deploy.sh
+            /opt/workroom/aws-build/cleanup.sh
