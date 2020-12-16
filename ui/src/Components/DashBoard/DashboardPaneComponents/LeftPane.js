@@ -83,7 +83,7 @@ export default function LeftPane(props) {
                 <div className="menu--items__icon text-sm w-1/6">
                   {entry.icon}
                 </div>
-                <div className="menu--items__label w-5/6 xl:text-2xl lg:text-2xl md:text-xl block xl:block lg:block md:hidden sm:hidden hidden">
+                <div className="menu--items__label w-5/6 xl:text-2xl lg:text-2xl md:text-xl block xl:block lg:block md:hidden sm:hidden">
                   {entry.label}
                 </div>
               </div>

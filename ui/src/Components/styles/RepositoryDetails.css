@@ -5,7 +5,7 @@
   margin-left: auto;
   margin-right: auto;
   border-radius: 0.5rem;
-  justify-content: space-evenly
+  justify-content: space-evenly;
 }
 
 .action-view {
@@ -32,8 +32,9 @@
   height: 3rem;
   align-items: center;
   vertical-align: middle;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  margin-right: 1.25rem
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-right: 1.25rem;
 }
 
 .backdrop-view {
@@ -44,7 +45,7 @@
   left: 0;
   right: 0;
   display: flex;
-  overflow: auto
+  overflow: auto;
 }
 
 .commitlogs-view {
@@ -71,8 +72,9 @@
   height: 3rem;
   align-items: center;
   vertical-align: middle;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  margin-right: 1.25rem
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin-right: 1.25rem;
 }
 
 .repo-leftpane {
@@ -89,13 +91,13 @@
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
   margin-left: auto;
-  margin-right: auto
+  margin-right: auto;
 }
 
 .repo-leftpane--remote {
   display: flex;
   justify-content: space-evenly;
-  align-items: center
+  align-items: center;
 }
 
 .repo-leftpane--remote--host {
@@ -105,13 +107,14 @@
   justify-content: center;
   padding: 1rem;
   border-radius: 0.375rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border-width: 1px;
   border-style: dashed;
   margin-top: auto;
   margin-bottom: auto;
   align-items: center;
-  vertical-align: middle
+  vertical-align: middle;
 }
 
 .repo-leftpane--remote--name {
@@ -124,7 +127,7 @@
   border-color: #cbd5e0;
   border-color: rgba(203, 213, 224, var(--border-opacity));
   width: 75%;
-  text-align: center
+  text-align: center;
 }
 
 .add-btn {
@@ -141,7 +144,7 @@
   margin-left: auto;
   margin-right: auto;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  cursor: pointer
+  cursor: pointer;
 }
 
 .tooltip {
@@ -162,7 +165,7 @@
   font-size: 0.875rem;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-  position: relative
+  position: relative;
 }
 
 .remote--url {
@@ -171,18 +174,18 @@
   color: rgba(99, 179, 237, var(--text-opacity));
   cursor: pointer;
   width: 50%;
-  overflow-wrap: break-word
+  overflow-wrap: break-word;
 }
 
 .remote--url:hover {
   --text-opacity: 1;
   color: #4299e1;
-  color: rgba(66, 153, 225, var(--text-opacity))
+  color: rgba(66, 153, 225, var(--text-opacity));
 }
 
 .flex-even {
   display: flex;
-  justify-content: space-evenly
+  justify-content: space-evenly;
 }
 
 .commitlogs {
@@ -190,31 +193,32 @@
   margin-left: auto;
   margin-right: auto;
   margin-top: 1.5rem;
-  margin-bottom: 1.5rem
+  margin-bottom: 1.5rem;
 }
 
 .commitlogs--label {
   width: 25%;
   --text-opacity: 1;
   color: #718096;
-  color: rgba(113, 128, 150, var(--text-opacity))
+  color: rgba(113, 128, 150, var(--text-opacity));
 }
 
 .commitlogs--content {
   width: 50%;
   border-radius: 0.375rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 0.75rem;
   text-align: center;
   --bg-opacity: 1;
   background-color: #fbd38d;
   background-color: rgba(251, 211, 141, var(--bg-opacity));
-  cursor: pointer
+  cursor: pointer;
 }
 
-.commitlogs--content:hover{
+.commitlogs--content:hover {
   background-color: #fcc972;
-  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.05));
+  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.05);
 }
 
 .repo-rightpane {
@@ -230,7 +234,7 @@
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
   margin-left: auto;
-  margin-right: auto
+  margin-right: auto;
 }
 
 .total-commits {
@@ -239,7 +243,7 @@
   --text-opacity: 1;
   color: #2d3748;
   color: rgba(45, 55, 72, var(--text-opacity));
-  width: 50%
+  width: 50%;
 }
 
 .latest-commit {
@@ -252,7 +256,7 @@
   width: 50%;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap
+  white-space: nowrap;
 }
 
 .branch-list {
@@ -260,7 +264,7 @@
   display: flex;
   justify-content: space-evenly;
   vertical-align: middle;
-  align-items: center
+  align-items: center;
 }
 
 .branch-list--current {
@@ -273,39 +277,43 @@
   margin-bottom: 0.25rem;
   border-bottom-width: 1px;
   border-style: dotted;
-  cursor: pointer
+  cursor: pointer;
 }
 
 .branch-list--current:hover {
   border-style: dashed;
   --text-opacity: 1;
   color: #5a67d8;
-  color: rgba(90, 103, 216, var(--text-opacity))
+  color: rgba(90, 103, 216, var(--text-opacity));
 }
 
 .branch-list--branches {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-weight: 600;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
   border-bottom-width: 1px;
   border-style: dotted;
-  cursor: pointer
+  cursor: pointer;
 }
 
 .branch-list--branches:hover {
   border-style: dashed;
   --text-opacity: 1;
   color: #7f9cf5;
-  color: rgba(127, 156, 245, var(--text-opacity))
+  color: rgba(127, 156, 245, var(--text-opacity));
 }
 
 .branch-list__listbranch {
   border-bottom-width: 1px;
   border-style: dashed;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --text-opacity: 1;
   color: #4299e1;
   color: rgba(66, 153, 225, var(--text-opacity));
@@ -314,13 +322,13 @@
   margin-bottom: 0.5rem;
   text-align: center;
   margin-top: auto;
-  margin-bottom: auto
+  margin-bottom: auto;
 }
 
 .branch-list__listbranch:hover {
   --text-opacity: 1;
   color: #2c5282;
-  color: rgba(44, 82, 130, var(--text-opacity))
+  color: rgba(44, 82, 130, var(--text-opacity));
 }
 
 .repo-info {
@@ -331,17 +339,20 @@
   width: 100%;
   display: flex;
   border-radius: 0.375rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   border-width: 2px;
   --border-opacity: 1;
   border-color: #f7fafc;
   border-color: rgba(247, 250, 252, var(--border-opacity));
   padding: 1rem;
-  justify-content: space-evenly
+  justify-content: space-evenly;
 }
 
 .repo-info--label {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-weight: 600;
   --text-opacity: 1;
   color: #2d3748;
@@ -349,11 +360,11 @@
   font-size: 1.125rem;
   padding: 0.5rem;
   margin-left: 0.5rem;
-  margin-right: 0.5rem
+  margin-right: 0.5rem;
 }
 
 .repo-info--data {
   padding: 0.75rem;
   border-radius: 0.125rem;
-  border-width: 1px
+  border-width: 1px;
 }
