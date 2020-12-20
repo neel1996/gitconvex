@@ -151,7 +151,7 @@ export default function RepositoryAction() {
       data: {
         query: `
           mutation{
-            setBranch(repoId: "${defaultRepo.id}", branch: "${branchName}")
+            checkoutBranch(repoId: "${defaultRepo.id}", branchName: "${branchName}")
           }
         `,
       },
