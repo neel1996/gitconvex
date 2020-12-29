@@ -26,6 +26,9 @@ export default function RepositoryAction() {
     gitTotalTrackedFiles: 0,
   });
   const [branchError, setBranchError] = useState(false);
+  const [toggleSearchSelect, setToggleSearchSelect] = useState(false);
+  const [searchBranchValue, setSearchBranchValue] = useState("");
+  const [filteredBranchList, setFilteredBranchList] = useState([]);
 
   const memoizedGitTracker = useMemo(() => {
     if (defaultRepo && defaultRepo.id) {
@@ -72,7 +75,6 @@ export default function RepositoryAction() {
         })
           .then((res) => {
             setLoading(false);
-
             setSelectedRepoDetails(res.data.data.gitRepoStatus);
             setActiveBranch(res.data.data.gitRepoStatus.gitCurrentBranch);
           })
@@ -158,20 +160,39 @@ export default function RepositoryAction() {
     })
       .then((res) => {
         setLoading(false);
-
         if (res.data.data && !res.data.error) {
           setActiveBranch(branchName);
+          setSearchBranchValue("");
+          setFilteredBranchList([]);
+          setToggleSearchSelect(!toggleSearchSelect);
         }
       })
       .catch((err) => {
         setLoading(false);
-
         if (err) {
           setBranchError(true);
-          event.target.selectedIndex = 0;
+          event.target.innerText = activeBranch;
         }
       });
   }
+
+  const searchBranchHandler = (e) => {
+    const searchBranch = e.target.value;
+    setSearchBranchValue(searchBranch);
+    if (
+      searchBranch !== "" &&
+      selectedRepoDetails &&
+      selectedRepoDetails.gitBranchList
+    ) {
+      const { gitBranchList } = selectedRepoDetails;
+      const filteredBranches = gitBranchList.filter((branchName) =>
+        branchName.toLowerCase().includes(searchBranch)
+      );
+      setFilteredBranchList(filteredBranches);
+    } else {
+      setFilteredBranchList([]);
+    }
+  };
 
   function activeRepoPane() {
     return (
@@ -218,26 +239,42 @@ export default function RepositoryAction() {
         </div>
         {selectedFlag ? (
           <div className="flex items-center">
-            <div className="select--label">Branch</div>
-            <select
-              value={activeBranch}
-              defaultChecked={activeBranch}
-              className="top-pane--select bg-indigo-50 border-indigo-300 text-indigo-700"
-              disabled={activeBranch ? false : true}
-              onChange={(event) => {
-                event.persist();
-                setActiveBranch("...");
-                setTrackingBranch(event.target.value, event);
-              }}
-              onClick={() => {
-                setBranchError(false);
-              }}
-            >
-              <option key={activeBranch} value={activeBranch}>
-                {activeBranch}
-              </option>
-              {availableBranch()}
-            </select>
+            <div className="flex-1 select--label mr-2">Branch</div>
+            <div className="flex-1 flex flex-col justify-center">
+              <div
+                className="flex-auto cursor-pointer inline-flex items-center justify-center px-4 py-2 shadow-md bg-indigo-50 border-indigo-400 text-indigo-700 border-dashed	border-b-2 truncate"
+                onClick={(e) => {
+                  let target = e.currentTarget;
+                  if (!toggleSearchSelect) {
+                    target.style.width = "15rem";
+                  } else {
+                    target.style.width = "auto";
+                  }
+                  setToggleSearchSelect(!toggleSearchSelect);
+                }}
+              >
+                <span className="mr-2">{activeBranch}</span>
+                <FontAwesomeIcon
+                  className="text-sm m-1"
+                  icon={["fas", "chevron-down"]}
+                ></FontAwesomeIcon>
+              </div>
+              {toggleSearchSelect ? (
+                <div className="flex-auto flex flex-row justify-center">
+                  <div className="bg-indigo-50 border-indigo-300 text-indigo-700 px-4 py-2 shadow-md rounded-md z-20 absolute">
+                    <input
+                      id="branchSearchInput"
+                      type="text"
+                      placeholder="Search..."
+                      className="px-4 py-2 bg-indigo-100 mt-2 mb-2 text-indigo-700 shadow-sm rounded-sm focus:outline-none outline-none"
+                      onChange={searchBranchHandler}
+                      value={searchBranchValue}
+                    ></input>
+                    {availableBranch()}
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
         ) : null}
       </div>
@@ -257,21 +294,49 @@ export default function RepositoryAction() {
     );
   }
 
+  const branchCardComponent = (branch) => {
+    return (
+      <div
+        key={branch}
+        value={branch}
+        className="cursor-pointer text-sm shadow-sm p-1 mt-1 mb-1"
+        onClick={(event) => {
+          event.persist();
+          setActiveBranch("...");
+          setTrackingBranch(event.target.innerText, event);
+        }}
+      >
+        {branch}
+      </div>
+    );
+  };
+
   function availableBranch() {
     if (selectedRepoDetails && selectedRepoDetails.gitBranchList) {
       const { gitBranchList } = selectedRepoDetails;
-
-      return gitBranchList.map((branch, index) => {
-        if (branch !== "NO_BRANCH" && branch !== activeBranch) {
+      if (searchBranchValue !== "") {
+        if (filteredBranchList.length > 0) {
+          return filteredBranchList.map((branch, index) => {
+            if (branch !== "NO_BRANCH") {
+              return branchCardComponent(branch);
+            }
+            return null;
+          });
+        } else {
           return (
-            <option key={branch} value={branch}>
-              {branch}
-            </option>
+            <div className="text-center font-sans font-light text-xl my-2 text-gray-600 border-b border-dotted">
+              {searchBranchValue.concat(" branch not available!")}
+            </div>
           );
         }
-
-        return null;
-      });
+      } else {
+        return gitBranchList.map((branch, index) => {
+          if (branch !== "NO_BRANCH") {
+            return branchCardComponent(branch);
+          }
+          return null;
+        });
+      }
     }
   }
 

@@ -8,6 +8,7 @@ import { ContextProvider } from "../../../../context";
 import "../../../../prism.css";
 import { globalAPIEndpoint } from "../../../../util/env_config";
 import "../../../styles/GitDiffView.css";
+import "prismjs/components/prism-markdown";
 
 export default function GitDiffViewComponent() {
   const { state, dispatch } = useContext(ContextProvider);

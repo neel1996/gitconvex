@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import "../../../../../../prism.css";
 import InfiniteLoader from "../../../../../Animations/InfiniteLoader";
 import { globalAPIEndpoint } from "../../../../../../util/env_config";
+import "prismjs/components/prism-markdown";
 
 export default function CodeFileViewComponent(props) {
   const [languageState, setLanguageState] = useState("");
@@ -51,7 +52,7 @@ export default function CodeFileViewComponent(props) {
           let prism;
 
           if (lang.prismIndicator === "" || !lang.prismIndicator) {
-            prism = "go";
+            prism = "markdown";
           } else {
             prism = lang.prismIndicator;
           }
@@ -72,6 +73,14 @@ export default function CodeFileViewComponent(props) {
               })
               .catch((err) => {
                 console.log(err);
+                const codeHighlight = fileData.map((line) => {
+                  return Prism.highlight(
+                    line,
+                    Prism.languages["markdown"],
+                    "markdown"
+                  );
+                });
+                setHighlightedCode([...codeHighlight]);
               });
           }
         }
@@ -85,6 +94,7 @@ export default function CodeFileViewComponent(props) {
   function topPanePills(label, content, accent) {
     const bg = accent.bg;
     const textColor = accent.text;
+    const border = accent.border;
 
     return (
       <div className="flex justify-between w-1/2 gap-10 items-center align-middle">
@@ -92,9 +102,9 @@ export default function CodeFileViewComponent(props) {
           {label}
         </div>
         <div
-          className={`"w-11/12 mx-auto rounded p-2 text-center ${bg} ${textColor} ${
+          className={`${border} mx-auto rounded p-2 text-center ${bg} ${textColor} ${
             content.length > 10 ? "text-sm" : ""
-          } font-semibold"`}
+          } font-semibold`}
         >
           {content}
         </div>
@@ -132,13 +142,15 @@ export default function CodeFileViewComponent(props) {
                   {languageState
                     ? topPanePills("Language", languageState, {
                         text: "text-pink-500",
-                        bg: "bg-pink-200",
+                        bg: "bg-pink-50",
+                        border: "border-2 border-dashed border-pink-400",
                       })
                     : null}
                   {numberOfLines
                     ? topPanePills("Lines", numberOfLines, {
                         text: "text-yellow-400",
-                        bg: "bg-yellow-100",
+                        bg: "bg-yellow-50",
+                        border: "border-2 border-dashed border-yellow-400",
                       })
                     : null}
                 </div>
@@ -148,7 +160,7 @@ export default function CodeFileViewComponent(props) {
                       <div className="codeview--commits--latest--label">
                         Latest Commit
                       </div>
-                      <div className="codeview--commits--latest--data">
+                      <div className="w-3/4 mx-auto bg-indigo-100 font-sans font-semibold text-xl text-center text-indigo-600 p-2 rounded shadow">
                         {latestCommit}
                       </div>
                     </div>

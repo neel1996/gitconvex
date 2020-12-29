@@ -75,8 +75,10 @@ export default function RepoLeftPaneComponent(props) {
                   ) : null}
                   <div
                     className={`${
-                      gitRemoteHost !== "No Remote Host Set" ? "text-xl" : ""
-                    } repo-leftpane--remote--name`}
+                      gitRemoteHost !== "No Remote Host Available"
+                        ? "text-xl repo-leftpane--remote--name"
+                        : "text-base font-sans font-light text-gray-600 text-center"
+                    }`}
                   >
                     {gitRemoteHost}
                   </div>

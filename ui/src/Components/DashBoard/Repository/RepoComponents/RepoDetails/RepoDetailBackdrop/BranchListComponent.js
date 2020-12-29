@@ -17,6 +17,8 @@ export default function BranchListComponent({ repoId, currentBranch }) {
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [branchSearchTerm, setBranchSearchTerm] = useState("");
+  const [filteredBranchList, setFilteredBranchList] = useState([]);
 
   function resetStates() {
     setListError(false);
@@ -26,6 +28,8 @@ export default function BranchListComponent({ repoId, currentBranch }) {
     setErrorBranch("");
     setDeleteError(false);
     setDeleteSuccess(false);
+    setBranchSearchTerm("");
+    setFilteredBranchList([]);
   }
 
   useEffect(() => {
@@ -65,7 +69,6 @@ export default function BranchListComponent({ repoId, currentBranch }) {
             setListError(true);
             return;
           }
-
           gitAllBranchList = gitAllBranchList.map((branch) => {
             if (branch === gitCurrentBranch) {
               return "*" + branch;
@@ -198,6 +201,131 @@ export default function BranchListComponent({ repoId, currentBranch }) {
     );
   }
 
+  const searchBranchFromList = (event) => {
+    const searchBranch = event.target.value;
+    setBranchSearchTerm(searchBranch);
+    if (searchBranch !== "") {
+      const filteredBranches = branchList.filter((branchName) =>
+        branchName.toLowerCase().includes(searchBranch)
+      );
+      setFilteredBranchList(filteredBranches);
+    } else {
+      setFilteredBranchList([]);
+    }
+  };
+
+  const cancelSearchBranchFromList = () => {
+    setBranchSearchTerm("");
+    setFilteredBranchList([]);
+  };
+
+  const renderBranchListComponent = (branch) => {
+    const branchPickerComponent = (icon, branchType, branchName) => {
+      let activeSwitchStyle = "";
+      let activeBranchFlag = false;
+      if (branchName.includes("*")) {
+        activeBranchFlag = true;
+        branchName = branchName.replace("*", "");
+      }
+
+      if (activeBranchFlag) {
+        activeSwitchStyle = "border-dashed border-b-2 text-indigo-700 text-2xl";
+      }
+      return (
+        <div className="list-area--branches" key={branchType + branchName}>
+          <div
+            className={
+              icon === "wifi"
+                ? "list-area--branches--icon ml-0"
+                : "list-area--branches--icon"
+            }
+          >
+            <FontAwesomeIcon icon={["fas", icon]}></FontAwesomeIcon>
+          </div>
+          <div className="xl:block lg:block md:block sm:hidden list-area--branches--type">
+            {branchType}
+          </div>
+          <div
+            className={`list-area--branches--name ${activeSwitchStyle}`}
+            title={branchName}
+            onClick={() => {
+              if (!activeBranchFlag) {
+                if (branchType !== "Local Branch") {
+                  switchBranchHandler(branch);
+                } else {
+                  switchBranchHandler(branchName);
+                }
+              }
+            }}
+          >
+            {branchName}
+          </div>
+          {!activeBranchFlag && branchType === "Local Branch" ? (
+            <div className="list-area--branches--active">
+              <div
+                className="list-area--branches--delete"
+                title="Will delete only if the branch is clean and safe"
+                onClick={() => {
+                  if (!activeBranchFlag) {
+                    deleteBranchHandler(branchName, false);
+                  }
+                }}
+              >
+                <div className="list-area--branches--delete--btn">
+                  <FontAwesomeIcon
+                    icon={["fas", "trash-alt"]}
+                  ></FontAwesomeIcon>
+                </div>
+                <div className="list-area--branches--delete--type">Normal</div>
+              </div>
+              <div
+                className="list-area--branches--delete"
+                title="Will delete the branch forcefully.Be careful!"
+                onClick={() => {
+                  if (!activeBranchFlag) {
+                    deleteBranchHandler(branchName, true);
+                  }
+                }}
+              >
+                <div className="list-area--branches--delete--btn">
+                  <FontAwesomeIcon
+                    icon={["fas", "minus-square"]}
+                  ></FontAwesomeIcon>
+                </div>
+                <div className="list-area--branches--delete--type">Force</div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {activeBranchFlag ? (
+                <div className="list-area--branches--pill bg-blue-200 border-blue-800">
+                  Active
+                </div>
+              ) : (
+                <div className="list-area--branches--pill bg-yellow-100 border-yellow-700">
+                  Remote
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      );
+    };
+
+    if (!branch.includes("remotes/")) {
+      return branchPickerComponent("code-branch", "Local Branch", branch);
+    } else {
+      const splitBranch = branch.split("/");
+      if (splitBranch.length <= 2) {
+        return null;
+      }
+      const remoteName = splitBranch[1];
+      const remoteBranch = splitBranch.slice(2, splitBranch.length).join("/");
+
+      return branchPickerComponent("wifi", remoteName, remoteBranch);
+    }
+  };
+
   return (
     <div className="repo-backdrop--branchlist xl:w-3/4 lg:w-3/4 md:w-11/12 sm:w-11/12">
       <div className="branchlist--header">Available Branches</div>
@@ -221,122 +349,44 @@ export default function BranchListComponent({ repoId, currentBranch }) {
             Collecting branch list...
           </div>
         ) : null}
-        {!listError &&
-          branchList &&
+        {!loading ? (
+          <div className="flex flex-row mx-8 shadow-md rounded-md my-4">
+            <div className="b-1 text-center p-4 text-white bg-blue-500 rounded-l-md">
+              <FontAwesomeIcon icon={["fas", "search"]}></FontAwesomeIcon>
+            </div>
+            <div className="w-full">
+              <input
+                id="branchListSearchInput"
+                type="text"
+                placeholder="Search For Branch Name"
+                className="border-0 outline-none w-full p-4 focus:outline-none"
+                onChange={searchBranchFromList}
+                value={branchSearchTerm}
+              ></input>
+            </div>
+            <div
+              className="b-1 text-center p-4 text-gray-500 cursor-pointer bg-white rounded-r-md"
+              onClick={cancelSearchBranchFromList}
+            >
+              <FontAwesomeIcon icon={["fas", "times"]}></FontAwesomeIcon>
+            </div>
+          </div>
+        ) : null}
+        {!listError && branchList && branchSearchTerm !== "" ? (
+          filteredBranchList.length > 0 ? (
+            filteredBranchList.map((branch) => {
+              return renderBranchListComponent(branch);
+            })
+          ) : (
+            <div className="text-center font-sans font-light text-xl my-2 text-gray-600 border-b border-dotted">
+              {branchSearchTerm.concat(" branch not available!")}
+            </div>
+          )
+        ) : (
           branchList.map((branch) => {
-            const branchPickerComponent = (icon, branchType, branchName) => {
-              let activeSwitchStyle = "";
-              let activeBranchFlag = false;
-              if (branchName.includes("*")) {
-                activeBranchFlag = true;
-                branchName = branchName.replace("*", "");
-              }
-
-              if (activeBranchFlag) {
-                activeSwitchStyle =
-                  "border-dashed border-b-2 text-indigo-700 text-2xl";
-              }
-              return (
-                <div
-                  className="list-area--branches"
-                  key={branchType + branchName}
-                >
-                  <div className="list-area--branches--icon">
-                    <FontAwesomeIcon icon={["fas", icon]}></FontAwesomeIcon>
-                  </div>
-                  <div className="xl:block lg:block md:block sm:hidden list-area--branches--type">
-                    {branchType}
-                  </div>
-                  <div
-                    className={`list-area--branches--name ${activeSwitchStyle}`}
-                    title={branchName}
-                    onClick={() => {
-                      if (!activeBranchFlag) {
-                        if (branchType !== "Local Branch") {
-                          switchBranchHandler(branch);
-                        } else {
-                          switchBranchHandler(branchName);
-                        }
-                      }
-                    }}
-                  >
-                    {branchName}
-                  </div>
-                  {!activeBranchFlag && branchType === "Local Branch" ? (
-                    <div className="list-area--branches--active">
-                      <div
-                        className="list-area--branches--delete"
-                        title="Will delete only if the branch is clean and safe"
-                        onClick={() => {
-                          if (!activeBranchFlag) {
-                            deleteBranchHandler(branchName, false);
-                          }
-                        }}
-                      >
-                        <div className="list-area--branches--delete--btn">
-                          <FontAwesomeIcon
-                            icon={["fas", "trash-alt"]}
-                          ></FontAwesomeIcon>
-                        </div>
-                        <div className="list-area--branches--delete--type">
-                          Normal
-                        </div>
-                      </div>
-                      <div
-                        className="list-area--branches--delete"
-                        title="Will delete the branch forcefully.Be careful!"
-                        onClick={() => {
-                          if (!activeBranchFlag) {
-                            deleteBranchHandler(branchName, true);
-                          }
-                        }}
-                      >
-                        <div className="list-area--branches--delete--btn">
-                          <FontAwesomeIcon
-                            icon={["fas", "minus-square"]}
-                          ></FontAwesomeIcon>
-                        </div>
-                        <div className="list-area--branches--delete--type">
-                          Force
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      {activeBranchFlag ? (
-                        <div className="list-area--branches--pill bg-blue-200 border-blue-800">
-                          Active
-                        </div>
-                      ) : (
-                        <div className="list-area--branches--pill bg-yellow-100 border-yellow-700">
-                          Remote
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              );
-            };
-
-            if (!branch.includes("remotes/")) {
-              return branchPickerComponent(
-                "code-branch",
-                "Local Branch",
-                branch
-              );
-            } else {
-              const splitBranch = branch.split("/");
-              if (splitBranch.length <= 2) {
-                return null;
-              }
-              const remoteName = splitBranch[1];
-              const remoteBranch = splitBranch
-                .slice(2, splitBranch.length)
-                .join("/");
-
-              return branchPickerComponent("wifi", remoteName, remoteBranch);
-            }
-          })}
+            return renderBranchListComponent(branch);
+          })
+        )}
       </div>
       {listError
         ? errorComponent("Error occurred while listing branches!")

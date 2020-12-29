@@ -225,7 +225,7 @@ export default function FileExplorerComponent(props) {
               className="folder-view--content"
               key={`directory-key-${uuid()}`}
             >
-              <div className="flex cursor-pointer">
+              <div className="flex cursor-pointer items-center">
                 <div className="w-1/6">
                   <FontAwesomeIcon
                     icon={["fas", "folder"]}
