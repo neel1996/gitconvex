@@ -387,7 +387,7 @@ export default function RepositoryAction() {
           </div>
           {!selectedFlag ? (
             <>
-              <div className="alert--jumbotron">
+              <div className="text-center mx-auto font-sans p-10 text-2xl bg-yellow-100 w-11/12 font-light rounded-lg shadow border-dashed border-2 border-yellow-200">
                 Select a configured repo from the dropdown to perform git
                 related operations
               </div>

@@ -4,8 +4,8 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import { format } from "date-fns";
 import debounce from "lodash.debounce";
-import moment from "moment";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { globalAPIEndpoint } from "../../../../../../util/env_config";
@@ -357,8 +357,9 @@ export default function RepositoryCommitLogComponent(props) {
           } = commit;
 
           let commitRelativeTime = relativeCommitTimeCalculator(commitTime);
-          const formattedCommitTime = moment(new Date(commitTime)).format(
-            "MMM DD, YYYY"
+          const formattedCommitTime = format(
+            new Date(commitTime),
+            "MMMM dd, yyyy"
           );
 
           return (

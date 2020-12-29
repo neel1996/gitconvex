@@ -13,6 +13,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "date-fns": "^2.16.1",
     "firebase": "^8.0.2",
     "lodash.debounce": "^4.0.8",
     "moment": "^2.27.0",

@@ -163,19 +163,19 @@ export default function GitOperationComponent(props) {
     let statusPill = (status) => {
       if (status === "M") {
         return (
-          <div className="git-ops--file--status p-3 text-yellow-600 border-2 border-yellow-200 font-sans font-semibold bg-yellow-50">
+          <div className="git-ops--file--status w-full p-3 text-yellow-600 border-2 border-yellow-200 font-sans font-semibold bg-yellow-50">
             MODIFIED
           </div>
         );
       } else if (status === "D") {
         return (
-          <div className="git-ops--file--status p-3 text-red-500 border-2 border-red-200 font-sans font-semibold bg-red-50">
+          <div className="git-ops--file--status w-full p-3 text-red-500 border-2 border-red-200 font-sans font-semibold bg-red-50">
             REMOVED
           </div>
         );
       } else {
         return (
-          <div className="git-ops--file--status p-3 text-indigo-600 border-2 border-indigo-200 font-sans font-semibold bg-indigo-50">
+          <div className="git-ops--file--status w-full p-3 text-indigo-600 border-2 border-indigo-200 font-sans font-semibold bg-indigo-50">
             UNTRACKED
           </div>
         );
@@ -499,7 +499,7 @@ export default function GitOperationComponent(props) {
                             return (
                               <div
                                 key={`${data}-${index}`}
-                                className={`break-all font-sans text-gray-700 items-center align-middle my-auto ${
+                                className={`mx-1 break-all font-sans text-gray-700 items-center align-middle my-auto ${
                                   index === 0
                                     ? "w-3/4 text-left"
                                     : "w-1/4 text-center"

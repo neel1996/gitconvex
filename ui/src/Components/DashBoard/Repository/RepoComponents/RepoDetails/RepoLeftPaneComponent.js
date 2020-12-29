@@ -128,7 +128,7 @@ export default function RepoLeftPaneComponent(props) {
             <div className="flex-even my-3">
               <div className="commitlogs--label">Commit Logs</div>
               <div
-                className="commitlogs--content"
+                className="p-3 text-gray-600 text-center w-1/2 rounded-md shadow-md bg-yellow-200 text-whtie font-sans font-semibold text-xl hover:bg-yellow-100 hover:shadow-sm cursor-pointer transition"
                 onClick={(event) => {
                   showCommitLogsView();
                 }}

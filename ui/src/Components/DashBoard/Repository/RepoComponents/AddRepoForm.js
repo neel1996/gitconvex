@@ -233,6 +233,24 @@ export default function AddRepoForm(props) {
     );
   }
 
+  function onRepoPathChange(event) {
+    setRepoPath(event.target.value);
+    if (repoNameState === "") {
+      let pathValue = event.currentTarget.value;
+      if (pathValue.includes("/")) {
+        let splitPath = pathValue.split("/");
+        let detectedRepoName = splitPath[splitPath.length - 1];
+        setRepoName(detectedRepoName);
+      }
+
+      if (pathValue.includes("\\")) {
+        let splitPath = pathValue.split("\\");
+        let detectedRepoName = splitPath[splitPath.length - 1];
+        setRepoName(detectedRepoName);
+      }
+    }
+  }
+
   function addRepoFormContainer() {
     return (
       <div className="repo-form block">
@@ -243,7 +261,7 @@ export default function AddRepoForm(props) {
             id="repoNameText"
             type="text"
             placeholder="Enter a Repository Name"
-            className="repo-form--input"
+            className="repo-form--input font-sans text-gray-700"
             onChange={(event) => {
               setRepoName(event.target.value);
             }}
@@ -262,10 +280,8 @@ export default function AddRepoForm(props) {
                 ? "Enter base directory path"
                 : "Enter repository path"
             }
-            className="repo-form--input"
-            onChange={(event) => {
-              setRepoPath(event.target.value);
-            }}
+            className="repo-form--input font-sans text-gray-700"
+            onChange={onRepoPathChange}
             value={repoPathState}
             onClick={() => {
               resetAlertBanner();
