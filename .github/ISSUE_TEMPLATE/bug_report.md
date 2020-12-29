@@ -47,6 +47,6 @@ Gitconvex displays logs in the command line. Please paste the error logs below
 >mark with [x] to select the check box
 
 - [ ] Critical (The application crashes / breaks completely)
-- [ ] High (Blocks you from performing an critical operation)
+- [ ] High (Blocks you from performing a critical operation)
 - [ ] Moderate (Bearable or Manageable issue) 
 - [ ] Low (Something is not right, but the impact is minimal)
