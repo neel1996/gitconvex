@@ -104,6 +104,7 @@ type ComplexityRoot struct {
 		StageAllItems       func(childComplexity int, repoID string) int
 		StageItem           func(childComplexity int, repoID string, item string) int
 		UpdateRepoDataFile  func(childComplexity int, newDbFile string) int
+		UpdateRepoName      func(childComplexity int, repoID string, repoName string) int
 	}
 
 	PullResult struct {
@@ -194,6 +195,7 @@ type MutationResolver interface {
 	SettingsEditPort(ctx context.Context, newPort string) (string, error)
 	UpdateRepoDataFile(ctx context.Context, newDbFile string) (string, error)
 	DeleteRepo(ctx context.Context, repoID string) (*model.DeleteStatus, error)
+	UpdateRepoName(ctx context.Context, repoID string, repoName string) (string, error)
 }
 type QueryResolver interface {
 	HealthCheck(ctx context.Context) (*model.HealthCheckParams, error)
@@ -579,6 +581,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateRepoDataFile(childComplexity, args["newDbFile"].(string)), true
+
+	case "Mutation.updateRepoName":
+		if e.complexity.Mutation.UpdateRepoName == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateRepoName_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateRepoName(childComplexity, args["repoId"].(string), args["repoName"].(string)), true
 
 	case "PullResult.pulledItems":
 		if e.complexity.PullResult.PulledItems == nil {
@@ -1094,6 +1108,7 @@ type Mutation {
     settingsEditPort(newPort: String!): String!
     updateRepoDataFile(newDbFile: String!): String!
     deleteRepo(repoId: String!): deleteStatus!
+    updateRepoName(repoId: String!, repoName: String!): String!
 }
 `, BuiltIn: false},
 }
@@ -1538,6 +1553,30 @@ func (ec *executionContext) field_Mutation_updateRepoDataFile_args(ctx context.C
 		}
 	}
 	args["newDbFile"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateRepoName_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["repoId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("repoId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["repoId"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["repoName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("repoName"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["repoName"] = arg1
 	return args, nil
 }
 
@@ -3324,6 +3363,48 @@ func (ec *executionContext) _Mutation_deleteRepo(ctx context.Context, field grap
 	res := resTmp.(*model.DeleteStatus)
 	fc.Result = res
 	return ec.marshalNdeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐDeleteStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateRepoName(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateRepoName_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateRepoName(rctx, args["repoId"].(string), args["repoName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PullResult_status(ctx context.Context, field graphql.CollectedField, obj *model.PullResult) (ret graphql.Marshaler) {
@@ -6177,6 +6258,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "deleteRepo":
 			out.Values[i] = ec._Mutation_deleteRepo(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateRepoName":
+			out.Values[i] = ec._Mutation_updateRepoName(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

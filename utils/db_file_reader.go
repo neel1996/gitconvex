@@ -14,7 +14,6 @@ type RepoData struct {
 }
 
 // DataStoreFileReader reads the database json file tracking the stored repos and returns the data as a struct
-
 func DataStoreFileReader() []RepoData {
 	logger := global.Logger{}
 

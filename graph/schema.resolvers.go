@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-
 	"github.com/neel1996/gitconvex-server/api"
 	"github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/global"
@@ -217,6 +216,11 @@ func (r *mutationResolver) DeleteRepo(ctx context.Context, repoID string) (*mode
 	return api.DeleteRepo(repoID), nil
 }
 
+func (r *mutationResolver) UpdateRepoName(ctx context.Context, repoID string, repoName string) (string, error) {
+	logger.Log("Initiating repo name update request", global.StatusInfo)
+	return api.UpdateRepoName(repoID, repoName)
+}
+
 func (r *queryResolver) HealthCheck(ctx context.Context) (*model.HealthCheckParams, error) {
 	logger.Log("Initiating health check request", global.StatusInfo)
 	return api.HealthCheckApi(), nil
@@ -298,11 +302,11 @@ func (r *queryResolver) SearchCommitLogs(ctx context.Context, repoID string, sea
 		logger.Log("Repo is invalid or HEAD is nil", global.StatusError)
 		return []*model.GitCommits{
 			{
-				Hash:               nil,
-				Author:             nil,
-				CommitTime:         nil,
-				CommitMessage:      nil,
-				CommitFilesCount:   nil,
+				Hash:             nil,
+				Author:           nil,
+				CommitTime:       nil,
+				CommitMessage:    nil,
+				CommitFilesCount: nil,
 			},
 		}, nil
 	}

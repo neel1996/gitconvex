@@ -134,4 +134,5 @@ type Mutation {
     settingsEditPort(newPort: String!): String!
     updateRepoDataFile(newDbFile: String!): String!
     deleteRepo(repoId: String!): deleteStatus!
+    updateRepoName(repoId: String!, repoName: String!): String!
 }
