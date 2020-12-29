@@ -1,6 +1,6 @@
 // Global ENV file for all environment variables
 
-export const CURRENT_VERSION = "2.0.0";
+export const CURRENT_VERSION = "2.0.1";
 
 //PORTS LIST
 
