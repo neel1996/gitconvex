@@ -209,6 +209,8 @@ export default function FileExplorerComponent(props) {
   };
 
   const gitTrackedFileComponent = () => {
+    var fileIcon;
+
     if (gitRepoFiles && gitRepoFiles.length > 0) {
       var formattedFiles = [];
       var directoryEntry = [];
@@ -248,25 +250,23 @@ export default function FileExplorerComponent(props) {
             </div>
           );
         } else if (splitEntry[1].includes("File")) {
-          let fileIcon;
           if (splitEntry[0] === "LICENSE") {
             fileIcon = require("../../../../../assets/icons/file_type_license.svg");
           } else {
             fileIcon = require("../../../../../assets/icons/" +
               getIconForFile(splitEntry[0]));
           }
-
           fileEntry.push(
             <div className="folder-view--content" key={`file-key-${uuid()}`}>
               <div className="flex items-center align-middle">
                 <div className="w-1/6">
                   <img
-                    src={fileIcon}
+                    src={fileIcon.default}
                     style={{
                       width: "26px",
                       filter: "grayscale(30%)",
                     }}
-                    alt={fileIcon}
+                    alt={fileIcon.default}
                   ></img>
                 </div>
                 <div

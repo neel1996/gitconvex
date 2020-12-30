@@ -160,7 +160,7 @@ export default function CodeFileViewComponent(props) {
                       <div className="codeview--commits--latest--label">
                         Latest Commit
                       </div>
-                      <div className="w-3/4 mx-auto bg-indigo-100 font-sans font-semibold text-xl text-center text-indigo-600 p-2 rounded shadow">
+                      <div className="w-3/4 mx-auto bg-indigo-100 font-sans font-semibold text-base text-center text-indigo-600 p-2 rounded shadow">
                         {latestCommit}
                       </div>
                     </div>
