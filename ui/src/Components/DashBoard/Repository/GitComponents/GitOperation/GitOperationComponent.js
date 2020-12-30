@@ -335,10 +335,10 @@ export default function GitOperationComponent(props) {
             </div>
           ) : null}
           <div className="git-ops--unstage--header">
-            <div className="w-3/4 font-sans font-semibold text-xl text-center text-white border-r-2 border-indigo-300">
+            <div className="w-11/12 font-sans font-semibold text-xl text-center text-white border-r-2 border-indigo-300">
               STAGED FILE
             </div>
-            <div className="w-1/2 font-sans font-semibold text-xl text-center text-white border-r-2 border-indigo-300">
+            <div className="w-1/4 font-sans font-semibold text-xl text-center text-white border-r-2 border-indigo-300">
               ACTION
             </div>
           </div>
@@ -347,10 +347,12 @@ export default function GitOperationComponent(props) {
               if (item) {
                 return (
                   <div className="git-ops--unstage--table--data" key={item}>
-                    <div className="git-ops--unstage--table--item font-sans font-light text-xl text-gray-700">
-                      {item}
+                    <div className="w-11/12 block px-1 border-r-2 border-gray-300">
+                      <div className="git-changed-item overflow-x-auto w-full font-sans font-light text-base text-gray-700">
+                        {item}
+                      </div>
                     </div>
-                    <div className="w-1/2 mx-auto">
+                    <div className="w-1/4 mx-auto">
                       <div
                         className="git-ops--unstage--remove--btn p-3 bg-red-400 text-xl font-sans font-semibold text-center shadow-md hover:bg-red-500 hover:shadow-sm"
                         onClick={(event) => {
@@ -499,7 +501,8 @@ export default function GitOperationComponent(props) {
                             return (
                               <div
                                 key={`${data}-${index}`}
-                                className={`mx-1 break-all font-sans text-gray-700 items-center align-middle my-auto ${
+                                title={data}
+                                className={`git-changed-item mx-1 overflow-x-auto font-sans text-gray-700 items-center align-middle my-auto ${
                                   index === 0
                                     ? "w-3/4 text-left"
                                     : "w-1/4 text-center"

@@ -32,6 +32,7 @@ export default function Settings(props) {
   const [renameRepo, setRenameRepo] = useState("");
 
   useEffect(() => {
+    setRenameRepo("");
     axios({
       url: globalAPIEndpoint,
       method: "POST",

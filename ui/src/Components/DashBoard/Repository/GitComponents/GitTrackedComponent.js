@@ -299,7 +299,7 @@ export default function GitTrackedComponent(props) {
 
   return (
     <>
-      <style jsx>
+      <style>
         {`
           .git-changed-item::-webkit-scrollbar {
             background: rgba(0, 0, 0, 0);
