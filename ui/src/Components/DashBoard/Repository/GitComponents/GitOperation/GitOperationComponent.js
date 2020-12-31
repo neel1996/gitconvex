@@ -7,6 +7,7 @@ import "../../../../styles/GitOperations.css";
 import CommitComponent from "./CommitComponent";
 import PushComponent from "./PushComponent";
 import StageComponent from "./StageComponent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function GitOperationComponent(props) {
   library.add(fab);
@@ -435,16 +436,18 @@ export default function GitOperationComponent(props) {
           }}
         >
           {actionComponent(action)}
-
           <div
-            className="git-ops--backdrop--close"
+            className="w-14 h-14 mr-5 mt-6 rounded-full bg-red-500 text-white flex justify-center items-center shadow cursor-pointer fixed right-0 top-0"
             onClick={() => {
               setAction("");
               const localReload = viewReload + 1;
               setViewReload(localReload);
             }}
           >
-            X
+            <FontAwesomeIcon
+              className="flex text-center text-3xl my-auto"
+              icon={["fas", "times"]}
+            ></FontAwesomeIcon>
           </div>
         </div>
       ) : null}

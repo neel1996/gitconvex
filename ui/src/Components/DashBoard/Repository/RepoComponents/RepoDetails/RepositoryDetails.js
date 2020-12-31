@@ -230,18 +230,21 @@ export default function RepositoryDetails(props) {
             }}
           >
             <div
-              className="commitlogs-view"
-              onClick={() => {
-                setShowCommitLogs(false);
-              }}
-            >
-              X
-            </div>
-            <div
               id="commit-log__cards"
               className="w-full xl:w-3/4 lg:w-5/6 md:w-11/12 sm:w-11/12 h-full block mx-auto my-auto mt-10 mb-10"
             >
               {memoizedCommitLogComponent}
+            </div>
+            <div
+              className="w-14 h-14 mr-5 mt-6 rounded-full bg-red-500 text-white flex justify-center items-center shadow cursor-pointer fixed right-0 top-0"
+              onClick={() => {
+                setShowCommitLogs(false);
+              }}
+            >
+              <FontAwesomeIcon
+                className="flex text-center text-3xl my-auto"
+                icon={["fas", "times"]}
+              ></FontAwesomeIcon>
             </div>
           </div>
         </>
@@ -260,7 +263,7 @@ export default function RepositoryDetails(props) {
         >
           <>{action ? actionComponentPicker() : null}</>
           <div
-            className="action-view"
+            className="w-14 h-14 mr-5 mt-6 rounded-full bg-red-500 text-white flex justify-center items-center shadow cursor-pointer fixed top-0 right-0"
             onClick={() => {
               setBackdropToggle(false);
               setCodeViewToggle(false);
@@ -268,7 +271,10 @@ export default function RepositoryDetails(props) {
               setAction("");
             }}
           >
-            X
+            <FontAwesomeIcon
+              className="flex text-center text-3xl my-auto"
+              icon={["fas", "times"]}
+            ></FontAwesomeIcon>
           </div>
         </div>
       ) : null}
