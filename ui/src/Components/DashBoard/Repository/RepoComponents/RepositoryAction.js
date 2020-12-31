@@ -324,8 +324,11 @@ export default function RepositoryAction() {
           });
         } else {
           return (
-            <div className="text-center font-sans font-light text-xl my-2 text-gray-600 border-b border-dotted">
-              {searchBranchValue.concat(" branch not available!")}
+            <div className="text-center font-sans font-light text-base my-2 text-indigo-800 border-b border-dotted">
+              <span className="mx-1 font-semibold border-b border-dashed">
+                {searchBranchValue}
+              </span>
+              branch is not available!
             </div>
           );
         }

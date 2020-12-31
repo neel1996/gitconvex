@@ -379,7 +379,10 @@ export default function BranchListComponent({ repoId, currentBranch }) {
             })
           ) : (
             <div className="text-center font-sans font-light text-xl my-2 text-gray-600 border-b border-dotted">
-              {branchSearchTerm.concat(" branch not available!")}
+              <span className="mx-2 font-semibold border-b border-dashed">
+                {branchSearchTerm}
+              </span>
+              branch is not available!
             </div>
           )
         ) : (
