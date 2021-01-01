@@ -347,15 +347,15 @@ export default function GitOperationComponent(props) {
             {stageItems.map((item) => {
               if (item) {
                 return (
-                  <div className="git-ops--unstage--table--data" key={item}>
+                  <div className="git-ops--unstage--table--data p-1" key={item}>
                     <div className="w-11/12 block px-1 border-r-2 border-gray-300">
-                      <div className="git-changed-item overflow-x-auto w-full font-sans font-light text-base text-gray-700">
+                      <div className="git-changed-item overflow-x-auto w-full font-sans ml-1 text-gray-700">
                         {item}
                       </div>
                     </div>
                     <div className="w-1/4 mx-auto">
                       <div
-                        className="git-ops--unstage--remove--btn p-3 bg-red-400 text-xl font-sans font-semibold text-center shadow-md hover:bg-red-500 hover:shadow-sm"
+                        className="git-ops--unstage--remove--btn p-2 my-1 bg-red-400 text-xl font-sans font-semibold text-center shadow-md hover:bg-red-500 hover:shadow-sm"
                         onClick={(event) => {
                           removeStagedItem(item, event);
                           setUnStageFailed(false);
