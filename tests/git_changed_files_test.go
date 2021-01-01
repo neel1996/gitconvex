@@ -18,7 +18,7 @@ func TestChangedFiles(t *testing.T) {
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex/starfleet"
+		repoPath = "/home/runner/work/gitconvex-server/starfleet"
 		r, _ = git.PlainOpen(repoPath)
 	}
 

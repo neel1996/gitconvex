@@ -13,7 +13,18 @@ import (
 func TestGetBranchList(t *testing.T) {
 	b := make(chan git2.Branch)
 	cwd, _ := os.Getwd()
-	r, _ := git.PlainOpen(path.Join(cwd, ".."))
+
+	var repoPath string
+	var r *git.Repository
+	currentEnv := os.Getenv("GOTESTENV")
+	fmt.Println("Environment : " + currentEnv)
+
+	if currentEnv == "ci" {
+		repoPath = "/home/runner/work/gitconvex-server/starfleet"
+		r, _ = git.PlainOpen(repoPath)
+	} else {
+		r, _ = git.PlainOpen(path.Join(cwd, ".."))
+	}
 
 	type args struct {
 		repo       *git.Repository
