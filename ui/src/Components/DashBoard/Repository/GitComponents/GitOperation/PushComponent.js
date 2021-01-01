@@ -140,7 +140,7 @@ export default function PushComponent(props) {
     };
 
     return (
-      <div className="block justify-evenly border shadow rounded p-2">
+      <div className="block justify-evenly border-b-2 p-2">
         {modelLabel.map((label, index) => {
           return localModelFormat(label, splitCommit[index]);
         })}
@@ -187,17 +187,17 @@ export default function PushComponent(props) {
     <>
       {!pushDone ? (
         <>
-          <div className="git-ops--push">
-            <div className="text-center font-sans font-semibold mx-auto w-full p-3 text-2xl border-b-2 border-dashed text-gray-800">
+          <div className="w-11/12 xl:w-3/4 lg:w-3/4 mx-auto my-auto bg-gray-50 px-10 py-6 rounded-lg">
+            <div className="text-center mb-4 font-sans font-semibold mx-auto w-full p-3 text-2xl border-b-2 border-dashed text-gray-800">
               Push To Remote
             </div>
-            <div className="flex mx-auto justify-around items-center align-middle gap-4">
+            <div className="flex w-full mx-auto justify-around items-center align-middle gap-4 my-6">
               <div className="w-2/3 font-sans text-xl font-semibold text-gray-600">
                 Available remotes
               </div>
               <div className="w-3/4">
                 <select
-                  className="git-ops--push--select"
+                  className="outline-none p-3 font-sans text-xl text-gray-600 rounded shadow-md border border-blue-100"
                   defaultValue="checked"
                   onChange={() => {
                     setIsRemoteSet(true);
@@ -217,14 +217,14 @@ export default function PushComponent(props) {
             </div>
 
             {isRemoteSet ? (
-              <div className="flex mx-auto justify-around items-center align-middle gap-4">
+              <div className="my-4 flex w-full mx-auto justify-around items-center align-middle gap-4">
                 <div className="w-2/3 font-sans text-xl font-semibold text-gray-600">
-                  Commits will be pushed
+                  Commits will be pushed to 
                 </div>
                 <div className="w-3/4">
                   <select
                     disabled
-                    className="git-ops--push--select"
+                    className="outline-none p-3 font-sans text-xl text-gray-600 rounded shadow-md border border-blue-100"
                     defaultValue={remoteData.gitCurrentBranch}
                     onChange={() => {
                       getUnpushedCommits();
@@ -238,8 +238,8 @@ export default function PushComponent(props) {
             ) : null}
 
             {unpushedCommits && unpushedCommits.length > 0 ? (
-              <div className="git-ops--push--unpushed">
-                <div className="git-ops--push--unpushed--label">
+              <div className="my-2 mx-auto w-full bg-purple-50 p-4 rounded-lg shadow border">
+                <div className="font-sans font-semibold text-2xl text-gray-600 my-1">
                   {unpushedCommits.length !== 0 ? (
                     <span className="mx-1 border-b border-dashed border-gray-600">
                       {unpushedCommits.length}
@@ -251,10 +251,7 @@ export default function PushComponent(props) {
                 <div className="overflow-auto" style={{ height: "200px" }}>
                   {unpushedCommits.map((commits, index) => {
                     return (
-                      <div
-                        key={`unpushed-commit-${index}`}
-                        className="git-ops--push--commits"
-                      >
+                      <div key={`unpushed-commit-${index}`} className="p-2">
                         {commitModel(commits)}
                       </div>
                     );
@@ -267,7 +264,7 @@ export default function PushComponent(props) {
 
             {pushFailed ? (
               <>
-                <div className="git-ops--push--nochange">
+                <div className="my-4 bg-red-100 text-red-400 text-center text-2xl font-sans font-semibold border-b-4 border-dashed border-red-400 p-4 rounded-lg">
                   Failed to push changes!
                 </div>
               </>
@@ -275,7 +272,7 @@ export default function PushComponent(props) {
 
             {isRemoteSet && unpushedCommits.length > 0 && !loading ? (
               <div
-                className="git-ops--push--btn"
+                className="w-full text-center font-sans font-semibold p-3 my-4 bg-indigo-300 text-xl text-white rounded shadow-md cursor-pointer hover:bg-indigo-400 hover:shadow-sm"
                 onClick={() => {
                   const remoteHost = remoteRef.current.value.trim();
 
@@ -284,12 +281,12 @@ export default function PushComponent(props) {
                   }
                 }}
               >
-                Push changes
+                PUSH CHANGES
               </div>
             ) : (
               <>
                 {isCommitEmpty ? (
-                  <div className="git-ops--push--nocommits">
+                  <div className="mt-4 rounded shadow-md p-3 bg-gray-400 text-white font-sans font-semibold text-xl text-center">
                     No Commits to Push
                   </div>
                 ) : null}
@@ -297,7 +294,7 @@ export default function PushComponent(props) {
             )}
             <>
               {loading ? (
-                <div className="git-ops--push--loader">
+                <div className="my-2 p-3 bg-green-50 rounded-lg shadow text-green-500 font-sans font-light text-center text-2xl border-2 border-dashed border-green-500">
                   <div className="text-green-500 text-2xl">
                     Pushing to remote...
                   </div>
