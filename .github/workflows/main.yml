@@ -25,7 +25,7 @@ jobs:
       
       - name: Clone test repo
         run: |
-          mkdir -p /home/runner/work/gitconvex-server/
+          mkdir -p /home/runner/work/gitconvex-server/starfleet/
           git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex-server/
           cd /home/runner/work/gitconvex-server/starfleet
           git branch 
