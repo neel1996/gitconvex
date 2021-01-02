@@ -2,7 +2,7 @@ name: Gitconvex build deploy
 
 on:
   push:
-    branches: [ v2.0.1 ]
+    branches: [ build-log-test ]
 
 jobs:
   build:
