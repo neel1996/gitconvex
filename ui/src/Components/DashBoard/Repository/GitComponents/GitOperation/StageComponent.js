@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
-import "../../../../styles/GitOperations.css";
 
 export default function StageComponent(props) {
   const { stageComponents, repoId } = props;
@@ -80,8 +79,8 @@ export default function StageComponent(props) {
                 </div>
               ) : null}
               {loading ? (
-                <div className="git-ops--stage--alert--progress">
-                  Staging in prgoress...
+                <div className="mx-auto w-full p-4 text-center rounded-lg rounded-b-xl bg-gray-100 shadow-md border text-3xl border-b-4 border-gray-400 border-dashed font-sans font-semibold text-gray-500">
+                  Staging in progress...
                 </div>
               ) : (
                 <div

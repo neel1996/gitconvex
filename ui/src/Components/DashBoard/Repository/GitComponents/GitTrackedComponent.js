@@ -316,9 +316,6 @@ export default function GitTrackedComponent(props) {
       {noChangeMarker ? (
         <>
           <div className="git-tracked--wrapper">{memoizedGitOperationView}</div>
-          <div className="git-tracked--nochange">
-            No changes found in the selected git repo
-          </div>
           <div className="git-tracked--alert">
             <div>
               <FontAwesomeIcon

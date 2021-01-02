@@ -2,7 +2,6 @@ import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
 import InfiniteLoader from "../../../../Animations/InfiniteLoader";
-import "../../../../styles/GitOperations.css";
 
 export default function PushComponent(props) {
   const { repoId } = props;
@@ -219,7 +218,7 @@ export default function PushComponent(props) {
             {isRemoteSet ? (
               <div className="my-4 flex w-full mx-auto justify-around items-center align-middle gap-4">
                 <div className="w-2/3 font-sans text-xl font-semibold text-gray-600">
-                  Commits will be pushed to 
+                  Commits will be pushed to
                 </div>
                 <div className="w-3/4">
                   <select

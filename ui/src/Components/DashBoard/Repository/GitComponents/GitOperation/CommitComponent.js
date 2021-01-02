@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
-import "../../../../styles/GitOperations.css";
 
 export default function CommitComponent(props) {
   const { repoId } = props;

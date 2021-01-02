@@ -3,7 +3,6 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
-import "../../../../styles/GitOperations.css";
 import CommitComponent from "./CommitComponent";
 import PushComponent from "./PushComponent";
 import StageComponent from "./StageComponent";
@@ -164,19 +163,19 @@ export default function GitOperationComponent(props) {
     let statusPill = (status) => {
       if (status === "M") {
         return (
-          <div className="git-ops--file--status w-full p-3 text-yellow-600 border-2 border-yellow-200 font-sans font-semibold bg-yellow-50">
+          <div className="rounded w-3/4 mx-auto p-2 text-yellow-600 border-2 border-yellow-200 font-sans font-semibold bg-yellow-50">
             MODIFIED
           </div>
         );
       } else if (status === "D") {
         return (
-          <div className="git-ops--file--status w-full p-3 text-red-500 border-2 border-red-200 font-sans font-semibold bg-red-50">
+          <div className="rounded w-3/4 mx-auto p-2 text-red-500 border-2 border-red-200 font-sans font-semibold bg-red-50">
             REMOVED
           </div>
         );
       } else {
         return (
-          <div className="git-ops--file--status w-full p-3 text-indigo-600 border-2 border-indigo-200 font-sans font-semibold bg-indigo-50">
+          <div className="rounded w-3/4 mx-auto p-2 text-indigo-600 border-2 border-indigo-200 font-sans font-semibold bg-indigo-50">
             UNTRACKED
           </div>
         );
@@ -186,7 +185,7 @@ export default function GitOperationComponent(props) {
     let actionButton = (stageItem) => {
       return (
         <div
-          className="git-ops--stageitem--add p-3 bg-green-300 text-xl font-sans font-semibold text-center shadow-md hover:bg-green-400 hover:shadow-sm"
+          className="w-3/4 rounded-md text-white mx-auto cursor-pointer p-2 bg-green-300 text-xl font-sans font-semibold text-center shadow-md hover:bg-green-400 hover:shadow-sm"
           onClick={(event) => {
             stageGitComponent(stageItem, event);
             setUnStageFailed(false);
@@ -310,13 +309,13 @@ export default function GitOperationComponent(props) {
 
     if (stageItems && stageItems.length > 0) {
       return (
-        <div className="git-ops--stagearea border border-blue-100 shadow-md rounded-lg">
-          <div className="git-ops--stagearea--top items-center">
-            <div className="text-5xl font-sans text-gray-800 mx-4">
+        <div className="p-3 my-10 w-full mx-auto border border-blue-100 shadow-md rounded-lg">
+          <div className="flex items-center justify-start my-6 w-full">
+            <div className="text-4xl font-sans text-gray-800 mx-4">
               Staged Files
             </div>
             <div
-              className="git-ops--unstage--btn"
+              className="p-3 rounded-lg bg-red-400 text-white font-sans font-semibold text-xl cursor-pointer hover:bg-red-500"
               onClick={(event) => {
                 removeAllStagedItems(event);
                 setUnStageFailed(false);
@@ -335,27 +334,33 @@ export default function GitOperationComponent(props) {
               to perform a complete git reset
             </div>
           ) : null}
-          <div className="git-ops--unstage--header">
-            <div className="w-11/12 font-sans font-semibold text-xl text-center text-white border-r-2 border-indigo-300">
+          <div className="flex justify-between p-3 bg-indigo-400 rounded my-1 shadow">
+            <div className="w-3/4 font-sans font-semibold text-xl text-center text-white border-r-2 border-indigo-300">
               STAGED FILE
             </div>
             <div className="w-1/4 font-sans font-semibold text-xl text-center text-white border-r-2 border-indigo-300">
               ACTION
             </div>
           </div>
-          <div className="git-ops--unstage--table" style={{ height: "450px" }}>
+          <div
+            className="overflow-y-auto w-full my-2"
+            style={{ height: "450px" }}
+          >
             {stageItems.map((item) => {
               if (item) {
                 return (
-                  <div className="git-ops--unstage--table--data p-1" key={item}>
-                    <div className="w-11/12 block px-1 border-r-2 border-gray-300">
+                  <div
+                    className="flex items-center justify-between border-b p-1"
+                    key={item}
+                  >
+                    <div className="w-3/4 pr-6 block px-1 border-r-2 border-gray-300">
                       <div className="git-changed-item overflow-x-auto w-full font-sans ml-1 text-gray-700">
                         {item}
                       </div>
                     </div>
                     <div className="w-1/4 mx-auto">
                       <div
-                        className="git-ops--unstage--remove--btn p-2 my-1 bg-red-400 text-xl font-sans font-semibold text-center shadow-md hover:bg-red-500 hover:shadow-sm"
+                        className="rounded text-white cursor-pointer w-3/4 mx-auto p-2 my-1 bg-red-400 text-xl font-sans font-semibold text-center shadow-md hover:bg-red-500 hover:shadow-sm"
                         onClick={(event) => {
                           removeStagedItem(item, event);
                           setUnStageFailed(false);
@@ -406,7 +411,7 @@ export default function GitOperationComponent(props) {
 
   function noChangesComponent() {
     return (
-      <div className="git-ops--nochange">
+      <div className="mx-auto my-4 text-center font-sans font-light text-2xl shadow p-6 bg-pink-50 border-b-4 border-pink-400 rounded-lg text-pink-500 border-dashed">
         {!isLoading ? (
           <span>No files changes found in the repo.</span>
         ) : (
@@ -420,7 +425,7 @@ export default function GitOperationComponent(props) {
     <>
       {action ? (
         <div
-          className="git-ops--backdrop"
+          className="w-full h-full fixed flex mx-auto my-auto overflow-auto top-0 bottom-0 left-0 right-0"
           id="operation-backdrop"
           style={{ background: "rgba(0,0,0,0.6)", zIndex: "99" }}
           onClick={(event) => {
@@ -466,7 +471,7 @@ export default function GitOperationComponent(props) {
         })}
       </div>
       {getTableData() && getTableData().length > 0 ? (
-        <div className="git-ops--file-table">
+        <div className="w-full shadow-md p-2 rounded-lg border border-blue-50 overflow-auto py-4">
           <div className="flex items-center p-4 bg-gray-100 rounded">
             {tableColumns.map((column, index) => {
               return (
@@ -483,7 +488,7 @@ export default function GitOperationComponent(props) {
           </div>
 
           <div
-            className="git-ops--file-table--data"
+            className="block w-full overflow-auto"
             style={{ height: "400px" }}
           >
             <div>
@@ -497,15 +502,15 @@ export default function GitOperationComponent(props) {
                     getTableData().map((tableData, index) => {
                       return (
                         <div
-                          className="git-ops--file-table--items"
+                          className="flex justify-between items-center border-b p-2"
                           key={`tableItem-${index}`}
                         >
                           {tableData.map((data, index) => {
                             return (
                               <div
                                 key={`${data}-${index}`}
-                                title={data}
-                                className={`git-changed-item mx-1 overflow-x-auto font-sans text-gray-700 items-center align-middle my-auto ${
+                                title={index === 0 ? data : null}
+                                className={`git-changed-item overflow-x-auto mx-auto font-sans text-gray-700 items-center align-middle my-auto border-r-2 border-gray-100 ${
                                   index === 0
                                     ? "w-3/4 text-left"
                                     : "w-1/4 text-center"

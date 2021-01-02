@@ -7,7 +7,6 @@ import { GIT_TRACKED_FILES } from "../../../../actionStore";
 import { ContextProvider } from "../../../../context";
 import "../../../../prism.css";
 import { globalAPIEndpoint } from "../../../../util/env_config";
-import "../../../styles/GitDiffView.css";
 import "prismjs/components/prism-markdown";
 
 export default function GitDiffViewComponent() {
@@ -99,17 +98,28 @@ export default function GitDiffViewComponent() {
         let fileName = splitEntry[splitEntry.length - 1];
 
         return (
-          <div className="git-diff--files--list" title={fileEntry}>
-            <div className="bg-gray-100 p-1 rounded">
-              <div className="git-diff--files--label">Directory:</div>
-              <div className="git-diff--files--directory">{dirSplit}</div>
+          <div
+            className="my-2 block cursor-pointer border border-dashed border-blue-800"
+            title={fileEntry}
+          >
+            <div className="bg-gray-50 p-1 rounded">
+              <div className="font-sans font-semibold text-blue-400">
+                Directory:
+              </div>
+              <div className="text-gray-500 truncate font-light">
+                {dirSplit}
+              </div>
             </div>
-            <div className="git-diff--files--filename_sm">{fileName}</div>
+            <div className="mx-1 my-2 text-sm font-sans text-blue-800">
+              {fileName}
+            </div>
           </div>
         );
       } else {
         return (
-          <span className="git-diff--files--filename_lg">{fileEntry}</span>
+          <span className="text-lg p-2 border-b-2 border-gray-200 w-full">
+            {fileEntry}
+          </span>
         );
       }
     };
@@ -263,10 +273,10 @@ export default function GitDiffViewComponent() {
         if (line[0] && line[0] === "+") {
           return (
             <div
-              className="git-diff--codeview--change bg-green-100"
+              className="w-full flex items-center gap-1 bg-green-100 w-screen"
               key={`${line}-${uuidv4()}`}
             >
-              <div className="git-diff--codeview--linenumber border-green-400 text-green-500">
+              <div className="font-sans text-center w-16 mx-2 border-r border-green-400 text-green-500">
                 {++lineCounter}
               </div>
               <pre className="w-5/6 mx-2">
@@ -285,10 +295,10 @@ export default function GitDiffViewComponent() {
         } else if (line[0] && line[0] === "-") {
           return (
             <div
-              className="git-diff--codeview--change bg-red-100"
+              className="w-full flex items-center gap-1 bg-red-100 w-screen"
               key={`${line}-${uuidv4()}`}
             >
-              <div className="git-diff--codeview--linenumber border-red-400 text-red-400">
+              <div className="font-sans text-center w-16 mx-2 border-r border-red-400 text-red-400">
                 -
               </div>
               <pre className="w-5/6 mx-2">
@@ -308,13 +318,13 @@ export default function GitDiffViewComponent() {
           if (line[0]) {
             return (
               <div
-                className="git-diff--codeview--change bg-white-200 "
+                className="w-full flex items-center gap-1 bg-white-200 w-screen"
                 key={`${line}-${uuidv4()}`}
               >
-                <div className="git-diff--codeview--linenumber">
+                <div className="font-sans text-gray-300 text-center w-16 mx-2 border-r border-gray-200">
                   {++lineCounter}
                 </div>
-                <pre className="w-5/6">
+                <pre className="w-5/6 mx-2">
                   <code
                     dangerouslySetInnerHTML={{
                       __html: Prism.highlight(
@@ -345,33 +355,38 @@ export default function GitDiffViewComponent() {
     <>
       {changedFiles && changedFiles.length > 0 ? (
         <>
-          <div className="git-diff--wrapper">
-            <div className="git-diff--files" style={{ height: "880px" }}>
+          <div className="w-full flex justify-center mx-auto">
+            <div
+              className="overflow-auto break-words p-3 bg-white border-2 border-dashed border-gray-300 w-1/4 rounded-lg shadow-md"
+              style={{ height: "880px" }}
+            >
               {getDiffFiles()}
             </div>
 
             {!activeFileName ? (
-              <div className="git-diff--msg">
-                Click on a file to see difference information
+              <div className="mt-4 p-4 mb-auto bg-gray-200 rounded shadow w-1/2 font-sans font-semibold mx-auto flex justify-center text-center">
+                Click on a file to see difference
               </div>
             ) : (
               ""
             )}
 
             {warnStatus ? (
-              <div className="git-diff--warn">{warnStatus}</div>
+              <div className="mx-auto my-auto block bg-yellow-200 text-yellow-700 p-5 text-xl font-semibold rounded-lg shadow border border-b-2 border-dashed border-yellow-300">
+                {warnStatus}
+              </div>
             ) : null}
 
             {diffStatState &&
             diffStatState !== "Click on a file item to see the difference" &&
             !warnStatus ? (
-              <div className="git-diff--codeview">
+              <div className="w-3/4 mx-auto my-auto break-all p-3">
                 {diffStatState ? statFormat() : ""}
                 {fileLineDiffState &&
                 fileLineDiffState !==
                   "Click on a file item to see the difference" ? (
                   <div
-                    className="git-diff--codeview--content"
+                    className="p-3 overflow-auto break-words w-full"
                     style={{ height: "800px" }}
                   >
                     {fileLineDiffComponent()}
@@ -388,9 +403,11 @@ export default function GitDiffViewComponent() {
       ) : (
         <>
           {isApiCalled ? (
-            <div className="git-diff--error">No File changes in the repo</div>
+            <div className="mx-auto bg-yellow-100 w-full my-2 p-3 border-dashed rounded-lg shadow border-b-4 border-yellow-400 text-xl font-sans font-semibold text-center text-yellow-600">
+              No File changes in the repo
+            </div>
           ) : (
-            <div className="git-diff--loader">
+            <div className="w-full p-4 mx-auto text-center font-sans font-semibold text-xl rounded-lg shadow my-2 bg-pink-50 border-b-4 border-dashed border-pink-400">
               <span className="text-gray-400">
                 Fetching changed files from the server...
               </span>

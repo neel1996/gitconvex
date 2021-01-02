@@ -517,7 +517,7 @@ export default function Settings(props) {
         >
           {deleteRepo ? deleteRepoHandler() : null}
           <div
-            className="top-0 right-0 fixed float-right font-semibold my-2 bg-red-500 text-3xl cursor-pointer text-center text-white align-middle rounded-full w-12 h-12 items-center shadow-md mr-5"
+            className="w-14 h-14 mr-5 mt-6 rounded-full bg-red-500 text-white flex justify-center items-center shadow cursor-pointer fixed right-0 top-0"
             onClick={() => {
               setDeleteRepoStatus("");
               setBackdropToggle(false);
@@ -525,7 +525,10 @@ export default function Settings(props) {
               setViewReload(localViewReload);
             }}
           >
-            X
+            <FontAwesomeIcon
+              className="flex text-center text-3xl my-auto"
+              icon={["fas", "times"]}
+            ></FontAwesomeIcon>
           </div>
         </div>
       ) : null}
