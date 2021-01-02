@@ -9,7 +9,7 @@ This is the front-end react source for [gitconvex](https://github.com/neel1996/g
 
 The depedency packages used by this project can be found [here](https://github.com/neel1996/gitconvex-ui/network/dependencies)
 
-- **🎨 Styling** - For styling, the project uses [tailwind]() css framework 
+- **🎨 Styling** - For styling, the project uses [tailwind](https://github.com/tailwindlabs/tailwindcss) css framework 
 - **📑 Syntax Highlighting** - [prismjs](https://github.com/PrismJS/prism) is used for syntax highlighting within the *Git Difference* and *CodeView* section
 - **🎭 Icon set** - [FontAweomse for react](https://github.com/FortAwesome/Font-Awesome)
 
@@ -27,7 +27,7 @@ After cloning the repo, follow the steps mentioned below to setup the react app,
 
 - **Installing dependencies**
 
-```
+``` shell
 $ cd gitconvex-ui
 $ npm install
 ```
@@ -36,7 +36,7 @@ $ npm install
 
 The project uses `tailwindcss v2.0.2` for styling all the elements, so it is mandatory to build the CSS file which is not included in the repo. Follow the steps to build the css file
 
-```
+``` shell
 
 $ cd gitconvex-ui
 $ npm install --global tailwindcss 
@@ -46,6 +46,7 @@ $ npm run build:tailwind
 ## This will generate a default tailwind css bundle
 
 ```
+
 > **Note:** The final production build stage is configured to purge unused CSS selectors from the tailwind css file. So make sure you follow the [tailwind purge guidelines](https://tailwindcss.com/docs/controlling-file-size#writing-purgeable-html:~:text=Don't%20use%20string%20concatenation%20to%20create%20class%20names) to ensure that the required styles are included to the [production bundle](https://github.com/neel1996/gitconvex)
 
 - **Starting the app**
@@ -55,7 +56,7 @@ After completing the setup process, use `npm start` to start the react app
 
 ## Project directory tree
 
-```
+``` shell
 ├── LICENSE
 ├── README.md
 ├── package-lock.json
