@@ -1,5 +1,5 @@
 # gitconvex react project
-This is the front end react source for the [gitconvex](https://github.com/neel1996/gitconvex) project.
+This is the front-end react source for [gitconvex](https://github.com/neel1996/gitconvex).
 
 <p align="center">
     <img src="https://user-images.githubusercontent.com/47709856/87220396-e72df380-c380-11ea-9b2b-e156402842bb.png" width="280">
@@ -9,13 +9,13 @@ This is the front end react source for the [gitconvex](https://github.com/neel19
 
 The depedency packages used by this project can be found [here](https://github.com/neel1996/gitconvex-ui/network/dependencies)
 
-- **🎨 Styling** - For styling, the project used [tailwind]() css framework 
-- **📑 Syntax Highlighting** - [prismjs](https://github.com/PrismJS/prism) is used for syntax highlighting within the *Git Difference* section
+- **🎨 Styling** - For styling, the project uses [tailwind]() css framework 
+- **📑 Syntax Highlighting** - [prismjs](https://github.com/PrismJS/prism) is used for syntax highlighting within the *Git Difference* and *CodeView* section
 - **🎭 Icon set** - [FontAweomse for react](https://github.com/FortAwesome/Font-Awesome)
 
 ## Contribute!
 
-If you are interested in contributing to the project, fork the repo, submit a PR. Currently its just a single dev working on the project. Hopefully will get couple more on board to maintain the repo
+If you are interested in contributing to the project, fork the repo and submit a PR. Currently there are only 3 maintainers working on the project, so the review may take some time. Hopefully will get a couple more on board soon to maintain the repo
 
 ### Guidelines 
 
@@ -34,7 +34,7 @@ $ npm install
 
 - **Building the css file**
 
-The project uses `tailwindcss` for styling all the elements, so it is mandatory to build the CSS file which is not included in the git tree. Follow the steps to build the css file
+The project uses `tailwindcss v2.0.2` for styling all the elements, so it is mandatory to build the CSS file which is not included in the repo. Follow the steps to build the css file
 
 ```
 
@@ -46,7 +46,7 @@ $ npm run build:tailwind
 ## This will generate a default tailwind css bundle
 
 ```
-> **Note:** The final production build stage is configured to purge unused CSS selectors from the tailwind css file. So make sure you follow the [tailwind purge guidelines](https://tailwindcss.com/docs/controlling-file-size#writing-purgeable-html:~:text=Don't%20use%20string%20concatenation%20to%20create%20class%20names) to make sure that the required styles are not getting purged from the [production bundle](https://github.com/neel1996/gitconvex)
+> **Note:** The final production build stage is configured to purge unused CSS selectors from the tailwind css file. So make sure you follow the [tailwind purge guidelines](https://tailwindcss.com/docs/controlling-file-size#writing-purgeable-html:~:text=Don't%20use%20string%20concatenation%20to%20create%20class%20names) to ensure that the required styles are included to the [production bundle](https://github.com/neel1996/gitconvex)
 
 - **Starting the app**
 
@@ -148,11 +148,11 @@ After completing the setup process, use `npm start` to start the react app
     │       └── RightPane.css
     ├── actionStore.js
     ├── assets
-    │   └── gitconvex.png
+    │   ├── gitconvex.png
+    │   └── icons
     ├── context.js
     ├── index.css
     ├── index.js
-    ├── logo.svg
     ├── postcss.config.js
     ├── prism.css
     ├── reducer.js
@@ -164,9 +164,10 @@ After completing the setup process, use `npm start` to start the react app
     │   └── Dashboard.test.js
     └── util
         ├── apiURLSupplier.js
-        └── env_config.js
+        ├── env_config.js
+        └── relativeCommitTimeCalculator.js
 
-21 directories, 88 files
+22 directories, 88 files
 
 ```
 

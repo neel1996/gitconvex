@@ -22,6 +22,7 @@ export default function GitDiffViewComponent() {
   const [isApiCalled, setIsApiCalled] = useState(false);
   const [warnStatus, setWarnStatus] = useState("");
   const [lang, setLang] = useState("");
+  const [diffWidth, setDiffWidth] = useState(0);
 
   useEffect(() => {
     let repoId = state.globalRepoId;
@@ -196,6 +197,11 @@ export default function GitDiffViewComponent() {
             setDiffStatState(diffStat);
             setFileLineDiffState(fileDiff);
 
+            // Logic to set width for code lines based on max scroll width
+            const target = document.getElementById("codeDiffWrapper");
+            const targetWidth = target.scrollWidth;
+            setDiffWidth(targetWidth);
+
             let language;
             let langName = new LangLine().withFileName(fileName).prismIndicator;
 
@@ -273,8 +279,9 @@ export default function GitDiffViewComponent() {
         if (line[0] && line[0] === "+") {
           return (
             <div
-              className="w-full flex items-center gap-1 bg-green-100 w-screen"
+              className="flex items-center gap-1 bg-green-100 w-screen"
               key={`${line}-${uuidv4()}`}
+              style={diffWidth ? { width: `${diffWidth}px` } : null}
             >
               <div className="font-sans text-center w-16 mx-2 border-r border-green-400 text-green-500">
                 {++lineCounter}
@@ -295,8 +302,9 @@ export default function GitDiffViewComponent() {
         } else if (line[0] && line[0] === "-") {
           return (
             <div
-              className="w-full flex items-center gap-1 bg-red-100 w-screen"
+              className="flex items-center gap-1 bg-red-100 w-screen"
               key={`${line}-${uuidv4()}`}
+              style={diffWidth ? { width: `${diffWidth}px` } : null}
             >
               <div className="font-sans text-center w-16 mx-2 border-r border-red-400 text-red-400">
                 -
@@ -318,8 +326,9 @@ export default function GitDiffViewComponent() {
           if (line[0]) {
             return (
               <div
-                className="w-full flex items-center gap-1 bg-white-200 w-screen"
+                className="flex items-center gap-1 bg-white-200 w-screen"
                 key={`${line}-${uuidv4()}`}
+                style={diffWidth ? { width: `${diffWidth}px` } : null}
               >
                 <div className="font-sans text-gray-300 text-center w-16 mx-2 border-r border-gray-200">
                   {++lineCounter}
@@ -387,6 +396,7 @@ export default function GitDiffViewComponent() {
                   "Click on a file item to see the difference" ? (
                   <div
                     className="p-3 overflow-auto break-words w-full"
+                    id="codeDiffWrapper"
                     style={{ height: "800px" }}
                   >
                     {fileLineDiffComponent()}
