@@ -8,7 +8,7 @@ The main goal of this platform is to act as a web-based alternative for Github d
 [How to use](#how-to-use)
 - [Adding a new repo](#adding-a-new-repo)
 - [Repo Details](#repo-details)
-- [Add a new branch](#add-new-branch)
+- [List all branches](#list-all-branches)
  
 ## Requirements
 1. [Git](https://git-scm.com/) (Version 2.20+)
@@ -92,8 +92,7 @@ The repo detail view also provides features for performing the following operati
 - Code view for valid files from the file explorer view
 - Loading commit logs dynamically
 ```
-
-![repo-card-details](https://user-images.githubusercontent.com/65342122/89164057-30deb800-d594-11ea-94d6-d3a330260044.png)
+![repo-card-details](https://user-images.githubusercontent.com/65342122/103479129-82b09600-4df1-11eb-808f-9a6eba736841.png)
 
 ### Commit logs
 
@@ -101,8 +100,9 @@ The repo detail view also provides features for performing the following operati
 
 ![commit-logs](https://user-images.githubusercontent.com/65342122/90782955-1723cb80-e31d-11ea-9c42-d1d5a6306e6f.png)
 
-#### Add new branch
-![new-branch](https://user-images.githubusercontent.com/65342122/87232643-23437180-c3de-11ea-9d9e-7e3c3789c32e.png)
+#### List all branches
+
+![branches](https://user-images.githubusercontent.com/65342122/103480861-f7d59880-4dfc-11eb-9a19-17636d111388.png)
 
 Note: In a newly initialized git repo, the newly added branch will be considered by git only after an initial commit
 
@@ -111,30 +111,27 @@ Note: In a newly initialized git repo, the newly added branch will be considered
 
 ### File View
 - File view shows the New/Untracked/Modified/Deleted files.
-![file-view](https://user-images.githubusercontent.com/65342122/87232644-29d1e900-c3de-11ea-9adc-03fb4e690882.png)
+![file-view](https://user-images.githubusercontent.com/65342122/103479243-577a7680-4df2-11eb-97f0-35c318d1c0c0.png)
 
 ### Git Operations
 - Git operations module lets you handle three basic git operations (**Stage all changes, commit changes, push to remote**). Below this option, the files will be displayed and the files can be staged individually using the "Add" button or as a whole using the "stage all changes".
-![git-operations](https://user-images.githubusercontent.com/65342122/87232645-30f8f700-c3de-11ea-8ddb-52f4d5ec7140.png)
+![git-operations](https://user-images.githubusercontent.com/65342122/103480923-7f230c00-4dfd-11eb-95c7-abf0aadd0aec.png)
 
 - The staged files can be removed individually or it can be removed all at once.
-![staged-files](https://user-images.githubusercontent.com/65342122/89167388-ff1c2000-d598-11ea-8150-fc96b6aa41b7.png)
+![staged-files](https://user-images.githubusercontent.com/65342122/103479263-82fd6100-4df2-11eb-93e2-e731479ef4f1.png)
 
 - The staged changes can be committed using the **Commit changes** option. This will display a pop-up with all the staged files and it requires a commit message to successfully commit the changes. The commit messages can either be a single line message or a multi-line message 
-![commit-changes](https://user-images.githubusercontent.com/65342122/87232659-56860080-c3de-11ea-9bc4-a19ad727b101.png)
+![commit-changes](https://user-images.githubusercontent.com/65342122/103479271-95779a80-4df2-11eb-91c8-835742758ad4.png)
 
-- **Push to remote** option pushes all commits to the selected remote host. The pop-up displayed will display the commits which are in queue to be pushed to the remote repository
+- **Push to remote** option pushes all commits to the selected remote host. The pop-up displayed will display the commits which are in queue to be pushed to the remote repository.
 
-![push-operation-with-remote](https://user-images.githubusercontent.com/65342122/89562600-d796b300-d837-11ea-969c-9abb93f24c1c.png)
-
-This section will let you know if the selected remote is not valid or if the push operation fails
-![push-opeartion-without-remote](https://user-images.githubusercontent.com/65342122/89562476-a1f1ca00-d837-11ea-9f3a-bb566aeb327e.png)
+![push-operation-with-remote](https://user-images.githubusercontent.com/65342122/103480641-66b1f200-4dfb-11eb-9753-e736bdb49b43.png)
 
 ### Git Difference
 
 In "Git Difference" click on the modified file to see the difference. The platform has syntax highlighting available for a limited set of [languages](LANGUAGES.md)
 
-![git-difference](https://user-images.githubusercontent.com/65342122/89559704-ab793300-d833-11ea-88a8-28afea4b461b.png)
+![git-difference](https://user-images.githubusercontent.com/65342122/103480618-497d2380-4dfb-11eb-99d5-08543457c445.png)
 
 ## Compare
 - The **Compare** menu has two sections: **Branch compare** and **Commit compare**.
@@ -149,10 +146,11 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 
 ## Settings
 - Settings in the left pane has three sections (Server data file, saved repos, Active GitConvex port number).
-![settings](https://user-images.githubusercontent.com/65342122/87243003-a4871c80-c44f-11ea-9d1a-8350bdfb0da8.png)
+![settings](https://user-images.githubusercontent.com/65342122/103480592-31a59f80-4dfb-11eb-87a3-90c71bc1b25e.png)
 
 - Server data file stores repo details such as the repo path, timestamp and the unique ID assigned to each repo. The data file must be an accessible JSON file with read / write permissions set to it. Also make sure you enter the full path for the file. E.g: /opt/my_data/data-file.json
 - In the saved repos section, added repo(s) can be deleted permanently from GitConvex. 
+- Saved repo name can be changed in this section.
 
 >Note that, this will only remove the repo from GitConvex records and it will not perform an actual folder delete operation
 
