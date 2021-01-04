@@ -1,6 +1,6 @@
 # Introduction
 GitConvex is a web app for managing your git repositories. It is supported by Linux, Mac OS and Windows. The [latest version](https://github.com/neel1996/gitconvex/releases) of GitConvex supports git features such as initializing and tracking a git repo, staging and unstaging changes, committing changes, pushing changes to the selected remote and so on.
-The main goal of this platform is to act as a web-based alternative for Github desktop, but we are still in the starting stages, so we are not completely there yet (baby steps, right?)
+The main goal of this platform is to act as a web-based alternative for native git GUI clients and also to provide an option for managing git repos which are residing in servers with no GUI. Gitconvex is also available as a docker image along with the yaml files included in the repo for deploying it with k8s or docker swarm, which makes it a viable option for managing git repos residing within containers.
 ## Table of Contents
 [Requirements](#requirements)<br>
 [Download Options](#download-options)<br>
@@ -146,7 +146,7 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 
 ## Settings
 - Settings in the left pane has three sections (Server data file, saved repos, Active GitConvex port number).
-![settings](https://user-images.githubusercontent.com/65342122/103480592-31a59f80-4dfb-11eb-87a3-90c71bc1b25e.png)
+![settings](https://user-images.githubusercontent.com/65342122/103557499-53755400-4ed9-11eb-9c37-7ffb7891fc2e.png)
 
 - Server data file stores repo details such as the repo path, timestamp and the unique ID assigned to each repo. The data file must be an accessible JSON file with read / write permissions set to it. Also make sure you enter the full path for the file. E.g: /opt/my_data/data-file.json
 - In the saved repos section, added repo(s) can be deleted permanently from GitConvex. 
@@ -159,4 +159,5 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 ## Help and Support
 
 - Visit help section if you're facing an issue or need any help. If you have any queries or feedback, then discuss it in "Discord" or report an issue in GitHub.
-![help-and-support](https://user-images.githubusercontent.com/65342122/101987492-5efaa400-3cba-11eb-87fb-6d8cb19ae9d2.png)
+- You can check the current version of Gitconvex by clicking on the update button in this section.
+![help-and-support](https://user-images.githubusercontent.com/65342122/103559379-0b0b6580-4edc-11eb-9abe-c101f8792d42.png)
