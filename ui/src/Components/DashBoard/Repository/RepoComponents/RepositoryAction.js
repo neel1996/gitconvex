@@ -165,6 +165,7 @@ export default function RepositoryAction() {
           setSearchBranchValue("");
           setFilteredBranchList([]);
           setToggleSearchSelect(!toggleSearchSelect);
+          handleScreenEvents();
         }
       })
       .catch((err) => {
@@ -174,6 +175,16 @@ export default function RepositoryAction() {
           event.target.innerText = activeBranch;
         }
       });
+  }
+
+  const handleScreenEvents = () => {
+    if(!toggleSearchSelect){
+      document.getElementById("repository-action").addEventListener('scroll', () => {
+        setToggleSearchSelect(false);
+      });
+    } else {
+      document.getElementById("repository-action").removeEventListener('scroll', () => {});
+    }
   }
 
   const searchBranchHandler = (e) => {
@@ -194,13 +205,18 @@ export default function RepositoryAction() {
     }
   };
 
+  const cancelSearchBranch = () => {
+    setSearchBranchValue("");
+    setFilteredBranchList([]);
+  };
+
   function activeRepoPane() {
     return (
       <div className="top-pane">
         <div className="flex items-center">
           <div className="select--label">Choose saved repository</div>
           <select
-            className="top-pane--select bg-green-50 text-green-700 border-green-400"
+            className="cursor-pointer top-pane--select bg-green-50 text-green-700 border-green-400"
             defaultValue={"checked"}
             onClick={() => {
               setBranchError(false);
@@ -246,13 +262,13 @@ export default function RepositoryAction() {
                 onClick={(e) => {
                   let target = e.currentTarget;
                   if (!toggleSearchSelect) {
-                    target.style.width = "15rem";
+                    target.style.width = "17.5rem";
                   } else {
                     target.style.width = "auto";
                   }
                   setToggleSearchSelect(!toggleSearchSelect);
-                }}
-              >
+                  handleScreenEvents();
+                }}>
                 <span className="mr-2">{activeBranch}</span>
                 <FontAwesomeIcon
                   className="text-sm m-1"
@@ -261,15 +277,25 @@ export default function RepositoryAction() {
               </div>
               {toggleSearchSelect ? (
                 <div className="flex-auto flex flex-row justify-center">
-                  <div className="bg-indigo-50 border-indigo-300 text-indigo-700 px-4 py-2 shadow-md rounded-md z-20 absolute">
-                    <input
+                  <div className="bg-white border-indigo-300 text-indigo-700 px-4 py-4 shadow-md rounded-md z-20 absolute">
+                    <div className="flex flex-row mt-1 mb-3">
+                      <div className="b-1 text-center px-2 py-1 text-white bg-blue-400 rounded-l-md">
+                        <FontAwesomeIcon icon={["fas", "search"]}></FontAwesomeIcon>
+                      </div>
+                      <input
                       id="branchSearchInput"
                       type="text"
                       placeholder="Search..."
-                      className="px-4 py-2 bg-indigo-100 mt-2 mb-2 text-indigo-700 shadow-sm rounded-sm focus:outline-none outline-none"
+                      className="px-2 py-1 bg-indigo-100 text-indigo-700 shadow-sm rounded-sm focus:outline-none outline-none"
                       onChange={searchBranchHandler}
                       value={searchBranchValue}
                     ></input>
+                    <div
+                      className="b-1 text-center px-2 py-1 text-white cursor-pointer bg-red-400 rounded-r-md"
+                      onClick={cancelSearchBranch}>
+                      <FontAwesomeIcon icon={["fas", "times"]}></FontAwesomeIcon>
+                    </div>
+                    </div>
                     {availableBranch()}
                   </div>
                 </div>
@@ -299,7 +325,7 @@ export default function RepositoryAction() {
       <div
         key={branch}
         value={branch}
-        className="cursor-pointer text-sm shadow-sm p-1 mt-1 mb-1"
+        className="cursor-pointer text-sm border-b border-dotted p-2 mt-1 mb-1"
         onClick={(event) => {
           event.persist();
           setActiveBranch("...");
@@ -344,7 +370,7 @@ export default function RepositoryAction() {
   }
 
   return (
-    <div className="repository-action">
+    <div className="repository-action" id="repository-action">
       {availableRepos ? (
         <div>
           <div className="active-repo">
