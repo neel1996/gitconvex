@@ -1,22 +1,25 @@
-import moment from "moment";
+import {
+  differenceInCalendarDays,
+  differenceInHours,
+  differenceInMinutes,
+  differenceInMonths,
+  differenceInYears
+} from "date-fns";
 
 export function relativeCommitTimeCalculator(commitTime) {
   let commitRelativeTime;
 
-  const now = new Date();
-  const timeDiff = moment.duration(moment(now).diff(commitTime));
-
-  const days = Math.floor(timeDiff.asDays());
-  const hours = Math.floor(timeDiff.asHours());
-  const minutes = Math.floor(timeDiff.asMinutes());
+  const days = differenceInCalendarDays(new Date(), new Date(commitTime));
+  const hours = differenceInHours(new Date(), new Date(commitTime));
+  const minutes = differenceInMinutes(new Date(), new Date(commitTime));
 
   if (days > 0) {
     if (days >= 30) {
-      const month = Math.floor(timeDiff.asMonths());
+      const month = differenceInMonths(new Date(), new Date(commitTime));
       commitRelativeTime =
         month === 1 ? month + " Month Ago" : month + " Months Ago";
     } else if (days >= 365) {
-      const year = Math.floor(timeDiff.asYears());
+      const year = differenceInYears(new Date(), new Date(commitTime));
       commitRelativeTime =
         year === 1 ? year + " Year Ago" : year + " Years Ago";
     } else {

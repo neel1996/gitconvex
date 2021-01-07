@@ -3,10 +3,10 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
-import "../../../../styles/GitOperations.css";
 import CommitComponent from "./CommitComponent";
 import PushComponent from "./PushComponent";
 import StageComponent from "./StageComponent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function GitOperationComponent(props) {
   library.add(fab);
@@ -98,28 +98,31 @@ export default function GitOperationComponent(props) {
   const actionButtons = [
     {
       label: "Stage all changes",
-      border: "border-blue-500",
-      text: "text-blue-700",
-      hoverBg: "bg-blue-500",
+      border: "border-indigo-300",
+      text: "text-indigo-700",
+      bg: "bg-indigo-50",
+      hoverBg: "hover:bg-indigo-100",
       key: "stage",
     },
     {
       label: "Commit Changes",
-      border: "border-green-500",
+      border: "border-green-300",
       text: "text-green-700",
-      hoverBg: "bg-green-500",
+      bg: "bg-green-50",
+      hoverBg: "hover:bg-green-100",
       key: "commit",
     },
     {
       label: "Push to remote",
-      border: "border-pink-500",
+      border: "border-pink-300",
       text: "text-pink-700",
-      hoverBg: "bg-pink-500",
+      bg: "bg-pink-50",
+      hoverBg: "hover:bg-pink-100",
       key: "push",
     },
   ];
 
-  const tableColumns = ["Changes", "File Status", "Action"];
+  const tableColumns = ["CHANGES", "FILE STATUS", "ACTION"];
 
   function stageGitComponent(stageItem, event) {
     let localViewReload = viewReload + 1;
@@ -160,20 +163,20 @@ export default function GitOperationComponent(props) {
     let statusPill = (status) => {
       if (status === "M") {
         return (
-          <div className="git-ops--file--status text-yellow-400 border-yellow-400 ">
-            Modified
+          <div className="rounded w-3/4 mx-auto p-2 text-yellow-600 border-2 border-yellow-200 font-sans font-semibold bg-yellow-50">
+            MODIFIED
           </div>
         );
       } else if (status === "D") {
         return (
-          <div className="git-ops--file--status text-red-700 bg-red-200 border-red-500 ">
-            Removed
+          <div className="rounded w-3/4 mx-auto p-2 text-red-500 border-2 border-red-200 font-sans font-semibold bg-red-50">
+            REMOVED
           </div>
         );
       } else {
         return (
-          <div className="git-ops--file--status text-indigo-700 border-indigo-500 ">
-            Untracked
+          <div className="rounded w-3/4 mx-auto p-2 text-indigo-600 border-2 border-indigo-200 font-sans font-semibold bg-indigo-50">
+            UNTRACKED
           </div>
         );
       }
@@ -182,14 +185,14 @@ export default function GitOperationComponent(props) {
     let actionButton = (stageItem) => {
       return (
         <div
-          className="git-ops--stageitem--add"
+          className="w-3/4 rounded-md text-white mx-auto cursor-pointer p-2 bg-green-300 text-xl font-sans font-semibold text-center shadow-md hover:bg-green-400 hover:shadow-sm"
           onClick={(event) => {
             stageGitComponent(stageItem, event);
             setUnStageFailed(false);
           }}
           key={`add-btn-${stageItem}`}
         >
-          Add
+          ADD
         </div>
       );
     };
@@ -306,13 +309,13 @@ export default function GitOperationComponent(props) {
 
     if (stageItems && stageItems.length > 0) {
       return (
-        <div className="git-ops--stagearea">
-          <div className="git-ops--stagearea--top">
-            <div className="text-5xl font-sans text-gray-800 mx-4">
+        <div className="p-3 my-10 w-full mx-auto border border-blue-100 shadow-md rounded-lg">
+          <div className="flex items-center justify-start my-6 w-full">
+            <div className="text-4xl font-sans text-gray-800 mx-4">
               Staged Files
             </div>
             <div
-              className="git-ops--unstage--btn"
+              className="p-3 rounded-lg bg-red-400 text-white font-sans font-semibold text-xl cursor-pointer hover:bg-red-500"
               onClick={(event) => {
                 removeAllStagedItems(event);
                 setUnStageFailed(false);
@@ -331,26 +334,40 @@ export default function GitOperationComponent(props) {
               to perform a complete git reset
             </div>
           ) : null}
-          <div className="git-ops--unstage--header">
-            <div className="w-3/4">Staged File</div>
-            <div className="w-1/2">Action</div>
+          <div className="flex justify-between p-3 bg-indigo-400 rounded my-1 shadow">
+            <div className="w-3/4 font-sans font-semibold text-xl text-center text-white border-r-2 border-indigo-300">
+              STAGED FILE
+            </div>
+            <div className="w-1/4 font-sans font-semibold text-xl text-center text-white border-r-2 border-indigo-300">
+              ACTION
+            </div>
           </div>
-          <div className="git-ops--unstage--table" style={{ height: "450px" }}>
+          <div
+            className="overflow-y-auto w-full my-2"
+            style={{ height: "450px" }}
+          >
             {stageItems.map((item) => {
               if (item) {
                 return (
-                  <div className="git-ops--unstage--table--data" key={item}>
-                    <div className="git-ops--unstage--table--item">{item}</div>
-                    <div className="w-1/2 mx-auto">
+                  <div
+                    className="flex items-center justify-between border-b p-1"
+                    key={item}
+                  >
+                    <div className="w-3/4 pr-6 block px-1 border-r-2 border-gray-300">
+                      <div className="git-changed-item overflow-x-auto w-full font-sans ml-1 text-gray-700">
+                        {item}
+                      </div>
+                    </div>
+                    <div className="w-1/4 mx-auto">
                       <div
-                        className="git-ops--unstage--remove--btn"
+                        className="rounded text-white cursor-pointer w-3/4 mx-auto p-2 my-1 bg-red-400 text-xl font-sans font-semibold text-center shadow-md hover:bg-red-500 hover:shadow-sm"
                         onClick={(event) => {
                           removeStagedItem(item, event);
                           setUnStageFailed(false);
                         }}
                         key={`remove-btn-${item}`}
                       >
-                        Remove
+                        REMOVE
                       </div>
                     </div>
                   </div>
@@ -394,7 +411,7 @@ export default function GitOperationComponent(props) {
 
   function noChangesComponent() {
     return (
-      <div className="git-ops--nochange">
+      <div className="mx-auto my-4 text-center font-sans font-light text-2xl shadow p-6 bg-pink-50 border-b-4 border-pink-400 rounded-lg text-pink-500 border-dashed">
         {!isLoading ? (
           <span>No files changes found in the repo.</span>
         ) : (
@@ -408,7 +425,7 @@ export default function GitOperationComponent(props) {
     <>
       {action ? (
         <div
-          className="git-ops--backdrop"
+          className="w-full h-full fixed flex mx-auto my-auto overflow-auto top-0 bottom-0 left-0 right-0"
           id="operation-backdrop"
           style={{ background: "rgba(0,0,0,0.6)", zIndex: "99" }}
           onClick={(event) => {
@@ -424,25 +441,27 @@ export default function GitOperationComponent(props) {
           }}
         >
           {actionComponent(action)}
-
           <div
-            className="git-ops--backdrop--close"
+            className="w-14 h-14 mr-5 mt-6 rounded-full bg-red-500 text-white flex justify-center items-center shadow cursor-pointer fixed right-0 top-0"
             onClick={() => {
               setAction("");
               const localReload = viewReload + 1;
               setViewReload(localReload);
             }}
           >
-            X
+            <FontAwesomeIcon
+              className="flex text-center text-3xl my-auto"
+              icon={["fas", "times"]}
+            ></FontAwesomeIcon>
           </div>
         </div>
       ) : null}
-      <div className="git-ops--actions">
+      <div className="flex justify-between w-full mx-auto items-center my-10">
         {actionButtons.map((item) => {
-          const { label, border, text, hoverBg, key } = item;
+          const { label, border, text, hoverBg, key, bg } = item;
           return (
             <div
-              className={`git-ops--actions--btn ${border} ${text} hover:${hoverBg}`}
+              className={`mx-4 shadow-lg w-1/3 text-center font-sans text-xl font-semibold rounded-lg p-3 border-b-4 rounded-b-xl transition hover:shadow-sm cursor-pointer ${bg} ${border} ${text} ${hoverBg}`}
               key={key}
               onClick={() => setAction(key)}
             >
@@ -452,13 +471,13 @@ export default function GitOperationComponent(props) {
         })}
       </div>
       {getTableData() && getTableData().length > 0 ? (
-        <div className="git-ops--file-table">
-          <div className="git-ops--file-table--header">
+        <div className="w-full shadow-md p-2 rounded-lg border border-blue-50 overflow-auto py-4">
+          <div className="flex items-center p-4 bg-gray-100 rounded">
             {tableColumns.map((column, index) => {
               return (
                 <div
                   key={column}
-                  className={`git-ops--file-table--cols ${
+                  className={`font-sans font-semibold text-xl text-center text-gray-600 border-r-2 border-white  ${
                     index === 0 ? "w-3/4" : "w-1/4"
                   }`}
                 >
@@ -469,7 +488,7 @@ export default function GitOperationComponent(props) {
           </div>
 
           <div
-            className="git-ops--file-table--data"
+            className="block w-full overflow-auto"
             style={{ height: "400px" }}
           >
             <div>
@@ -483,14 +502,15 @@ export default function GitOperationComponent(props) {
                     getTableData().map((tableData, index) => {
                       return (
                         <div
-                          className="git-ops--file-table--items"
+                          className="flex justify-between items-center border-b p-2"
                           key={`tableItem-${index}`}
                         >
                           {tableData.map((data, index) => {
                             return (
                               <div
                                 key={`${data}-${index}`}
-                                className={`break-all items-center align-middle my-auto ${
+                                title={index === 0 ? data : null}
+                                className={`git-changed-item overflow-x-auto mx-auto font-sans text-gray-700 items-center align-middle my-auto border-r-2 border-gray-100 ${
                                   index === 0
                                     ? "w-3/4 text-left"
                                     : "w-1/4 text-center"

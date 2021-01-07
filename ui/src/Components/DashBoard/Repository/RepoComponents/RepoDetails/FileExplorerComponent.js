@@ -209,6 +209,8 @@ export default function FileExplorerComponent(props) {
   };
 
   const gitTrackedFileComponent = () => {
+    var fileIcon;
+
     if (gitRepoFiles && gitRepoFiles.length > 0) {
       var formattedFiles = [];
       var directoryEntry = [];
@@ -225,7 +227,7 @@ export default function FileExplorerComponent(props) {
               className="folder-view--content"
               key={`directory-key-${uuid()}`}
             >
-              <div className="flex cursor-pointer">
+              <div className="flex cursor-pointer items-center">
                 <div className="w-1/6">
                   <FontAwesomeIcon
                     icon={["fas", "folder"]}
@@ -248,25 +250,23 @@ export default function FileExplorerComponent(props) {
             </div>
           );
         } else if (splitEntry[1].includes("File")) {
-          let fileIcon;
           if (splitEntry[0] === "LICENSE") {
             fileIcon = require("../../../../../assets/icons/file_type_license.svg");
           } else {
             fileIcon = require("../../../../../assets/icons/" +
               getIconForFile(splitEntry[0]));
           }
-
           fileEntry.push(
             <div className="folder-view--content" key={`file-key-${uuid()}`}>
               <div className="flex items-center align-middle">
                 <div className="w-1/6">
                   <img
-                    src={fileIcon}
+                    src={fileIcon.default}
                     style={{
                       width: "26px",
                       filter: "grayscale(30%)",
                     }}
-                    alt={fileIcon}
+                    alt={fileIcon.default}
                   ></img>
                 </div>
                 <div
@@ -337,14 +337,16 @@ export default function FileExplorerComponent(props) {
               }}
             >
               <div
-                className="close-btn-round"
+                className="w-14 h-14 mr-5 mt-6 rounded-full bg-red-500 text-white flex justify-center items-center shadow cursor-pointer fixed right-0 top-0"
                 onClick={() => {
                   setCodeViewToggle(false);
                 }}
               >
-                X
+                <FontAwesomeIcon
+                  className="flex text-center text-3xl my-auto"
+                  icon={["fas", "times"]}
+                ></FontAwesomeIcon>
               </div>
-
               <div className="code-view-area">
                 {memoizedCodeFileViewComponent}
               </div>

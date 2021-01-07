@@ -19,7 +19,7 @@ func TestCommitLogs(t *testing.T) {
 	expectedTotalCommits := float64(19)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex/starfleet"
+		repoPath = "/home/runner/work/gitconvex-server/starfleet"
 		r, _ = git.PlainOpen(repoPath)
 	}
 

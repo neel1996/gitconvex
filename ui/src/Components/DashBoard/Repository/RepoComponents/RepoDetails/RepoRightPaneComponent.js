@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { actionType } from "./backdropActionType";
 
@@ -11,6 +11,44 @@ export default function RepoRightPaneComponent(props) {
     actionTrigger,
     switchBranchHandler,
   } = props;
+
+  const [branchValid, setBranchValid] = useState(false);
+
+  useEffect(() => {
+    const invalidBranchList = "No Branches available";
+    const invalidCurrentBranch = "Repo HEAD is nil";
+
+    if (gitBranchList && gitCurrentBranch && gitBranchList.length > 0) {
+      if (
+        gitBranchList[0] !== invalidBranchList &&
+        gitCurrentBranch !== invalidCurrentBranch
+      ) {
+        setBranchValid(true);
+      }
+    }
+  }, [gitBranchList, gitCurrentBranch]);
+
+  function addBranchButton() {
+    return (
+      <div
+        id="addBranch"
+        className="add-btn bg-green-400 hover:bg-green-500 cursor-pointer"
+        onMouseEnter={(event) => {
+          let popUp =
+            '<div class="tooltip" style="margin-left:-40px;">Click to add a new branch</div>';
+          event.target.innerHTML += popUp;
+        }}
+        onMouseLeave={(event) => {
+          event.target.innerHTML = "+";
+        }}
+        onClick={() => {
+          actionTrigger(actionType.ADD_BRANCH);
+        }}
+      >
+        +
+      </div>
+    );
+  }
 
   return (
     <>
@@ -36,72 +74,65 @@ export default function RepoRightPaneComponent(props) {
                 Available Branches
               </div>
 
-              <div className="branch-list">
-                <div className="w-3/4 my-auto">
-                  <div
-                    className="branch-list--current"
-                    key={`${gitCurrentBranch}-${uuid()}`}
-                  >
-                    {gitCurrentBranch}
-                  </div>
-                  {gitBranchList &&
-                    gitCurrentBranch &&
-                    gitBranchList
-                      .slice(0, 2)
-                      .map((entry) => {
-                        if (entry) {
-                          if (entry !== gitCurrentBranch) {
-                            return (
-                              <div
-                                className="branch-list--branches"
-                                key={`entry-key-${uuid()}`}
-                                onClick={() => {
-                                  switchBranchHandler(entry);
-                                  actionTrigger(actionType.SWITCH_BRANCH);
-                                }}
-                              >
-                                {entry}
-                              </div>
-                            );
-                          } else {
-                            return null;
+              {branchValid ? (
+                <div className="branch-list">
+                  <div className="w-3/4 my-auto">
+                    <div
+                      className="branch-list--current"
+                      key={`${gitCurrentBranch}-${uuid()}`}
+                    >
+                      {gitCurrentBranch}
+                    </div>
+                    {gitBranchList &&
+                      gitCurrentBranch &&
+                      gitBranchList
+                        .slice(0, 2)
+                        .map((entry) => {
+                          if (entry) {
+                            if (entry !== gitCurrentBranch) {
+                              return (
+                                <div
+                                  className="branch-list--branches"
+                                  key={`entry-key-${uuid()}`}
+                                  onClick={() => {
+                                    switchBranchHandler(entry);
+                                    actionTrigger(actionType.SWITCH_BRANCH);
+                                  }}
+                                >
+                                  {entry}
+                                </div>
+                              );
+                            } else {
+                              return null;
+                            }
                           }
-                        }
-                        return null;
-                      })
-                      .filter((item) => {
-                        if (item) {
-                          return item;
-                        }
-                        return false;
-                      })}
-                  <div
-                    className="branch-list__listbranch"
-                    onClick={() => {
-                      actionTrigger(actionType.LIST_BRANCH);
-                    }}
-                  >
-                    List all branches
+                          return null;
+                        })
+                        .filter((item) => {
+                          if (item) {
+                            return item;
+                          }
+                          return false;
+                        })}
+                    <div
+                      className="branch-list__listbranch"
+                      onClick={() => {
+                        actionTrigger(actionType.LIST_BRANCH);
+                      }}
+                    >
+                      List all branches
+                    </div>
                   </div>
+                  {addBranchButton()}
                 </div>
-                <div
-                  id="addBranch"
-                  className="rounded-full items-center align-middle w-10 h-10 text-white text-2xl bg-green-400 text-center mx-auto shadow hover:bg-green-500 cursor-pointer"
-                  onMouseEnter={(event) => {
-                    let popUp =
-                      '<div class="tooltip" style="margin-left:-40px;">Click to add a new branch</div>';
-                    event.target.innerHTML += popUp;
-                  }}
-                  onMouseLeave={(event) => {
-                    event.target.innerHTML = "+";
-                  }}
-                  onClick={() => {
-                    actionTrigger(actionType.ADD_BRANCH);
-                  }}
-                >
-                  +
+              ) : (
+                <div className="flex w-1/2 justify-between items-center">
+                  <div className="w-1/2 font-sans font-light text-gray-400 border-b-2 border-dashed border-gray-600 text-center">
+                    No branches available
+                  </div>
+                  {addBranchButton()}
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="flex justify-around mx-auto mt-4">

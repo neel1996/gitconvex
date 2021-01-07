@@ -64,6 +64,9 @@ func GetBranchList(repo *git.Repository, branchChan chan Branch) {
 			splitCurrentBranch := strings.Split(currentBranch, "/")
 			currentBranch = splitCurrentBranch[len(splitCurrentBranch)-1]
 
+			allBranchList = append(allBranchList, &currentBranch)
+			branches = append(branches, &currentBranch)
+
 			ref, _ := repo.References()
 
 			if ref != nil {
@@ -83,7 +86,10 @@ func GetBranchList(repo *git.Repository, branchChan chan Branch) {
 								} else {
 									refNamePtr = &refNameSplit[1]
 								}
-								allBranchList = append(allBranchList, refNamePtr)
+								if *refNamePtr != currentBranch {
+									allBranchList = append(allBranchList, refNamePtr)
+								}
+
 							}
 						}
 					}
@@ -104,7 +110,9 @@ func GetBranchList(repo *git.Repository, branchChan chan Branch) {
 							localBranch = splitBranch[len(splitBranch)-1]
 
 							logger.Log("Available Branch : "+localBranch, global.StatusInfo)
-							branches = append(branches, &localBranch)
+							if localBranch != currentBranch {
+								branches = append(branches, &localBranch)
+							}
 						}
 						return nil
 					} else {

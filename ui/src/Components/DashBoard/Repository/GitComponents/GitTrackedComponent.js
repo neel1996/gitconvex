@@ -131,22 +131,38 @@ export default function GitTrackedComponent(props) {
           case "M":
             styleSelector += "text-yellow-900 bg-yellow-100";
             modifiedArtifacts.push(
-              <div className="git-tracked--changes" key={name}>
-                <div className={`${styleSelector} w-11/12 break-all`}>
+              <div
+                className="git-tracked--changes items-center border-b border-white border-dotted"
+                key={name}
+              >
+                <div
+                  className={`git-changed-item ${styleSelector} w-11/12 p-3 overflow-x-auto`}
+                  title={name}
+                >
                   {name}
                 </div>
-                <div className="git-tracked--changes--status">Modified</div>
+                <div className="p-2 text-yellow-600 border-2 border-yellow-200 font-sans font-semibold bg-yellow-50 w-1/6 text-center">
+                  MODIFIED
+                </div>
               </div>
             );
             break;
           case "D":
             styleSelector += "text-red-900 bg-red-200";
             deletedArtifacts.push(
-              <div className="git-tracked--changes" key={name}>
-                <div className={`${styleSelector} w-11/12 break-all`}>
+              <div
+                className="git-tracked--changes items-center border-b border-white border-dotted"
+                key={name}
+              >
+                <div
+                  className={`git-changed-item ${styleSelector} w-11/12 overflow-x-auto p-3`}
+                  title={name}
+                >
                   {name}
                 </div>
-                <div className="git-tracked--changes--status">Deleted</div>
+                <div className="p-2 text-red-600 border-2 border-red-200 font-sans font-semibold bg-red-50 w-1/6 text-center">
+                  DELETED
+                </div>
               </div>
             );
             break;
@@ -190,9 +206,19 @@ export default function GitTrackedComponent(props) {
 
     return untrackedFiles.map((entry, index) => {
       return (
-        <div className="flex git-tracked--untracked" key={`${entry}-${index}`}>
-          <div className="git-tracked--untracked--label">{entry}</div>
-          <div className="git-tracked--untracked--status">New / Untracked</div>
+        <div
+          className="flex git-tracked--untracked items-center border-b border-white border-dotted"
+          key={`${entry}-${index}`}
+        >
+          <div
+            className="git-changed-item p-3 text-indigo-900 bg-indigo-100 w-11/12 overflow-x-auto"
+            title={entry}
+          >
+            {entry}
+          </div>
+          <div className="p-2 text-indigo-600 border-2 border-indigo-200 font-sans font-semibold bg-indigo-50 w-1/6 text-center">
+            UNTRACKED
+          </div>
         </div>
       );
     });
@@ -273,12 +299,23 @@ export default function GitTrackedComponent(props) {
 
   return (
     <>
+      <style>
+        {`
+          .git-changed-item::-webkit-scrollbar {
+            background: rgba(0, 0, 0, 0);
+            width: 10px;
+            height: 1px;
+            border: solid 1px rgba(0, 0, 0, 0);
+          }
+
+          .git-changed-item::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0);
+          }
+        `}
+      </style>
       {noChangeMarker ? (
         <>
           <div className="git-tracked--wrapper">{memoizedGitOperationView}</div>
-          <div className="git-tracked--nochange">
-            No changes found in the selected git repo
-          </div>
           <div className="git-tracked--alert">
             <div>
               <FontAwesomeIcon

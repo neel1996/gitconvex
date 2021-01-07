@@ -3,8 +3,6 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import firebase from "firebase/app";
-import "firebase/database";
 import React, { useEffect, useState } from "react";
 import GoLogo from "../../../assets/Go-Logo_White.svg";
 import { CURRENT_VERSION } from "../../../util/env_config";
@@ -211,14 +209,6 @@ export default function Help() {
                 paddingRight: "-15px",
               }}
               onClick={() => {
-                if (
-                  firebase.apps[0] &&
-                  firebase.apps[0].name === "update-app"
-                ) {
-                  firebase.apps[0].delete();
-                  resetStates();
-                  return;
-                }
                 resetStates();
               }}
             >

@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
-import "../../../../styles/GitOperations.css";
 
 export default function CommitComponent(props) {
   const { repoId } = props;
@@ -100,8 +99,8 @@ export default function CommitComponent(props) {
       return (
         <>
           {!commitDone ? (
-            <div className="git-ops--commit--wrapper">
-              <div className="git-ops--commit--header">
+            <div className="w-11/12 mx-auto my-auto p-4">
+              <div className="font-font-sans font-semibold text-3xl my-4 text-gray-700">
                 {stagedCount} {stagedCount > 1 ? "Changes" : "Change"} to
                 commit...
               </div>
@@ -109,7 +108,7 @@ export default function CommitComponent(props) {
                 {stagedFilesState.map((stagedFile) => {
                   return (
                     <div
-                      className="git-ops--commit--stagedfiles"
+                      className="font-sans text-gray-700 my-1 mx-6 border-b"
                       key={stagedFile}
                     >
                       {stagedFile}
@@ -117,9 +116,11 @@ export default function CommitComponent(props) {
                   );
                 })}
               </div>
-              <div className="text-xl my-4">Commit Message</div>
+              <div className="text-xl my-4 font-sans font-semibold text-gray-600">
+                Commit Message
+              </div>
               {commitMessageWarning ? (
-                <div className="font-sans font-semibold italic p-2 border-b border-dotted border-yellow-400 text-yellow-600">
+                <div className="font-sans font-semibold italic p-2 border-b border-dotted border-yellow-400 text-yellow-500">
                   <span role="img" aria-label="suggestion">
                     💡
                   </span>
@@ -134,7 +135,7 @@ export default function CommitComponent(props) {
                 </div>
               ) : null}
               <textarea
-                className="git-ops--commit--message"
+                className="w-full outline-none rounded-lg p-4 shadow-lg border border-blue-100"
                 placeholder="Enter commit message"
                 cols="20"
                 rows="5"
@@ -150,17 +151,17 @@ export default function CommitComponent(props) {
                 }}
               ></textarea>
               {commitError ? (
-                <div className="git-ops--commit--alert--failed">
+                <div className="w-full mx-auto my-2 bg-red-200 border-b-2 border-red-400 rounded rounded-b-lg p-3 text-center text-xl text-red-600 font-semibold font-sans">
                   Commit Failed!
                 </div>
               ) : null}
               {loadingCommit ? (
-                <div className="git-ops--commit--alert--progress">
+                <div className="font-sans font-light my-1 mx-auto my-auto p-2 text-center text-xl bg-gray-100 shadow-md w-full cursor-pointer rounded-lg text-gray-600">
                   Committing Changes...
                 </div>
               ) : (
                 <div
-                  className="git-ops--commit--btn"
+                  className="w-full my-2 p-3 rounded shadow bg-green-500 font-sans font-semibold text-center text-white text-xl cursor-pointer hover:bg-green-600"
                   onClick={(event) => {
                     const commitMsg = commitRef.current.value;
 
@@ -171,12 +172,12 @@ export default function CommitComponent(props) {
                     }
                   }}
                 >
-                  Commit Changes
+                  COMMIT CHANGES
                 </div>
               )}
             </div>
           ) : (
-            <div className="git-ops--commit--alert--success">
+            <div className="mx-auto my-2 p-3 bg-green-200 text-green-600 font-sans font-semibold text-2xl text-center border-b-4 border-dashed border-green-500 rounded">
               All changes have been committed!
             </div>
           )}
@@ -186,11 +187,11 @@ export default function CommitComponent(props) {
   }
 
   return (
-    <div className="git-ops--commit">
+    <div className="w-11/12 xl:w-3/4 lg:w-3/4 mx-auto my-auto bg-gray-100 rounded-lg shadow p-5">
       {stagedFilesState && stagedFilesState.length > 0 ? (
         commitComponent()
       ) : (
-        <div className="git-ops--commit--alert">
+        <div className="bg-gray-200 p-3 text-center font-sans text-2xl mx-auto my-2 rounded font-light border-b-4 border-dashed border-gray-400">
           {loading ? (
             <span>Loading staged files to commit...</span>
           ) : stagedFilesState.length === 0 ? (

@@ -7,11 +7,13 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { DELETE_PRESENT_REPO } from "../../../actionStore";
 import { ContextProvider } from "../../../context";
 import { globalAPIEndpoint } from "../../../util/env_config";
+import { format } from "date-fns";
 
 export default function Settings(props) {
   library.add(fab, fas);
 
   const dbPathTextRef = useRef();
+  const repoNameRef = useRef();
 
   const { state, dispatch } = useContext(ContextProvider);
   const { presentRepo } = state;
@@ -26,8 +28,11 @@ export default function Settings(props) {
   const [newDbPath, setNewDbPath] = useState("");
   const [dbUpdateFailed, setDbUpdateFailed] = useState(false);
   const [portUpdateFailed, setPortUpdateFailed] = useState(false);
+  const [editMode, setEditMode] = useState({ status: false, idx: null });
+  const [renameRepo, setRenameRepo] = useState("");
 
   useEffect(() => {
+    setRenameRepo("");
     axios({
       url: globalAPIEndpoint,
       method: "POST",
@@ -52,7 +57,6 @@ export default function Settings(props) {
           setDbPath(settingsDatabasePath);
           setNewDbPath(settingsDatabasePath);
           setPort(settingsPortDetails);
-
           dbPathTextRef.current.value = settingsDatabasePath;
         }
       })
@@ -106,7 +110,6 @@ export default function Settings(props) {
           .then((res) => {
             if (res.data.data && !res.data.error) {
               const updateStatus = res.data.data.updateRepoDataFile;
-
               if (updateStatus === "DATAFILE_UPDATE_SUCCESS") {
                 setDbUpdateFailed(false);
                 setViewReload(localViewReload);
@@ -248,7 +251,7 @@ export default function Settings(props) {
       },
     })
       .then((res) => {
-        if (res.data.data && !res.data.eror) {
+        if (res.data.data && !res.data.error) {
           const { status, repoId } = res.data.data.deleteRepo;
           if (status === "DELETE_SUCCESS") {
             if (presentRepo && presentRepo.length > 0) {
@@ -280,6 +283,37 @@ export default function Settings(props) {
       });
   }
 
+  const saveRenamedRepo = (repoId, updatedRepoName) => {
+    axios({
+      url: globalAPIEndpoint,
+      method: "POST",
+      data: {
+        query: `
+          mutation {
+            updateRepoName(repoId:"${repoId}", repoName:"${updatedRepoName}")
+          }
+        `,
+      },
+    })
+      .then((res) => {
+        if (res.data && !res.data.error) {
+          setViewReload(viewReload + 1);
+          setEditMode({ status: false, idx: null });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setViewReload(viewReload + 1);
+        setRenameRepo("ERROR!");
+        repoNameRef.current.classList.add("border-2");
+        repoNameRef.current.classList.add("border-red-400");
+      });
+  };
+
+  const cancelRenameRepo = (e) => {
+    setEditMode({ status: false, idx: null });
+  };
+
   const repoDetailsSettings = () => {
     return (
       <div className="repo-data my-10">
@@ -290,7 +324,7 @@ export default function Settings(props) {
           {repoDetails && repoDetails.repoId && repoDetails.repoId.length ? (
             <>
               <div className="flex my-4 bg-indigo-500 w-full rounded text-white shadow p-3 font-sand text-xl font-semibold">
-                <div className="w-1/2 border-r text-center">Repo ID</div>
+                <div className="w-1/4 border-r text-center">Repo ID</div>
                 <div className="w-1/2 border-r text-center">Repo Name</div>
                 <div className="w-1/2 border-r text-center">Repo Path</div>
                 <div className="w-1/2 border-r text-center">Timestamp</div>
@@ -299,24 +333,76 @@ export default function Settings(props) {
               {repoDetails.repoId.map((repoId, idx) => {
                 return (
                   <div
-                    className="flex my-1 w-full rounded bg-white shadow p-3 font-sans text-gray-800"
+                    className="flex items-center my-1 w-full rounded bg-white shadow p-3 font-sans text-gray-800"
                     key={repoId}
                   >
-                    <div className="w-1/2 px-2 border-r font-sans break-all">
+                    <div className="w-1/4 px-2 border-r font-sans break-all">
                       {repoId}
                     </div>
                     <div className="w-1/2 px-2 border-r font-bold font-sans break-all">
-                      {repoDetails.repoName[idx]}
+                      {editMode.status && editMode.idx === repoId ? (
+                        <input
+                          id={repoId.concat("repoeditinput")}
+                          type="text"
+                          placeholder={repoDetails.repoName[idx]}
+                          className="repo-form--input mt-0 mb-0"
+                          onChange={(e) => setRenameRepo(e.target.value)}
+                          value={renameRepo}
+                          ref={repoNameRef}
+                        ></input>
+                      ) : (
+                        repoDetails.repoName[idx]
+                      )}
                     </div>
                     <div className="w-1/2 px-2 border-r font-sans break-all text-sm font-light text-blue-600">
                       {repoDetails.repoPath[idx]}
                     </div>
                     <div className="w-1/2 px-2 border-r font-sans break-all text-sm font-light">
-                      {repoDetails.timeStamp[idx]}
+                      {format(
+                        new Date(repoDetails.timeStamp[idx]),
+                        "MMMM dd, yyyy"
+                      )}
                     </div>
-                    <div className="w-1/2 px-2 border-r font-sans break-all">
+                    <div className="w-1/2 px-2 border-r font-sans break-all flex flex-row justify-center">
+                      {editMode.idx === repoId && editMode.status ? (
+                        <>
+                          <div
+                            className="bg-indigo-500 p-2 mx-2 my-2 rounded shadow text-center w-1/2 hover:bg-indigo-400 cursor-pointer"
+                            onClick={() => saveRenamedRepo(repoId, renameRepo)}
+                          >
+                            <FontAwesomeIcon
+                              color="white"
+                              icon={["fas", "save"]}
+                            ></FontAwesomeIcon>
+                          </div>
+                          <div
+                            className="bg-gray-600 p-2 mx-2 my-2 rounded shadow text-center w-1/2 hover:bg-gray-400 cursor-pointer"
+                            onClick={cancelRenameRepo}
+                          >
+                            <FontAwesomeIcon
+                              color="white"
+                              icon={["fas", "times"]}
+                            ></FontAwesomeIcon>
+                          </div>
+                        </>
+                      ) : (
+                        <div
+                          className="bg-gray-600 p-2 mx-2 my-2 rounded shadow text-center w-1/2 hover:bg-gray-400 cursor-pointer"
+                          onClick={(event) => {
+                            setEditMode({
+                              status: true,
+                              idx: repoId,
+                            });
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            color="white"
+                            icon={["fas", "edit"]}
+                          ></FontAwesomeIcon>
+                        </div>
+                      )}
                       <div
-                        className="bg-red-600 p-2 mx-auto my-auto rounded shadow text-center w-1/2 hover:bg-red-400 cursor-pointer"
+                        className="bg-red-600 p-2 mx-2 my-2 rounded shadow text-center w-1/2 hover:bg-red-400 cursor-pointer"
                         onClick={(event) => {
                           setBackdropToggle(true);
                           setDeleteRepo({
@@ -431,7 +517,7 @@ export default function Settings(props) {
         >
           {deleteRepo ? deleteRepoHandler() : null}
           <div
-            className="top-0 right-0 fixed float-right font-semibold my-2 bg-red-500 text-3xl cursor-pointer text-center text-white align-middle rounded-full w-12 h-12 items-center shadow-md mr-5"
+            className="w-14 h-14 mr-5 mt-6 rounded-full bg-red-500 text-white flex justify-center items-center shadow cursor-pointer fixed right-0 top-0"
             onClick={() => {
               setDeleteRepoStatus("");
               setBackdropToggle(false);
@@ -439,7 +525,10 @@ export default function Settings(props) {
               setViewReload(localViewReload);
             }}
           >
-            X
+            <FontAwesomeIcon
+              className="flex text-center text-3xl my-auto"
+              icon={["fas", "times"]}
+            ></FontAwesomeIcon>
           </div>
         </div>
       ) : null}

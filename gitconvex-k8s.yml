@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitconvex
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gitconvex
+  template:
+    metadata:
+      labels:
+        app: gitconvex
+    spec:
+      containers:
+      - name: gitconvex
+        image: itassistors/gitconvex
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 9001

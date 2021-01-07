@@ -11,7 +11,7 @@ export default function RepoInfoComponent(props) {
       </div>
       <div className="repo-info--label">Active Branch</div>
       <div className="bg-yellow-50 text-yellow-800 border-yellow-300 repo-info--data rounded shadow">
-        {gitCurrentBranch}
+        {gitCurrentBranch === "Repo HEAD is nil" ? "---" : gitCurrentBranch}
       </div>
     </div>
   );
