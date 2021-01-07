@@ -160,4 +160,4 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 
 - Visit help section if you're facing an issue or need any help. If you have any queries or feedback, then discuss it in "Discord" or report an issue in GitHub.
 - You can check the current version of Gitconvex by clicking on the update button in this section.
-![help-and-support](https://user-images.githubusercontent.com/65342122/103559379-0b0b6580-4edc-11eb-9abe-c101f8792d42.png)
+![help-and-support](https://user-images.githubusercontent.com/65342122/103891656-3eced100-5110-11eb-9497-3daf8d4195d2.png)
