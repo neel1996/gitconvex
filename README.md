@@ -18,8 +18,8 @@
 
 > Use any of the below options to get gitconvex for your system
 
-[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v2.0.0&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
-[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v2.0.0&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
+[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v2.0.1&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
+[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v2.0.1&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
 
 
 - **Option - 1** Cloning repo from **github**
