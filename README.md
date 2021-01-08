@@ -1,6 +1,6 @@
 # Gitconvex
 
-### Web application for managing all your git repositories
+### Web application for managing your git repositories
 
 <p align="center">
     <img src="https://user-images.githubusercontent.com/47709856/87170859-8bfff080-c2ef-11ea-9140-b9e5db1c17d8.png" width="280">
@@ -22,9 +22,9 @@
 [![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v2.0.1&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
 
 
-- **Option - 1** Cloning repo from **github**
+- **Option - 1** Cloning the repo from **github**
 
-**To be Noted :** The `master` branch contains the latest stable build of the project. For a reliable experience, always clone the repo from the master branch.
+**To be Noted:** The `master` branch contains the latest and the stable build of the project. For a reliable experience, always clone the repo from the master branch.
 
 ``` shell
 
@@ -46,13 +46,13 @@ make build
 
 ```
 
-- **Option - 2** If you are into **docker**, then there is also a docker image available for gitconvex 
+- **Option - 2** If you are into **docker**, then there is a docker image available for gitconvex 
 
 ``` shell
 docker pull itassistors/gitconvex
 ```
 
-**Note:** Make sure you mount the host volume to the container to access the git repos from the host system. If you have git repos stored within your containers, then this is not required
+**Note:** Make sure you mount the host volume to the container, to access the git repos from the host system. If you have git repos stored within your containers, then this is not required
 
 - **Option - 3** Downloading the zip file from the tagged github [**release**](https://github.com/neel1996/gitconvex/releases)
 
@@ -80,9 +80,9 @@ make build
 
 | Software | Purpose |
 | --- | --- |
-| <b>[Git](https://git-scm.com/)</b> | <b>Required for handling some intense git operations with the target repo</b> |
+| <b>[Git](https://git-scm.com/)</b> | <b>Required for handling some git operations with the target repo</b> |
 | <b>[Go](https://golang.org/)</b> | <b>For building the backend from the source</b> |
-| <b>[Node JS](https://nodejs.org/en/)</b> | <b>For building the react UI bundle from scratch</b> |
+| <b>[Node JS](https://nodejs.org/en/)</b> | <b>For building the React UI bundle from scratch</b> |
     
 > **Important note for windows users**
 
@@ -105,13 +105,13 @@ C:\> git --version
 operable program or batch file.
 ```
 
-This can be fixed by adding `git` to the PATH environment variable in windows. The process of setting this up is available [here](https://stackoverflow.com/questions/26620312/git-installing-git-in-path-with-github-client-for-windows#answer-53706956:~:text=comment-,27,Here%20is%20the%20magic)
+This can be fixed by adding `git` to the PATH environment variable in windows. The steps for setting this up is available [here](https://stackoverflow.com/questions/26620312/git-installing-git-in-path-with-github-client-for-windows#answer-53706956:~:text=comment-,27,Here%20is%20the%20magic)
 
 > **🍎 Important note for MacOS users**
 
-The pre-built bundle for MacOS is not a verfieid or signed bundle. So gatekeeper could warn you or even prevent you from using gitconvex on your Mac devices. If this is the case then I recommend building the application from scratch using the `Makefile` included in the repo. Follow **[Option - 1](#download-options)** mentioned above to build the application from scratch.
+The pre-built bundle for MacOS is not a verified or signed bundle, so gatekeeper could warn you or even prevent you from using gitconvex on your Mac devices. If this is the case, then I recommend building the application from scratch using the `Makefile` included in the repo. Follow **[Option - 1](#download-options)** mentioned above to build the application from scratch.
 
-**Reason** - Enrolling in the apple developer program for making the application a verfied one will cost me 100 USD anually. So I will do it once the project gets enough reach 
+**Reason** - Enrolling in the apple developer program for making the application a verified one will cost me 100 USD annually, so I will do it once the project gets enough reach 
 
 # Detailed documentation
 
@@ -119,23 +119,10 @@ Refer the detailed [Documentation](DOCUMENTATION.md) for how to setup and use th
 
 
 # Contributions 
-
-This is the final production build for **gitconvex** and direct contributions will not be accepted to this repo. If you wish to contribute to this project, then it has to be made to the following repos which are dedicated to the frontend (React) and backend (Go) for the platform 
-
-- **Frontend repo - Build with React JS**
-
-[![gitconvex-ui](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-ui)](https://github.com/neel1996/gitconvex-ui)
-
-- **Backend repo - Build with GoLang**
-
-[![gitconvex-server](https://github-readme-stats-git-master.neel1996.vercel.app/api/pin/?username=neel1996&repo=gitconvex-server)](https://github.com/neel1996/gitconvex-server)
-
-
-> Please make sure that you are following the contribution guidelines for the respective repos. 
-
+Contributions are always welcome for the project. Please do refer the [Contribution Guidelines]( CONTRIBUTING.md) for details
 # Help and Feedback
 
-For reporting issues or for requesting any feature use the following medium,
+For reporting issues or for requesting a new feature, use the following channels
 
 [**Discord Channel** ](https://discord.gg/PSd2Cq9)
 
