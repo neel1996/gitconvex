@@ -7,11 +7,20 @@ import (
 	"github.com/neel1996/gitconvex-server/utils"
 )
 
+type ResetAllInterface interface {
+	ResetAllItems() string
+}
+
+type ResetAllStruct struct {
+	Repo *git.Repository
+}
+
 // ResetAllItems removes all the staged items back to the staging area.
 //
 // go-git fails to reset all changes for a newly initialized repo, so the function falls back
 // to the git client for resetting all items if the go-git Reset fails
-func ResetAllItems(repo *git.Repository) string {
+func (r ResetAllStruct) ResetAllItems() string {
+	repo := r.Repo
 	w, wErr := repo.Worktree()
 
 	if wErr != nil {
@@ -41,5 +50,4 @@ func ResetAllItems(repo *git.Repository) string {
 			return global.ResetAllSuccess
 		}
 	}
-
 }

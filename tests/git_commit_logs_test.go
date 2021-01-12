@@ -42,7 +42,14 @@ func TestCommitLogs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert := assert2.New(t)
-			cLogs := git2.CommitLogs(tt.args.repo, "")
+
+			var testObj git2.CommitLogInterface
+			testObj = git2.CommitLogStruct{
+				Repo:            tt.args.repo,
+				ReferenceCommit: "",
+			}
+
+			cLogs := testObj.CommitLogs()
 			gotTotal := *cLogs.TotalCommits
 			assert.Equal(expectedTotalCommits, gotTotal, "Total commit count are mis-matching")
 		})

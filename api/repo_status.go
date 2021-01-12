@@ -19,7 +19,9 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	commitChan := make(chan git.AllCommitData)
 	trackedFileCountChan := make(chan int)
 
-	go git.Repo(repoId, repoChan)
+	var repoObject git.RepoInterface
+	repoObject = git.RepoStruct{RepoId: repoId}
+	go repoObject.Repo(repoChan)
 
 	var repoName *string
 	r := <-repoChan
@@ -42,7 +44,14 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	remote := ""
 	var remoteURL *string
 	remoteURL = &remote
-	go git.RemoteData(repo, remoteChan)
+
+	var remoteDataObject git.RemoteDataInterface
+	remoteDataObject = git.RemoteDataStruct{
+		Repo:      repo,
+		RemoteURL: *remoteURL,
+	}
+
+	go remoteDataObject.RemoteData(remoteChan)
 	remoteData := <-remoteChan
 	remotes := remoteData.RemoteURL
 
@@ -71,7 +80,10 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 		*remoteURL = *remotes[0]
 	}
 
-	go git.GetBranchList(repo, branchChan)
+	var branchListObject git.BranchListInterface
+	branchListObject = git.BranchListInputs{Repo: repo}
+	go branchListObject.GetBranchList(branchChan)
+
 	branchList := <-branchChan
 	currentBranch := &branchList.CurrentBranch
 	branches := branchList.BranchList
@@ -79,13 +91,20 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 
 	var latestCommit *string
 
-	go git.AllCommits(repo, commitChan)
+	var allCommitObject git.AllCommitInterface
+	allCommitObject = git.AllCommitStruct{Repo: repo}
+	go allCommitObject.AllCommits(commitChan)
 	commitData := <-commitChan
 	latestCommit = &commitData.LatestCommit
 	totalCommits := commitData.TotalCommits
 	totalCommitsPtr := &totalCommits
 
-	go git.TrackedFileCount(repo, trackedFileCountChan)
+	var listFilesObject git.ListFilesInterface
+	listFilesObject = git.ListFilesStruct{
+		Repo: repo,
+	}
+
+	go listFilesObject.TrackedFileCount(trackedFileCountChan)
 	trackedFileCount := <-trackedFileCountChan
 	trackedFilePtr := &trackedFileCount
 

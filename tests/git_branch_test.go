@@ -41,7 +41,11 @@ func TestGetBranchList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			go git2.GetBranchList(tt.args.repo, tt.args.branchChan)
+			var testObj git2.BranchListInterface
+			testObj = git2.BranchListInputs{
+				Repo: tt.args.repo,
+			}
+			go testObj.GetBranchList(tt.args.branchChan)
 			branchList := <-tt.args.branchChan
 
 			cBranch := branchList.CurrentBranch

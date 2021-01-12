@@ -15,10 +15,24 @@ import (
 	to do the job
 */
 
+type ChangeInterface interface {
+	GetUntrackedFiles(untrackedChan chan []*string)
+	GetModifiedFiles(modifiedFileChan chan []*string)
+	GetStagedFiles(stagedFileChan chan []*string)
+	ChangedFiles() *model.GitChangeResults
+}
+
+type ChangedStruct struct {
+	Repo     *git.Repository
+	RepoPath string
+}
+
 // GetUntrackedFiles executes a native git command to fetch the list of untracked files
-func GetUntrackedFiles(repoPath string, untrackedChan chan []*string) {
+func (c ChangedStruct) GetUntrackedFiles(untrackedChan chan []*string) {
 	logger.Log("Fetching untracked files from the repo", global.StatusInfo)
 	args := []string{"ls-files", "--others", "--exclude-standard"}
+	repoPath := c.RepoPath
+
 	cmd := utils.GetGitClient(repoPath, args)
 	cmdString, cmdErr := cmd.Output()
 	if cmdErr != nil {
@@ -40,9 +54,10 @@ func GetUntrackedFiles(repoPath string, untrackedChan chan []*string) {
 }
 
 // GetStagedFiles executes a native git command to fetch the list of staged files
-func GetStagedFiles(repoPath string, stagedFileChan chan []*string) {
+func (c ChangedStruct) GetStagedFiles(stagedFileChan chan []*string) {
 	logger.Log("Fetching staged files from the repo", global.StatusInfo)
 	args := []string{"diff", "--name-only", "--cached"}
+	repoPath := c.RepoPath
 	cmd := utils.GetGitClient(repoPath, args)
 	cmdString, cmdErr := cmd.Output()
 	if cmdErr != nil {
@@ -65,9 +80,10 @@ func GetStagedFiles(repoPath string, stagedFileChan chan []*string) {
 }
 
 // GetModifiedFiles executes a native git command to fetch all the modified files from the repo
-func GetModifiedFiles(repoPath string, modifiedFileChan chan []*string) {
+func (c ChangedStruct) GetModifiedFiles(modifiedFileChan chan []*string) {
 	logger.Log("Fetching changed files from the repo", global.StatusInfo)
 	args := []string{"diff", "--raw"}
+	repoPath := c.RepoPath
 	cmd := utils.GetGitClient(repoPath, args)
 	cmdString, cmdErr := cmd.Output()
 	if cmdErr != nil && cmdString != nil {
@@ -97,8 +113,9 @@ func GetModifiedFiles(repoPath string, modifiedFileChan chan []*string) {
 
 // ChangedFiles returns the list of changes from the target
 // The function organizes the tracked, untracked and staged files in separate slices and returns the struct *model.GitChangeResults
-func ChangedFiles(repo *git.Repository) *model.GitChangeResults {
+func (c ChangedStruct) ChangedFiles() *model.GitChangeResults {
 	logger := global.Logger{}
+	repo := c.Repo
 
 	logger.Log("Fetching the current status of the repo", global.StatusInfo)
 	w, _ := repo.Worktree()
@@ -107,10 +124,11 @@ func ChangedFiles(repo *git.Repository) *model.GitChangeResults {
 	var unTrackedFileChan = make(chan []*string)
 	var changedFileChan = make(chan []*string)
 	var stagedFileChan = make(chan []*string)
+	c.RepoPath = repoPath
 
-	go GetModifiedFiles(repoPath, changedFileChan)
-	go GetUntrackedFiles(repoPath, unTrackedFileChan)
-	go GetStagedFiles(repoPath, stagedFileChan)
+	go c.GetModifiedFiles(changedFileChan)
+	go c.GetUntrackedFiles(unTrackedFileChan)
+	go c.GetStagedFiles(stagedFileChan)
 
 	// Intermediate return value to close the channels and then return the values
 	returnVal := &model.GitChangeResults{

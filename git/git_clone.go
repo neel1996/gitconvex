@@ -14,9 +14,25 @@ import (
 	"io"
 )
 
+type CloneInterface interface {
+	CloneHandler() (*model.ResponseModel, error)
+	fallbackClone() (*model.ResponseModel, error)
+}
+
+type CloneStruct struct {
+	RepoPath   string
+	RepoURL    string
+	AuthOption string
+	UserName   *string
+	Password   *string
+}
+
 // fallbackClone performs a git clone using the native git client
 // If the go-git based clone fails due to an authentication issue, then this function will be invoked to perform a clone
-func fallbackClone(repoPath string, repoURL string) (*model.ResponseModel, error) {
+func (c CloneStruct) fallbackClone() (*model.ResponseModel, error) {
+	repoPath := c.RepoPath
+	repoURL := c.RepoURL
+
 	args := []string{"clone", repoURL, repoPath}
 	cmd := utils.GetGitClient(".", args)
 	cmdStr, cmdErr := cmd.Output()
@@ -36,15 +52,21 @@ func fallbackClone(repoPath string, repoURL string) (*model.ResponseModel, error
 
 // CloneHandler clones the remote repo to the target directory
 // It supports options for SSH and HTTPS authentications
-func CloneHandler(repoPath string, repoURL string, authOption string, userName *string, password *string) (*model.ResponseModel, error) {
+func (c CloneStruct) CloneHandler() (*model.ResponseModel, error) {
 	logger := global.Logger{}
+
+	authOption := c.AuthOption
+	repoPath := c.RepoPath
+	repoURL := c.RepoURL
+	userName := c.UserName
+	password := c.Password
 
 	gitSSHAuth, authErr := ssh.NewSSHAgentAuth("git")
 
 	if authOption == "ssh" && authErr != nil {
 		logger.Log(authErr.Error(), global.StatusError)
 		logger.Log("Auth failed. Retrying with native git client based clone", global.StatusWarning)
-		return fallbackClone(repoPath, repoURL)
+		return c.fallbackClone()
 	} else {
 		logger.Log(fmt.Sprintf("Initiating repo clone with - %v auth option", authOption), global.StatusInfo)
 		var err error

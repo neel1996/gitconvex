@@ -8,11 +8,23 @@ import (
 	"github.com/neel1996/gitconvex-server/graph/model"
 )
 
+type CommitFileListInterface interface {
+	CommitFileList() []*model.GitCommitFileResult
+}
+
+type CommitFileListStruct struct {
+	Repo       *git.Repository
+	CommitHash string
+}
+
 // CommitFileList returns the list of files modified, added or removed as part of a commit
 // compares the previous commit tree with the current commit tree and, returns the change type (M|D|A) and file name
-func CommitFileList(repo *git.Repository, commitHash string) []*model.GitCommitFileResult {
+func (c CommitFileListStruct) CommitFileList() []*model.GitCommitFileResult {
 	logger := global.Logger{}
 	var res []*model.GitCommitFileResult
+
+	repo := c.Repo
+	commitHash := c.CommitHash
 
 	logger.Log(fmt.Sprintf("Fetching file details for commit %v", commitHash), global.StatusInfo)
 
@@ -82,5 +94,4 @@ func CommitFileList(repo *git.Repository, commitHash string) []*model.GitCommitF
 		}
 		return res
 	}
-
 }

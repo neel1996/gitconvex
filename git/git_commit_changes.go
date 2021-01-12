@@ -13,9 +13,23 @@ import (
 	"time"
 )
 
+type CommitInterface interface {
+	CommitChanges() string
+	windowsCommit() string
+}
+
+type CommitStruct struct {
+	Repo          *git.Repository
+	CommitMessage string
+	RepoPath      string
+}
+
 // windowsCommit is used for committing changes using the git client if the platform is windows
 // go-git commit fails with an access denied error for windows platform
-func windowsCommit(repoPath string, msg string) string {
+func (c CommitStruct) windowsCommit() string {
+	repoPath := c.RepoPath
+	msg := c.CommitMessage
+
 	args := []string{"commit", "-m", msg}
 	cmd := utils.GetGitClient(repoPath, args)
 	cmdStr, cmdErr := cmd.Output()
@@ -33,7 +47,10 @@ func windowsCommit(repoPath string, msg string) string {
 //
 // The function falls back to the native git client for Windows platform due to an existing bug in the go-git library which
 // blocks commits in windows platform
-func CommitChanges(repo *git.Repository, commitMessage string) string {
+func (c CommitStruct) CommitChanges() string {
+	commitMessage := c.CommitMessage
+	repo := c.Repo
+
 	var formattedMessage = commitMessage
 	logger := global.Logger{}
 	w, wErr := repo.Worktree()
@@ -52,7 +69,7 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 		platform := runtime.GOOS
 		if platform == "windows" && w != nil {
 			logger.Log(fmt.Sprintf("OS is %s -- Switching to native git client", platform), global.StatusWarning)
-			return windowsCommit(w.Filesystem.Root(), formattedMessage)
+			return c.windowsCommit()
 		}
 
 		// Checking if repo is a fresh repo with no branches
@@ -60,7 +77,7 @@ func CommitChanges(repo *git.Repository, commitMessage string) string {
 		head, _ := repo.Head()
 		if head == nil {
 			logger.Log("Repo with no HEAD", global.StatusWarning)
-			return windowsCommit(w.Filesystem.Root(), formattedMessage)
+			return c.windowsCommit()
 		}
 
 		// Logic to check if the repo / global config has proper user information setup

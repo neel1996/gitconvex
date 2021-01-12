@@ -15,9 +15,26 @@ import (
 	"strings"
 )
 
+type PullInterface interface {
+	PullFromRemote() *model.PullResult
+	windowsPull() *model.PullResult
+}
+
+type PullStruct struct {
+	Repo         *git.Repository
+	RemoteURL    string
+	RemoteBranch string
+	RemoteName   string
+	RepoPath     string
+}
+
 // windowsPull is used for pulling changes using the git client if the platform is windows
 // go-git pull fails in windows due to SSH authentication error
-func windowsPull(repoPath string, remoteName string, branch string) *model.PullResult {
+func (p PullStruct) windowsPull() *model.PullResult {
+	remoteName := p.RemoteName
+	repoPath := p.RepoPath
+	branch := p.RemoteBranch
+
 	args := []string{"pull", remoteName, branch}
 	cmd := utils.GetGitClient(repoPath, args)
 	cmdStr, cmdErr := cmd.Output()
@@ -49,10 +66,23 @@ func windowsPull(repoPath string, remoteName string, branch string) *model.PullR
 }
 
 // PullFromRemote pulls the changes from the remote repository using the remote URL and branch name received
-func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string) *model.PullResult {
+func (p PullStruct) PullFromRemote() *model.PullResult {
 	var pullErr error
 	logger := global.Logger{}
-	remoteName := GetRemoteName(repo, remoteURL)
+
+	repo := p.Repo
+	remoteURL := p.RemoteURL
+	remoteBranch := p.RemoteBranch
+
+	var remoteDataObject RemoteDataInterface
+	remoteDataObject = RemoteDataStruct{
+		Repo:      repo,
+		RemoteURL: remoteURL,
+	}
+
+	remoteName := remoteDataObject.GetRemoteName()
+	p.RemoteName = remoteName
+
 	w, _ := repo.Worktree()
 	b := new(bytes.Buffer)
 
@@ -83,7 +113,7 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 					PulledItems: nil,
 				}
 			}
-			return windowsPull(w.Filesystem.Root(), remoteName, remoteBranch)
+			return p.windowsPull()
 		}
 
 		pullErr = w.Pull(&git.PullOptions{
@@ -111,7 +141,7 @@ func PullFromRemote(repo *git.Repository, remoteURL string, remoteBranch string)
 		} else {
 			if strings.Contains(pullErr.Error(), "ssh: handshake failed: ssh:") || strings.Contains(pullErr.Error(), "invalid auth method") {
 				logger.Log("Pull failed. Retrying pull with git client", global.StatusWarning)
-				return windowsPull(w.Filesystem.Root(), remoteName, remoteBranch)
+				return p.windowsPull()
 			}
 			logger.Log(pullErr.Error(), global.StatusError)
 			return &model.PullResult{

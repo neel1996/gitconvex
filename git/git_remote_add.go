@@ -6,9 +6,24 @@ import (
 	"github.com/neel1996/gitconvex-server/global"
 )
 
+type AddRemoteInterface interface {
+	AddRemote() string
+}
+
+type AddRemoteStruct struct {
+	Repo       *git.Repository
+	RemoteName string
+	RemoteURL  string
+}
+
 // AddRemote adds a new remote to the target git repo
-func AddRemote(repo *git.Repository, remoteName string, remoteURL string) string {
+func (a AddRemoteStruct) AddRemote() string {
 	logger := global.Logger{}
+
+	repo := a.Repo
+	remoteName := a.RemoteName
+	remoteURL := a.RemoteURL
+
 	remote, err := repo.CreateRemote(&config.RemoteConfig{
 		Name: remoteName,
 		URLs: []string{remoteURL},

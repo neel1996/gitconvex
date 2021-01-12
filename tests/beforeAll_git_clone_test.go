@@ -37,7 +37,15 @@ func TestCloneHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := git.CloneHandler(tt.args.repoPath, tt.args.repoURL, "noauth", nil, nil)
+			var testObject git.CloneInterface
+			testObject = git.CloneStruct{
+				RepoPath:   tt.args.repoPath,
+				RepoURL:    tt.args.repoURL,
+				AuthOption: "noauth",
+				UserName:   nil,
+				Password:   nil,
+			}
+			got, err := testObject.CloneHandler()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CloneHandler() error = %v, wantErr %v", err, tt.wantErr)
 				return

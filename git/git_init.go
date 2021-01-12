@@ -9,7 +9,6 @@ import (
 )
 
 // InitHandler initializes a new git repo in the target directory
-
 func InitHandler(repoPath string) (*model.ResponseModel, error) {
 	_, err := git.PlainInit(repoPath, false)
 

@@ -23,8 +23,11 @@ func TestCommitChanges(t *testing.T) {
 	sampleFile := "untracked.txt"
 	err := ioutil.WriteFile(repoPath+"/"+sampleFile, []byte{byte(63)}, 0755)
 
+	var stageAllObjects git2.StageAllInterface
+	stageAllObjects = git2.StageAllStruct{Repo: r}
+
 	fmt.Println(err)
-	fmt.Println(git2.StageAllItems(r))
+	fmt.Println(stageAllObjects.StageAllItems())
 
 	type args struct {
 		repo          *git.Repository
@@ -42,7 +45,14 @@ func TestCommitChanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := git2.CommitChanges(tt.args.repo, tt.args.commitMessage); got != tt.want {
+			var testObj git2.CommitInterface
+			testObj = git2.CommitStruct{
+				Repo:          tt.args.repo,
+				CommitMessage: tt.args.commitMessage,
+				RepoPath:      repoPath,
+			}
+
+			if got := testObj.CommitChanges(); got != tt.want {
 				t.Errorf("CommitChanges() = %v, want %v", got, tt.want)
 			}
 		})

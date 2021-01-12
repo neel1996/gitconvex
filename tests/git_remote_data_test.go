@@ -30,7 +30,11 @@ func TestRemoteData(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert := assert2.New(t)
-			go git2.RemoteData(tt.args.repo, tt.args.remoteChan)
+			var testObj git2.RemoteDataInterface
+			testObj = git2.RemoteDataStruct{
+				Repo: tt.args.repo,
+			}
+			go testObj.RemoteData(tt.args.remoteChan)
 			remoteData := <-remoteChan
 
 			rHost := remoteData.RemoteHost

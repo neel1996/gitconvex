@@ -32,7 +32,13 @@ func TestDeleteBranch(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := git2.DeleteBranch(tt.args.repo, tt.args.branchName, tt.args.forceFlag); !reflect.DeepEqual(got, tt.want) {
+			var testObj git2.DeleteBranchInterface
+			testObj = git2.DeleteBranchInputs{
+				Repo:       tt.args.repo,
+				BranchName: tt.args.branchName,
+				ForceFlag:  tt.args.forceFlag,
+			}
+			if got := testObj.DeleteBranch(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DeleteBranch() = %v, want %v", got, tt.want)
 			}
 		})

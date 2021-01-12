@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+type BranchListInterface interface {
+	GetBranchList(branchChan chan Branch)
+}
+
+type BranchListInputs struct {
+	Repo *git.Repository
+}
+
 type Branch struct {
 	CurrentBranch string
 	BranchList    []*string
@@ -39,13 +47,13 @@ func isBranchNameValid(branchName string) bool {
 
 // GetBranchList fetches all the branches from the target repository
 // The result will be returned as a struct with the current branch and all the available branches
-func GetBranchList(repo *git.Repository, branchChan chan Branch) {
+func (inputs BranchListInputs) GetBranchList(branchChan chan Branch) {
 	var (
 		branches      []*string
 		allBranchList []*string
 	)
 	var currentBranch string
-
+	repo := inputs.Repo
 	logger := global.Logger{}
 
 	if repo != nil {

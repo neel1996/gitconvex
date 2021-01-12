@@ -10,9 +10,19 @@ import (
 	"strings"
 )
 
+type FileLineDiffInterface interface {
+	FileLineDiff() *model.FileLineChangeResult
+}
+
+type FileLineDiffStruct struct {
+	Repo     *git.Repository
+	FileName string
+	Data     []*string
+}
+
 // FileLineDiff function compares the current version of the target file with the recently comitted version of the file
 // and returns the line wise difference. Similar to git diff <filename>
-func FileLineDiff(repo *git.Repository, fileName string, data []*string) *model.FileLineChangeResult {
+func (f FileLineDiffStruct) FileLineDiff() *model.FileLineChangeResult {
 	var (
 		currentFileLines []string
 		commitLines      []string
@@ -23,6 +33,10 @@ func FileLineDiff(repo *git.Repository, fileName string, data []*string) *model.
 		insertionCount   int
 		deletionCount    int
 	)
+
+	repo := f.Repo
+	data := f.Data
+	fileName := f.FileName
 
 	for _, line := range data {
 		currentFileLines = append(currentFileLines, *line)

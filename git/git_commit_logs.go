@@ -12,6 +12,15 @@ import (
 	"time"
 )
 
+type CommitLogInterface interface {
+	CommitLogs() *model.GitCommitLogResults
+}
+
+type CommitLogStruct struct {
+	Repo            *git.Repository
+	ReferenceCommit string
+}
+
 // commitOrganizer collects and organizes the commit related information in the GitCommits struct
 func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 	logger := global.Logger{}
@@ -86,12 +95,19 @@ func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 // CommitLogs fetches the structured commit logs list for the target repo
 // Limits the length of commits to 10 for a single function call
 // The referenceCommit is used as a reference to fetch the commits in a linear manner
-func CommitLogs(repo *git.Repository, referenceCommit string) *model.GitCommitLogResults {
+func (c CommitLogStruct) CommitLogs() *model.GitCommitLogResults {
 	var commitLogs []object.Commit
 	var logOptions *git.LogOptions
 
+	repo := c.Repo
+	referenceCommit := c.ReferenceCommit
+
 	allCommitChan := make(chan AllCommitData)
-	go AllCommits(repo, allCommitChan)
+
+	var allCommitsObject AllCommitInterface
+	allCommitsObject = AllCommitStruct{Repo: repo}
+	go allCommitsObject.AllCommits(allCommitChan)
+
 	acc := <-allCommitChan
 	totalCommits := acc.TotalCommits
 
