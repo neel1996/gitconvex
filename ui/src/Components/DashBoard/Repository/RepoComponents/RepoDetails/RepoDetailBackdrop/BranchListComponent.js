@@ -264,22 +264,6 @@ export default function BranchListComponent({ repoId, currentBranch }) {
             <div className="list-area--branches--active">
               <div
                 className="list-area--branches--delete"
-                title="Will delete only if the branch is clean and safe"
-                onClick={() => {
-                  if (!activeBranchFlag) {
-                    deleteBranchHandler(branchName, false);
-                  }
-                }}
-              >
-                <div className="list-area--branches--delete--btn">
-                  <FontAwesomeIcon
-                    icon={["fas", "trash-alt"]}
-                  ></FontAwesomeIcon>
-                </div>
-                <div className="list-area--branches--delete--type">Normal</div>
-              </div>
-              <div
-                className="list-area--branches--delete"
                 title="Will delete the branch forcefully.Be careful!"
                 onClick={() => {
                   if (!activeBranchFlag) {
@@ -289,10 +273,10 @@ export default function BranchListComponent({ repoId, currentBranch }) {
               >
                 <div className="list-area--branches--delete--btn">
                   <FontAwesomeIcon
-                    icon={["fas", "minus-square"]}
+                    icon={["fas", "trash-alt"]}
                   ></FontAwesomeIcon>
                 </div>
-                <div className="list-area--branches--delete--type">Force</div>
+                <div className="list-area--branches--delete--type">DELETE</div>
               </div>
             </div>
           ) : (

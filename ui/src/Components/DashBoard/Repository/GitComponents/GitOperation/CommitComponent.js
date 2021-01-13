@@ -156,7 +156,7 @@ export default function CommitComponent(props) {
                 </div>
               ) : null}
               {loadingCommit ? (
-                <div className="font-sans font-light my-1 mx-auto my-auto p-2 text-center text-xl bg-gray-100 shadow-md w-full cursor-pointer rounded-lg text-gray-600">
+                <div className="font-sans font-semibold my-1 mx-auto p-2 text-center text-xl bg-gray-400 shadow-md w-full cursor-pointer rounded-lg text-white">
                   Committing Changes...
                 </div>
               ) : (
