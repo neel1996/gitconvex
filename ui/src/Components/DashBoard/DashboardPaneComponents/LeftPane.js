@@ -55,9 +55,9 @@ export default function LeftPane(props) {
   ];
 
   return (
-    <div className="dashboard--leftpane block xl:w-1/4 lg:w-1/3 md:w-1/6 sm:w-1/6 w-1/6">
+    <div className="bg-white overflow-auto shadow top-0 left-0 bottom-0 p-3 block xl:w-1/4 lg:w-1/3 md:w-1/6 sm:w-1/6 w-1/6">
       <div
-        className="leftpane--logo"
+        className="flex justify-center items-center bg-blue-50 cursor-pointer p-2 rounded-md"
         onClick={(event) => {
           dispatch({ type: ADD_FORM_CLOSE, payload: true });
           props.parentProps.history.push("/dashboard");
@@ -69,21 +69,21 @@ export default function LeftPane(props) {
           Convex
         </div>
       </div>
-      <div className="menu xl:mt-32 lg:mt-24 md:mt-48 sm:mt-56 mt-56 cursor-pointer block items-center align-middle">
+      <div className="xl:mt-32 lg:mt-24 md:mt-48 sm:mt-56 mt-56 cursor-pointer block items-center align-middle">
         {menuItemParams.map((entry) => {
           return (
             <NavLink
               to={`${entry.link}`}
               exact
               activeClassName="bg-gray-200"
-              className="menu--link xl:justify-between lg:justify-between md:justify-center sm:justify-center justify-center xl:my-0 lg:my-0 md:my-6 sm:my-6 my-6"
+              className="flex p-3 mx-2 border-b xl:justify-between lg:justify-between md:justify-center sm:justify-center justify-center xl:my-0 lg:my-0 md:my-6 sm:my-6 my-6 hover:bg-gray-200"
               key={entry.label}
             >
-              <div className="menu--items sm:text-center">
-                <div className="menu--items__icon text-sm w-1/6">
+              <div className="flex gap-10 align-middle items-center my-auto sm:text-center">
+                <div className="text-sm w-1/6">
                   {entry.icon}
                 </div>
-                <div className="menu--items__label w-5/6 xl:text-2xl lg:text-2xl md:text-xl block xl:block lg:block md:hidden sm:hidden">
+                <div className="text-gray-500 w-5/6 xl:text-2xl lg:text-2xl md:text-xl block xl:block lg:block md:hidden sm:hidden">
                   {entry.label}
                 </div>
               </div>
