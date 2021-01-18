@@ -219,7 +219,7 @@ export default function FileExplorerComponent(props) {
       gitRepoFiles.forEach(async (entry, index) => {
         const splitEntry = entry.split(":");
 
-        if (splitEntry[1].includes("directory")) {
+        if (splitEntry[1] && splitEntry[1].includes("directory")) {
           let directoryPath = directorySeparatorRemover(splitEntry[0]);
 
           directoryEntry.push(
@@ -249,7 +249,7 @@ export default function FileExplorerComponent(props) {
               </div>
             </div>
           );
-        } else if (splitEntry[1].includes("File")) {
+        } else if (splitEntry[1] && splitEntry[1].includes("File")) {
           if (splitEntry[0] === "LICENSE") {
             fileIcon = require("../../../../../assets/icons/file_type_license.svg");
           } else {
