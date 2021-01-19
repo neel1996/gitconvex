@@ -62,7 +62,7 @@ export default function SearchRepoCards(props) {
         repo.map((item) => {
           return (
             <div
-              className="compare--search-card"
+              className="border-b cursor-pointer flex items-center justify-around my-4 mx-auto p-4 hover:bg-gray-100"
               key={item.id}
               onClick={(e) => {
                 props.setSelectedRepoHandler(item);

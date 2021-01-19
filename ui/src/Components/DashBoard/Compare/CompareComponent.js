@@ -3,7 +3,6 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useMemo, useState } from "react";
-import "../../styles/Compare.css";
 import BranchCompareComponent from "./BranchCompareComponent/BranchCompareComponent";
 import CommitCompareComponent from "./CommitCompareComponent/CommitCompareComponent";
 import CompareActionButtons from "./CompareActionButtons";
@@ -51,7 +50,7 @@ export default function CompareComponent() {
 
   function noSelectedRepobanner() {
     return (
-      <div className="compare--hint">
+      <div className="block m-auto text-center w-full">
         <FontAwesomeIcon
           icon={["far", "object-group"]}
           className="font-sans text-center text-gray-300 my-20"
@@ -63,8 +62,10 @@ export default function CompareComponent() {
   }
 
   return (
-    <div className="compare overflow-auto">
-      <div className="compare--header">Compare Branches and Commits</div>
+    <div className="h-full py-10 w-full overflow-auto">
+      <div className="font-sans font-light text-3xl mx-10 text-gray-800">
+        Compare Branches and Commits
+      </div>
       <RepoSearchBar activateCompare={activateCompare}></RepoSearchBar>
       {selectedRepo ? (
         <>

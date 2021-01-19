@@ -93,7 +93,7 @@ export default function BranchCommitLogChanges(props) {
                         </div>
                       </div>
                       <div className="shadow border rounded p-2 bg-indigo-100 font-mono font-semibold text-indigo-800">
-                        #{item.hash}
+                        #{<>{item.hash ? item.hash.substring(0, 7) : null}</>}
                       </div>
                     </div>
                   );

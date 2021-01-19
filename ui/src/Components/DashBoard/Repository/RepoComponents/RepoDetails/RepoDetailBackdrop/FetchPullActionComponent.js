@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { globalAPIEndpoint } from "../../../../../../util/env_config";
 import InfiniteLoader from "../../../../../Animations/InfiniteLoader";
+import "../../../../../styles/RepositoryDetailsBackdrop.css";
 
 export default function FetchFromRemoteComponent(props) {
   library.add(fas);
@@ -179,14 +180,14 @@ export default function FetchFromRemoteComponent(props) {
 
   return (
     <>
-      <div className="repo-backdrop--fetchpull pt-4">
+      <div className="w-3/4 mx-auto my-auto shadow rounded-lg bg-white pt-4">
         {actionType === "fetch" ? (
           <div>
             <div className="text-center font-sans font-semibold mx-auto w-full p-3 text-2xl border-b-2 border-dashed text-gray-800">
               Fetch from Remote
             </div>
             <div
-              className="fetchpull--fetch-global xl:w-3/5 lg:w-3/4 md:w-3/4 sm:w-11/12"
+              className="flex justify-center items-center w-11/12 mx-auto my-4 text-center p-1 font-sans font-medium text-lg cursor-pointer text-indigo-400 hover:text-indigo-500 xl:w-3/5 lg:w-3/4 md:w-3/4 sm:w-11/12"
               onClick={() => {
                 actionHandler();
               }}
@@ -211,7 +212,7 @@ export default function FetchFromRemoteComponent(props) {
           </div>
           <div className="w-full mb-6">
             <select
-              className="fetchpull--select"
+              className="border p-3 text-lg rounded shadow font-sans outline-none"
               defaultValue="checked"
               disabled={remoteData ? false : true}
               onChange={() => {
@@ -239,7 +240,7 @@ export default function FetchFromRemoteComponent(props) {
             </div>
             <div className="w-full mb-6">
               <select
-                className="fetchpull--select"
+                className="border p-3 text-lg rounded shadow font-sans outline-none"
                 defaultValue="checked"
                 onChange={() => {
                   setIsBranchSet(true);
@@ -260,7 +261,7 @@ export default function FetchFromRemoteComponent(props) {
 
         {isRemoteSet && isBranchSet && !loading ? (
           <div
-            className="fetchpull--btn mt-10 rounded-b"
+            className="text-center font-semibold text-xl p-4 mx-auto cursor-pointer bg-indigo-400 text-white mt-10 rounded-b hover:bg-indigo-500"
             onClick={(event) => {
               const remoteHost = remoteRef.current.value;
               const branchName = branchRef.current.value;
@@ -272,14 +273,14 @@ export default function FetchFromRemoteComponent(props) {
               }
             }}
           >
-            {actionType === "pull" ? "Pull from Remote" : null}
-            {actionType === "fetch" ? "Fetch from Remote" : null}
+            {actionType === "pull" ? "PULL FROM REMOTE" : null}
+            {actionType === "fetch" ? "FETCH FROM REMOTE" : null}
           </div>
         ) : null}
         <div>
           {loading ? (
             <>
-              <div className="fetchpull--loader">
+              <div className="my-4 text-center border-2 border-dashed border-gray-500 font-light font-sans text-xl p-2 mx-auto text-gray-500 bg-gray-50 shadow rounded-md">
                 {actionType === "pull" ? "Pulling changes" : "Fetching"} from
                 remote...
               </div>
@@ -290,20 +291,18 @@ export default function FetchFromRemoteComponent(props) {
           ) : null}
         </div>
 
-        {!loading && result && result.length > 0 ? (
+        {true || (!loading && result && result.length > 0) ? (
           <>
-            <div className="fetchpull--result">
-              {result.map((result) => {
-                return (
-                  <div
-                    className="my-1 mx-2 text-center text-xl font-sans shadow bg-gray-300"
-                    key={result + `-${uuid()}`}
-                  >
-                    {result}
-                  </div>
-                );
-              })}
-            </div>
+            {result.map((result) => {
+              return (
+                <div
+                  className="my-1 mx-2 text-center text-xl font-sans shadow bg-gray-300"
+                  key={result + `-${uuid()}`}
+                >
+                  {result}
+                </div>
+              );
+            })}
           </>
         ) : null}
       </div>

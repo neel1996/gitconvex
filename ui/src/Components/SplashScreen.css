@@ -16,17 +16,3 @@
 .logo-label__title-first::first-letter {
     color: pink;
 }
-
-@media only screen and (max-width: 1500px) {
-    .dashboard-leftpane__logo {
-        width: 60px;
-        height: 60px;
-    }
-}
-
-@media only screen and (max-width: 1080px) {
-    .dashboard-leftpane__logo {
-        width: 50px;
-        height: 50px;
-    }
-}

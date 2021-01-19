@@ -47,9 +47,9 @@ export default function CommitLogFileCard({
   }, [repoId, commitHash]);
 
   return (
-    <div className="commitlogs--files">
+    <div className="w-11/12 p-6 rounded-lg shadow block mx-auto my-6 bg-blue-50">
       <div
-        className="commitlogs--files--close"
+        className="font-sans font-light float-right right-0 cursor-pointer mx-auto text-2xl text-blue-400 mb-0"
         style={{ marginTop: "-20px" }}
         onClick={() => {
           setCommitFiles([]);
@@ -59,14 +59,14 @@ export default function CommitLogFileCard({
         x
       </div>
       {isLoading ? (
-        <div className="commitlogs--files--header text-center">
+        <div className="mx-4 text-2xl font-sans font-light text-gray-600 text-center">
           Fetching changed files...
         </div>
       ) : null}
       {!isLoading && commitFiles ? (
-        <div className="commitlogs--files--header">{`${commitFiles.length} Files changed`}</div>
+        <div className="mx-4 text-2xl font-sans font-light text-gray-600">{`${commitFiles.length} Files changed`}</div>
       ) : null}
-      <div className="commitlogs--files--list">
+      <div className="block w-3/4 mx-10 my-4">
         {commitFiles &&
           commitFiles.map(({ type, fileName }) => {
             let iconSelector = "";
@@ -92,7 +92,7 @@ export default function CommitLogFileCard({
 
             return (
               <div
-                className="commitlogs--files--list--item"
+                className="flex justify-evenly items-center align-middle my-auto"
                 key={fileName + commitHash}
               >
                 <div className={`w-1/4 text-2xl ${colorSelector}`}>
@@ -101,7 +101,7 @@ export default function CommitLogFileCard({
                   ></FontAwesomeIcon>
                 </div>
                 <div
-                  className="commitlogs--files--list--filename"
+                  className="truncate w-3/4 font-medium text-sm text-gray-600"
                   title={fileName}
                 >
                   {fileName}

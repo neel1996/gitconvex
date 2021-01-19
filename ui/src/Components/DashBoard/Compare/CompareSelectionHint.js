@@ -38,7 +38,7 @@ export default function CompareSelectionHint() {
   ];
 
   return (
-    <div className="compare--selection-hint">
+    <div className="flex justify-around my-6 mx-auto text-gray-300 gap-10 w-11/12">
       {selectionHints.map((hint, index) => {
         if (hint.message) {
           return (

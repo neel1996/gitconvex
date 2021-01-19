@@ -6,7 +6,6 @@ import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
 import LoadingHOC from "../../../../LoadingHOC";
-import "../../../../styles/RepositoryDetails.css";
 import FileExplorerComponent from "./FileExplorerComponent";
 import AddBranchComponent from "./RepoDetailBackdrop/AddBranchComponent";
 import AddRemoteRepoComponent from "./RepoDetailBackdrop/AddRemoteRepoComponent";
@@ -251,7 +250,7 @@ export default function RepositoryDetails(props) {
       ) : null}
       {backdropToggle || codeViewToggle ? (
         <div
-          className="backdrop-view z-40"
+          className="flex h-full overflow-auto fixed inset-x-0 top-0 w-full z-40"
           id="repo-backdrop"
           style={{ background: "rgba(0,0,0,0.7)", zIndex: "99" }}
           onClick={(event) => {
@@ -280,7 +279,7 @@ export default function RepositoryDetails(props) {
       ) : null}
       <>
         {!loading && gitRepoStatus && !repoFetchFailed ? (
-          <div className="overflow-auto repo-details">
+          <div className="overflow-auto rounded-lg justify-evenly h-full mx-auto p-6 w-full">
             <div className="flex px-3 py-2">
               {gitRepoStatus ? (
                 <RepoInfoComponent

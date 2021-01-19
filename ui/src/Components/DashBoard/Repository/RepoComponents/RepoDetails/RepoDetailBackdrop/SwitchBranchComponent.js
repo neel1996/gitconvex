@@ -44,15 +44,16 @@ export default function SwitchBranchComponent({
   }, [branchName, closeBackdrop, repoId, switchReloadView]);
 
   return (
-    <div className="xl:w-3/4 lg:w-3/4 md:w-11/12 sm:w-11/12 repo-backdrop--switchbranch">
-      <div className="switchbranch--alert--success">
+    <div className="xl:w-3/4 lg:w-3/4 md:w-11/12 sm:w-11/12 w-11/12 mx-auto my-auto p-6 rounded-md bg-gray-100">
+      <div className="bg-blue-100 p-2 border-indigo-400 rounded shadow">
         Switching to branch -
-        <span className="switchbranch--name">{branchName}</span>...
+        <span className="font-sans text-xl font-semibold">{branchName}</span>...
       </div>
       {branchError ? (
-        <div className="switchbranch--alert--failed">
+        <div className="bg-red-100 p-2 border-red-400 rounded shadow">
           Switching to branch -
-          <span className="switchbranch--name">{branchName}</span> Failed!
+          <span className="font-sans text-xl font-semibold">{branchName}</span>
+          Failed!
         </div>
       ) : null}
     </div>

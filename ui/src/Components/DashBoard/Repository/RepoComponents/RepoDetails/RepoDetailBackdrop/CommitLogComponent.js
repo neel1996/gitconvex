@@ -365,39 +365,39 @@ export default function RepositoryCommitLogComponent(props) {
           return (
             <div
               id={`commitLogCard-${hash}`}
-              className="repo-backdrop--commitlogs"
+              className="p-6 rounded-lg block shadow-md justify-center mx-auto my-4 bg-white w-full border-b-8 border-indigo-400"
               key={hash}
             >
-              <div className="commitlogs--toppane">
-                <div className="commitlogs--toppane--label">
+              <div className="flex justify-between text-indigo-400">
+                <div className="text-2xl font-sans mx-auto">
                   <FontAwesomeIcon
                     icon={["fas", "calendar-alt"]}
                   ></FontAwesomeIcon>
-                  <span className="commitlogs--toppane--data">
+                  <span className="border-b-2 border-dashed mx-2">
                     {formattedCommitTime}
                   </span>
                 </div>
-                <div className="commitlogs--toppane--divider"></div>
-                <div className="commitlogs--toppane--label">
+                <div className="h-auto p-1 border-r"></div>
+                <div className="text-2xl font-sans mx-auto">
                   <FontAwesomeIcon
                     icon={["fab", "slack-hash"]}
                   ></FontAwesomeIcon>
-                  <span className="commitlogs--toppane--data">
+                  <span className="border-b-2 border-dashed mx-2">
                     {hash.substring(0, 7)}
                   </span>
                 </div>
-                <div className="commitlogs--toppane--divider"></div>
-                <div className="commitlogs--toppane--label">
+                <div className="h-auto p-1 border-r"></div>
+                <div className="text-2xl font-sans mx-auto">
                   <FontAwesomeIcon
                     icon={["fas", "user-ninja"]}
                   ></FontAwesomeIcon>
-                  <span className="commitlogs--toppane--data truncate">
+                  <span className="border-b-2 border-dashed mx-2 truncate">
                     {author}
                   </span>
                 </div>
               </div>
 
-              <div className="commitlogs--message">
+              <div className="font-sans font-semibold text-2xl my-4 text-gray-500 p-3 flex justify-evenly items-center">
                 <div className="w-1/8">
                   <FontAwesomeIcon
                     icon={["fas", "code"]}
@@ -407,17 +407,17 @@ export default function RepositoryCommitLogComponent(props) {
                 <div className="w-5/6 mx-3">{commitMessage}</div>
               </div>
 
-              <div className="commitlogs--bottompane">
-                <div className="commitlogs--bottompane--label">
+              <div className="w-11/12 flex justify-between mx-auto mt-4 font-sans text-xl text-gray-500">
+                <div className="w-1/3 flex justify-center my-auto items-center align-middle">
                   <div>
                     <FontAwesomeIcon icon={["far", "clock"]}></FontAwesomeIcon>
                   </div>
-                  <div className="commitlogs--bottompane--data">
+                  <div className="mx-2 border-dashed border-b-4">
                     {commitRelativeTime}
                   </div>
                 </div>
                 <div
-                  className="commitlogs--expand"
+                  className="w-1/3 flex justify-around my-auto font-sans text-3xl font-light pt-10 cursor-pointer text-gray-500"
                   onClick={(event) => {
                     if (commitFilesCount) {
                       event.currentTarget.classList.add("hidden");
@@ -436,13 +436,13 @@ export default function RepositoryCommitLogComponent(props) {
                     ></FontAwesomeIcon>
                   )}
                 </div>
-                <div className="commitlogs--bottompane--label">
+                <div className="w-1/3 flex justify-center my-auto items-center align-middle">
                   <div>
                     <FontAwesomeIcon
                       icon={["far", "plus-square"]}
                     ></FontAwesomeIcon>
                   </div>
-                  <div className="commitlogs--bottompane--data">
+                  <div className="mx-2 border-dashed border-b-4">
                     {commitFilesCount ? (
                       `${commitFilesCount} Files`
                     ) : (
@@ -456,7 +456,7 @@ export default function RepositoryCommitLogComponent(props) {
         })}
       {excessCommit ? (
         <div
-          className="commitlogs--load-btn"
+          className="fixed flex bottom-0 right-0 w-16 h-16 mx-auto p-6 rounded-full shadow-md text-center bg-indigo-500 text-white text-2xl mb-6 mr-6 cursor-pointer"
           title="Click to load commits"
           onClick={() => {
             if (commitLogs.length > skipLimit) {
@@ -470,7 +470,7 @@ export default function RepositoryCommitLogComponent(props) {
         </div>
       ) : null}
       {isLoading && totalCommitCount ? (
-        <div className="commitlogs--loading">
+        <div className="my-4 rounded-lg p-3 bg-gray-100 text-lg font-semibold font-sans text-gray-700 text-center mx-auto">
           Loading {totalCommitCount - skipLimit} more commits...
           <div className="flex mx-auto my-6 text-center justify-center">
             <InfiniteLoader loadAnimation={isLoading}></InfiniteLoader>

@@ -6,14 +6,11 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   ADD_FORM_CLOSE,
   DELETE_PRESENT_REPO,
-  PRESENT_REPO
+  PRESENT_REPO,
 } from "../../../../actionStore";
 import { ContextProvider } from "../../../../context";
-import {
-  globalAPIEndpoint
-} from "../../../../util/env_config";
+import { globalAPIEndpoint } from "../../../../util/env_config";
 import InfiniteLoader from "../../../Animations/InfiniteLoader";
-import "../../../styles/RepoComponent.css";
 import AddRepoFormComponent from "./AddRepoForm";
 import RepoCard from "./RepoCard";
 
@@ -88,7 +85,7 @@ export default function RepoComponent(props) {
 
     return (
       <>
-        <div className="repo-component--wrapper">
+        <div className="flex flex-wrap justify-center mx-auto pb-40 w-full gap-16">
           <>
             {repoArray.length > 0 ? (
               <>
@@ -100,10 +97,10 @@ export default function RepoComponent(props) {
                 ) : null}
               </>
             ) : (
-              <div className="repo-component--loadingview">
+              <div className="w-3/4 bg-gray-100 rounded-md font-sans text-xl my-10 mx-auto p-10 shadow text-center text-gray-800">
                 {loading ? (
-                  <div className="block loadingview--content">
-                    <div className="flex loadingview--content">
+                  <div className="block justify-center my-6 mx-auto text-center">
+                    <div className="flex justify-center my-6 mx-auto text-center">
                       <InfiniteLoader loadAnimation={loading}></InfiniteLoader>
                     </div>
                     <div>Loading available repos...</div>
@@ -159,7 +156,7 @@ export default function RepoComponent(props) {
   };
 
   return (
-    <div className="repo-component">
+    <div className="flex flex-wrap justify-center mx-auto text-center align-middle">
       {!repoFormEnable ? (
         showAvailableRepo()
       ) : (
