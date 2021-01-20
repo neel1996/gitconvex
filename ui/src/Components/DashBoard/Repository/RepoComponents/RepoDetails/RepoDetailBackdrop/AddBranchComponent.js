@@ -42,10 +42,10 @@ export default function AddBranchComponent(props) {
   }
 
   return (
-    <div className="w-3/4 mx-auto my-auto bg-gray-50 rounded-lg">
+    <div className="w-11/12 xl:w-1/2 lg:w-8/12 md:w-3/4 mx-auto my-auto bg-gray-50 rounded-lg">
       <div className="my-auto">
         <div
-          className={`w-full my-5 text-center p-4 mx-auto font-sans font-semibold text-2xl border-b-2 border-dashed ${
+          className={`w-full mb-20 text-center p-4 mx-auto font-sans font-semibold text-2xl border-b-2 border-dashed ${
             branchAddStatus === "BRANCH_CREATION_SUCCESS"
               ? "text-green-400 border-green-400"
               : "text-gray-600 border-gray-400"
@@ -71,7 +71,7 @@ export default function AddBranchComponent(props) {
             ref={branchNameRef}
             id="branchName"
             placeholder="Enter branch name"
-            className="w-11/12 flex justify-center mx-auto p-4 text-center rounded shadow-md text-xl text-gray-800 border border-blue-50 my-10 outline-none"
+            className="w-11/12 flex justify-center mx-auto p-4 text-center rounded-lg shadow-md text-xl text-gray-800 border-2 border-blue-100 mb-20 outline-none"
             onChange={(event) => {
               const branchNameVal = event.target.value;
               if (

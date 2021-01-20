@@ -6,7 +6,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { globalAPIEndpoint } from "../../../../../../util/env_config";
 import InfiniteLoader from "../../../../../Animations/InfiniteLoader";
-import "../../../../../styles/RepositoryDetailsBackdrop.css";
 
 export default function FetchFromRemoteComponent(props) {
   library.add(fas);
