@@ -307,17 +307,17 @@ export default function AddRepoForm(props) {
             </span>
           </div>
         ) : null}
-        <div className="w-11/12 flex items-center justify-center my-10 mx-auto gap-4">
-          <div className="w-1/2 flex items-center justify-start">
+        <div className="w-11/12 flex items-center justify-center my-10 mx-auto">
+          <div className="w-1/2 flex items-center justify-between">
             <div className="w-1/6">{switchComponent("clone")}</div>
-            <div className="w-11/12 font-sans font-light mx-6">
+            <div className="w-5/6 text-left xl:text-lg lg:text-lg text-base font-sans font-light mx-10">
               Clone from remote
             </div>
           </div>
 
-          <div className="w-1/2 flex items-center justify-start">
+          <div className="w-1/2 flex items-center justify-between">
             <div className="w-1/6">{switchComponent("init")}</div>
-            <div className="w-11/12 font-sans font-light mx-6">
+            <div className="w-5/6 text-left xl:text-lg lg:text-lg text-base font-sans font-light mx-10">
               Initialize a new repo
             </div>
           </div>

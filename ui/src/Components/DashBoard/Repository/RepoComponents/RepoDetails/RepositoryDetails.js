@@ -289,7 +289,7 @@ export default function RepositoryDetails(props) {
               ) : null}
             </div>
             <div className="w-full">
-              <div className="xl:flex lg:block md:block sm:block my-4 mx-auto justify-around">
+              <div className="xl:w-11/12 lg:w-full w-full xl:flex lg:block md:block sm:block my-4 mx-auto justify-around">
                 {gitRepoStatus ? (
                   <>
                     <RepoLeftPaneComponent
