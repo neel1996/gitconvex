@@ -238,6 +238,9 @@ export default function AddRepoForm(props) {
 
   function onRepoPathChange(event) {
     setRepoPath(event.target.value);
+  }
+
+  function autoDetectRepoName(event) {
     if (repoNameState === "") {
       let pathValue = event.currentTarget.value;
       if (pathValue.includes("/")) {
@@ -287,6 +290,7 @@ export default function AddRepoForm(props) {
             }
             className="border-blue-50 rounded-md border-2 my-3 outline-none p-4 w-11/12 shadow-md font-sans text-gray-700"
             onChange={onRepoPathChange}
+            onBlur={autoDetectRepoName}
             value={repoPathState}
             onClick={() => {
               resetAlertBanner();
