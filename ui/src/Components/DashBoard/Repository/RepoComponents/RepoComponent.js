@@ -106,7 +106,9 @@ export default function RepoComponent(props) {
                     <div>Loading available repos...</div>
                   </div>
                 ) : (
-                  <div>No repos present. Press + to add a new repo</div>
+                  <div className="font-sans text-2xl text-gray-400 text-center">
+                    No repos present. Press + to add a new repo
+                  </div>
                 )}
               </div>
             )}
@@ -140,7 +142,7 @@ export default function RepoComponent(props) {
             </div>
             <div
               id="pop-up"
-              className="addrepo--button--tooltip hidden"
+              className="fixed p-2 rounded bg-white w-48 text-gray-600 text-center font-sans font-medium text-sm shadow border mx-auto hidden"
               style={{ marginTop: "-75px", width: "130px" }}
             >
               Click to add a new repo

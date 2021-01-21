@@ -303,15 +303,17 @@ export default function AddRepoForm(props) {
             </span>
           </div>
         ) : null}
-        <div className="flex items-center justify-center my-10 mx-auto gap-4">
-          <div className="flex items-center justify-around gap-4">
-            <div>{switchComponent("clone")}</div>
-            <div className="font-sans font-light mx-6">Clone from remote</div>
+        <div className="w-11/12 flex items-center justify-center my-10 mx-auto gap-4">
+          <div className="w-1/2 flex items-center justify-start">
+            <div className="w-1/6">{switchComponent("clone")}</div>
+            <div className="w-11/12 font-sans font-light mx-6">
+              Clone from remote
+            </div>
           </div>
 
-          <div className="flex items-center justify-around gap-4">
-            <div>{switchComponent("init")}</div>
-            <div className="font-sans font-light mx-6">
+          <div className="w-1/2 flex items-center justify-start">
+            <div className="w-1/6">{switchComponent("init")}</div>
+            <div className="w-11/12 font-sans font-light mx-6">
               Initialize a new repo
             </div>
           </div>
@@ -438,7 +440,7 @@ export default function AddRepoForm(props) {
 
   return (
     <div
-      className={`border-gray-200 rounded-lg border-2 block justify-center my-20 mx-auto p-6 text-center shadow xl:w-1/2 lg:w-2/3 md:w-3/4 sm:w-11/12 w-11/12 ${
+      className={`border-gray-200 rounded-lg border-2 block justify-center my-20 mx-auto p-6 text-center shadow xl:w-7/12 lg:w-2/3 md:w-3/4 sm:w-11/12 w-11/12 ${
         loading ? "border-dashed border-2" : ""
       }`}
     >

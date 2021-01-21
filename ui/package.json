@@ -30,11 +30,10 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build:tailwind": "NODE_ENV=production tailwindcss build -o src/index.css -c src/tailwind.config.js",
+    "build:tailwind": "tailwindcss build -o src/index.css -c src/tailwind.config.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "postcss": "postcss ./src/Components/styles/ --dir ./src/Components/styles/"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
