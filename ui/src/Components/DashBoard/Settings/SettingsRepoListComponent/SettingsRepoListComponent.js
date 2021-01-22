@@ -7,11 +7,13 @@ import SettingsRepoListCard from "./SettingsRepoListCard";
 
 export default function SettingsRepoListComponent() {
   const [repoDetails, setRepoDetails] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { state } = useContext(SettingsContext);
 
   useEffect(() => {
     const token = axios.CancelToken;
     const source = token.source();
+    setLoading(true);
 
     axios({
       url: globalAPIEndpoint,
@@ -31,12 +33,14 @@ export default function SettingsRepoListComponent() {
       },
     })
       .then((res) => {
+        setLoading(false);
         if (res.data.data && !res.data.error) {
           const repoDetails = res.data.data.fetchRepo;
           setRepoDetails(repoDetails);
         }
       })
       .catch((err) => {
+        setLoading(false);
         console.log(err);
       });
 
@@ -51,7 +55,10 @@ export default function SettingsRepoListComponent() {
         Saved Repositories
       </div>
       <>
-        {repoDetails && repoDetails.repoId && repoDetails.repoId.length ? (
+        {!loading &&
+        repoDetails &&
+        repoDetails.repoId &&
+        repoDetails.repoId.length ? (
           <>
             <div className="flex my-4 bg-indigo-500 w-full rounded text-white shadow p-3 font-sand text-xl font-semibold">
               <div className="w-1/4 border-r text-center">Repo ID</div>
@@ -76,9 +83,10 @@ export default function SettingsRepoListComponent() {
             })}
           </>
         ) : (
-          <div className="my-10 mx-auto bg-gray-200 text-center p-10 rounded shadow w-3/4">
-            No repos are being managed by Gitconvex. You can add one from the
-            dashboard
+          <div className="my-10 mx-auto font-sans font-medium text-gray-700 bg-gray-200 text-center p-10 rounded shadow w-3/4">
+            {loading
+              ? "Fetching repo list from the server..."
+              : "No repos are being managed by Gitconvex. You can add one from the dashboard"}
           </div>
         )}
       </>
