@@ -67,7 +67,7 @@ export default function GitTrackedComponent(props) {
       },
     })
       .then((res) => {
-        if (res) {
+        if (res.data.data && !res.data.error) {
           var apiData = res.data.data.gitChanges;
           const {
             gitChangedFiles,
@@ -108,10 +108,13 @@ export default function GitTrackedComponent(props) {
               setIsLoading(false);
             }
           }
+        } else {
+          setIsLoading(false);
         }
       })
       .catch((err) => {
         console.log(err);
+        setIsLoading(false);
         setNoChangeMarker(true);
       });
   }, [props.repoId, dispatch, topMenuItemState, requestStateChange]);
