@@ -1,6 +1,7 @@
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
+import { faTools } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { actionType } from "./backdropActionType";
 import React, { useEffect } from "react";
@@ -61,6 +62,24 @@ export default function RepoLeftPaneComponent(props) {
     return remoteLogo;
   };
 
+  const remoteUrl = () => {
+    let remoteData = "";
+    if (gitRemoteData) {
+      if (gitRemoteData.match(/(^https)/gi)) {
+        remoteData = (
+          <a href={gitRemoteData} target="_blank" rel="noopener noreferrer">
+            {gitRemoteData}
+          </a>
+        );
+      } else {
+        remoteData = <>{gitRemoteData}</>;
+      }
+    } else {
+      remoteData = " ";
+    }
+    return remoteData;
+  };
+
   return (
     <>
       {props.received ? (
@@ -88,18 +107,28 @@ export default function RepoLeftPaneComponent(props) {
                     id="addRemote"
                     className="rounded-full cursor-pointer items-center h-10 text-2xl mx-auto shadow text-center text-white align-middle w-10 bg-indigo-400 hover:bg-indigo-500"
                     onMouseEnter={(event) => {
-                      let popUp =
-                        '<div class="tooltip" style="margin-left:-40px;">Click to add a new remote repo</div>';
-                      event.target.innerHTML += popUp;
+                      let popUp = document.createElement("div");
+                      popUp.className =
+                        "text-gray-600 bg-white border-gray-300 p-2 rounded w-40 text-center border text-sm mt-2 mb-2 -ml-10 absolute";
+                      popUp.innerHTML = `Click here to configure remote repo`;
+                      event.currentTarget.insertAdjacentElement(
+                        "afterend",
+                        popUp
+                      );
                     }}
                     onMouseLeave={(event) => {
-                      event.target.innerHTML = "+";
+                      if (event.currentTarget.parentNode.children[1]) {
+                        event.currentTarget.parentNode.children[1].remove();
+                      }
                     }}
                     onClick={() => {
                       actionTrigger(actionType.ADD_REMOTE_REPO);
                     }}
                   >
-                    +
+                    <FontAwesomeIcon
+                      icon={faTools}
+                      className="text-xl text-center text-white"
+                    ></FontAwesomeIcon>
                   </div>
                 </div>
               </div>
@@ -110,7 +139,7 @@ export default function RepoLeftPaneComponent(props) {
                 {`${gitRemoteHost} URL`}
               </div>
               <div className="cursor-pointer text-blue-400 break-words w-1/2 hover:text-blue-500">
-                {gitRemoteData}
+                {remoteUrl()}
               </div>
             </div>
 

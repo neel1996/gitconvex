@@ -8,7 +8,7 @@ import { globalAPIEndpoint } from "../../../../../util/env_config";
 import LoadingHOC from "../../../../LoadingHOC";
 import FileExplorerComponent from "./FileExplorerComponent";
 import AddBranchComponent from "./RepoDetailBackdrop/AddBranchComponent";
-import AddRemoteRepoComponent from "./RepoDetailBackdrop/AddRemoteRepoComponent";
+import AddRemoteRepoComponent from "./RepoDetailBackdrop/RemoteConfigComponent/RemoteManagementComponent";
 import BranchListComponent from "./RepoDetailBackdrop/BranchListComponent";
 import CommitLogComponent from "./RepoDetailBackdrop/CommitLogComponent";
 import FetchPullActionComponent from "./RepoDetailBackdrop/FetchPullActionComponent";
