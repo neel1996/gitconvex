@@ -85,7 +85,7 @@ export default function RepoComponent(props) {
 
     return (
       <>
-        <div className="flex flex-wrap justify-center mx-auto pb-40 w-full gap-16">
+        <div className="w-4/5 flex flex-wrap mx-auto justify-center">
           <>
             {repoArray.length > 0 ? (
               <>
