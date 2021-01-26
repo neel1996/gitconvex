@@ -17,7 +17,8 @@ export default function SettingsRepoListCard(props) {
   function saveRenamedRepo(repoId, updatedRepoName) {
     if (
       !updatedRepoName.match(/([a-zA-Z-_.])*([0-9])*/gi) ||
-      updatedRepoName.match(/( )+/gi)
+      updatedRepoName.match(/( )+/gi) ||
+      updatedRepoName.length === 0
     ) {
       setEditMode(false);
       return;
