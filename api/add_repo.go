@@ -144,6 +144,7 @@ func (inputs AddRepoInputs) AddRepo() *model.AddRepoParams {
 
 	if cloneSwitch && len(*repoURL) > 0 {
 		repoPath = repoPath + "/" + repoName
+		inputs.RepoPath = repoPath
 
 		var cloneObject git.CloneInterface
 		cloneObject = git.CloneStruct{
