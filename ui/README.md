@@ -21,6 +21,10 @@ If you are interested in contributing to the project, fork the repo and submit a
 
 Fork the repo and raise a new Pull Request to merge your branch with the `development` branch of this repo. Once the review is complete, the PR will be approved and merged with `master`
 
+##### API schema request
+
+The backend is powered by graphql and if your changes require a separate query / mutation to be created to communicate with the server, then suggest
+your schema in the [api_schema.graphql](api_schema.graphql) file.
 ### Setup
 
 After cloning the repo, follow the steps mentioned below to setup the react app,
