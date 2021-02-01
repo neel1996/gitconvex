@@ -11,7 +11,7 @@ import {
 import { ContextProvider } from "../../../../context";
 import { globalAPIEndpoint } from "../../../../util/env_config";
 import InfiniteLoader from "../../../Animations/InfiniteLoader";
-import AddRepoFormComponent from "./AddRepoForm";
+import AddNewRepoContainer from "../../AddNewRepoComponent/AddNewRepoContainer";
 import RepoCard from "./RepoCard";
 
 export default function RepoComponent(props) {
@@ -21,7 +21,7 @@ export default function RepoComponent(props) {
   const [repoFormEnable, setRepoFormEnable] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { dispatch } = useContext(ContextProvider);
+  const { state, dispatch } = useContext(ContextProvider);
 
   useEffect(() => {
     setLoading(true);
@@ -153,16 +153,18 @@ export default function RepoComponent(props) {
     );
   };
 
-  const addFormRemove = (param) => {
-    setRepoFormEnable(param);
-  };
-
   return (
     <div className="flex flex-wrap justify-center mx-auto text-center align-middle">
-      {!repoFormEnable ? (
+      {!repoFormEnable || state.shouldAddFormClose ? (
         showAvailableRepo()
       ) : (
-        <AddRepoFormComponent formEnable={addFormRemove}></AddRepoFormComponent>
+        <>
+          {!state.shouldAddFormClose ? (
+            <AddNewRepoContainer
+              formEnable={setRepoFormEnable}
+            ></AddNewRepoContainer>
+          ) : null}
+        </>
       )}
     </div>
   );

@@ -25,7 +25,6 @@ export default function SwitchBranchComponent({
       .then((res) => {
         if (res.data.data && !res.data.error) {
           const status = res.data.data.checkoutBranch;
-          console.log(status);
           if (status === "CHECKOUT_FAILED") {
             setBranchError(true);
           } else {
