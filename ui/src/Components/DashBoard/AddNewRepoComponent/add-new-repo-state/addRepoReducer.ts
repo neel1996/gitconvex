@@ -35,6 +35,9 @@ export const addRepoReducer = (
     case AddRepoActionTypes.SET_AUTH_OPTION: {
       return { ...state, authMethod: payload };
     }
+    case AddRepoActionTypes.SET_SSH_KEY_PATH: {
+      return { ...state, sshKeyPath: payload };
+    }
     case AddRepoActionTypes.SET_HTTPS_AUTH_INPUTS: {
       return {
         ...state,

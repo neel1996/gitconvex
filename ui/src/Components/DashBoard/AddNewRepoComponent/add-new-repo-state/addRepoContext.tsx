@@ -13,6 +13,7 @@ export interface AddRepoStateType {
   alertStatus: statusType;
   isInputInvalid: boolean;
   authMethod: authMethodType;
+  sshKeyPath?: string;
   httpsAuthInputs?: {
     userName: string;
     password: string;
@@ -30,6 +31,7 @@ export const AddRepoState: AddRepoStateType = {
   alertStatus: "",
   isInputInvalid: false,
   authMethod: "noauth",
+  sshKeyPath: "",
   httpsAuthInputs: {
     userName: "",
     password: "",

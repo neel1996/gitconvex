@@ -1,4 +1,4 @@
-import { FormEvent, useContext, useEffect } from "react";
+import { FormEvent, useContext } from "react";
 import { AddRepoActionTypes } from "./add-new-repo-state/actions";
 import { AddRepoContext } from "./add-new-repo-state/addRepoContext";
 import AddRepoActionButtonsComponent from "./AddRepoActionButtonsComponent";
@@ -8,8 +8,6 @@ import ToggleSwitchComponent from "./ToggleSwitchComponent";
 
 export default function AddRepoFormComponent() {
   const { state, dispatch } = useContext(AddRepoContext);
-
-  useEffect(() => {}, [state]);
 
   function onRepoPathChange(event: FormEvent) {
     const target = event.target as HTMLInputElement;

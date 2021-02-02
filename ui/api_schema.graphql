@@ -149,6 +149,7 @@ type Mutation {
     repoURL: String
     initSwitch: Boolean!
     authOption: String!
+    sshKeyPath: String
     userName: String
     password: String
   ): AddRepoParams!

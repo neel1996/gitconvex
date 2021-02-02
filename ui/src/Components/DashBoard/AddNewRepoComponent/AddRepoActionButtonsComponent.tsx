@@ -23,6 +23,7 @@ export default function AddRepoActionButtonsComponent() {
       cloneURL,
       authMethod,
       httpsAuthInputs,
+      sshKeyPath,
     } = state;
 
     if (repoName && repoPath) {
@@ -76,7 +77,7 @@ export default function AddRepoActionButtonsComponent() {
         data: {
           query: `
                   mutation {
-                    addRepo(repoName: "${repoName}", repoPath: "${repoPath}", initSwitch: ${initCheck}, cloneSwitch: ${cloneCheck}, repoURL: "${cloneURL}", authOption: "${authMethod}", userName: "${userName}", password: "${password}"){
+                    addRepo(repoName: "${repoName}", repoPath: "${repoPath}", initSwitch: ${initCheck}, cloneSwitch: ${cloneCheck}, repoURL: "${cloneURL}", authOption: "${authMethod}", userName: "${userName}", password: "${password}", sshKeyPath: "${sshKeyPath}"){
                       repoId
                       status
                     }
