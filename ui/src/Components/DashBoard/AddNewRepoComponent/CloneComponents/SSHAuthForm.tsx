@@ -13,7 +13,7 @@ export default function SSHAuthForm() {
     },
     {
       key: "Linux",
-      path: "C:\\Users\\name\\.ssh\\id_rsa",
+      path: "~/.ssh/id_rsa",
     },
   ];
 
@@ -23,7 +23,7 @@ export default function SSHAuthForm() {
         <div className="border py-3 px-6 text-center">
           <FontAwesomeIcon icon={["fas", "key"]}></FontAwesomeIcon>
         </div>
-        <div className="w-5/6">
+        <div className="w-full">
           <input
             value={state.sshKeyPath}
             className="border-0 outline-none w-full p-2"

@@ -44,13 +44,15 @@ export default function SettingsDataFileComponent(props) {
 
   const updateDbFileHandler = () => {
     if (newDbPath) {
+      const revisedDbPath = newDbPath.replaceAll("\\", "\\\\");
+
       axios({
         url: globalAPIEndpoint,
         method: "POST",
         data: {
           query: `
             mutation {
-              updateRepoDataFile(newDbFile: "${newDbPath.toString()}")
+              updateRepoDataFile(newDbFile: "${revisedDbPath}")
             }
           `,
         },

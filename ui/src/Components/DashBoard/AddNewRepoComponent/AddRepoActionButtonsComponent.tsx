@@ -64,6 +64,18 @@ export default function AddRepoActionButtonsComponent() {
           userName = httpsAuthInputs.userName;
           password = httpsAuthInputs.password;
         }
+
+        if (authMethod === "ssh") {
+          if (sshKeyPath) {
+            sshKeyPath = sshKeyPath.replaceAll("\\", "\\\\");
+          } else {
+            dispatch({
+              type: AddRepoActionTypes.SET_INPUT_INVALID,
+              payload: true,
+            });
+            return;
+          }
+        }
       }
 
       dispatch({

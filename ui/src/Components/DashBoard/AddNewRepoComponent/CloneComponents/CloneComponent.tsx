@@ -15,7 +15,7 @@ export default function CloneComponent() {
         <div className="border py-3 px-6 text-center">
           <FontAwesomeIcon icon={["fas", "link"]}></FontAwesomeIcon>
         </div>
-        <div className="w-5/6">
+        <div className="w-full">
           <input
             value={state.cloneURL}
             className="border-0 outline-none w-full p-2"
