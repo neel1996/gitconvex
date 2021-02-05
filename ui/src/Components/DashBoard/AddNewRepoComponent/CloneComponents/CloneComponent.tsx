@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { AddRepoActionTypes } from "../add-new-repo-state/actions";
 import { AddRepoContext } from "../add-new-repo-state/addRepoContext";
 import AuthOptionsComponent from "./AuthOptionsComponent";
-import HTTPSAuthForm from "./HTTPSAuthForm";
+import HTTPSAuthForm from "./HTTPSAuthForm/HTTPSAuthForm";
 import SSHAuthForm from "./SSHAuthForm";
 
 export default function CloneComponent() {

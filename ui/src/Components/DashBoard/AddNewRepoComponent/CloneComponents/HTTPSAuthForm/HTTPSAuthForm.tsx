@@ -1,14 +1,24 @@
-import React, { useContext } from "react";
-import { AddRepoActionTypes } from "../add-new-repo-state/actions";
-import { AddRepoContext } from "../add-new-repo-state/addRepoContext";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useContext, useState } from "react";
+import { AddRepoActionTypes } from "../../add-new-repo-state/actions";
+import { AddRepoContext } from "../../add-new-repo-state/addRepoContext";
+import HTTPSAuthHintComponent from "./HTTPSAuthHintComponent";
 
 export default function HTTPSAuthForm() {
   const { state, dispatch } = useContext(AddRepoContext);
+  const [showHint, setShowHint] = useState<boolean>(false);
 
   return (
     <form className="my-4 mx-auto">
-      <div className="text-sm font-sans font-light my-1 text-center mx-auto text-pink-500">
-        Basic Authentication will not work if 2-Factor Authentication is enabled
+      <div
+        className="flex mx-auto transition-all my-4 justify-center items-center w-11/12 p-2 border-b border-dashed font-sans font-semibold cursor-pointer text-indigo-500 hover:text-indigo-800"
+        onClick={() => {
+          setShowHint(!showHint);
+        }}
+      >
+        <FontAwesomeIcon className="mx-2" icon={faInfoCircle}></FontAwesomeIcon>
+        <div>KNOW MORE ABOUT HTTPS AUTH</div>
       </div>
       <div className="my-2">
         <input
@@ -58,6 +68,9 @@ export default function HTTPSAuthForm() {
           }}
         ></input>
       </div>
+      {showHint ? (
+        <HTTPSAuthHintComponent hideHint={setShowHint}></HTTPSAuthHintComponent>
+      ) : null}
     </form>
   );
 }
