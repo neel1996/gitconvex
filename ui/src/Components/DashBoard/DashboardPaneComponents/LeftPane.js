@@ -64,7 +64,7 @@ export default function LeftPane(props) {
         }}
       >
         <div className="dashboard-leftpane__logo"></div>
-        <div className="font-mono xl:text-3xl lg:text-2xl md:text-3xl sm:text-2xl p-4 xl:block lg:block md:hidden sm:hidden hidden">
+        <div className="font-mono xl:text-2xl lg:text-2xl md:text-3xl sm:text-2xl p-4 xl:block lg:block md:hidden sm:hidden hidden">
           <span className="font-bold mx-2 border-b-4 border-pink-400">Git</span>
           Convex
         </div>
