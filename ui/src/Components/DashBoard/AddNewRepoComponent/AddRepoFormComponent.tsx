@@ -3,7 +3,8 @@ import { AddRepoActionTypes } from "./add-new-repo-state/actions";
 import { AddRepoContext } from "./add-new-repo-state/addRepoContext";
 import AddRepoActionButtonsComponent from "./AddRepoActionButtonsComponent";
 import AddRepoStatusAlert from "./AddRepoStatusAlert";
-import CloneComponent from "./CloneComponents/CloneComponent";
+import AuthComponent from "./AuthComponent/AuthComponent";
+import CloneComponent from "./CloneComponent";
 import ToggleSwitchComponent from "./ToggleSwitchComponent";
 
 export default function AddRepoFormComponent() {
@@ -113,6 +114,7 @@ export default function AddRepoFormComponent() {
       ) : null}
       <ToggleSwitchComponent></ToggleSwitchComponent>
       {state.cloneSwitch ? <CloneComponent></CloneComponent> : null}
+      <AuthComponent></AuthComponent>
       <AddRepoActionButtonsComponent></AddRepoActionButtonsComponent>
     </div>
   );
