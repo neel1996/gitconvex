@@ -43,12 +43,12 @@ export default function SSHAuthForm() {
           ></input>
         </div>
       </div>
-      <div className="my-2 italic font-sans font-light text-gray-600 mx-8">
+      <div className="my-2 font-sans font-light text-gray-600 mx-8">
         <span className="mx-1">E.g: </span>
         {hintData.map((item) => {
           return (
             <span key={item.key}>
-              <span className="font-semibold text-left mx-2 text-gray-800 non-italic">
+              <span className="font-semibold text-left mx-2 text-gray-800">
                 {item.key}
               </span>
               {item.path}

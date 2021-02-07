@@ -21,7 +21,7 @@
     "date-fns": "^2.16.1",
     "jest": "^26.6.0",
     "lodash.debounce": "^4.0.8",
-    "postcss": "^8.2.4",
+    "postcss": "^8.2.5",
     "prismjs": "^1.22.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
