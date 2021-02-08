@@ -188,6 +188,7 @@ export default function FetchFromRemoteComponent(props) {
             <div
               className="flex justify-center items-center w-11/12 mx-auto my-4 text-center p-1 font-sans font-medium text-lg cursor-pointer text-indigo-400 hover:text-indigo-500 xl:w-3/5 lg:w-3/4 md:w-3/4 sm:w-11/12"
               onClick={() => {
+                setResult([]);
                 actionHandler();
               }}
             >
@@ -196,7 +197,9 @@ export default function FetchFromRemoteComponent(props) {
                   icon={["fas", "exclamation-circle"]}
                 ></FontAwesomeIcon>
               </div>
-              <div>Click to Fetch from default remote and branch</div>
+              <div>
+                Click to Fetch from the first available remote and branch
+              </div>
             </div>
           </div>
         ) : null}

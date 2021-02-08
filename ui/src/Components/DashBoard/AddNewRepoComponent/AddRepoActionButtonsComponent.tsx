@@ -58,23 +58,23 @@ export default function AddRepoActionButtonsComponent() {
 
       if (initSwitch) {
         initCheck = true;
-      } else if (cloneSwitch && cloneURL) {
-        cloneCheck = true;
-        if (authMethod === "https") {
-          userName = httpsAuthInputs.userName;
-          password = httpsAuthInputs.password;
-        }
+      }
 
-        if (authMethod === "ssh") {
-          if (sshKeyPath) {
-            sshKeyPath = sshKeyPath.replaceAll("\\", "\\\\");
-          } else {
-            dispatch({
-              type: AddRepoActionTypes.SET_INPUT_INVALID,
-              payload: true,
-            });
-            return;
-          }
+      cloneCheck = true;
+      if (authMethod === "https") {
+        userName = httpsAuthInputs.userName;
+        password = httpsAuthInputs.password;
+      }
+
+      if (authMethod === "ssh") {
+        if (sshKeyPath) {
+          sshKeyPath = sshKeyPath.replaceAll("\\", "\\\\");
+        } else {
+          dispatch({
+            type: AddRepoActionTypes.SET_INPUT_INVALID,
+            payload: true,
+          });
+          return;
         }
       }
 
