@@ -86,6 +86,11 @@ type branchCompareResults {
   commits: [gitCommits]!
 }
 
+type remoteDetails {
+  remoteName: String!
+  remoteUrl: String!
+}
+
 type Query {
   healthCheck: HealthCheckParams!
   fetchRepo: FetchRepoParams!
@@ -120,6 +125,7 @@ type Query {
     baseBranch: String!
     compareBranch: String!
   ): [branchCompareResults]!
+  getRemote(repoId: String!): [remoteDetails]!
 }
 
 type BranchDeleteStatus {
@@ -139,6 +145,10 @@ type PullResult {
 type deleteStatus {
   status: String!
   repoId: String!
+}
+
+type remoteMutationResult {
+  status: String!
 }
 
 type Mutation {
@@ -181,4 +191,15 @@ type Mutation {
   updateRepoDataFile(newDbFile: String!): String!
   deleteRepo(repoId: String!): deleteStatus!
   updateRepoName(repoId: String!, repoName: String!): String!
+  addRemote(
+    repoId: String!
+    remoteName: String!
+    remoteUrl: String!
+  ): remoteMutationResult!
+  editRemote(
+    repoId: String!
+    remoteName: String!
+    remoteUrl: String!
+  ): remoteMutationResult!
+  deleteRemote(repoId: String!, remoteName: String!): remoteMutationResult!
 }

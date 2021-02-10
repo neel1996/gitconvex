@@ -1,8 +1,21 @@
 import React, { useRef } from "react";
+import axios from "axios";
+import { globalAPIEndpoint } from "../../../../../../../util/env_config";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function AddRemoteRepoFormComponent(props) {
+  const {
+    setReloadView,
+    setRemoteForm,
+    setFieldMissing,
+    setInvalidUrl,
+    setAddNewRemote,
+    setAddRemoteStatus,
+    repoId,
+    setStatusCheck,
+    setRemoteOperation,
+  } = props;
   const remoteNameRef = useRef();
   const remoteUrlRef = useRef();
 
@@ -17,9 +30,9 @@ export default function AddRemoteRepoFormComponent(props) {
         placeholder={placeholder}
         ref={formId === "remoteName" ? remoteNameRef : remoteUrlRef}
         onChange={(event) => {
-          props.setFieldMissing(false);
-          props.setAddRemoteStatus(false);
-          props.setInvalidUrl(false);
+          setFieldMissing(false);
+          setAddRemoteStatus(false);
+          setInvalidUrl(false);
           const remoteNameVal = event.target.value;
           if (
             event.target.id === "remoteName" &&
@@ -38,48 +51,73 @@ export default function AddRemoteRepoFormComponent(props) {
 
     if (remoteName && remoteUrl && remoteUrl.match(/[^ ]*/g)) {
       if (remoteUrl.match(/(\s)/g)) {
-        props.setInvalidUrl(true);
+        setInvalidUrl(true);
       } else {
-        //TODO: Add axios
         let status = "success";
-        if (status === "success") {
-          localStorage.setItem(
-            remoteName,
-            JSON.stringify({
-              remoteName: remoteName,
-              remoteUrl: remoteUrl,
-            })
-          );
-          props.setRemoteForm(false);
-          props.setAddNewRemote(true);
-          props.setReloadView(true);
-          remoteNameRef.current.value = "";
-          remoteUrlRef.current.value = "";
-        } else {
-          props.setAddRemoteStatus(true);
-        }
+
+        axios({
+          url: globalAPIEndpoint,
+          method: "POST",
+          data: {
+            query: `
+                  mutation {
+                    addRemote(repoId: "${repoId}", remoteName: "${remoteName}", remoteUrl: ${remoteUrl}"){
+                      status
+                    }
+                  }
+                `,
+          },
+        })
+          .then((res) => {
+            status = res.data.data;
+            if (status === "success") {
+              setRemoteForm(false);
+              setAddNewRemote(true);
+              setReloadView(true);
+              remoteNameRef.current.value = "";
+              remoteUrlRef.current.value = "";
+            } else {
+              setAddRemoteStatus(true); //status === "failed"
+            }
+            setStatusCheck(false);
+            setRemoteOperation(" ");
+          })
+          .catch(() => {
+            setStatusCheck(true);
+            setRemoteOperation("add");
+            // setRemoteDetails([...remoteDetails, {
+            //   remoteName: remoteName,
+            //   remoteUrl: remoteUrl,
+            // }]);
+
+            // setRemoteForm(false);
+            // setAddNewRemote(true);
+            // setReloadView(true);
+            // remoteNameRef.current.value = "";
+            // remoteUrlRef.current.value = "";
+          });
       }
     } else {
-      props.setAddNewRemote(false);
-      props.setInvalidUrl(false);
-      props.setFieldMissing(true);
+      setAddNewRemote(false);
+      setInvalidUrl(false);
+      setFieldMissing(true);
     }
   };
 
   return (
-    <form className="form--data flex w-full items-center my-6">
-      <div className="mx-auto w-1/4">
+    <form className="flex items-center w-full my-6 form--data">
+      <div className="w-1/4 mx-auto">
         {formAddRemote("remoteName", "Remote name")}
       </div>
-      <div className="mx-auto w-1/2">
+      <div className="w-1/2 mx-auto">
         {formAddRemote("remoteURL", "Remote URL")}
       </div>
       <div
-        className="text-center flex items-center justify-evenly"
+        className="flex items-center text-center justify-evenly"
         style={{ outline: "none", width: "22%" }}
       >
         <div
-          className="xl:text-lg lg:text-lg md:text-base text-base items-center p-1 py-2 rounded w-5/12 mx-auto cursor-pointer bg-blue-500 hover:bg-blue-700 font-semibold"
+          className="items-center w-5/12 p-1 py-2 mx-auto text-base font-semibold bg-blue-500 rounded cursor-pointer xl:text-lg lg:text-lg md:text-base hover:bg-blue-700"
           onClick={() => {
             addRemote();
           }}
@@ -90,13 +128,13 @@ export default function AddRemoteRepoFormComponent(props) {
           ></FontAwesomeIcon>
         </div>
         <div
-          className="xl:text-lg lg:text-lg md:text-base text-base items-center p-1 py-2 rounded w-5/12 mx-auto cursor-pointer bg-red-500 hover:bg-red-600 font-semibold"
+          className="items-center w-5/12 p-1 py-2 mx-auto text-base font-semibold bg-red-500 rounded cursor-pointer xl:text-lg lg:text-lg md:text-base hover:bg-red-600"
           onClick={() => {
-            props.setAddNewRemote(true);
-            props.setRemoteForm(false);
-            props.setFieldMissing(false);
-            props.setInvalidUrl(false);
-            props.setAddRemoteStatus(false);
+            setAddNewRemote(true);
+            setRemoteForm(false);
+            setFieldMissing(false);
+            setInvalidUrl(false);
+            setAddRemoteStatus(false);
           }}
         >
           <FontAwesomeIcon

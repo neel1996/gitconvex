@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react";
+import axios from "axios";
+import { globalAPIEndpoint } from "../../../../../../../util/env_config";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPencilAlt,
@@ -23,6 +25,9 @@ export default function RemoteCard(props) {
     setAddRemoteStatus,
     setDeleteFailed,
     setReloadView,
+    repoId,
+    setStatusCheck,
+    setRemoteOperation,
   } = props;
   const remoteFormName = useRef();
   const remoteFormUrl = useRef();
@@ -35,23 +40,43 @@ export default function RemoteCard(props) {
   var globalUrl = remoteUrl;
 
   const changeState = (name, url) => {
-    //TODO:Axios
-
     let status = "success";
+    axios({
+      url: globalAPIEndpoint,
+      method: "POST",
+      data: {
+        query: `
+            mutation {
+              editRemote(repoId: "${repoId}", remoteName: "${name}", remoteUrl: ${url}"){
+                status
+              }
+            }
+        `,
+      },
+    })
+      .then((res) => {
+        status = res.data.data;
+        setStatusCheck(false);
+        setRemoteOperation(" ");
 
-    if (status === "success") {
-      localStorage.removeItem(remoteNameState);
-      localStorage.setItem(
-        name,
-        JSON.stringify({
-          remoteName: name,
-          remoteUrl: url,
-        })
-      );
-      setReloadView(true);
-    } else {
-      setAddRemoteStatus(true);
-    }
+        if (status === "success") {
+          setReloadView(true);
+        } else {
+          setAddRemoteStatus(true); //status === "failed"
+        }
+      })
+      .catch(() => {
+        setStatusCheck(true);
+        setRemoteOperation("edit");
+
+        // remoteDetails.forEach((items) => {
+        //   if (items.name === name) {
+        //     items.name = name;
+        //   }
+        // });
+        // setRemoteDetails([...remoteDetails]);
+        // setReloadView(true);
+      });
 
     setRemoteNameState(name);
     setRemoteUrlState(url);
@@ -66,35 +91,35 @@ export default function RemoteCard(props) {
       remoteLogo = (
         <FontAwesomeIcon
           icon={faGithub}
-          className="xl:text-3xl lg:text-3xl md:text-2xl text-xl text-pink-500 w-2/12 mr-2"
+          className="w-2/12 mr-2 text-xl text-pink-500 xl:text-3xl lg:text-3xl md:text-2xl"
         ></FontAwesomeIcon>
       );
     } else if (gitRemoteHost.match(/gitlab/i)) {
       remoteLogo = (
         <FontAwesomeIcon
           icon={faGitlab}
-          className="xl:text-3xl lg:text-3xl md:text-2xl text-xl text-pink-500 w-2/12 mr-2"
+          className="w-2/12 mr-2 text-xl text-pink-500 xl:text-3xl lg:text-3xl md:text-2xl"
         ></FontAwesomeIcon>
       );
     } else if (gitRemoteHost.match(/bitbucket/i)) {
       remoteLogo = (
         <FontAwesomeIcon
           icon={faBitbucket}
-          className="xl:text-3xl lg:text-3xl md:text-2xl text-xl text-pink-500 w-2/12 mr-2"
+          className="w-2/12 mr-2 text-xl text-pink-500 xl:text-3xl lg:text-3xl md:text-2xl"
         ></FontAwesomeIcon>
       );
     } else if (gitRemoteHost.match(/codecommit/i)) {
       remoteLogo = (
         <FontAwesomeIcon
           icon={faAws}
-          className="xl:text-3xl lg:text-3xl md:text-2xl text-xl text-pink-500 w-2/12 mr-2"
+          className="w-2/12 mr-2 text-xl text-pink-500 xl:text-3xl lg:text-3xl md:text-2xl"
         ></FontAwesomeIcon>
       );
     } else {
       remoteLogo = (
         <FontAwesomeIcon
           icon={faGitSquare}
-          className="xl:text-3xl lg:text-3xl md:text-2xl text-xl text-pink-500 w-2/12 mr-2"
+          className="w-2/12 mr-2 text-xl text-pink-500 xl:text-3xl lg:text-3xl md:text-2xl"
         ></FontAwesomeIcon>
       );
     }
@@ -128,8 +153,8 @@ export default function RemoteCard(props) {
   return (
     <div className="w-full">
       {editRemote ? (
-        <div className="flex items-center align-middle w-full mx-auto my-1 shadow rounded-md py-6 bg-gray-50">
-          <div className="flex items-center w-1/5 mx-auto justify-center text-sans xl:text-lg lg:text-lg md:text-base text-base text-gray-700">
+        <div className="flex items-center w-full py-6 mx-auto my-1 align-middle rounded-md shadow bg-gray-50">
+          <div className="flex items-center justify-center w-1/5 mx-auto text-base text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
             <input
               type="text"
               autoComplete="off"
@@ -151,7 +176,7 @@ export default function RemoteCard(props) {
               }}
             ></input>
           </div>
-          <div className="text-sans mx-auto justify-center items-center text-center flex xl:text-lg lg:text-lg md:text-base text-base text-gray-700 w-1/2">
+          <div className="flex items-center justify-center w-1/2 mx-auto text-base text-center text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
             <input
               type="text"
               autoComplete="off"
@@ -169,11 +194,11 @@ export default function RemoteCard(props) {
             ></input>
           </div>
           <div
-            className="text-center flex items-center"
+            className="flex items-center text-center"
             style={{ width: "22%" }}
           >
             <div
-              className="xl:text-lg lg:text-lg md:text-base text-base items-center p-1 py-2 rounded w-5/12 mx-auto cursor-pointer bg-blue-500 hover:bg-blue-700 font-semibold"
+              className="items-center w-5/12 p-1 py-2 mx-auto text-base font-semibold bg-blue-500 rounded cursor-pointer xl:text-lg lg:text-lg md:text-base hover:bg-blue-700"
               onClick={() => {
                 let name;
                 let url = !remoteFormUrl.current.value
@@ -200,7 +225,7 @@ export default function RemoteCard(props) {
               ></FontAwesomeIcon>
             </div>
             <div
-              className="xl:text-lg lg:text-lg md:text-base text-base items-center p-1 py-2 rounded w-5/12 mx-auto cursor-pointer bg-gray-500 hover:bg-gray-700 font-semibold"
+              className="items-center w-5/12 p-1 py-2 mx-auto text-base font-semibold bg-gray-500 rounded cursor-pointer xl:text-lg lg:text-lg md:text-base hover:bg-gray-700"
               onClick={() => {
                 setRemoteUrlState(globalUrl);
                 setEditRemote(false);
@@ -221,21 +246,21 @@ export default function RemoteCard(props) {
           {deleteRemote ? (
             " "
           ) : (
-            <div className="flex items-center align-middle w-full mx-auto my-1 shadow rounded-md py-6 bg-gray-50">
-              <div className="flex items-center w-1/4 mx-auto justify-center text-sans xl:text-lg lg:text-lg md:text-base text-base text-gray-700">
+            <div className="flex items-center w-full py-6 mx-auto my-1 align-middle rounded-md shadow bg-gray-50">
+              <div className="flex items-center justify-center w-1/4 mx-auto text-base text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
                 {getRemoteLogo(remoteUrlState)}
                 <div className="w-1/2">{remoteNameState}</div>
               </div>
-              <div className="text-sans mx-auto justify-center items-center text-center flex xl:text-lg lg:text-lg md:text-base text-base text-gray-700 w-7/12">
+              <div className="flex items-center justify-center w-7/12 mx-auto text-base text-center text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
                 {remoteUrlHandler(remoteUrlState)}
               </div>
 
               <div
-                className="text-center flex items-center"
+                className="flex items-center text-center"
                 style={{ width: "22%" }}
               >
                 <div
-                  className="xl:text-lg lg:text-lg md:text-base text-base items-center p-1 py-2 rounded w-5/12 mx-auto cursor-pointer bg-blue-500 hover:bg-blue-700 font-semibold"
+                  className="items-center w-5/12 p-1 py-2 mx-auto text-base font-semibold bg-blue-500 rounded cursor-pointer xl:text-lg lg:text-lg md:text-base hover:bg-blue-700"
                   onClick={() => {
                     setEditRemote(true);
                     setAddRemoteStatus(false);
@@ -249,18 +274,48 @@ export default function RemoteCard(props) {
                   ></FontAwesomeIcon>
                 </div>
                 <div
-                  className="xl:text-lg lg:text-lg md:text-base text-base items-center p-1 py-2 rounded w-5/12 mx-auto cursor-pointer bg-red-500 hover:bg-red-600 font-semibold"
+                  className="items-center w-5/12 p-1 py-2 mx-auto text-base font-semibold bg-red-500 rounded cursor-pointer xl:text-lg lg:text-lg md:text-base hover:bg-red-600"
                   onClick={() => {
-                    //TODO: Add axios
                     let status = "success";
-                    if (status === "success") {
-                      localStorage.removeItem(remoteNameState);
-                      setReloadView(true);
-                      setDeleteFailed(false);
-                      setDeleteRemote(true);
-                    } else {
-                      setDeleteFailed(true);
-                    }
+                    axios({
+                      url: globalAPIEndpoint,
+                      method: "POST",
+                      data: {
+                        query: `
+                                mutation {
+                                  deleteRemote(repoId: "${repoId}", remoteName: "${remoteNameState}"){
+                                    status
+                                  }
+                                }
+                            `,
+                      },
+                    })
+                      .then((res) => {
+                        status = res.data.data;
+
+                        setStatusCheck(false);
+                        setRemoteOperation(" ");
+
+                        if (status === "success") {
+                          setReloadView(true);
+                          setDeleteFailed(false);
+                          setDeleteRemote(true);
+                        } else {
+                          setDeleteFailed(true); //status === "failed"
+                        }
+                      })
+                      .catch(() => {
+                        setStatusCheck(true);
+                        setRemoteOperation("delete");
+
+                        // setRemoteDetails([
+                        //   remoteDetails.filter((items) => {
+                        //     return items.name !== remoteNameState;
+                        //   }),
+                        // ]);
+
+                        // setReloadView(true);
+                      });
                   }}
                 >
                   <FontAwesomeIcon
