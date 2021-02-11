@@ -39,7 +39,7 @@ export default function RemoteCard(props) {
 
   var globalUrl = remoteUrl;
 
-  const changeState = (name, url) => {
+  const changeState = (newRemoteName, oldRemoteName, url) => {
     let status = "success";
     axios({
       url: globalAPIEndpoint,
@@ -47,7 +47,7 @@ export default function RemoteCard(props) {
       data: {
         query: `
             mutation {
-              editRemote(repoId: "${repoId}", remoteName: "${name}", remoteUrl: ${url}"){
+              editRemote(repoId: "${repoId}", newRemoteName: "${newRemoteName}",oldRemoteName: "${oldRemoteName}", remoteUrl: ${url}"){
                 status
               }
             }
@@ -78,7 +78,7 @@ export default function RemoteCard(props) {
         // setReloadView(true);
       });
 
-    setRemoteNameState(name);
+    setRemoteNameState(newRemoteName);
     setRemoteUrlState(url);
     setEditRemote(false);
     setFieldMissing(false);
@@ -200,7 +200,8 @@ export default function RemoteCard(props) {
             <div
               className="items-center w-5/12 p-1 py-2 mx-auto text-base font-semibold bg-blue-500 rounded cursor-pointer xl:text-lg lg:text-lg md:text-base hover:bg-blue-700"
               onClick={() => {
-                let name;
+                let newRemoteName;
+                let oldRemoteName = remoteNameState.trim();
                 let url = !remoteFormUrl.current.value
                   ? remoteUrlState.trim()
                   : remoteFormUrl.current.value.trim();
@@ -211,11 +212,11 @@ export default function RemoteCard(props) {
                     !remoteFormName.current.value ||
                     remoteFormName.current.value === remoteNameState
                   ) {
-                    name = remoteNameState.trim();
+                    newRemoteName = oldRemoteName;
                   } else {
-                    name = remoteFormName.current.value.trim();
+                    newRemoteName = remoteFormName.current.value.trim();
                   }
-                  changeState(name, url);
+                  changeState(newRemoteName, oldRemoteName, url);
                 }
               }}
             >
