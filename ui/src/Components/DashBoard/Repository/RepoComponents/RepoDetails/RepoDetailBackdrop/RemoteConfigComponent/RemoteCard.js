@@ -276,7 +276,6 @@ export default function RemoteCard(props) {
                 <div
                   className="items-center w-5/12 p-1 py-2 mx-auto text-base font-semibold bg-red-500 rounded cursor-pointer xl:text-lg lg:text-lg md:text-base hover:bg-red-600"
                   onClick={() => {
-                    let status = "success";
                     axios({
                       url: globalAPIEndpoint,
                       method: "POST",
@@ -291,30 +290,22 @@ export default function RemoteCard(props) {
                       },
                     })
                       .then((res) => {
-                        status = res.data.data;
+                        const { status } = res.data.data.deleteRemote;
 
                         setStatusCheck(false);
                         setRemoteOperation(" ");
 
-                        if (status === "success") {
+                        if (status === "REMOTE_DELETE_SUCCESS") {
                           setReloadView(true);
                           setDeleteFailed(false);
                           setDeleteRemote(true);
                         } else {
-                          setDeleteFailed(true); //status === "failed"
+                          setDeleteFailed(true);
                         }
                       })
                       .catch(() => {
                         setStatusCheck(true);
                         setRemoteOperation("delete");
-
-                        // setRemoteDetails([
-                        //   remoteDetails.filter((items) => {
-                        //     return items.name !== remoteNameState;
-                        //   }),
-                        // ]);
-
-                        // setReloadView(true);
                       });
                   }}
                 >

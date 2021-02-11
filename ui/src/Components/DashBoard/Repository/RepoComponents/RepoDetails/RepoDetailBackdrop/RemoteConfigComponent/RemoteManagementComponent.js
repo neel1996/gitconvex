@@ -29,15 +29,16 @@ export default function AddRemoteRepoComponent({ repoId }) {
         query: `
               query {
                 getRemote(repoId: "${repoId}"){
-                  remoteDetails
+                    remoteName
+                    remoteUrl
                 }
               }
             `,
       },
     })
       .then((res) => {
-        if (res.data.data.remoteDetails) {
-          res.data.data.remoteDetails.forEach((items) => {
+        if (res.data.data.getRemote) {
+          res.data.data.getRemote.forEach((items) => {
             remoteArray.push(items);
           });
           setRemoteDetails([...remoteArray]);
@@ -46,10 +47,9 @@ export default function AddRemoteRepoComponent({ repoId }) {
           setRemoteOperation("");
         }
       })
-      .catch(() => {
+      .catch((err) => {
         setFetchStatus(true);
-        // setRemoteDetails(remoteDetails);
-        // console.log(err);
+        console.log(err);
       });
 
     return () => {
@@ -206,6 +206,7 @@ export default function AddRemoteRepoComponent({ repoId }) {
                       setAddRemoteStatus={setAddRemoteStatus}
                       repoId={repoId}
                       setStatusCheck={setStatusCheck}
+                      setRemoteOperation={setRemoteOperation}
                     ></AddRemoteRepoFormComponent>
                   )}
                 </div>

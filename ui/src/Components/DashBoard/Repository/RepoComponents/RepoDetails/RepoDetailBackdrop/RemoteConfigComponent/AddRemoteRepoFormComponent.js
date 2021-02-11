@@ -16,6 +16,7 @@ export default function AddRemoteRepoFormComponent(props) {
     setStatusCheck,
     setRemoteOperation,
   } = props;
+
   const remoteNameRef = useRef();
   const remoteUrlRef = useRef();
 
@@ -53,15 +54,13 @@ export default function AddRemoteRepoFormComponent(props) {
       if (remoteUrl.match(/(\s)/g)) {
         setInvalidUrl(true);
       } else {
-        let status = "success";
-
         axios({
           url: globalAPIEndpoint,
           method: "POST",
           data: {
             query: `
                   mutation {
-                    addRemote(repoId: "${repoId}", remoteName: "${remoteName}", remoteUrl: ${remoteUrl}"){
+                    addRemote(repoId: "${repoId}", remoteName: "${remoteName}", remoteUrl: "${remoteUrl}"){
                       status
                     }
                   }
@@ -69,32 +68,24 @@ export default function AddRemoteRepoFormComponent(props) {
           },
         })
           .then((res) => {
-            status = res.data.data;
-            if (status === "success") {
+            const { status } = res.data.data.addRemote;
+            if (status === "REMOTE_ADD_SUCCESS") {
+              remoteNameRef.current.value = "";
+              remoteUrlRef.current.value = "";
+
               setRemoteForm(false);
               setAddNewRemote(true);
               setReloadView(true);
-              remoteNameRef.current.value = "";
-              remoteUrlRef.current.value = "";
             } else {
-              setAddRemoteStatus(true); //status === "failed"
+              setAddRemoteStatus(true);
             }
             setStatusCheck(false);
             setRemoteOperation(" ");
           })
-          .catch(() => {
+          .catch((err) => {
+            console.log(err);
             setStatusCheck(true);
             setRemoteOperation("add");
-            // setRemoteDetails([...remoteDetails, {
-            //   remoteName: remoteName,
-            //   remoteUrl: remoteUrl,
-            // }]);
-
-            // setRemoteForm(false);
-            // setAddNewRemote(true);
-            // setReloadView(true);
-            // remoteNameRef.current.value = "";
-            // remoteUrlRef.current.value = "";
           });
       }
     } else {
