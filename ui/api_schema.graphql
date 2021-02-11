@@ -198,8 +198,7 @@ type Mutation {
   ): remoteMutationResult!
   editRemote(
     repoId: String!
-    newRemoteName: String!
-    oldRemoteName: String!
+    remoteName: String!
     remoteUrl: String!
   ): remoteMutationResult!
   deleteRemote(repoId: String!, remoteName: String!): remoteMutationResult!

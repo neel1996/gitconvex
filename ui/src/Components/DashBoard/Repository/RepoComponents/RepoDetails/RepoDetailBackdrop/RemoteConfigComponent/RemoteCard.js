@@ -1,20 +1,20 @@
-import React, { useState, useRef } from "react";
-import axios from "axios";
-import { globalAPIEndpoint } from "../../../../../../../util/env_config";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faPencilAlt,
-  faTrashAlt,
-  faSave,
-  faTimes,
-} from "@fortawesome/free-solid-svg-icons";
-import {
+  faAws,
+  faBitbucket,
   faGithub,
   faGitlab,
-  faBitbucket,
-  faAws,
   faGitSquare,
 } from "@fortawesome/free-brands-svg-icons";
+import {
+  faPencilAlt,
+  faSave,
+  faTimes,
+  faTrashAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
+import React, { useRef, useState } from "react";
+import { globalAPIEndpoint } from "../../../../../../../util/env_config";
 
 export default function RemoteCard(props) {
   const {
@@ -40,14 +40,13 @@ export default function RemoteCard(props) {
   var globalUrl = remoteUrl;
 
   const changeState = (newRemoteName, oldRemoteName, url) => {
-    let status = "success";
     axios({
       url: globalAPIEndpoint,
       method: "POST",
       data: {
         query: `
             mutation {
-              editRemote(repoId: "${repoId}", newRemoteName: "${newRemoteName}",oldRemoteName: "${oldRemoteName}", remoteUrl: ${url}"){
+              editRemote(repoId: "${repoId}", remoteName: "${oldRemoteName}", remoteUrl: "${url}"){
                 status
               }
             }
@@ -55,27 +54,19 @@ export default function RemoteCard(props) {
       },
     })
       .then((res) => {
-        status = res.data.data;
+        const { status } = res.data.data.editRemote;
         setStatusCheck(false);
         setRemoteOperation(" ");
 
-        if (status === "success") {
+        if (status === "REMOTE_EDIT_SUCCESS") {
           setReloadView(true);
         } else {
-          setAddRemoteStatus(true); //status === "failed"
+          setAddRemoteStatus(true);
         }
       })
       .catch(() => {
         setStatusCheck(true);
         setRemoteOperation("edit");
-
-        // remoteDetails.forEach((items) => {
-        //   if (items.name === name) {
-        //     items.name = name;
-        //   }
-        // });
-        // setRemoteDetails([...remoteDetails]);
-        // setReloadView(true);
       });
 
     setRemoteNameState(newRemoteName);
@@ -154,28 +145,6 @@ export default function RemoteCard(props) {
     <div className="w-full">
       {editRemote ? (
         <div className="flex items-center w-full py-6 mx-auto my-1 align-middle rounded-md shadow bg-gray-50">
-          <div className="flex items-center justify-center w-1/5 mx-auto text-base text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
-            <input
-              type="text"
-              autoComplete="off"
-              className={`rounded w-full shadow-md py-2 border-2 text-center xl:text-lg lg:text-lg md:text-base text-base items-center text-gray-800 bg-white`}
-              style={{ borderColor: "rgb(113 166 196 / 33%)" }}
-              placeholder={remoteNameState}
-              ref={remoteFormName}
-              onChange={(event) => {
-                const remoteNameVal = event.target.value;
-                if (remoteNameVal.match(/[\s\\//*]/gi)) {
-                  event.target.value = remoteNameVal.replace(
-                    /[\s\\//*]/gi,
-                    "-"
-                  );
-                }
-                setAddRemoteStatus(false);
-                setFieldMissing(false);
-                setInvalidUrl(false);
-              }}
-            ></input>
-          </div>
           <div className="flex items-center justify-center w-1/2 mx-auto text-base text-center text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
             <input
               type="text"
