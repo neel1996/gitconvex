@@ -94,7 +94,7 @@ export default function FetchFromRemoteComponent(props) {
 
   function actionHandler(remote = "", branch = "") {
     setLoading(true);
-
+    setResult([]);
     const getAxiosRequestBody = (remote, branch) => {
       let gqlQuery = "";
       if (actionType === "fetch") {
@@ -184,22 +184,6 @@ export default function FetchFromRemoteComponent(props) {
           <div>
             <div className="text-center font-sans font-semibold mx-auto w-full p-3 text-2xl border-b-2 border-dashed text-gray-800">
               Fetch from Remote
-            </div>
-            <div
-              className="flex justify-center items-center w-11/12 mx-auto my-4 text-center p-1 font-sans font-medium text-lg cursor-pointer text-indigo-400 hover:text-indigo-500 xl:w-3/5 lg:w-3/4 md:w-3/4 sm:w-11/12"
-              onClick={() => {
-                setResult([]);
-                actionHandler();
-              }}
-            >
-              <div className="text-2xl text-indigo-800 mx-4">
-                <FontAwesomeIcon
-                  icon={["fas", "exclamation-circle"]}
-                ></FontAwesomeIcon>
-              </div>
-              <div>
-                Click to Fetch from the first available remote and branch
-              </div>
             </div>
           </div>
         ) : null}
