@@ -29,24 +29,23 @@ export default function RemoteCard(props) {
     setStatusCheck,
     setRemoteOperation,
   } = props;
-  const remoteFormName = useRef();
+
   const remoteFormUrl = useRef();
 
-  const [remoteNameState, setRemoteNameState] = useState(remoteName);
   const [remoteUrlState, setRemoteUrlState] = useState(remoteUrl);
   const [editRemote, setEditRemote] = useState(false);
   const [deleteRemote, setDeleteRemote] = useState(false);
 
   var globalUrl = remoteUrl;
 
-  const changeState = (newRemoteName, oldRemoteName, url) => {
+  const changeState = (remoteName, url) => {
     axios({
       url: globalAPIEndpoint,
       method: "POST",
       data: {
         query: `
             mutation {
-              editRemote(repoId: "${repoId}", remoteName: "${oldRemoteName}", remoteUrl: "${url}"){
+              editRemote(repoId: "${repoId}", remoteName: "${remoteName}", remoteUrl: "${url}"){
                 status
               }
             }
@@ -69,7 +68,6 @@ export default function RemoteCard(props) {
         setRemoteOperation("edit");
       });
 
-    setRemoteNameState(newRemoteName);
     setRemoteUrlState(url);
     setEditRemote(false);
     setFieldMissing(false);
@@ -145,6 +143,10 @@ export default function RemoteCard(props) {
     <div className="w-full">
       {editRemote ? (
         <div className="flex items-center w-full py-6 mx-auto my-1 align-middle rounded-md shadow bg-gray-50">
+          <div className="flex items-center justify-center w-1/5 mx-auto text-base text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
+            {getRemoteLogo(remoteUrlState)}
+            <div className="w-1/2">{remoteName}</div>
+          </div>
           <div className="flex items-center justify-center w-1/2 mx-auto text-base text-center text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
             <input
               type="text"
@@ -169,23 +171,13 @@ export default function RemoteCard(props) {
             <div
               className="items-center w-5/12 p-1 py-2 mx-auto text-base font-semibold bg-blue-500 rounded cursor-pointer xl:text-lg lg:text-lg md:text-base hover:bg-blue-700"
               onClick={() => {
-                let newRemoteName;
-                let oldRemoteName = remoteNameState.trim();
                 let url = !remoteFormUrl.current.value
                   ? remoteUrlState.trim()
                   : remoteFormUrl.current.value.trim();
                 if (url.match(/(\s)/g) || url.length === 0) {
                   setInvalidUrl(true);
                 } else {
-                  if (
-                    !remoteFormName.current.value ||
-                    remoteFormName.current.value === remoteNameState
-                  ) {
-                    newRemoteName = oldRemoteName;
-                  } else {
-                    newRemoteName = remoteFormName.current.value.trim();
-                  }
-                  changeState(newRemoteName, oldRemoteName, url);
+                  changeState(remoteName.trim(), url);
                 }
               }}
             >
@@ -219,7 +211,7 @@ export default function RemoteCard(props) {
             <div className="flex items-center w-full py-6 mx-auto my-1 align-middle rounded-md shadow bg-gray-50">
               <div className="flex items-center justify-center w-1/4 mx-auto text-base text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
                 {getRemoteLogo(remoteUrlState)}
-                <div className="w-1/2">{remoteNameState}</div>
+                <div className="w-1/2">{remoteName}</div>
               </div>
               <div className="flex items-center justify-center w-7/12 mx-auto text-base text-center text-gray-700 text-sans xl:text-lg lg:text-lg md:text-base">
                 {remoteUrlHandler(remoteUrlState)}
@@ -252,7 +244,7 @@ export default function RemoteCard(props) {
                       data: {
                         query: `
                                 mutation {
-                                  deleteRemote(repoId: "${repoId}", remoteName: "${remoteNameState}"){
+                                  deleteRemote(repoId: "${repoId}", remoteName: "${remoteName}"){
                                     status
                                   }
                                 }
