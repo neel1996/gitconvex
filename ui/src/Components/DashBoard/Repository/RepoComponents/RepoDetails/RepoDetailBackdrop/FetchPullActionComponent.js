@@ -169,7 +169,7 @@ export default function FetchFromRemoteComponent(props) {
         setLoading(false);
         console.error(err);
         setResult([
-          <div className="text-xl p-2 text-pink-800 border border-pink-200 shadow rounded font-semibold">
+          <div className="text-xl p-2 text-red-500 border border-pink-200 shadow rounded font-semibold">
             Error while {actionType === "fetch" ? "Fetching" : "Pulling"} from
             remote!
           </div>,
@@ -282,7 +282,7 @@ export default function FetchFromRemoteComponent(props) {
             {result.map((result) => {
               return (
                 <div
-                  className="my-1 mx-2 text-center text-xl font-sans shadow bg-gray-300"
+                  className="border-dashed border-gray-200 text-center text-xl font-sans shadow bg-red-200 rounded w-full"
                   key={result + `-${uuid()}`}
                 >
                   {result}
