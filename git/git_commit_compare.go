@@ -2,8 +2,7 @@ package git
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
 )
@@ -13,7 +12,7 @@ type CompareCommitInterface interface {
 }
 
 type CompareCommitStruct struct {
-	Repo                *git.Repository
+	Repo                *git2go.Repository
 	BaseCommitString    string
 	CompareCommitString string
 }
@@ -26,11 +25,15 @@ func (c CompareCommitStruct) CompareCommit() []*model.GitCommitFileResult {
 	baseCommitString := c.BaseCommitString
 	compareCommitString := c.CompareCommitString
 
-	baseHash := plumbing.NewHash(baseCommitString)
-	compareHash := plumbing.NewHash(compareCommitString)
+	baseHash, _ := git2go.NewOid(baseCommitString)
+	compareHash, _ := git2go.NewOid(compareCommitString)
+	if baseHash == nil || compareHash == nil {
+		logger.Log("Converting commit hash string to Oid", global.StatusError)
+		return res
+	}
 
-	baseCommit, bErr := repo.CommitObject(baseHash)
-	compareCommit, cErr := repo.CommitObject(compareHash)
+	baseCommit, bErr := repo.LookupCommit(baseHash)
+	compareCommit, cErr := repo.LookupCommit(compareHash)
 
 	if bErr != nil || cErr != nil {
 		logger.Log("Error occurred in fetching commits for the HASH", global.StatusError)
@@ -46,38 +49,35 @@ func (c CompareCommitStruct) CompareCommit() []*model.GitCommitFileResult {
 	}
 
 	logger.Log(fmt.Sprintf("Initiating tree comparison for %s..%s", baseHash.String(), compareHash.String()), global.StatusInfo)
-	diff, diffErr := baseTree.Diff(compareTree)
-	patchDiff, patchErr := baseTree.Patch(compareTree)
+	diff, diffErr := repo.DiffTreeToTree(baseTree, compareTree, nil)
 
-	if diffErr != nil || patchErr != nil {
+	if diffErr != nil {
 		logger.Log("Error occurred while comparing the commit Trees", global.StatusError)
+		logger.Log(diffErr.Error(), global.StatusError)
 		return res
 	}
 
-	fileFullName := patchDiff.FilePatches()
+	numDeltas := 0
+	numDeltas, _ = diff.NumDeltas()
 
-	for i, change := range diff {
-		action, _ := change.Action()
-		file, _ := fileFullName[i].Files()
-
-		actionType := action.String()
-
-		if actionType == "Insert" {
-			actionType = "Add"
-		}
-
-		if file != nil {
-			res = append(res, &model.GitCommitFileResult{
-				Type:     actionType[:1],
-				FileName: file.Path(),
-			})
-		} else {
-			_, changedFile, _ := change.Files()
-			res = append(res, &model.GitCommitFileResult{
-				Type:     actionType[:1],
-				FileName: changedFile.Name,
-			})
-		}
+	if numDeltas == 0 {
+		logger.Log("No changes found between the trees", global.StatusWarning)
+		return res
 	}
+
+	for i := 0; i < numDeltas; i++ {
+		delta, deltaErr := diff.Delta(i)
+		if deltaErr != nil {
+			logger.Log(deltaErr.Error(), global.StatusError)
+			return res
+		}
+		filePath := delta.NewFile
+		status := delta.Status.String()
+		res = append(res, &model.GitCommitFileResult{
+			Type:     status[0:1],
+			FileName: filePath.Path,
+		})
+	}
+
 	return res
 }

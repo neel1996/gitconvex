@@ -2,8 +2,7 @@ package git
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 )
 
@@ -12,26 +11,34 @@ type AddBranchInterface interface {
 }
 
 type AddBranchInput struct {
-	Repo       *git.Repository
-	BranchName string
+	Repo         *git2go.Repository
+	BranchName   string
+	RemoteSwitch bool
+	TargetCommit *git2go.Commit
 }
 
 // AddBranch adds a new branch to the target repo
 func (input AddBranchInput) AddBranch() string {
 	logger := global.Logger{}
 
+	targetCommit := input.TargetCommit
 	repo := input.Repo
 	branchName := input.BranchName
-
-	headRef, headErr := repo.Head()
+	head, headErr := repo.Head()
 
 	logger.Log(fmt.Sprintf("Adding new branch -> %s", branchName), global.StatusInfo)
 	if headErr != nil {
 		logger.Log(fmt.Sprintf("Unable to fetch HEAD -> %s", headErr.Error()), global.StatusError)
 		return global.BranchAddError
 	} else {
-		ref := plumbing.NewHashReference(plumbing.ReferenceName(fmt.Sprintf("refs/heads/%v", branchName)), headRef.Hash())
-		branchErr := repo.Storer.SetReference(ref)
+		if targetCommit == nil {
+			targetCommit, _ = repo.LookupCommit(head.Target())
+			if targetCommit == nil {
+				logger.Log("Target commit is nil", global.StatusError)
+				return global.BranchAddError
+			}
+		}
+		_, branchErr := repo.CreateBranch(branchName, targetCommit, false)
 
 		if branchErr != nil {
 			logger.Log(fmt.Sprintf("Failed to add branch - %s - %s", branchName, branchErr.Error()), global.StatusError)

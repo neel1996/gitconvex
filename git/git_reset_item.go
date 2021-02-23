@@ -2,8 +2,8 @@ package git
 
 import (
 	"fmt"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
-	"github.com/neel1996/gitconvex-server/utils"
 )
 
 type ResetInterface interface {
@@ -11,6 +11,7 @@ type ResetInterface interface {
 }
 
 type ResetStruct struct {
+	Repo     *git2go.Repository
 	RepoPath string
 	FileItem string
 }
@@ -22,23 +23,24 @@ func removeErr(fileItem string, errMsg string) string {
 }
 
 // RemoveItem performs a git rest 'file' to remove the item from the staged area
-// Uses the gitclient module, as go-git does not support selective reset
 func (r ResetStruct) RemoveItem() string {
-	repoPath := r.RepoPath
 	fileItem := r.FileItem
-	args := []string{"reset", fileItem}
-	cmd := utils.GetGitClient(repoPath, args)
+	repo := r.Repo
 
-	if cmd.String() == "" {
-		return removeErr(fileItem, "Error occurred while fetching git client")
+	head, headErr := repo.Head()
+	if headErr != nil {
+		return removeErr(fileItem, headErr.Error())
+	}
+
+	commit, commitErr := repo.LookupCommit(head.Target())
+	if commitErr != nil {
+		return removeErr(fileItem, commitErr.Error())
+	}
+
+	resetErr := repo.ResetDefaultToCommit(commit, []string{fileItem})
+	if resetErr != nil {
+		return removeErr(fileItem, resetErr.Error())
 	} else {
-		removeMsg, err := cmd.Output()
-
-		if err != nil {
-			return removeErr(fileItem, err.Error())
-		} else {
-			logger.Log(fmt.Sprintf("Staged item -> %s removed from the staging area\n%s", fileItem, string(removeMsg)), global.StatusInfo)
-			return global.RemoveItemSuccess
-		}
+		return global.RemoveItemSuccess
 	}
 }

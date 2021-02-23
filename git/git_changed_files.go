@@ -2,146 +2,165 @@ package git
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
-	"github.com/neel1996/gitconvex-server/utils"
-	"strings"
+	"runtime/debug"
 )
 
-/*
-	The file invokes the GetGitClient function to run native git commands in the system terminal to fetch some results.
-	The (WorkTree) Status function is slower for huge repos which is taking minutes to return the results, so git client is called
-	to do the job
-*/
-
-type ChangeInterface interface {
-	GetUntrackedFiles(untrackedChan chan []*string)
-	GetModifiedFiles(modifiedFileChan chan []*string)
-	GetStagedFiles(stagedFileChan chan []*string)
+type ChangedItemsInterface interface {
 	ChangedFiles() *model.GitChangeResults
 }
 
-type ChangedStruct struct {
-	Repo     *git.Repository
+type ChangedItemStruct struct {
+	Repo     *git2go.Repository
 	RepoPath string
 }
 
-// GetUntrackedFiles executes a native git command to fetch the list of untracked files
-func (c ChangedStruct) GetUntrackedFiles(untrackedChan chan []*string) {
-	logger.Log("Fetching untracked files from the repo", global.StatusInfo)
-	args := []string{"ls-files", "--others", "--exclude-standard"}
-	repoPath := c.RepoPath
-
-	cmd := utils.GetGitClient(repoPath, args)
-	cmdString, cmdErr := cmd.Output()
-	if cmdErr != nil {
-		logger.Log(fmt.Sprintf("Command execution failed -> %s", cmdErr.Error()), global.StatusError)
-		untrackedChan <- []*string{}
-	} else {
-		trimStr := strings.TrimSpace(string(cmdString))
-		splitLines := strings.Split(trimStr, "\n")
-		logger.Log(fmt.Sprintf("Untracked files --> %v", splitLines), global.StatusInfo)
-		var fileList []*string
-		for _, file := range splitLines {
-			untrackedFile := file
-			if file != "" {
-				fileList = append(fileList, &untrackedFile)
-			}
-		}
-		untrackedChan <- fileList
+func checkChangedFilesError(err error) error {
+	if err != nil {
+		logger.Log(err.Error(), global.StatusError)
+		return err
 	}
-}
-
-// GetStagedFiles executes a native git command to fetch the list of staged files
-func (c ChangedStruct) GetStagedFiles(stagedFileChan chan []*string) {
-	logger.Log("Fetching staged files from the repo", global.StatusInfo)
-	args := []string{"diff", "--name-only", "--cached"}
-	repoPath := c.RepoPath
-	cmd := utils.GetGitClient(repoPath, args)
-	cmdString, cmdErr := cmd.Output()
-	if cmdErr != nil {
-		logger.Log(fmt.Sprintf("Command execution failed -> %s", cmdErr.Error()), global.StatusError)
-		stagedFileChan <- []*string{}
-	} else {
-		trimStr := strings.TrimSpace(string(cmdString))
-		splitLines := strings.Split(trimStr, "\n")
-		logger.Log(fmt.Sprintf("Staged files --> %v", splitLines), global.StatusInfo)
-
-		var fileList []*string
-		for _, file := range splitLines {
-			if file != "" {
-				temp := file
-				fileList = append(fileList, &temp)
-			}
-		}
-		stagedFileChan <- fileList
-	}
-}
-
-// GetModifiedFiles executes a native git command to fetch all the modified files from the repo
-func (c ChangedStruct) GetModifiedFiles(modifiedFileChan chan []*string) {
-	logger.Log("Fetching changed files from the repo", global.StatusInfo)
-	args := []string{"diff", "--raw"}
-	repoPath := c.RepoPath
-	cmd := utils.GetGitClient(repoPath, args)
-	cmdString, cmdErr := cmd.Output()
-	if cmdErr != nil && cmdString != nil {
-		logger.Log(fmt.Sprintf("Command execution failed -> %s", cmdErr.Error()), global.StatusError)
-		modifiedFileChan <- []*string{}
-	} else {
-		trimStr := strings.TrimSpace(string(cmdString))
-		splitLines := strings.Split(trimStr, "\n")
-		var fileList []*string
-		for _, change := range splitLines {
-			if change == "" {
-				continue
-			}
-			fileName := strings.Fields(change)
-			logger.Log(fmt.Sprintf("Changed file --> %v", fileName), global.StatusInfo)
-			var changeStr string
-			if fileName[4] == "D" {
-				changeStr = "D," + fileName[5]
-			} else {
-				changeStr = "M," + fileName[5]
-			}
-			fileList = append(fileList, &changeStr)
-		}
-		modifiedFileChan <- fileList
-	}
+	return nil
 }
 
 // ChangedFiles returns the list of changes from the target
 // The function organizes the tracked, untracked and staged files in separate slices and returns the struct *model.GitChangeResults
-func (c ChangedStruct) ChangedFiles() *model.GitChangeResults {
-	logger := global.Logger{}
+func (c ChangedItemStruct) ChangedFiles() *model.GitChangeResults {
+	logger.Log("Fetching the current status of the repo", global.StatusInfo)
+	var changedFileList []*string
+	var stagedFileList []*string
+	var unTrackedList []*string
+	var stagedMap = make(map[string]bool)
+	var errStatus error
+
+	logger.Log("Fetching changed files from the repo", global.StatusInfo)
 	repo := c.Repo
 
-	logger.Log("Fetching the current status of the repo", global.StatusInfo)
-	w, _ := repo.Worktree()
-	repoPath := w.Filesystem.Root()
-
-	var unTrackedFileChan = make(chan []*string)
-	var changedFileChan = make(chan []*string)
-	var stagedFileChan = make(chan []*string)
-	c.RepoPath = repoPath
-
-	go c.GetModifiedFiles(changedFileChan)
-	go c.GetUntrackedFiles(unTrackedFileChan)
-	go c.GetStagedFiles(stagedFileChan)
-
-	// Intermediate return value to close the channels and then return the values
-	returnVal := &model.GitChangeResults{
-		GitUntrackedFiles: <-unTrackedFileChan,
-		GitChangedFiles:   <-changedFileChan,
-		GitStagedFiles:    <-stagedFileChan,
-	}
-
 	defer func() {
-		close(stagedFileChan)
-		close(changedFileChan)
-		close(unTrackedFileChan)
+		if r := recover(); r != nil {
+			logger.Log(fmt.Sprintf("%v", r), global.StatusError)
+			logger.Log(string(debug.Stack()), global.StatusWarning)
+		}
 	}()
 
-	return returnVal
+	head, _ := repo.Head()
+	if head == nil {
+		logger.Log("Repo has no HEAD. Treating it as a newly initialized repo", global.StatusWarning)
+		statusList, statusListErr := repo.StatusList(&git2go.StatusOptions{
+			Show:  git2go.StatusShowIndexAndWorkdir,
+			Flags: git2go.StatusOptIncludeUntracked,
+		})
+		errStatus = checkChangedFilesError(statusListErr)
+
+		n, _ := statusList.EntryCount()
+		for i := 0; i < n; i++ {
+			entry, entryErr := statusList.ByIndex(i)
+
+			if entryErr == nil {
+				diff := entry.HeadToIndex
+				unTrackedList = append(unTrackedList, &diff.NewFile.Path)
+			}
+		}
+		return &model.GitChangeResults{
+			GitUntrackedFiles: unTrackedList,
+			GitChangedFiles:   nil,
+			GitStagedFiles:    nil,
+		}
+	}
+
+	commit, commitErr := repo.LookupCommit(head.Target())
+	errStatus = checkChangedFilesError(commitErr)
+
+	tree, treeErr := commit.Tree()
+	errStatus = checkChangedFilesError(treeErr)
+
+	diff, diffErr := repo.DiffTreeToWorkdirWithIndex(tree, nil)
+	errStatus = checkChangedFilesError(diffErr)
+
+	repoIndex, indexErr := repo.Index()
+	errStatus = checkChangedFilesError(indexErr)
+
+	stagedDiff, stagedDiffErr := repo.DiffTreeToIndex(tree, repoIndex, nil)
+	errStatus = checkChangedFilesError(stagedDiffErr)
+
+	statusList, statusListErr := repo.StatusList(&git2go.StatusOptions{
+		Show:     git2go.StatusShowWorkdirOnly,
+		Flags:    git2go.StatusOptIncludeUntracked,
+		Pathspec: nil,
+	})
+	errStatus = checkChangedFilesError(statusListErr)
+
+	stat, statErr := stagedDiff.Stats()
+	errStatus = checkChangedFilesError(statErr)
+
+	stagedFileCount := stat.FilesChanged()
+
+	if stagedFileCount > 0 {
+		n, _ := stagedDiff.NumDeltas()
+		for d := 0; d < n; d++ {
+			delta, deltaErr := stagedDiff.Delta(d)
+			errStatus = checkChangedFilesError(deltaErr)
+
+			fileEntry := delta.NewFile.Path
+			logger.Log(fmt.Sprintf("Staged file --> %v", fileEntry), global.StatusInfo)
+			stagedMap[fileEntry] = true
+			stagedFileList = append(stagedFileList, &fileEntry)
+		}
+	} else {
+		logger.Log("No staged Files", global.StatusWarning)
+		stagedFileList = nil
+	}
+
+	var n = 0
+	n, _ = diff.NumDeltas()
+	for d := 0; d < n; d++ {
+		delta, deltaErr := diff.Delta(d)
+		errStatus = checkChangedFilesError(deltaErr)
+
+		fileEntry := delta.NewFile.Path
+		if !stagedMap[fileEntry] {
+			changeStatus := delta.Status
+			if changeStatus != git2go.DeltaUntracked {
+				logger.Log(fmt.Sprintf("Changed file --> %v", delta.NewFile.Path), global.StatusInfo)
+				entry := delta.Status.String()[0:1] + "," + delta.NewFile.Path
+				changedFileList = append(changedFileList, &entry)
+			}
+		} else {
+			changeFlag := delta.NewFile.Flags
+			if changeFlag == 8 {
+				logger.Log(fmt.Sprintf("Staged and Changed file --> %v", delta.NewFile.Path), global.StatusInfo)
+				entry := delta.Status.String()[0:1] + "," + delta.NewFile.Path
+				changedFileList = append(changedFileList, &entry)
+			}
+		}
+	}
+
+	numStatus, numStatusErr := statusList.EntryCount()
+	errStatus = checkChangedFilesError(numStatusErr)
+
+	for i := 0; i < numStatus; i++ {
+		statusEntry, _ := statusList.ByIndex(i)
+		delta := statusEntry.IndexToWorkdir
+		if delta.Status == git2go.DeltaUntracked {
+			logger.Log(fmt.Sprintf("Untracked file --> %v", delta.NewFile.Path), global.StatusInfo)
+			entry := delta.NewFile.Path
+			unTrackedList = append(unTrackedList, &entry)
+		}
+	}
+
+	if errStatus == nil {
+		return &model.GitChangeResults{
+			GitUntrackedFiles: unTrackedList,
+			GitChangedFiles:   changedFileList,
+			GitStagedFiles:    stagedFileList,
+		}
+	} else {
+		return &model.GitChangeResults{
+			GitUntrackedFiles: nil,
+			GitChangedFiles:   nil,
+			GitStagedFiles:    nil,
+		}
+	}
 }

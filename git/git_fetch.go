@@ -1,65 +1,27 @@
 package git
 
 import (
-	"bytes"
 	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband"
-	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
-	"github.com/neel1996/gitconvex-server/utils"
-	"io"
 )
 
 type FetchInterface interface {
 	FetchFromRemote() *model.FetchResult
-	windowsFetch() *model.FetchResult
 }
 
 type FetchStruct struct {
-	Repo         *git.Repository
+	Repo         *git2go.Repository
 	RemoteName   string
 	RepoPath     string
 	RemoteURL    string
 	RemoteBranch string
-}
-
-// windowsFetch is used for fetching changes using the git client if the platform is windows
-// go-git fetch fails in windows due to SSH authentication error
-func (f FetchStruct) windowsFetch() *model.FetchResult {
-	var args []string
-
-	remoteName := f.RemoteName
-	repoPath := f.RepoPath
-	branch := f.RemoteBranch
-
-	if remoteName == "" && branch == "" {
-		args = []string{"fetch"}
-	} else {
-		branchReference := branch + ":" + branch
-		args = []string{"fetch", remoteName, branchReference}
-	}
-	cmd := utils.GetGitClient(repoPath, args)
-	cmdStr, cmdErr := cmd.Output()
-
-	if cmdErr != nil {
-		logger.Log(fmt.Sprintf("Fetch failed -> %s", cmdErr.Error()), global.StatusError)
-
-		return &model.FetchResult{
-			Status:       global.FetchFromRemoteError,
-			FetchedItems: nil,
-		}
-	} else {
-		logger.Log(fmt.Sprintf("Changes fetched from remote - %s\n%s", remoteName, cmdStr), global.StatusInfo)
-
-		msg := fmt.Sprintf("Changes fetched from remote %v", remoteName)
-		return &model.FetchResult{
-			Status:       "CHANGES FETCHED FROM REMOTE",
-			FetchedItems: []*string{&msg},
-		}
-	}
+	RepoName     string
+	AuthOption   string
+	UserName     string
+	Password     string
+	SSHKeyPath   string
 }
 
 // FetchFromRemote performs a git fetch for the supplied remote and branch (e.g. `git fetch origin main`)
@@ -68,7 +30,6 @@ func (f FetchStruct) FetchFromRemote() *model.FetchResult {
 	repo := f.Repo
 	remoteURL := f.RemoteURL
 	remoteBranch := f.RemoteBranch
-	repoPath := f.RepoPath
 
 	var remoteDataObject RemoteDataInterface
 	remoteDataObject = RemoteDataStruct{
@@ -77,81 +38,75 @@ func (f FetchStruct) FetchFromRemote() *model.FetchResult {
 	}
 
 	remoteName := remoteDataObject.GetRemoteName()
-	logger := global.Logger{}
+	localRefSpec := "+refs/heads/" + remoteBranch
+	targetRefPsec := "refs/remotes/" + remoteName + "/" + remoteBranch
+	targetRemote, _ := repo.Remotes.Lookup(remoteName)
 
-	targetRefPsec := "refs/heads/" + remoteBranch + ":refs/remotes/" + remoteBranch
-	b := new(bytes.Buffer)
-	var fetchErr error
-	gitSSHAuth, sshErr := ssh.NewSSHAgentAuth("git")
-	w, _ := repo.Worktree()
-
-	// Check if repo path is empty and fetch path from worktree
-	if repoPath == "" {
-		repoPath = w.Filesystem.Root()
+	if targetRemote == nil {
+		logger.Log("Target remote is unavailable", global.StatusError)
+		return &model.FetchResult{
+			Status:       global.FetchFromRemoteError,
+			FetchedItems: nil,
+		}
 	}
 
-	if sshErr != nil {
-		logger.Log("Authentication method failed -> "+sshErr.Error(), global.StatusError)
-		if w == nil {
-			return &model.FetchResult{
-				Status:       global.FetchFromRemoteError,
-				FetchedItems: nil,
+	var remoteCallbackObject RemoteCallbackInterface
+	remoteCallbackObject = &RemoteCallbackStruct{
+		RepoName:   f.RepoName,
+		UserName:   f.UserName,
+		Password:   f.Password,
+		SSHKeyPath: f.SSHKeyPath,
+		AuthOption: f.AuthOption,
+	}
+
+	fetchOption := &git2go.FetchOptions{
+		RemoteCallbacks: remoteCallbackObject.RemoteCallbackSelector(),
+	}
+	logger.Log(fmt.Sprintf("Fetching changes from -> %s - %s", remoteName, localRefSpec+":"+targetRefPsec), global.StatusInfo)
+	err := targetRemote.Fetch([]string{localRefSpec + ":" + targetRefPsec}, fetchOption, "")
+
+	remoteRef, remoteRefErr := repo.References.Lookup(targetRefPsec)
+	if remoteRefErr == nil {
+		remoteCommit, _ := repo.AnnotatedCommitFromRef(remoteRef)
+		if remoteCommit != nil {
+			mergeAnalysis, _, mergeErr := repo.MergeAnalysis([]*git2go.AnnotatedCommit{remoteCommit})
+			if mergeErr != nil {
+				logger.Log("Fetch failed - "+mergeErr.Error(), global.StatusError)
+				return &model.FetchResult{
+					Status:       global.FetchFromRemoteError,
+					FetchedItems: nil,
+				}
+			} else {
+				if mergeAnalysis&git2go.MergeAnalysisUpToDate != 0 {
+					logger.Log("No new changes to fetch from remote", global.StatusWarning)
+					msg := "No new changes to fetch from remote"
+					return &model.FetchResult{
+						Status:       global.FetchNoNewChanges,
+						FetchedItems: []*string{&msg},
+					}
+				}
 			}
 		}
-		logger.Log("Retrying fetch with fallback module using git client", global.StatusWarning)
-		return f.windowsFetch()
-	}
 
-	logger.Log(fmt.Sprintf("Fetching changes from -> %s : %s", remoteURL, targetRefPsec), global.StatusInfo)
-
-	if remoteURL != "" && remoteBranch != "" {
-		if remoteName == "" {
+		if err != nil {
+			logger.Log("Fetch failed - "+err.Error(), global.StatusError)
 			return &model.FetchResult{
 				Status:       global.FetchFromRemoteError,
-				FetchedItems: nil,
-			}
-		}
-
-		fetchErr = repo.Fetch(&git.FetchOptions{
-			RemoteName: remoteName,
-			Auth:       gitSSHAuth,
-			RefSpecs:   []config.RefSpec{config.RefSpec(targetRefPsec)},
-			Progress: sideband.Progress(func(f io.Writer) io.Writer {
-				return f
-			}(b)),
-		})
-	} else {
-		fetchErr = repo.Fetch(&git.FetchOptions{
-			RemoteName: git.DefaultRemoteName,
-			Auth:       gitSSHAuth,
-			Progress: sideband.Progress(func(f io.Writer) io.Writer {
-				return f
-			}(b)),
-		})
-	}
-
-	if fetchErr != nil {
-		if fetchErr.Error() == "already up-to-date" {
-			logger.Log(fetchErr.Error(), global.StatusWarning)
-			return &model.FetchResult{
-				Status:       global.FetchNoNewChanges,
 				FetchedItems: nil,
 			}
 		} else {
-			logger.Log(fetchErr.Error(), global.StatusError)
-			logger.Log("Fetch failed. Retrying fetch with git client", global.StatusWarning)
-			return f.windowsFetch()
+			msg := "Changes fetched from remote " + remoteName
+			logger.Log(msg, global.StatusInfo)
+			return &model.FetchResult{
+				Status:       global.FetchFromRemoteSuccess,
+				FetchedItems: []*string{&msg},
+			}
 		}
-
 	} else {
-		logger.Log(b.String(), global.StatusInfo)
-		logger.Log("Changes fetched from remote", global.StatusInfo)
-
-		msg := fmt.Sprintf("Changes fetched from remote %v", remoteName)
+		logger.Log("Fetch failed - "+remoteRefErr.Error(), global.StatusError)
 		return &model.FetchResult{
-			Status:       global.FetchFromRemoteSuccess,
-			FetchedItems: []*string{&msg},
+			Status:       global.FetchFromRemoteError,
+			FetchedItems: nil,
 		}
 	}
-
 }

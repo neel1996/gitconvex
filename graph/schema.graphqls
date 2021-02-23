@@ -81,6 +81,11 @@ type branchCompareResults{
     commits: [gitCommits]!
 }
 
+type remoteDetails {
+    remoteName: String!
+    remoteUrl: String!
+}
+
 type Query {
     healthCheck: HealthCheckParams!
     fetchRepo: FetchRepoParams!
@@ -91,11 +96,12 @@ type Query {
     searchCommitLogs(repoId: String!, searchType: String!, searchKey: String!): [gitCommits]!
     codeFileDetails(repoId: String!, fileName: String!): codeFileType!
     gitChanges(repoId: String!): gitChangeResults!
-    gitUnPushedCommits(repoId: String!, remoteURL: String!, remoteBranch: String!): [String]!
+    gitUnPushedCommits(repoId: String!, remoteURL: String!, remoteBranch: String!): [gitCommits]!
     gitFileLineChanges(repoId: String!, fileName: String!): fileLineChangeResult!
     settingsData: settingsDataResults!
     commitCompare(repoId: String!,baseCommit: String!, compareCommit: String!): [gitCommitFileResult]!
     branchCompare(repoId: String!, baseBranch: String!, compareBranch: String!): [branchCompareResults]!
+    getRemote(repoId: String!): [remoteDetails]!
 }
 
 type BranchDeleteStatus{
@@ -117,12 +123,15 @@ type deleteStatus{
     repoId: String!
 }
 
+type remoteMutationResult{
+    status: String!
+}
+
 type Mutation {
-    addRepo(repoName: String!, repoPath: String!, cloneSwitch: Boolean!, repoURL: String, initSwitch: Boolean!, authOption: String!, userName: String, password: String): AddRepoParams!
+    addRepo(repoName: String!, repoPath: String!, cloneSwitch: Boolean!, repoURL: String, initSwitch: Boolean!, authOption: String!, sshKeyPath: String, userName: String, password: String): AddRepoParams!
     addBranch(repoId: String!, branchName: String!): String!
     checkoutBranch(repoId: String!, branchName: String!): String!
     deleteBranch(repoId: String!, branchName: String!, forceFlag: Boolean!): BranchDeleteStatus!
-    addRemote(repoId: String!, remoteName: String!, remoteUrl: String!): String!
     fetchFromRemote(repoId: String!, remoteUrl: String, remoteBranch: String): FetchResult!
     pullFromRemote(repoId: String!, remoteUrl: String, remoteBranch: String): PullResult!
     stageItem(repoId: String!, item: String!): String!
@@ -135,4 +144,7 @@ type Mutation {
     updateRepoDataFile(newDbFile: String!): String!
     deleteRepo(repoId: String!): deleteStatus!
     updateRepoName(repoId: String!, repoName: String!): String!
+    addRemote(repoId: String!, remoteName: String!, remoteUrl: String!): remoteMutationResult!
+    deleteRemote(repoId: String!, remoteName: String!): remoteMutationResult!
+    editRemote(repoId: String!, remoteName: String!, remoteUrl: String!): remoteMutationResult!
 }

@@ -2,8 +2,7 @@ package git
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
 )
@@ -13,14 +12,22 @@ type CommitFileListInterface interface {
 }
 
 type CommitFileListStruct struct {
-	Repo       *git.Repository
+	Repo       *git2go.Repository
 	CommitHash string
+}
+
+// Common function for returning empty response in case of errors
+func returnCommitFileError(err error) []*model.GitCommitFileResult {
+	logger.Log(err.Error(), global.StatusError)
+	return []*model.GitCommitFileResult{{
+		Type:     "",
+		FileName: "",
+	}}
 }
 
 // CommitFileList returns the list of files modified, added or removed as part of a commit
 // compares the previous commit tree with the current commit tree and, returns the change type (M|D|A) and file name
 func (c CommitFileListStruct) CommitFileList() []*model.GitCommitFileResult {
-	logger := global.Logger{}
 	var res []*model.GitCommitFileResult
 
 	repo := c.Repo
@@ -28,70 +35,46 @@ func (c CommitFileListStruct) CommitFileList() []*model.GitCommitFileResult {
 
 	logger.Log(fmt.Sprintf("Fetching file details for commit %v", commitHash), global.StatusInfo)
 
-	hash := plumbing.NewHash(commitHash)
-	commit, err := repo.CommitObject(hash)
+	oid, oidErr := git2go.NewOid(commitHash)
+	if oidErr != nil {
+		return returnCommitFileError(oidErr)
+	}
 
+	commit, err := repo.LookupCommit(oid)
 	if err != nil {
-		logger.Log(err.Error(), global.StatusError)
-		res = append(res, &model.GitCommitFileResult{
-			Type:     "",
-			FileName: "",
-		})
-
-		return res
+		return returnCommitFileError(err)
 	}
 
-	currentTree, _ := commit.Tree()
-	prev, parentErr := commit.Parents().Next()
+	numParents := commit.ParentCount()
+	if numParents > 0 {
+		prevCommit := commit.Parent(0)
+		prevTree, _ := prevCommit.Tree()
+		commitTree, _ := commit.Tree()
 
-	if parentErr != nil {
-		logger.Log(parentErr.Error(), global.StatusError)
-		res = append(res, &model.GitCommitFileResult{
-			Type:     "",
-			FileName: "",
-		})
-
-		return res
-	}
-
-	prevTree, _ := prev.Tree()
-	diff, diffErr := prevTree.Diff(currentTree)
-
-	pDiff, _ := prevTree.Patch(currentTree)
-	fileFullName := pDiff.FilePatches()
-
-	if diffErr != nil {
-		logger.Log(diffErr.Error(), global.StatusError)
-		res = append(res, &model.GitCommitFileResult{
-			Type:     "",
-			FileName: "",
-		})
-		return res
-	} else {
-		for i, change := range diff {
-			action, _ := change.Action()
-			file, _ := fileFullName[i].Files()
-
-			actionType := action.String()
-
-			if actionType == "Insert" {
-				actionType = "Add"
+		if commitTree != nil && prevTree != nil {
+			diff, diffErr := repo.DiffTreeToTree(prevTree, commitTree, nil)
+			if diffErr != nil {
+				return returnCommitFileError(diffErr)
 			}
 
-			if file != nil {
+			numDelta, numDeltaErr := diff.NumDeltas()
+			if numDeltaErr != nil {
+				return returnCommitFileError(numDeltaErr)
+			}
+			for d := 0; d < numDelta; d++ {
+				delta, _ := diff.Delta(d)
+				status := delta.Status.String()
 				res = append(res, &model.GitCommitFileResult{
-					Type:     actionType[:1],
-					FileName: file.Path(),
-				})
-			} else {
-				_, changedFile, _ := change.Files()
-
-				res = append(res, &model.GitCommitFileResult{
-					Type:     actionType[:1],
-					FileName: changedFile.Name,
+					Type:     status[0:1],
+					FileName: delta.NewFile.Path,
 				})
 			}
 		}
-		return res
+	} else {
+		return []*model.GitCommitFileResult{{
+			Type:     "",
+			FileName: "",
+		}}
 	}
+	return res
 }

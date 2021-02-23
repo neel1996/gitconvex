@@ -7,10 +7,14 @@ import (
 )
 
 type RepoData struct {
-	RepoId    string `json:"id"`
-	RepoName  string `json:"repoName"`
-	RepoPath  string `json:"repoPath"`
-	TimeStamp string `json:"timestamp"`
+	RepoId     string `json:"id"`
+	RepoName   string `json:"repoName"`
+	RepoPath   string `json:"repoPath"`
+	TimeStamp  string `json:"timestamp"`
+	AuthOption string `json:"authOption"`
+	UserName   string `json:"userName"`
+	Password   string `json:"password"`
+	SSHKeyPath string `json:"sshKeyPath"`
 }
 
 // DataStoreFileReader reads the database json file tracking the stored repos and returns the data as a struct

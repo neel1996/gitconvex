@@ -2,7 +2,7 @@ package git
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"go/types"
 	"os"
@@ -15,7 +15,7 @@ func RepoValidator(repoPath string) (string, error) {
 		return "", types.Error{Msg: "The selected folder is not a git repo"}
 	}
 
-	repo, repoErr := git.PlainOpen(repoPath)
+	repo, repoErr := git2go.OpenRepository(repoPath)
 	if repoErr != nil {
 		return "", types.Error{Msg: "The selected folder is not a valid git repo"}
 	}

@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/go-git/go-git/v5"
+	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"os"
 	"path"
@@ -10,7 +10,7 @@ import (
 
 func TestAddBranch(t *testing.T) {
 	cwd, _ := os.Getwd()
-	r, _ := git.PlainOpen(path.Join(cwd, ".."))
+	r, _ := git.OpenRepository(path.Join(cwd, ".."))
 
 	type args struct {
 		repo       *git.Repository

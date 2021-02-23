@@ -92,6 +92,7 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	var latestCommit *string
 
 	var allCommitObject git.AllCommitInterface
+
 	allCommitObject = git.AllCommitStruct{Repo: repo}
 	go allCommitObject.AllCommits(commitChan)
 	commitData := <-commitChan

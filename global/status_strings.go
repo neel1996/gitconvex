@@ -4,6 +4,8 @@ const (
 	BranchAddSuccess       = "BRANCH_CREATION_SUCCESS"
 	BranchDeleteSuccess    = "BRANCH_DELETE_SUCCESS"
 	RemoteAddSuccess       = "REMOTE_ADD_SUCCESS"
+	RemoteDeleteSuccess    = "REMOTE_DELETE_SUCCESS"
+	RemoteEditSuccess      = "REMOTE_EDIT_SUCCESS"
 	FetchNoNewChanges      = "NEW CHANGES ABSENT"
 	FetchFromRemoteSuccess = "CHANGES FETCHED FROM REMOTE"
 	PullNoNewChanges       = "NEW CHANGES ABSENT"

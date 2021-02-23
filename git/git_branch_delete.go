@@ -2,8 +2,7 @@ package git
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
 )
@@ -13,45 +12,29 @@ type DeleteBranchInterface interface {
 }
 
 type DeleteBranchInputs struct {
-	Repo       *git.Repository
+	Repo       *git2go.Repository
 	BranchName string
-	ForceFlag  bool
 }
 
-// DeleteBranch deleted a branch from the repo
-// If forceFlag is true then it will forcefully delete a branch
-// If forceFlag is false, then the branch status will be checked for unmerged changes and then it will be removed from the repo
+// DeleteBranch deletes a branch from the repo
 func (inputs DeleteBranchInputs) DeleteBranch() *model.BranchDeleteStatus {
-	var branchErr error
-	logger := global.Logger{}
-
 	repo := inputs.Repo
 	branchName := inputs.BranchName
-	forceFlag := inputs.ForceFlag
+	deleteBranch, deleteBranchErr := repo.LookupBranch(branchName, git2go.BranchLocal)
 
-	headRef, _ := repo.Head()
-	ref := plumbing.NewHashReference(plumbing.ReferenceName(fmt.Sprintf("refs/heads/%v", branchName)), headRef.Hash())
-
-	if forceFlag {
-		logger.Log("Deleting branch "+branchName+" forcefully", global.StatusInfo)
-		branchErr = repo.Storer.RemoveReference(ref.Name())
-	} else {
-		b, bErr := repo.Branch(branchName)
-		if bErr != nil {
-			logger.Log(fmt.Sprintf("Failed to delete branch %s -> %v", branchName, bErr.Error()), global.StatusError)
-			return &model.BranchDeleteStatus{Status: global.BranchDeleteError}
-		} else {
-			logger.Log("Deleting branch "+b.Name, global.StatusInfo)
-			branchErr = repo.Storer.RemoveReference(ref.Name())
-		}
-	}
-
-	if branchErr != nil {
-		logger.Log(fmt.Sprintf("Failed to delete branch %s -> %v", branchName, branchErr.Error()), global.StatusError)
+	if deleteBranchErr != nil {
+		logger.Log(fmt.Sprintf("Failed to delete branch %s -> %v", branchName, deleteBranchErr.Error()), global.StatusError)
 		return &model.BranchDeleteStatus{Status: global.BranchDeleteError}
-	}
-
-	return &model.BranchDeleteStatus{
-		Status: global.BranchDeleteSuccess,
+	} else {
+		deleteErr := deleteBranch.Delete()
+		if deleteErr == nil {
+			logger.Log(fmt.Sprintf("Branch - %s has been removed from the repo", branchName), global.StatusInfo)
+			return &model.BranchDeleteStatus{
+				Status: global.BranchDeleteSuccess,
+			}
+		} else {
+			logger.Log(fmt.Sprintf("Failed to delete branch %s -> %v", branchName, deleteErr.Error()), global.StatusError)
+			return &model.BranchDeleteStatus{Status: global.BranchDeleteError}
+		}
 	}
 }

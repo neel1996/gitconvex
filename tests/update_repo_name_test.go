@@ -9,7 +9,7 @@ import (
 func TestUpdateRepoName(t *testing.T) {
 	var testObj api.AddRepoInterface
 	testObj = api.AddRepoInputs{
-		RepoName: "test", RepoPath: "..", CloneSwitch: false, RepoURL: nil, InitSwitch: false, AuthOption: "", UserName: nil, Password: nil,
+		RepoName: "test", RepoPath: "..", CloneSwitch: false, RepoURL: "", InitSwitch: false, AuthOption: "", UserName: "", Password: "",
 	}
 	_ = utils.EnvConfigFileGenerator()
 	testRepoId := testObj.AddRepo().RepoID

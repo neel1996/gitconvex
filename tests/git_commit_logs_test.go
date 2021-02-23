@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
+	git2go "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/graph/model"
 	assert2 "github.com/stretchr/testify/assert"
@@ -12,7 +12,7 @@ import (
 
 func TestCommitLogs(t *testing.T) {
 	var repoPath string
-	var r *git.Repository
+	var r *git2go.Repository
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
@@ -20,11 +20,11 @@ func TestCommitLogs(t *testing.T) {
 
 	if currentEnv == "ci" {
 		repoPath = "/home/runner/work/gitconvex-server/starfleet"
-		r, _ = git.PlainOpen(repoPath)
+		r, _ = git2go.OpenRepository(repoPath)
 	}
 
 	type args struct {
-		repo      *git.Repository
+		repo      *git2go.Repository
 		skipCount int
 	}
 	tests := []struct {
@@ -33,7 +33,7 @@ func TestCommitLogs(t *testing.T) {
 		want *model.GitCommitLogResults
 	}{
 		{name: "Git commit logs test case", args: struct {
-			repo      *git.Repository
+			repo      *git2go.Repository
 			skipCount int
 		}{repo: r, skipCount: 0}, want: &model.GitCommitLogResults{
 			TotalCommits: &expectedTotalCommits,

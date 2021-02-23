@@ -1,39 +1,35 @@
 package git
 
 import (
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
+	"fmt"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
+	"github.com/neel1996/gitconvex-server/graph/model"
 )
 
 type AddRemoteInterface interface {
-	AddRemote() string
+	AddRemote() *model.RemoteMutationResult
 }
 
 type AddRemoteStruct struct {
-	Repo       *git.Repository
+	Repo       *git2go.Repository
 	RemoteName string
 	RemoteURL  string
 }
 
 // AddRemote adds a new remote to the target git repo
-func (a AddRemoteStruct) AddRemote() string {
-	logger := global.Logger{}
-
+func (a AddRemoteStruct) AddRemote() *model.RemoteMutationResult {
 	repo := a.Repo
 	remoteName := a.RemoteName
 	remoteURL := a.RemoteURL
 
-	remote, err := repo.CreateRemote(&config.RemoteConfig{
-		Name: remoteName,
-		URLs: []string{remoteURL},
-	})
+	remote, err := repo.Remotes.Create(remoteName, remoteURL)
 
 	if err == nil {
-		logger.Log("Remoted addition completed for"+remote.String(), global.StatusInfo)
-		return global.RemoteAddSuccess
+		logger.Log(fmt.Sprintf("New remote %s added to the repo", remote.Name()), global.StatusInfo)
+		return &model.RemoteMutationResult{Status: global.RemoteAddSuccess}
 	} else {
-		logger.Log("Remote addition Failed!", global.StatusError)
-		return global.RemoteAddError
+		logger.Log("Remote addition Failed -> "+err.Error(), global.StatusError)
+		return &model.RemoteMutationResult{Status: global.RemoteAddError}
 	}
 }

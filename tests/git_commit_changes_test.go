@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
+	git2go "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"io/ioutil"
 	"os"
@@ -11,13 +11,13 @@ import (
 
 func TestCommitChanges(t *testing.T) {
 	var repoPath string
-	var r *git.Repository
+	var r *git2go.Repository
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
 		repoPath = "/home/runner/work/gitconvex-server/starfleet"
-		r, _ = git.PlainOpen(repoPath)
+		r, _ = git2go.OpenRepository(repoPath)
 	}
 
 	sampleFile := "untracked.txt"
@@ -30,7 +30,7 @@ func TestCommitChanges(t *testing.T) {
 	fmt.Println(stageAllObjects.StageAllItems())
 
 	type args struct {
-		repo          *git.Repository
+		repo          *git2go.Repository
 		commitMessage string
 	}
 	tests := []struct {
@@ -39,7 +39,7 @@ func TestCommitChanges(t *testing.T) {
 		want string
 	}{
 		{name: "Git commit changes test case", args: struct {
-			repo          *git.Repository
+			repo          *git2go.Repository
 			commitMessage string
 		}{repo: r, commitMessage: "Test commit"}, want: "COMMIT_DONE"},
 	}

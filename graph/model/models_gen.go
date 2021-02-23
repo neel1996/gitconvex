@@ -94,6 +94,15 @@ type GitCommits struct {
 	CommitFilesCount *int    `json:"commitFilesCount"`
 }
 
+type RemoteDetails struct {
+	RemoteName string `json:"remoteName"`
+	RemoteURL  string `json:"remoteUrl"`
+}
+
+type RemoteMutationResult struct {
+	Status string `json:"status"`
+}
+
 type SettingsDataResults struct {
 	SettingsDatabasePath string `json:"settingsDatabasePath"`
 	SettingsPortDetails  string `json:"settingsPortDetails"`

@@ -5,6 +5,8 @@ const (
 	BranchCheckoutError  = "CHECKOUT_FAILED"
 	BranchDeleteError    = "BRANCH_DELETE_FAILED"
 	RemoteAddError       = "REMOTE_ADD_FAILED"
+	RemoteDeleteError    = "REMOTE_DELETE_FAILED"
+	RemoteEditError      = "REMOTE_EDIT_FAILED"
 	FetchFromRemoteError = "FETCH_ERROR"
 	PullFromRemoteError  = "PULL_ERROR"
 	StageItemError       = "ADD_ITEM_FAILED"

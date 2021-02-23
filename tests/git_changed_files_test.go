@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
+	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/graph/model"
 	"io/ioutil"
@@ -19,7 +19,7 @@ func TestChangedFiles(t *testing.T) {
 
 	if currentEnv == "ci" {
 		repoPath = "/home/runner/work/gitconvex-server/starfleet"
-		r, _ = git.PlainOpen(repoPath)
+		r, _ = git.OpenRepository(repoPath)
 	}
 
 	untrackedResult := "untracked.txt"
@@ -32,7 +32,7 @@ func TestChangedFiles(t *testing.T) {
 	var stageObject git2.StageItemInterface
 	stageObject = git2.StageItemStruct{
 		Repo:     r,
-		FileItem: repoPath + "/" + changedResult,
+		FileItem: changedResult,
 	}
 	stageObject.StageItem()
 
@@ -57,8 +57,8 @@ func TestChangedFiles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var testObj git2.ChangeInterface
-			testObj = git2.ChangedStruct{
+			var testObj git2.ChangedItemsInterface
+			testObj = git2.ChangedItemStruct{
 				Repo:     tt.args.repo,
 				RepoPath: "",
 			}
