@@ -1,4 +1,5 @@
 import axios from "axios";
+import { format } from "date-fns";
 import React, { useEffect, useRef, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
 import InfiniteLoader from "../../../../Animations/InfiniteLoader";
@@ -9,7 +10,7 @@ export default function PushComponent(props) {
   const [remoteData, setRemoteData] = useState();
   const [currentBranch, setCurrentBranch] = useState("");
   const [isRemoteSet, setIsRemoteSet] = useState(false);
-  const [unpushedCommits, setUnpushedCommits] = useState([]);
+  const [unPushedCommits, setUnPushedCommits] = useState([]);
   const [isCommitEmpty, setIsCommitEmpty] = useState(false);
 
   const [pushDone, setPushDone] = useState(false);
@@ -60,7 +61,12 @@ export default function PushComponent(props) {
         query: `
           query 
           {
-            gitUnPushedCommits(repoId: "${props.repoId}", remoteURL: "${remoteHost}", remoteBranch: "${branchName}")
+            gitUnPushedCommits(repoId: "${props.repoId}", remoteURL: "${remoteHost}", remoteBranch: "${branchName}"){
+              hash
+              author
+              commitTime
+              commitMessage
+            }
           }
         `,
       },
@@ -71,7 +77,7 @@ export default function PushComponent(props) {
           if (commits.length === 0) {
             setIsCommitEmpty(true);
           }
-          setUnpushedCommits([...commits]);
+          setUnPushedCommits([...commits]);
         }
       })
       .catch((err) => {
@@ -123,7 +129,8 @@ export default function PushComponent(props) {
       "Commit Timestamp",
       "Commit Message",
     ];
-    const splitCommit = commit.split("||");
+
+    const commitKeys = Object.keys(commit);
 
     const localModelFormat = (left, right) => {
       return (
@@ -141,7 +148,14 @@ export default function PushComponent(props) {
     return (
       <div className="block justify-evenly border-b-2 p-2">
         {modelLabel.map((label, index) => {
-          return localModelFormat(label, splitCommit[index]);
+          if (commitKeys[index] === "commitTime") {
+            const formattedDate = format(
+              new Date(commit["commitTime"]),
+              "dd-MMM-yyyy"
+            ).toUpperCase();
+            return localModelFormat(label, formattedDate);
+          }
+          return localModelFormat(label, commit[commitKeys[index]]);
         })}
       </div>
     );
@@ -236,19 +250,19 @@ export default function PushComponent(props) {
               </div>
             ) : null}
 
-            {unpushedCommits && unpushedCommits.length > 0 ? (
+            {unPushedCommits && unPushedCommits.length > 0 ? (
               <div className="my-2 mx-auto w-full bg-purple-50 p-4 rounded-lg shadow border">
                 <div className="font-sans font-semibold text-2xl text-gray-600 my-1">
-                  {unpushedCommits.length !== 0 ? (
+                  {unPushedCommits.length !== 0 ? (
                     <span className="mx-1 border-b border-dashed border-gray-600">
-                      {unpushedCommits.length}
+                      {unPushedCommits.length}
                     </span>
                   ) : null}
-                  {unpushedCommits.length === 1 ? "Commit " : "Commits "}
+                  {unPushedCommits.length === 1 ? "Commit " : "Commits "}
                   to be pushed
                 </div>
                 <div className="overflow-auto" style={{ height: "200px" }}>
-                  {unpushedCommits.map((commits, index) => {
+                  {unPushedCommits.map((commits, index) => {
                     return (
                       <div key={`unpushed-commit-${index}`} className="p-2">
                         {commitModel(commits)}
@@ -269,7 +283,7 @@ export default function PushComponent(props) {
               </>
             ) : null}
 
-            {isRemoteSet && unpushedCommits.length > 0 && !loading ? (
+            {isRemoteSet && unPushedCommits.length > 0 && !loading ? (
               <div
                 className="w-full text-center font-sans font-semibold p-3 my-4 bg-indigo-300 text-xl text-white rounded shadow-md cursor-pointer hover:bg-indigo-400 hover:shadow-sm"
                 onClick={() => {

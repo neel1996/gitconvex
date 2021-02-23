@@ -42,7 +42,10 @@ func TestTotalCommitLogs(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			assert := assert2.New(t)
 			zeroValue := float64(0)
-			go git2.AllCommits(tt.args.repo, tt.args.commitChan)
+
+			var testObj git2.AllCommitInterface
+			testObj = git2.AllCommitStruct{Repo: tt.args.repo}
+			go testObj.AllCommits(tt.args.commitChan)
 			commits := <-logChan
 			commitLength := commits.TotalCommits
 

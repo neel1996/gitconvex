@@ -42,7 +42,13 @@ func TestCompareCommit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := git2.CompareCommit(tt.args.repo, tt.args.baseCommitString, tt.args.compareCommitString); !reflect.DeepEqual(got, tt.want) {
+			var testObj git2.CompareCommitInterface
+			testObj = git2.CompareCommitStruct{
+				Repo:                tt.args.repo,
+				BaseCommitString:    tt.args.baseCommitString,
+				CompareCommitString: tt.args.compareCommitString,
+			}
+			if got := testObj.CompareCommit(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CompareCommit() = %v, want %v", got, tt.want)
 			}
 		})

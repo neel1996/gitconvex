@@ -7,17 +7,12 @@ import (
 )
 
 func TestUpdateRepoName(t *testing.T) {
-	utils.EnvConfigFileGenerator()
-	testRepoId := api.AddRepo(struct {
-		RepoName    string
-		RepoPath    string
-		CloneSwitch bool
-		RepoURL     *string
-		InitSwitch  bool
-		AuthOption  string
-		UserName    *string
-		Password    *string
-	}{RepoName: "test", RepoPath: "..", CloneSwitch: false, RepoURL: nil, InitSwitch: false, AuthOption: "", UserName: nil, Password: nil}).RepoID
+	var testObj api.AddRepoInterface
+	testObj = api.AddRepoInputs{
+		RepoName: "test", RepoPath: "..", CloneSwitch: false, RepoURL: nil, InitSwitch: false, AuthOption: "", UserName: nil, Password: nil,
+	}
+	_ = utils.EnvConfigFileGenerator()
+	testRepoId := testObj.AddRepo().RepoID
 
 	type args struct {
 		repoId   string

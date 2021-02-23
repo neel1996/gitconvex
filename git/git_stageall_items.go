@@ -7,10 +7,19 @@ import (
 	"github.com/neel1996/gitconvex-server/utils"
 )
 
+type StageAllInterface interface {
+	StageAllItems() string
+}
+
+type StageAllStruct struct {
+	Repo *git.Repository
+}
+
 // StageAllItems stages all the modified and untracked items to the worktree
 //
 // The function relies on the native git client to stage an item, as go-git staging is time consuming for huge repos
-func StageAllItems(repo *git.Repository) string {
+func (s StageAllStruct) StageAllItems() string {
+	repo := s.Repo
 	w, wErr := repo.Worktree()
 	logger.Log(fmt.Sprintf("Staging all changes from repo"), global.StatusInfo)
 

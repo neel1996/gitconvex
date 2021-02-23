@@ -22,7 +22,13 @@ func TestResetAllItems(t *testing.T) {
 
 	untrackedResult := "untracked.txt"
 	_ = ioutil.WriteFile(untrackedResult, []byte{byte(63)}, 0755)
-	git2.StageItem(r, untrackedResult)
+
+	var stageObject git2.StageItemInterface
+	stageObject = git2.StageItemStruct{
+		Repo:     r,
+		FileItem: untrackedResult,
+	}
+	stageObject.StageItem()
 
 	type args struct {
 		repo *git.Repository
@@ -36,7 +42,9 @@ func TestResetAllItems(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := git2.ResetAllItems(tt.args.repo); got != tt.want {
+			var testObj git2.ResetAllInterface
+			testObj = git2.ResetAllStruct{Repo: tt.args.repo}
+			if got := testObj.ResetAllItems(); got != tt.want {
 				t.Errorf("ResetAllItems() = %v, want %v", got, tt.want)
 			}
 		})

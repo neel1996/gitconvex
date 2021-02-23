@@ -8,7 +8,6 @@ import { DELETE_PRESENT_REPO } from "../../../../actionStore";
 import { ContextProvider } from "../../../../context";
 import { globalAPIEndpoint } from "../../../../util/env_config";
 import InfiniteLoader from "../../../Animations/InfiniteLoader";
-import "../../../styles/AddRepoForm.css";
 
 export default function AddRepoForm(props) {
   library.add(fas);
@@ -175,10 +174,14 @@ export default function AddRepoForm(props) {
 
   function repoAddStatusBanner() {
     if (repoAddSuccess) {
-      return <div className="alert-success">New repo added</div>;
+      return (
+        <div className="w-3/4 font-sans bg-green-50 border-green-300 rounded-lg border-dotted border-4 block font-light text-lg my-6 mx-auto p-2 shadow-sm text-center text-green-700">
+          New repo added
+        </div>
+      );
     } else if (repoAddFailed) {
       return (
-        <div className="alert-failure">
+        <div className="w-3/4 font-sans bg-red-50 border-red-300 rounded-lg border-dotted border-4 block font-light text-lg my-6 mx-auto p-2 shadow-sm text-center text-red-700">
           Process failed! Please try again
           {inputInvalid ? (
             <div className="font-semibold">Invalid input paremeters!</div>
@@ -194,7 +197,7 @@ export default function AddRepoForm(props) {
     return (
       <div
         key={`switch-${operation}`}
-        className={`toggle-switch ${
+        className={`rounded-full cursor-pointer flex items-center h-8 py-2 pl-1 shadow-inner align-middle w-16 ${
           operation === "clone" && cloneSwitch ? "bg-green-400" : "bg-gray-200"
         }
         ${operation === "init" && initSwitch ? "bg-blue-400" : "bg-gray-200"}`}
@@ -218,13 +221,13 @@ export default function AddRepoForm(props) {
       >
         {operation === "clone" ? (
           <animated.div
-            className="toggle-switch--pill"
+            className="bg-white rounded-full h-6 w-6 shadow-md"
             id={`${operation}-switch`}
             style={cloneSwitch ? switchAnimationEnter : switchAnimationExit}
           ></animated.div>
         ) : (
           <animated.div
-            className="toggle-switch--pill"
+            className="bg-white rounded-full h-6 w-6 shadow-md"
             id={`${operation}-switch`}
             style={initSwitch ? switchAnimationEnter : switchAnimationExit}
           ></animated.div>
@@ -235,6 +238,9 @@ export default function AddRepoForm(props) {
 
   function onRepoPathChange(event) {
     setRepoPath(event.target.value);
+  }
+
+  function autoDetectRepoName(event) {
     if (repoNameState === "") {
       let pathValue = event.currentTarget.value;
       if (pathValue.includes("/")) {
@@ -253,15 +259,17 @@ export default function AddRepoForm(props) {
 
   function addRepoFormContainer() {
     return (
-      <div className="repo-form block">
+      <div className="block">
         {repoAddStatusBanner()}
-        <div className="repo-form--header">Enter Repo Details</div>
+        <div className="block text-3xl my-4 text-center text-gray-500 font-sans font-semibold">
+          ENTER REPO DETAILS
+        </div>
         <div>
           <input
             id="repoNameText"
             type="text"
             placeholder="Enter a Repository Name"
-            className="repo-form--input font-sans text-gray-700"
+            className="border-blue-50 rounded-md border-2 my-3 outline-none p-4 w-11/12 shadow-md font-sans text-gray-700"
             onChange={(event) => {
               setRepoName(event.target.value);
             }}
@@ -280,8 +288,9 @@ export default function AddRepoForm(props) {
                 ? "Enter base directory path"
                 : "Enter repository path"
             }
-            className="repo-form--input font-sans text-gray-700"
+            className="border-blue-50 rounded-md border-2 my-3 outline-none p-4 w-11/12 shadow-md font-sans text-gray-700"
             onChange={onRepoPathChange}
+            onBlur={autoDetectRepoName}
             value={repoPathState}
             onClick={() => {
               resetAlertBanner();
@@ -289,7 +298,7 @@ export default function AddRepoForm(props) {
           ></input>
         </div>
         {cloneSwitch && repoPathState && repoNameState ? (
-          <div className="repo-form--clone">
+          <div className="items-center font-light text-sm my-4 mx-auto text-center text-gray-600 font-sans">
             The repo will be cloned to
             <span className="mx-3 text-center font-sans font-semibold border-b-2 border-dashed">
               {repoPathState}
@@ -298,21 +307,25 @@ export default function AddRepoForm(props) {
             </span>
           </div>
         ) : null}
-        <div className="repo-form--options">
-          <div className="options--switch">
-            <div>{switchComponent("clone")}</div>
-            <div className="options--label">Clone from remote</div>
+        <div className="w-11/12 flex items-center justify-center my-10 mx-auto">
+          <div className="w-1/2 flex items-center justify-between">
+            <div className="w-1/6">{switchComponent("clone")}</div>
+            <div className="w-5/6 text-left xl:text-lg lg:text-lg text-base font-sans font-light mx-10">
+              Clone from remote
+            </div>
           </div>
 
-          <div className="options--switch">
-            <div>{switchComponent("init")}</div>
-            <div className="options--label">Initialize a new repo</div>
+          <div className="w-1/2 flex items-center justify-between">
+            <div className="w-1/6">{switchComponent("init")}</div>
+            <div className="w-5/6 text-left xl:text-lg lg:text-lg text-base font-sans font-light mx-10">
+              Initialize a new repo
+            </div>
           </div>
         </div>
         {cloneSwitch ? (
           <>
-            <div className="option--clone">
-              <div className="option--clone--icon">
+            <div className="w-11/12 shadow rounded-md border flex items-center justify-between mx-auto text-indigo-800">
+              <div className="border py-3 px-6 text-center">
                 <FontAwesomeIcon icon={["fas", "link"]}></FontAwesomeIcon>
               </div>
               <div className="w-5/6">
@@ -371,7 +384,7 @@ export default function AddRepoForm(props) {
                       id="repoNameText"
                       type="text"
                       placeholder="User Name"
-                      className="repo-form--input"
+                      className="border-blue-50 rounded-md border-2 my-3 outline-none p-4 w-11/12 shadow-md font-sans text-gray-700"
                       onChange={(event) => {
                         setAuthInputs({
                           userName: event.currentTarget.value,
@@ -388,7 +401,7 @@ export default function AddRepoForm(props) {
                       id="repoNameText"
                       type="password"
                       placeholder="Password"
-                      className="repo-form--input"
+                      className="border-blue-50 rounded-md border-2 my-3 outline-none p-4 w-11/12 shadow-md font-sans text-gray-700"
                       onChange={(event) => {
                         setAuthInputs({
                           userName: authInputs.userName,
@@ -405,24 +418,24 @@ export default function AddRepoForm(props) {
             </div>
           </>
         ) : null}
-        <div className="repo-form--action">
+        <div className="flex justify-between my-5 mx-auto w-11/12">
           <div
-            className="btn btn-danger"
+            className="cursor-pointer rounded-md block my-2 mx-3 p-3 w-1/2 font-sans font-semibold text-xl bg-red-400 hover:bg-red-500 text-white"
             id="addRepoClose"
             onClick={() => {
               props.formEnable(false);
             }}
           >
-            Close
+            CLOSE
           </div>
           <div
-            className="btn btn-success"
+            className="cursor-pointer rounded-md block my-2 mx-3 p-3 w-1/2 font-sans font-semibold text-xl bg-green-400 hover:bg-green-500 text-white"
             id="addRepoSubmit"
             onClick={() => {
               storeRepoAPI(repoNameState, repoPathState);
             }}
           >
-            Submit
+            SUBMIT
           </div>
         </div>
       </div>
@@ -431,14 +444,16 @@ export default function AddRepoForm(props) {
 
   return (
     <div
-      className={`repo-form--status xl:w-1/2 lg:w-2/3 md:w-3/4 sm:w-11/12 w-11/12 ${
+      className={`border-gray-200 rounded-lg border-2 block justify-center my-20 mx-auto p-6 text-center shadow xl:w-7/12 lg:w-2/3 md:w-3/4 sm:w-11/12 w-11/12 ${
         loading ? "border-dashed border-2" : ""
       }`}
     >
       {loading ? (
         <>
-          <div className="status--label">Repo setup in progress...</div>
-          <div className="animation-loader">
+          <div className="font-sans font-semibold text-xl text-center text-gray-600">
+            Repo setup in progress...
+          </div>
+          <div className="flex justify-center my-6 mx-auto text-center">
             <InfiniteLoader loadAnimation={loading}></InfiniteLoader>
           </div>
         </>

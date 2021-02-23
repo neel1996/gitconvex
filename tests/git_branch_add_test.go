@@ -28,7 +28,13 @@ func TestAddBranch(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := git2.AddBranch(tt.args.repo, tt.args.branchName); got != tt.want {
+			var obj git2.AddBranchInterface
+			obj = git2.AddBranchInput{
+				Repo:       tt.args.repo,
+				BranchName: tt.args.branchName,
+			}
+
+			if got := obj.AddBranch(); got != tt.want {
 				t.Errorf("AddBranch() = %v, want %v", got, tt.want)
 			}
 		})

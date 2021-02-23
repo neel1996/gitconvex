@@ -6,6 +6,14 @@ import (
 	"github.com/neel1996/gitconvex-server/utils"
 )
 
+type RepoInterface interface {
+	Repo(repoChan chan RepoDetails)
+}
+
+type RepoStruct struct {
+	RepoId string
+}
+
 type RepoDetails struct {
 	RepoId   string
 	RepoPath string
@@ -22,10 +30,11 @@ func handlePanic() {
 }
 
 // Repo function gets the repoId and returns the respective git.Repository object along with additional repo metadata
-func Repo(repoId string, repoChan chan RepoDetails) {
+func (r RepoStruct) Repo(repoChan chan RepoDetails) {
 	var repoData []utils.RepoData
 	var repoPath string
 	logger := global.Logger{}
+	repoId := r.RepoId
 
 	defer handlePanic()
 	if repoId == "" || repoChan == nil {
@@ -60,6 +69,5 @@ func Repo(repoId string, repoChan chan RepoDetails) {
 			GitRepo:  repository,
 		}
 	}
-
 	close(repoChan)
 }

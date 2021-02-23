@@ -43,7 +43,13 @@ func TestListFiles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			repoContent := git2.ListFiles(tt.args.repo, tt.args.repoPath, "")
+			var testObj git2.ListFilesInterface
+			testObj = git2.ListFilesStruct{
+				Repo:          tt.args.repo,
+				RepoPath:      tt.args.repoPath,
+				DirectoryName: "",
+			}
+			repoContent := testObj.ListFiles()
 
 			trackedFiles := repoContent.TrackedFiles
 			commits := repoContent.FileBasedCommits

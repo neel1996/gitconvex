@@ -1,3 +1,5 @@
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { actionType } from "./backdropActionType";
@@ -32,20 +34,16 @@ export default function RepoRightPaneComponent(props) {
     return (
       <div
         id="addBranch"
-        className="add-btn bg-green-400 hover:bg-green-500 cursor-pointer"
-        onMouseEnter={(event) => {
-          let popUp =
-            '<div class="tooltip" style="margin-left:-40px;">Click to add a new branch</div>';
-          event.target.innerHTML += popUp;
-        }}
-        onMouseLeave={(event) => {
-          event.target.innerHTML = "+";
-        }}
+        className="rounded-full flex cursor-pointer items-center h-10 text-xl mx-auto shadow text-center text-white align-middle w-10 bg-green-400 hover:bg-green-500"
+        title="Add a new branch"
         onClick={() => {
           actionTrigger(actionType.ADD_BRANCH);
         }}
       >
-        +
+        <FontAwesomeIcon
+          className="mx-auto text-center"
+          icon={faPlus}
+        ></FontAwesomeIcon>
       </div>
     );
   }
@@ -53,18 +51,21 @@ export default function RepoRightPaneComponent(props) {
   return (
     <>
       {props.received ? (
-        <div className="repo-rightpane xl:w-1/2 lg:w-3/4 md:w-11/12 sm:w-11/12 w-11/12 ">
+        <div className="border-gray-300 rounded-md border-dotted border-2 block my-6 mx-auto p-1 shadow-sm xl:w-1/2 lg:w-3/4 md:w-11/12 sm:w-11/12 w-11/12 ">
           <div className="block mx-auto my-2">
             <div className="flex justify-around my-3">
               <div className="text-lg text-gray-500 w-1/4">Total Commits</div>
-              <div className="total-commits">
+              <div className="font-bold text-left text-gray-800 w-1/2">
                 {`${gitTotalCommits} Commits`}
               </div>
             </div>
 
             <div className="flex justify-around my-3">
               <div className="text-lg text-gray-500 w-1/4">Latest Commit</div>
-              <div className="latest-commit" title={gitLatestCommit}>
+              <div
+                className="font-bold text-sm text-left text-gray-900 truncate w-1/2"
+                title={gitLatestCommit}
+              >
                 {gitLatestCommit}
               </div>
             </div>
@@ -75,10 +76,10 @@ export default function RepoRightPaneComponent(props) {
               </div>
 
               {branchValid ? (
-                <div className="branch-list">
+                <div className="flex items-center justify-evenly align-middle w-1/2">
                   <div className="w-3/4 my-auto">
                     <div
-                      className="branch-list--current"
+                      className="border-dotted border-b cursor-pointer font-semibold text-lg my-1 text-indigo-500 hover:text-indigo-600"
                       key={`${gitCurrentBranch}-${uuid()}`}
                     >
                       {gitCurrentBranch}
@@ -92,7 +93,7 @@ export default function RepoRightPaneComponent(props) {
                             if (entry !== gitCurrentBranch) {
                               return (
                                 <div
-                                  className="branch-list--branches"
+                                  className="border-dotted border-b cursor-pointer font-semibold my-2 hover:text-indigo-400 font-sans"
                                   key={`entry-key-${uuid()}`}
                                   onClick={() => {
                                     switchBranchHandler(entry);
@@ -115,7 +116,7 @@ export default function RepoRightPaneComponent(props) {
                           return false;
                         })}
                     <div
-                      className="branch-list__listbranch"
+                      className="border-dashed border-b cursor-pointer my-auto text-center text-blue-500 hover:text-blue-800 font-sans"
                       onClick={() => {
                         actionTrigger(actionType.LIST_BRANCH);
                       }}
@@ -135,22 +136,22 @@ export default function RepoRightPaneComponent(props) {
               )}
             </div>
 
-            <div className="flex justify-around mx-auto mt-4">
+            <div className="flex justify-center mx-auto mt-6 gap-4">
               <div
-                className="w-1/3 rounded text-center cursor-pointer p-2 bg-indigo-400 hover:bg-indigo-500 text-white font-sans nowrap"
+                className="w-5/12 font-semibold rounded text-center cursor-pointer p-3 bg-indigo-400 hover:bg-indigo-500 text-white font-sans truncate"
                 onClick={() => {
                   actionTrigger(actionType.FETCH);
                 }}
               >
-                Fetch from remote
+                FETCH FROM REMOTE
               </div>
               <div
-                className="w-1/3 text-center cursor-pointer rounded text-white p-2 bg-blue-400 hover:bg-blue-500 font-sans"
+                className="w-5/12 font-semibold text-center cursor-pointer rounded text-white p-3 bg-blue-400 hover:bg-blue-500 font-sans truncate"
                 onClick={() => {
                   actionTrigger(actionType.PULL);
                 }}
               >
-                Pull from remote
+                PULL FROM REMOTE
               </div>
             </div>
           </div>

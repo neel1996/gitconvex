@@ -9,7 +9,6 @@ import (
 )
 
 // RepoValidator validates if the specified repoPath represents a valid git repo
-
 func RepoValidator(repoPath string) (string, error) {
 	_, err := os.Open(fmt.Sprintf("%v/.git/", repoPath))
 	if err != nil {

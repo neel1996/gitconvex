@@ -10,11 +10,25 @@ import (
 	"strings"
 )
 
+type BranchCompareInterface interface {
+	CompareBranch() []*model.BranchCompareResults
+}
+
+type BranchCompareInputs struct {
+	Repo       *git.Repository
+	BaseBranch string
+	DiffBranch string
+}
+
 // CompareBranch compares two branches and returns the commits which are different from each other
 // The function uses the git client to fetch the results as go-git lacks this feature
-func CompareBranch(repo *git.Repository, baseBranch string, compareBranch string) []*model.BranchCompareResults {
+func (inputs BranchCompareInputs) CompareBranch() []*model.BranchCompareResults {
 	var diffCommits []*model.BranchCompareResults
 	var commits []model.GitCommits
+	repo := inputs.Repo
+	baseBranch := inputs.BaseBranch
+	compareBranch := inputs.DiffBranch
+
 	w, _ := repo.Worktree()
 
 	if w == nil {

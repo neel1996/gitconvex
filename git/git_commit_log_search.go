@@ -10,12 +10,26 @@ import (
 	"regexp"
 )
 
+type SearchCommitInterface interface {
+	SearchCommitLogs() []*model.GitCommits
+}
+
+type SearchCommitStruct struct {
+	Repo       *git.Repository
+	SearchType string
+	SearchKey  string
+}
+
 // SearchCommitLogs searches for the required commits matching the searchKey with the respective searchType
 //
 // The UI uses 'message' as the default search type to look up based on commit messages
-func SearchCommitLogs(repo *git.Repository, searchType string, searchKey string) []*model.GitCommits {
+func (s SearchCommitStruct) SearchCommitLogs() []*model.GitCommits {
 	var searchResult []*model.GitCommits
 	logger := global.Logger{}
+
+	repo := s.Repo
+	searchKey := s.SearchKey
+	searchType := s.SearchType
 
 	commitLogs, _ := repo.Log(&git.LogOptions{
 		Order: git.LogOrderDFSPost,

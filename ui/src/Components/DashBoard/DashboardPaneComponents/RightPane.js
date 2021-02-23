@@ -1,6 +1,5 @@
 import React from "react";
 import RepoComponent from "../Repository/RepoComponents/RepoComponent";
-import "../../styles/RightPane.css";
 
 export default function RightPane(props) {
   const { platform, gitVersion } = props.params;
@@ -18,17 +17,20 @@ export default function RightPane(props) {
 
   return (
     <>
-      <div className="dashboard--rightpane overflow-auto">
-        <div className="rightpane--toparea xl:flex lg:flex md:block sm:block">
+      <div className="w-full mx-auto overflow-auto">
+        <div className="w-11/12 p-3 my-6 rounded-lg shadow-md justify-center mx-auto bg-blue-50 border border-blue-200 border-dashed block xl:flex lg:flex md:block sm:block">
           {hcParams.map((entry) => {
             return (
-              <div key={entry.label} className="rightpane--toparea--hc">
-                <div className="rightpane--toparea--hclabel xl:font-bold lg:font-semibold md:font-medium xl:text-2xl lg:text-xl md:text-md">
+              <div
+                key={entry.label}
+                className="my-2 flex mx-auto gap-10 justify-around items-center align-middle"
+              >
+                <div className="w-1/2 border-b-2 border-dashed text-center font-sans xl:font-bold lg:font-semibold md:font-medium xl:text-2xl lg:text-xl md:text-md">
                   {entry.label}
                 </div>
                 {entry.value !== "" ? (
                   <div
-                    className="rightpane--toparea--hcpills"
+                    className="w-2/3 mx-2 bg-green-100 border border-green-200 text-center p-2 rounded-lg"
                     id={`hc-param__${entry.label}`}
                   >
                     {entry.value}

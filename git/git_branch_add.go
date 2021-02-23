@@ -7,9 +7,22 @@ import (
 	"github.com/neel1996/gitconvex-server/global"
 )
 
+type AddBranchInterface interface {
+	AddBranch() string
+}
+
+type AddBranchInput struct {
+	Repo       *git.Repository
+	BranchName string
+}
+
 // AddBranch adds a new branch to the target repo
-func AddBranch(repo *git.Repository, branchName string) string {
+func (input AddBranchInput) AddBranch() string {
 	logger := global.Logger{}
+
+	repo := input.Repo
+	branchName := input.BranchName
+
 	headRef, headErr := repo.Head()
 
 	logger.Log(fmt.Sprintf("Adding new branch -> %s", branchName), global.StatusInfo)

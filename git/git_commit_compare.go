@@ -8,9 +8,24 @@ import (
 	"github.com/neel1996/gitconvex-server/graph/model"
 )
 
+type CompareCommitInterface interface {
+	CompareCommit() []*model.GitCommitFileResult
+}
+
+type CompareCommitStruct struct {
+	Repo                *git.Repository
+	BaseCommitString    string
+	CompareCommitString string
+}
+
 // CompareCommit compares the tree difference between two commits and returns the file difference status
-func CompareCommit(repo *git.Repository, baseCommitString string, compareCommitString string) []*model.GitCommitFileResult {
+func (c CompareCommitStruct) CompareCommit() []*model.GitCommitFileResult {
 	var res []*model.GitCommitFileResult
+
+	repo := c.Repo
+	baseCommitString := c.BaseCommitString
+	compareCommitString := c.CompareCommitString
+
 	baseHash := plumbing.NewHash(baseCommitString)
 	compareHash := plumbing.NewHash(compareCommitString)
 

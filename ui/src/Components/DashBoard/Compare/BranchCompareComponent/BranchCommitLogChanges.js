@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { globalAPIEndpoint } from "../../../../util/env_config";
+import { format } from "date-fns";
 
 export default function BranchCommitLogChanges(props) {
   library.add(fas);
@@ -69,7 +70,7 @@ export default function BranchCommitLogChanges(props) {
                     className="text-gray-700"
                   ></FontAwesomeIcon>
                 </div>
-                <div>Committed on - {commit.date}</div>
+                <div>Committed on - {format(new Date(commit.date), "d MMM yyyy")}</div>
               </div>
               <div>
                 {commit.commits.map((item) => {
@@ -93,7 +94,7 @@ export default function BranchCommitLogChanges(props) {
                         </div>
                       </div>
                       <div className="shadow border rounded p-2 bg-indigo-100 font-mono font-semibold text-indigo-800">
-                        #{item.hash}
+                        #{<>{item.hash ? item.hash.substring(0, 7) : null}</>}
                       </div>
                     </div>
                   );

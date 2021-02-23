@@ -1,0 +1,205 @@
+#######################################################################################
+#                                                                                     #
+# GraphQL schema for Gitconvex API                                                    #
+# Generated with https://gqlgen.com/                                                  #
+#                                                                                     #
+# If you want to request for a new query / mutation to be created in the backend,     #
+# add the desired schema to this file. It will be reviewed and added to the server    #
+#                                                                                     #
+#######################################################################################
+
+type HealthCheckParams {
+  os: String!
+  git: String!
+}
+
+type FetchRepoParams {
+  repoId: [String]!
+  repoName: [String]!
+  repoPath: [String]!
+  timeStamp: [String]!
+}
+
+type AddRepoParams {
+  repoId: String!
+  status: String!
+  message: String!
+}
+
+type GitRepoStatusResults {
+  gitRemoteData: String
+  gitRepoName: String
+  gitBranchList: [String]
+  gitAllBranchList: [String]
+  gitCurrentBranch: String
+  gitRemoteHost: String
+  gitTotalCommits: Float
+  gitLatestCommit: String
+  gitTotalTrackedFiles: Int
+}
+
+type GitFolderContentResults {
+  trackedFiles: [String]!
+  fileBasedCommits: [String]!
+}
+
+type gitCommitLogResults {
+  totalCommits: Float
+  commits: [gitCommits]
+}
+
+type gitCommits {
+  hash: String
+  author: String
+  commitTime: String
+  commitMessage: String
+  commitFilesCount: Int
+}
+
+type gitCommitFileResult {
+  type: String!
+  fileName: String!
+}
+
+type codeFileType {
+  fileData: [String]!
+}
+
+type gitChangeResults {
+  gitUntrackedFiles: [String]!
+  gitChangedFiles: [String]!
+  gitStagedFiles: [String]!
+}
+
+type fileLineChangeResult {
+  diffStat: String!
+  fileDiff: [String]!
+}
+
+type settingsDataResults {
+  settingsDatabasePath: String!
+  settingsPortDetails: String!
+}
+
+type branchCompareResults {
+  date: String!
+  commits: [gitCommits]!
+}
+
+type remoteDetails {
+  remoteName: String!
+  remoteUrl: String!
+}
+
+type Query {
+  healthCheck: HealthCheckParams!
+  fetchRepo: FetchRepoParams!
+  gitRepoStatus(repoId: String!): GitRepoStatusResults!
+  gitFolderContent(
+    repoId: String!
+    directoryName: String
+  ): GitFolderContentResults!
+  gitCommitLogs(repoId: String!, referenceCommit: String!): gitCommitLogResults!
+  gitCommitFiles(repoId: String!, commitHash: String!): [gitCommitFileResult]!
+  searchCommitLogs(
+    repoId: String!
+    searchType: String!
+    searchKey: String!
+  ): [gitCommits]!
+  codeFileDetails(repoId: String!, fileName: String!): codeFileType!
+  gitChanges(repoId: String!): gitChangeResults!
+  gitUnPushedCommits(
+    repoId: String!
+    remoteURL: String!
+    remoteBranch: String!
+  ): [String]!
+  gitFileLineChanges(repoId: String!, fileName: String!): fileLineChangeResult!
+  settingsData: settingsDataResults!
+  commitCompare(
+    repoId: String!
+    baseCommit: String!
+    compareCommit: String!
+  ): [gitCommitFileResult]!
+  branchCompare(
+    repoId: String!
+    baseBranch: String!
+    compareBranch: String!
+  ): [branchCompareResults]!
+  getRemote(repoId: String!): [remoteDetails]!
+}
+
+type BranchDeleteStatus {
+  status: String!
+}
+
+type FetchResult {
+  status: String!
+  fetchedItems: [String]!
+}
+
+type PullResult {
+  status: String!
+  pulledItems: [String]!
+}
+
+type deleteStatus {
+  status: String!
+  repoId: String!
+}
+
+type remoteMutationResult {
+  status: String!
+}
+
+type Mutation {
+  addRepo(
+    repoName: String!
+    repoPath: String!
+    cloneSwitch: Boolean!
+    repoURL: String
+    initSwitch: Boolean!
+    authOption: String!
+    sshKeyPath: String
+    userName: String
+    password: String
+  ): AddRepoParams!
+  addBranch(repoId: String!, branchName: String!): String!
+  checkoutBranch(repoId: String!, branchName: String!): String!
+  deleteBranch(
+    repoId: String!
+    branchName: String!
+    forceFlag: Boolean!
+  ): BranchDeleteStatus!
+  addRemote(repoId: String!, remoteName: String!, remoteUrl: String!): String!
+  fetchFromRemote(
+    repoId: String!
+    remoteUrl: String
+    remoteBranch: String
+  ): FetchResult!
+  pullFromRemote(
+    repoId: String!
+    remoteUrl: String
+    remoteBranch: String
+  ): PullResult!
+  stageItem(repoId: String!, item: String!): String!
+  removeStagedItem(repoId: String!, item: String!): String!
+  removeAllStagedItem(repoId: String!): String!
+  stageAllItems(repoId: String!): String!
+  commitChanges(repoId: String!, commitMessage: String!): String!
+  pushToRemote(repoId: String!, remoteHost: String!, branch: String!): String!
+  settingsEditPort(newPort: String!): String!
+  updateRepoDataFile(newDbFile: String!): String!
+  deleteRepo(repoId: String!): deleteStatus!
+  updateRepoName(repoId: String!, repoName: String!): String!
+  addRemote(
+    repoId: String!
+    remoteName: String!
+    remoteUrl: String!
+  ): remoteMutationResult!
+  editRemote(
+    repoId: String!
+    remoteName: String!
+    remoteUrl: String!
+  ): remoteMutationResult!
+  deleteRemote(repoId: String!, remoteName: String!): remoteMutationResult!
+}

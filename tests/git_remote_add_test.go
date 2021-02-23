@@ -41,7 +41,13 @@ func TestAddRemote(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := git2.AddRemote(tt.args.repo, tt.args.remoteName, tt.args.remoteURL); got != tt.want {
+			var testObj git2.AddRemoteInterface
+			testObj = git2.AddRemoteStruct{
+				Repo:       tt.args.repo,
+				RemoteName: tt.args.remoteName,
+				RemoteURL:  tt.args.remoteURL,
+			}
+			if got := testObj.AddRemote(); got != tt.want {
 				t.Errorf("AddRemote() = %v, want %v", got, tt.want)
 			}
 		})

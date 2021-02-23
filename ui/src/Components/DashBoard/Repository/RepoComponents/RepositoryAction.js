@@ -6,7 +6,6 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { GIT_GLOBAL_REPOID, PRESENT_REPO } from "../../../../actionStore";
 import { ContextProvider } from "../../../../context";
 import { globalAPIEndpoint } from "../../../../util/env_config";
-import "../../../styles/RepositoryAction.css";
 import GitTrackedComponent from "../GitComponents/GitTrackedComponent";
 
 export default function RepositoryAction() {
@@ -178,14 +177,18 @@ export default function RepositoryAction() {
   }
 
   const handleScreenEvents = () => {
-    if(!toggleSearchSelect){
-      document.getElementById("repository-action").addEventListener('scroll', () => {
-        setToggleSearchSelect(false);
-      });
+    if (!toggleSearchSelect) {
+      document
+        .getElementById("repository-action")
+        .addEventListener("scroll", () => {
+          setToggleSearchSelect(false);
+        });
     } else {
-      document.getElementById("repository-action").removeEventListener('scroll', () => {});
+      document
+        .getElementById("repository-action")
+        .removeEventListener("scroll", () => {});
     }
-  }
+  };
 
   const searchBranchHandler = (e) => {
     const searchBranch = e.target.value;
@@ -212,11 +215,13 @@ export default function RepositoryAction() {
 
   function activeRepoPane() {
     return (
-      <div className="top-pane">
+      <div className="flex items-center justify-around my-4 mx-auto align-middle">
         <div className="flex items-center">
-          <div className="select--label">Choose saved repository</div>
+          <div className="font-sans font-semibold my-1 text-gray-900">
+            Choose saved repository
+          </div>
           <select
-            className="cursor-pointer top-pane--select bg-green-50 text-green-700 border-green-400"
+            className="cursor-pointer rounded-lg border-dashed border-b-2 font-sans font-light text-xl mx-4 outline-none p-2 shadow bg-green-50 text-green-700 border-green-400"
             defaultValue={"checked"}
             onClick={() => {
               setBranchError(false);
@@ -254,11 +259,13 @@ export default function RepositoryAction() {
           </select>
         </div>
         {selectedFlag ? (
-          <div className="flex items-center">
-            <div className="flex-1 select--label mr-2">Branch</div>
+          <div className="flex items-center gap-4">
+            <div className="font-sans font-semibold my-1 text-gray-900">
+              Branch
+            </div>
             <div className="flex-1 flex flex-col justify-center">
               <div
-                className="flex-auto cursor-pointer inline-flex items-center justify-center px-4 py-2 shadow-md bg-indigo-50 border-indigo-400 text-indigo-700 border-dashed	border-b-2 truncate"
+                className="flex-auto cursor-pointer inline-flex items-center justify-center px-4 py-2 shadow-md bg-indigo-50 border-indigo-400 text-indigo-700 border-dashed border-b-2 truncate"
                 onClick={(e) => {
                   let target = e.currentTarget;
                   if (!toggleSearchSelect) {
@@ -268,7 +275,8 @@ export default function RepositoryAction() {
                   }
                   setToggleSearchSelect(!toggleSearchSelect);
                   handleScreenEvents();
-                }}>
+                }}
+              >
                 <span className="mr-2">{activeBranch}</span>
                 <FontAwesomeIcon
                   className="text-sm m-1"
@@ -280,21 +288,26 @@ export default function RepositoryAction() {
                   <div className="bg-white border-indigo-300 text-indigo-700 px-4 py-4 shadow-md rounded-md z-20 absolute">
                     <div className="flex flex-row mt-1 mb-3">
                       <div className="b-1 text-center px-2 py-1 text-white bg-blue-400 rounded-l-md">
-                        <FontAwesomeIcon icon={["fas", "search"]}></FontAwesomeIcon>
+                        <FontAwesomeIcon
+                          icon={["fas", "search"]}
+                        ></FontAwesomeIcon>
                       </div>
                       <input
-                      id="branchSearchInput"
-                      type="text"
-                      placeholder="Search..."
-                      className="px-2 py-1 bg-indigo-100 text-indigo-700 shadow-sm rounded-sm focus:outline-none outline-none"
-                      onChange={searchBranchHandler}
-                      value={searchBranchValue}
-                    ></input>
-                    <div
-                      className="b-1 text-center px-2 py-1 text-white cursor-pointer bg-red-400 rounded-r-md"
-                      onClick={cancelSearchBranch}>
-                      <FontAwesomeIcon icon={["fas", "times"]}></FontAwesomeIcon>
-                    </div>
+                        id="branchSearchInput"
+                        type="text"
+                        placeholder="Search..."
+                        className="px-2 py-1 bg-indigo-100 text-indigo-700 shadow-sm rounded-sm focus:outline-none outline-none"
+                        onChange={searchBranchHandler}
+                        value={searchBranchValue}
+                      ></input>
+                      <div
+                        className="b-1 text-center px-2 py-1 text-white cursor-pointer bg-red-400 rounded-r-md"
+                        onClick={cancelSearchBranch}
+                      >
+                        <FontAwesomeIcon
+                          icon={["fas", "times"]}
+                        ></FontAwesomeIcon>
+                      </div>
                     </div>
                     {availableBranch()}
                   </div>
@@ -310,7 +323,7 @@ export default function RepositoryAction() {
   function getTopPaneComponent(icon, value) {
     return (
       <>
-        <div className="top-pane--component">
+        <div className="border-indigo-400 border-dashed border-b-2 flex justify-between font-sans text-lg mx-2 p-2 text-gray-600">
           <div className="mx-2">
             <FontAwesomeIcon icon={["fas", icon]}></FontAwesomeIcon>
           </div>
@@ -370,10 +383,13 @@ export default function RepositoryAction() {
   }
 
   return (
-    <div className="repository-action" id="repository-action">
+    <div
+      className="block justify-center mx-auto overflow-x-hidden w-full"
+      id="repository-action"
+    >
       {availableRepos ? (
         <div>
-          <div className="active-repo">
+          <div className="w-11/12 border-gray-200 rounded border my-6 mx-auto shadow">
             {activeRepoPane()}
             {selectedRepoDetails && selectedFlag ? (
               <div className="my-auto flex justify-around p-3 mx-auto">
@@ -420,14 +436,14 @@ export default function RepositoryAction() {
                 Select a configured repo from the dropdown to perform git
                 related operations
               </div>
-              <div className="alert--message">
+              <div className="w-3/4 border-gray-100 rounded-lg border-2 block my-20 mx-auto p-6">
                 <div>
                   <FontAwesomeIcon
                     icon={["fas", "mouse-pointer"]}
-                    className="alert--message--icon"
+                    className="flex font-bold h-full text-6xl m-auto text-center text-gray-300 w-full"
                   ></FontAwesomeIcon>
                 </div>
-                <div className="alert--message--label xl:text-6xl lg:text-3xl md:text-2xl">
+                <div className="block my-4 mx-auto text-center text-gray-200 xl:text-6xl lg:text-3xl md:text-2xl">
                   No repositories selected
                 </div>
               </div>
@@ -435,7 +451,7 @@ export default function RepositoryAction() {
           ) : null}
           <div>
             {branchError ? (
-              <div className="alert--failure">
+              <div className="bg-red-100 rounded font-sans my-2 mx-auto p-2 text-center text-red-700">
                 Branch switching failed.Commit your changes and try again
               </div>
             ) : null}

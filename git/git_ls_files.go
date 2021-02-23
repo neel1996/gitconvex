@@ -16,6 +16,23 @@ import (
 // This go file relies on git installed on the host or the git client packed with the build application -> ./gitclient{.exe}
 // Git client dependency was induced as the go-git based log traversal was highly time consuming
 
+type ListFilesInterface interface {
+	DirCommitHandler(dir *string)
+	FileCommitHandler(file *string)
+	TrackedFileCount(trackedFileCountChan chan int)
+	ListFiles() *model.GitFolderContentResults
+}
+
+type ListFilesStruct struct {
+	Repo          *git.Repository
+	RepoPath      string
+	DirectoryName string
+	FileName      *string
+	fileChan      chan string
+	commitChan    chan string
+	waitGroup     *sync.WaitGroup
+}
+
 type LsFileInfo struct {
 	Content           []*string
 	Commits           []*string
@@ -23,11 +40,15 @@ type LsFileInfo struct {
 }
 
 var logger global.Logger
-var selectedDir string
 var waitGroup sync.WaitGroup
 
 // DirCommitHandler collects the commit messages for the directories present in the target repo
-func DirCommitHandler(dirName *string, repoPath string, fileChan chan string, commitChan chan string, waitGroup *sync.WaitGroup) {
+func (l ListFilesStruct) DirCommitHandler(dirName *string) {
+	repoPath := l.RepoPath
+	fileChan := l.fileChan
+	commitChan := l.commitChan
+	waitGroup := l.waitGroup
+
 	args := []string{"log", "--oneline", "-1", "--pretty=format:%s", *dirName + "/"}
 	cmd := utils.GetGitClient(repoPath, args)
 
@@ -52,7 +73,12 @@ func DirCommitHandler(dirName *string, repoPath string, fileChan chan string, co
 }
 
 // FileCommitHandler collects the commit messages for the files present in the target repo
-func FileCommitHandler(file *string, repoPath string, fileChan chan string, commitChan chan string, waitGroup *sync.WaitGroup) {
+func (l ListFilesStruct) FileCommitHandler(file *string) {
+	repoPath := l.RepoPath
+	fileChan := l.fileChan
+	commitChan := l.commitChan
+	waitGroup := l.waitGroup
+
 	args := []string{"log", "--oneline", "-1", "--pretty=format:%s", *file}
 	cmd := utils.GetGitClient(repoPath, args)
 
@@ -82,9 +108,10 @@ func FileCommitHandler(file *string, repoPath string, fileChan chan string, comm
 }
 
 // TrackedFileCount returns the total number of files tracked by the target git repo
-func TrackedFileCount(repo *git.Repository, trackedFileCountChan chan int) {
+func (l ListFilesStruct) TrackedFileCount(trackedFileCountChan chan int) {
 	var totalFileCount int
 	logger := global.Logger{}
+	repo := l.Repo
 
 	head, headErr := repo.Head()
 	if headErr != nil {
@@ -119,9 +146,12 @@ func TrackedFileCount(repo *git.Repository, trackedFileCountChan chan int) {
 // ListFiles collects the list of tracked files and their latest respective commit messages
 //
 // Used to display the git repo structure in the front-end file explorer in a github explorer based fashion
-func ListFiles(repo *git.Repository, repoPath string, directoryName string) *model.GitFolderContentResults {
+func (l ListFilesStruct) ListFiles() *model.GitFolderContentResults {
 	logger := global.Logger{}
 	logger.Log("Collecting tracked file list from the repo", global.StatusInfo)
+
+	directoryName := l.DirectoryName
+	repoPath := l.RepoPath
 
 	var targetPath string
 	var fileList []*string
@@ -161,9 +191,13 @@ func ListFiles(repo *git.Repository, repoPath string, directoryName string) *mod
 	var fileListChan = make(chan string)
 	var commitListChan = make(chan string)
 
+	l.waitGroup = &waitGroup
+	l.fileChan = fileListChan
+	l.commitChan = commitListChan
+
 	for _, file := range fileList {
 		waitGroup.Add(1)
-		go FileCommitHandler(file, repoPath, fileListChan, commitListChan, &waitGroup)
+		go l.FileCommitHandler(file)
 		fileName := <-fileListChan
 		commitMsg := <-commitListChan
 
@@ -175,7 +209,7 @@ func ListFiles(repo *git.Repository, repoPath string, directoryName string) *mod
 
 	for _, dir := range dirList {
 		waitGroup.Add(1)
-		go DirCommitHandler(dir, repoPath, fileListChan, commitListChan, &waitGroup)
+		go l.DirCommitHandler(dir)
 		fileName := <-fileListChan
 		commitMsg := <-commitListChan
 

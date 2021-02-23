@@ -8,7 +8,6 @@ import { v4 as uuid } from "uuid";
 import { getIconForFile } from "vscode-icons-js";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
 import InfiniteLoader from "../../../../Animations/InfiniteLoader";
-import "../../../../styles/FileExplorer.css";
 import CodeFileViewComponent from "./RepoDetailBackdrop/CodeFileViewComponent";
 
 export default function FileExplorerComponent(props) {
@@ -219,12 +218,12 @@ export default function FileExplorerComponent(props) {
       gitRepoFiles.forEach(async (entry, index) => {
         const splitEntry = entry.split(":");
 
-        if (splitEntry[1].includes("directory")) {
+        if (splitEntry[1] && splitEntry[1].includes("directory")) {
           let directoryPath = directorySeparatorRemover(splitEntry[0]);
 
           directoryEntry.push(
             <div
-              className="folder-view--content"
+              className="block w-full p-2 border-b border-gray-200"
               key={`directory-key-${uuid()}`}
             >
               <div className="flex cursor-pointer items-center">
@@ -235,7 +234,7 @@ export default function FileExplorerComponent(props) {
                   ></FontAwesomeIcon>
                 </div>
                 <div
-                  className="folder-view--content--path"
+                  className="font-sans w-1/2 text-gray-600 text-xl mx-3 hover:text-indigo-400"
                   onClick={(event) => {
                     fetchFolderContent(splitEntry[0], 0, false);
                   }}
@@ -243,13 +242,13 @@ export default function FileExplorerComponent(props) {
                   {directoryPath}
                 </div>
 
-                <div className="folder-view--content--commit bg-green-200 text-green-900">
+                <div className="w-3/5 p-2 overflow-hidden truncate rounded-lg mx-auto text-left bg-green-200 text-green-900">
                   {gitFileBasedCommits[index]}
                 </div>
               </div>
             </div>
           );
-        } else if (splitEntry[1].includes("File")) {
+        } else if (splitEntry[1] && splitEntry[1].includes("File")) {
           if (splitEntry[0] === "LICENSE") {
             fileIcon = require("../../../../../assets/icons/file_type_license.svg");
           } else {
@@ -257,8 +256,11 @@ export default function FileExplorerComponent(props) {
               getIconForFile(splitEntry[0]));
           }
           fileEntry.push(
-            <div className="folder-view--content" key={`file-key-${uuid()}`}>
-              <div className="flex items-center align-middle">
+            <div
+              className="block w-full p-2 border-b border-gray-200"
+              key={`file-key-${uuid()}`}
+            >
+              <div className="flex items-center align-middle cursor-pointer">
                 <div className="w-1/6">
                   <img
                     src={fileIcon.default}
@@ -270,7 +272,7 @@ export default function FileExplorerComponent(props) {
                   ></img>
                 </div>
                 <div
-                  className="folder-view--content--path"
+                  className="font-sans w-1/2 text-gray-700 text-xl mx-3 hover:text-indigo-400"
                   onClick={() => {
                     setSelectionIndex(index);
                     if (cwd === "" || cwd === "/") {
@@ -283,7 +285,7 @@ export default function FileExplorerComponent(props) {
                 >
                   {splitEntry[0]}
                 </div>
-                <div className="folder-view--content--commit bg-indigo-200 text-indigo-900">
+                <div className="w-3/5 p-2 overflow-hidden truncate rounded-lg mx-auto text-left bg-indigo-200 text-indigo-900">
                   {gitFileBasedCommits[index]}
                 </div>
               </div>
@@ -296,11 +298,19 @@ export default function FileExplorerComponent(props) {
       formattedFiles.push(fileEntry);
 
       return (
-        <div className="folder-view--tracked--entries" key="repo-key">
-          <div className="tracked--entries--header">
+        <div
+          className="block mx-auto justify-center p-2"
+          style={{
+            color: "#79b8ff",
+          }}
+          key="repo-key"
+        >
+          <div className="flex w-full justify-around p-2 mx-auto pb-4 border-b border-blue-400">
             <div className="w-1/6"></div>
-            <div className="w-2/4">File / Directory</div>
-            <div className="w-2/4">Latest commit</div>
+            <div className="w-2/4 font-sans font-semibold">
+              File / Directory
+            </div>
+            <div className="w-2/4 font-sans font-semibold">Latest commit</div>
           </div>
           {formattedFiles}
         </div>
@@ -312,8 +322,8 @@ export default function FileExplorerComponent(props) {
     <>
       {isLoading ? (
         <>
-          <div className="folder-view--loader">
-            <div className="folder-view--loader--label">
+          <div className="flex justify-center mx-auto my-2 w-3/4">
+            <div className="w-full mx-auto text-2xl text-center font-sans font-semibold text-gray-700 border-b-2 border-dashed border-gray-400">
               Loading tracked files...
             </div>
           </div>
@@ -327,7 +337,7 @@ export default function FileExplorerComponent(props) {
         <>
           {codeViewToggle ? (
             <div
-              className="code-view"
+              className="fixed flex w-full h-full top-0 left-0 right-0 overflow-auto"
               id="code-view__backdrop"
               style={{ background: "rgba(0,0,0,0.5)", zIndex: 99 }}
               onClick={(event) => {
@@ -347,7 +357,7 @@ export default function FileExplorerComponent(props) {
                   icon={["fas", "times"]}
                 ></FontAwesomeIcon>
               </div>
-              <div className="code-view-area">
+              <div className="w-full h-full mx-auto my-auto block mt-4 mb-10">
                 {memoizedCodeFileViewComponent}
               </div>
             </div>
@@ -355,7 +365,7 @@ export default function FileExplorerComponent(props) {
 
           <div>
             <div
-              className="folder-view--homebtn"
+              className="w-1/6 text-gray-600 cursor-pointer border-b-2 border-dashed text-center flex justify-center gap-4 p-3 rounded mx-6 myy-auto items-center align-middle text-xl"
               onClick={() => {
                 fetchFolderContent("", 0, false, true);
               }}
@@ -367,21 +377,21 @@ export default function FileExplorerComponent(props) {
               <div className="text-2xl font-sans text-blue-400">./</div>
             </div>
             {directoryNavigator && gitRepoFiles && gitRepoFiles.length > 0 ? (
-              <div className="folder-view">
+              <div className="mx-6 p-3 flex font-sans justify-start items-center gap-4">
                 <div
-                  className="folder-view--navigator"
+                  className="flex p-4 w-3/4 gap-4 items-center break-words overflow-x-auto"
                   id="repoFolderNavigator"
                 >
                   {directoryNavigator.map((item, index) => {
                     return (
                       <div
-                        className="folder-view--navigator--label"
+                        className="flex items-center justify-start gap-2"
                         key={item + "-" + index}
                       >
                         <div
                           className={`${
                             index !== directoryNavigator.length - 1
-                              ? "folder-view--navigator--label__active"
+                              ? "text-blue-400 cursor-pointer font-semibold hover:text-blue-500 underline"
                               : ""
                           } text-xl`}
                           onClick={() => {
@@ -400,11 +410,11 @@ export default function FileExplorerComponent(props) {
               </div>
             ) : null}
 
-            <div className="folder-view--tracked-content">
+            <div className="block w-11/12 my-6 mx-auto justify-center p-6 rounded-lg bg-white shadow overflow-auto border">
               {!isEmpty ? (
                 gitTrackedFileComponent()
               ) : (
-                <div className="folder-view--nofiles">
+                <div className="flex w-3/4 gap-4 mx-auto items-center align-middle justify-center rounded-lg text-gray-500 text-center border-b-4 text-2xl border-dashed p-1 border-gray-300">
                   <div>
                     <FontAwesomeIcon icon={["fas", "unlink"]}></FontAwesomeIcon>
                   </div>

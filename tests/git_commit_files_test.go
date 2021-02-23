@@ -40,7 +40,13 @@ func TestCommitFileList(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := git2.CommitFileList(tt.args.repo, tt.args.commitHash); !reflect.DeepEqual(got, tt.want) {
+			var testObject git2.CommitFileListInterface
+			testObject = git2.CommitFileListStruct{
+				Repo:       tt.args.repo,
+				CommitHash: tt.args.commitHash,
+			}
+
+			if got := testObject.CommitFileList(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CommitFileList() = %v, want %v", got, tt.want)
 			}
 		})

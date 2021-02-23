@@ -5,7 +5,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { globalAPIEndpoint } from "../../../../../../util/env_config";
 
-export default function BranchListComponent({ repoId, currentBranch }) {
+export default function BranchListComponent({ repoId }) {
   library.add(fas);
 
   const [branchList, setBranchList] = useState([]);
@@ -232,21 +232,21 @@ export default function BranchListComponent({ repoId, currentBranch }) {
         activeSwitchStyle = "border-dashed border-b-2 text-indigo-700 text-2xl";
       }
       return (
-        <div className="list-area--branches" key={branchType + branchName}>
+        <div className="flex items-center justify-center px-14 py-4 mx-auto border-dashed border-b" key={branchType + branchName}>
           <div
             className={
               icon === "wifi"
-                ? "list-area--branches--icon ml-0"
-                : "list-area--branches--icon"
+                ? "mx-2 text-2xl text-blue-500 ml-0"
+                : "mx-2 text-2xl text-blue-500"
             }
           >
             <FontAwesomeIcon icon={["fas", icon]}></FontAwesomeIcon>
           </div>
-          <div className="xl:block lg:block md:block sm:hidden list-area--branches--type">
+          <div className="xl:block lg:block md:block sm:hidden w-1/3 font-sans text-lg font-semibold text-center text-indigo-500">
             {branchType}
           </div>
           <div
-            className={`list-area--branches--name ${activeSwitchStyle}`}
+            className={`w-1/2 font-sans font-semibold text-lg text-left cursor-pointer overflow-hidden text-gray-500 hover:text-blue-800 ${activeSwitchStyle}`}
             title={branchName}
             onClick={() => {
               if (!activeBranchFlag) {
@@ -261,25 +261,9 @@ export default function BranchListComponent({ repoId, currentBranch }) {
             {branchName}
           </div>
           {!activeBranchFlag && branchType === "Local Branch" ? (
-            <div className="list-area--branches--active">
+            <div className="flex mx-4 justify-between my-auto text-center items-center w-1/4 px-2">
               <div
-                className="list-area--branches--delete"
-                title="Will delete only if the branch is clean and safe"
-                onClick={() => {
-                  if (!activeBranchFlag) {
-                    deleteBranchHandler(branchName, false);
-                  }
-                }}
-              >
-                <div className="list-area--branches--delete--btn">
-                  <FontAwesomeIcon
-                    icon={["fas", "trash-alt"]}
-                  ></FontAwesomeIcon>
-                </div>
-                <div className="list-area--branches--delete--type">Normal</div>
-              </div>
-              <div
-                className="list-area--branches--delete"
+                className="w-1/2 block mx-auto my-auto text-center px-2 justify-center bg-red-500 p-2 rounded-lg shadow-md cursor-pointer text-white font-sans font-semibold hover:bg-red-600"
                 title="Will delete the branch forcefully.Be careful!"
                 onClick={() => {
                   if (!activeBranchFlag) {
@@ -287,22 +271,22 @@ export default function BranchListComponent({ repoId, currentBranch }) {
                   }
                 }}
               >
-                <div className="list-area--branches--delete--btn">
+                <div>
                   <FontAwesomeIcon
-                    icon={["fas", "minus-square"]}
+                    icon={["fas", "trash-alt"]}
                   ></FontAwesomeIcon>
                 </div>
-                <div className="list-area--branches--delete--type">Force</div>
+                <div>DELETE</div>
               </div>
             </div>
           ) : (
             <>
               {activeBranchFlag ? (
-                <div className="list-area--branches--pill bg-blue-200 border-blue-800">
+                <div className="w-1/4 font-sans mx-4 text-sm px-2 font-light border border-dashed p-1 rounded-full text-center bg-blue-100 border-blue-800">
                   Active
                 </div>
               ) : (
-                <div className="list-area--branches--pill bg-yellow-100 border-yellow-700">
+                <div className="w-1/4 font-sans mx-4 text-sm px-2 font-light border border-dashed p-1 rounded-full text-center bg-yellow-100 border-yellow-700">
                   Remote
                 </div>
               )}
@@ -327,23 +311,23 @@ export default function BranchListComponent({ repoId, currentBranch }) {
   };
 
   return (
-    <div className="repo-backdrop--branchlist xl:w-3/4 lg:w-3/4 md:w-11/12 sm:w-11/12">
-      <div className="branchlist--header">Available Branches</div>
-      <div className="branchlist--warn">
-        <div className="mx-2">
+    <div className="bg-gray-50 p-6 mx-auto my-auto items-center rounded-lg w-11/12 xl:w-3/4 lg:w-3/4 md:w-11/12 sm:w-11/12">
+      <div className="text-4xl my-4 font-sans font-semibold text-gray-600">Available Branches</div>
+      <div className="flex justify-start items-center font-sans text-sm font-semibold text-red-500">
+        <div>
           <FontAwesomeIcon
             icon={["fas", "exclamation-circle"]}
           ></FontAwesomeIcon>
         </div>
-        <div className="font-sans font-semibold">
+        <div className="mx-2 font-sans font-semibold">
           Note that this section also lets you delete the branches, so be
           cautious!
         </div>
       </div>
-      <div className="branchlist--infotext">
+      <div className="italic font-sans font-semibold text-lg my-2 border-b-2 border-dashed border-gray-300 text-gray-300">
         Click on a branch to checkout to that branch
       </div>
-      <div className="branchlist--list-area" style={{ height: "400px" }}>
+      <div className="w-full mx-auto my-6 overflow-y-auto overflow-x-hidden" style={{ height: "400px" }}>
         {loading ? (
           <div className="text-center font-sans font-light text-xl my-2 text-gray-600 border-b border-dotted">
             Collecting branch list...

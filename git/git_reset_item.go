@@ -6,6 +6,15 @@ import (
 	"github.com/neel1996/gitconvex-server/utils"
 )
 
+type ResetInterface interface {
+	RemoveItem() string
+}
+
+type ResetStruct struct {
+	RepoPath string
+	FileItem string
+}
+
 func removeErr(fileItem string, errMsg string) string {
 	logger := global.Logger{}
 	logger.Log(fmt.Sprintf("Error occurred while removeing item %s -> %s", fileItem, errMsg), global.StatusError)
@@ -14,7 +23,9 @@ func removeErr(fileItem string, errMsg string) string {
 
 // RemoveItem performs a git rest 'file' to remove the item from the staged area
 // Uses the gitclient module, as go-git does not support selective reset
-func RemoveItem(repoPath string, fileItem string) string {
+func (r ResetStruct) RemoveItem() string {
+	repoPath := r.RepoPath
+	fileItem := r.FileItem
 	args := []string{"reset", fileItem}
 	cmd := utils.GetGitClient(repoPath, args)
 

@@ -13,10 +13,28 @@ import (
 	"io"
 )
 
+type FetchInterface interface {
+	FetchFromRemote() *model.FetchResult
+	windowsFetch() *model.FetchResult
+}
+
+type FetchStruct struct {
+	Repo         *git.Repository
+	RemoteName   string
+	RepoPath     string
+	RemoteURL    string
+	RemoteBranch string
+}
+
 // windowsFetch is used for fetching changes using the git client if the platform is windows
 // go-git fetch fails in windows due to SSH authentication error
-func windowsFetch(repoPath string, remoteName string, branch string) *model.FetchResult {
+func (f FetchStruct) windowsFetch() *model.FetchResult {
 	var args []string
+
+	remoteName := f.RemoteName
+	repoPath := f.RepoPath
+	branch := f.RemoteBranch
+
 	if remoteName == "" && branch == "" {
 		args = []string{"fetch"}
 	} else {
@@ -46,8 +64,19 @@ func windowsFetch(repoPath string, remoteName string, branch string) *model.Fetc
 
 // FetchFromRemote performs a git fetch for the supplied remote and branch (e.g. `git fetch origin main`)
 // If the remoteBranch is empty, then a fetch is performed with no branch name (similar to `git fetch`)
-func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string) *model.FetchResult {
-	remoteName := GetRemoteName(repo, remoteURL)
+func (f FetchStruct) FetchFromRemote() *model.FetchResult {
+	repo := f.Repo
+	remoteURL := f.RemoteURL
+	remoteBranch := f.RemoteBranch
+	repoPath := f.RepoPath
+
+	var remoteDataObject RemoteDataInterface
+	remoteDataObject = RemoteDataStruct{
+		Repo:      repo,
+		RemoteURL: remoteURL,
+	}
+
+	remoteName := remoteDataObject.GetRemoteName()
 	logger := global.Logger{}
 
 	targetRefPsec := "refs/heads/" + remoteBranch + ":refs/remotes/" + remoteBranch
@@ -55,6 +84,11 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 	var fetchErr error
 	gitSSHAuth, sshErr := ssh.NewSSHAgentAuth("git")
 	w, _ := repo.Worktree()
+
+	// Check if repo path is empty and fetch path from worktree
+	if repoPath == "" {
+		repoPath = w.Filesystem.Root()
+	}
 
 	if sshErr != nil {
 		logger.Log("Authentication method failed -> "+sshErr.Error(), global.StatusError)
@@ -65,7 +99,7 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 			}
 		}
 		logger.Log("Retrying fetch with fallback module using git client", global.StatusWarning)
-		return windowsFetch(w.Filesystem.Root(), remoteName, remoteBranch)
+		return f.windowsFetch()
 	}
 
 	logger.Log(fmt.Sprintf("Fetching changes from -> %s : %s", remoteURL, targetRefPsec), global.StatusInfo)
@@ -106,7 +140,7 @@ func FetchFromRemote(repo *git.Repository, remoteURL string, remoteBranch string
 		} else {
 			logger.Log(fetchErr.Error(), global.StatusError)
 			logger.Log("Fetch failed. Retrying fetch with git client", global.StatusWarning)
-			return windowsFetch(w.Filesystem.Root(), remoteName, remoteBranch)
+			return f.windowsFetch()
 		}
 
 	} else {

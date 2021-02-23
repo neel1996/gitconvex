@@ -6,15 +6,12 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   ADD_FORM_CLOSE,
   DELETE_PRESENT_REPO,
-  PRESENT_REPO
+  PRESENT_REPO,
 } from "../../../../actionStore";
 import { ContextProvider } from "../../../../context";
-import {
-  globalAPIEndpoint
-} from "../../../../util/env_config";
+import { globalAPIEndpoint } from "../../../../util/env_config";
 import InfiniteLoader from "../../../Animations/InfiniteLoader";
-import "../../../styles/RepoComponent.css";
-import AddRepoFormComponent from "./AddRepoForm";
+import AddNewRepoContainer from "../../AddNewRepoComponent/AddNewRepoContainer";
 import RepoCard from "./RepoCard";
 
 export default function RepoComponent(props) {
@@ -24,7 +21,7 @@ export default function RepoComponent(props) {
   const [repoFormEnable, setRepoFormEnable] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { dispatch } = useContext(ContextProvider);
+  const { state, dispatch } = useContext(ContextProvider);
 
   useEffect(() => {
     setLoading(true);
@@ -88,7 +85,7 @@ export default function RepoComponent(props) {
 
     return (
       <>
-        <div className="repo-component--wrapper">
+        <div className="w-4/5 flex flex-wrap mx-auto justify-center">
           <>
             {repoArray.length > 0 ? (
               <>
@@ -96,20 +93,22 @@ export default function RepoComponent(props) {
                   return <RepoCard key={entry.id} repoData={entry}></RepoCard>;
                 })}
                 {repoArray.length % 2 !== 0 && repoArray.length !== 1 ? (
-                  <div className="xl:w-1/3 lg:w-2/4 md:w-1/2 block p-6 my-6 text-center"></div>
+                  <div className="mx-10 xl:w-96 lg:w-96 md:w-1/2 block my-6 p-6 text-center"></div>
                 ) : null}
               </>
             ) : (
-              <div className="repo-component--loadingview">
+              <div className="w-3/4 bg-gray-100 rounded-md font-sans text-xl my-10 mx-auto p-10 shadow text-center text-gray-800">
                 {loading ? (
-                  <div className="block loadingview--content">
-                    <div className="flex loadingview--content">
+                  <div className="block justify-center my-6 mx-auto text-center">
+                    <div className="flex justify-center my-6 mx-auto text-center">
                       <InfiniteLoader loadAnimation={loading}></InfiniteLoader>
                     </div>
                     <div>Loading available repos...</div>
                   </div>
                 ) : (
-                  <div>No repos present. Press + to add a new repo</div>
+                  <div className="font-sans text-2xl text-gray-400 text-center">
+                    No repos present. Press + to add a new repo
+                  </div>
                 )}
               </div>
             )}
@@ -143,7 +142,7 @@ export default function RepoComponent(props) {
             </div>
             <div
               id="pop-up"
-              className="addrepo--button--tooltip hidden"
+              className="fixed p-2 rounded bg-white w-48 text-gray-600 text-center font-sans font-medium text-sm shadow border mx-auto hidden"
               style={{ marginTop: "-75px", width: "130px" }}
             >
               Click to add a new repo
@@ -154,16 +153,18 @@ export default function RepoComponent(props) {
     );
   };
 
-  const addFormRemove = (param) => {
-    setRepoFormEnable(param);
-  };
-
   return (
-    <div className="repo-component">
-      {!repoFormEnable ? (
+    <div className="flex flex-wrap justify-center mx-auto text-center align-middle">
+      {!repoFormEnable || state.shouldAddFormClose ? (
         showAvailableRepo()
       ) : (
-        <AddRepoFormComponent formEnable={addFormRemove}></AddRepoFormComponent>
+        <>
+          {!state.shouldAddFormClose ? (
+            <AddNewRepoContainer
+              formEnable={setRepoFormEnable}
+            ></AddNewRepoContainer>
+          ) : null}
+        </>
       )}
     </div>
   );

@@ -8,11 +8,20 @@ import (
 	"os"
 )
 
+type CodeViewInputs struct {
+	RepoPath string
+	FileName string
+}
+
+type CodeViewInterface interface {
+	CodeFileView() *model.CodeFileType
+}
+
 // CodeFileView returns the lines from the target file and the latest commit corresponding to the file
-func CodeFileView(repoPath string, fileName string) *model.CodeFileType {
+func (c CodeViewInputs) CodeFileView() *model.CodeFileType {
 	var codeLines []*string
 
-	targetFile := repoPath + "/" + fileName
+	targetFile := c.RepoPath + "/" + c.FileName
 	logger := global.Logger{}
 	file, err := os.Open(targetFile)
 

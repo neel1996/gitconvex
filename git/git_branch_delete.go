@@ -8,12 +8,26 @@ import (
 	"github.com/neel1996/gitconvex-server/graph/model"
 )
 
+type DeleteBranchInterface interface {
+	DeleteBranch() *model.BranchDeleteStatus
+}
+
+type DeleteBranchInputs struct {
+	Repo       *git.Repository
+	BranchName string
+	ForceFlag  bool
+}
+
 // DeleteBranch deleted a branch from the repo
 // If forceFlag is true then it will forcefully delete a branch
 // If forceFlag is false, then the branch status will be checked for unmerged changes and then it will be removed from the repo
-func DeleteBranch(repo *git.Repository, branchName string, forceFlag bool) *model.BranchDeleteStatus {
+func (inputs DeleteBranchInputs) DeleteBranch() *model.BranchDeleteStatus {
 	var branchErr error
 	logger := global.Logger{}
+
+	repo := inputs.Repo
+	branchName := inputs.BranchName
+	forceFlag := inputs.ForceFlag
 
 	headRef, _ := repo.Head()
 	ref := plumbing.NewHashReference(plumbing.ReferenceName(fmt.Sprintf("refs/heads/%v", branchName)), headRef.Hash())

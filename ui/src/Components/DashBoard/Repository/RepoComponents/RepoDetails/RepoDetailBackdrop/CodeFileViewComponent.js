@@ -97,8 +97,12 @@ export default function CodeFileViewComponent(props) {
     const border = accent.border;
 
     return (
-      <div className="flex justify-between w-1/2 gap-10 items-center align-middle">
-        <div className="text-center w-1/4 font-light font-sans text-xl border-b-4 border-dashed text-gray-700">
+      <div
+        className={`flex justify-between ${
+          label === "Language" ? "w-3/4" : "w-1/2"
+        } gap-10 items-center align-middle`}
+      >
+        <div className="text-center w-1/6 font-light font-sans text-xl border-b-4 border-dashed text-gray-700">
           {label}
         </div>
         <div
@@ -132,13 +136,13 @@ export default function CodeFileViewComponent(props) {
           </div>
         </div>
       ) : (
-        <div className="repo-backdrop--codeview">
+        <div className="w-5/6 mx-auto my-auto bg-white rounded-lg p-5">
           {isInvalidFile ? (
             invalidFileAlert()
           ) : (
-            <div className="codeview">
-              <div className="codeview--toppane">
-                <div className="codeview--language">
+            <div className="w-full mx-auto my-auto overflow-auto h-full">
+              <div className="w-full block mx-auto">
+                <div className="w-full flex justify-center items-center mx-auto py-4 border-b-2 border-dashed border-gray-100">
                   {languageState
                     ? topPanePills("Language", languageState, {
                         text: "text-pink-500",
@@ -155,22 +159,23 @@ export default function CodeFileViewComponent(props) {
                     : null}
                 </div>
                 {latestCommit ? (
-                  <div className="codeview--commits">
-                    <div className="codeview--commits--latest">
-                      <div className="codeview--commits--latest--label">
-                        Latest Commit
-                      </div>
-                      <div className="w-3/4 mx-auto bg-indigo-100 font-sans font-semibold text-base text-center text-indigo-600 p-2 rounded shadow">
-                        {latestCommit}
-                      </div>
+                  <div className="w-11/12 flex justify-around items-center mx-auto my-10 text-center">
+                    <div className="w-1/4 font-sans font-semibold text-base text-gray-400">
+                      LATEST COMMIT
+                    </div>
+                    <div className="w-3/4 mx-auto bg-indigo-100 font-sans font-semibold text-base text-center text-indigo-600 p-2 rounded shadow">
+                      {latestCommit}
                     </div>
                   </div>
                 ) : null}
               </div>
 
               {fileDataState && prismIndicator ? (
-                <div className="codeview--prismview">
-                  <pre className="codeview--prismview--pre">
+                <div
+                  className="w-full shadow p-4 block my-4 rounded-lg bg-gray-700 mx-auto overflow-auto"
+                  style={{ height: "700px" }}
+                >
+                  <pre className="w-11/12 text-white">
                     <code
                       dangerouslySetInnerHTML={{
                         __html: highlightedCode.join("\n"),

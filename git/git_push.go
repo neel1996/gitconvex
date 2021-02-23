@@ -13,9 +13,25 @@ import (
 	"strings"
 )
 
+type PushInterface interface {
+	PushToRemote() string
+	windowsPush() string
+}
+
+type PushStruct struct {
+	Repo         *git.Repository
+	RemoteName   string
+	RemoteBranch string
+	RepoPath     string
+}
+
 // windowsPush is used for pushing changes using the git client if the platform is windows
 // go-git push fails in windows due to SSH authentication error
-func windowsPush(repoPath string, remoteName string, branch string) string {
+func (p PushStruct) windowsPush() string {
+	repoPath := p.RepoPath
+	remoteName := p.RemoteName
+	branch := p.RemoteBranch
+
 	args := []string{"push", "-u", remoteName, branch}
 	cmd := utils.GetGitClient(repoPath, args)
 	cmdStr, cmdErr := cmd.Output()
@@ -31,7 +47,11 @@ func windowsPush(repoPath string, remoteName string, branch string) string {
 
 // PushToRemote pushed the commits to the selected remote repository
 // By default it will choose the current branch and pushes to the matching remote branch
-func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) string {
+func (p PushStruct) PushToRemote() string {
+	repo := p.Repo
+	remoteBranch := p.RemoteBranch
+	remoteName := p.RemoteName
+
 	targetRefPsec := "refs/heads/" + remoteBranch + ":refs/heads/" + remoteBranch
 	w, _ := repo.Worktree()
 
@@ -46,7 +66,7 @@ func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) 
 			return global.PushToRemoteError
 		}
 		logger.Log("Falling back to native git client for pushing changes", global.StatusWarning)
-		return windowsPush(w.Filesystem.Root(), remoteName, remoteBranch)
+		return p.windowsPush()
 	}
 
 	remote, remoteErr := repo.Remote(remoteName)
@@ -67,7 +87,7 @@ func PushToRemote(repo *git.Repository, remoteName string, remoteBranch string) 
 	if err != nil {
 		if strings.Contains(err.Error(), "ssh: handshake failed: ssh:") {
 			logger.Log("push failed. Retrying push with git client", global.StatusWarning)
-			return windowsPush(w.Filesystem.Root(), remoteName, remoteBranch)
+			return p.windowsPush()
 		}
 		logger.Log(fmt.Sprintf("Error occurred while pushing changes to -> %s : %s\n%s", remoteName, targetRefPsec, err.Error()), global.StatusError)
 		return global.PushToRemoteError

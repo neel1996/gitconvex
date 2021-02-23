@@ -59,7 +59,7 @@ export default function CommitFileDifferenceComponent(props) {
   }, [repoId, baseCommit, compareCommit]);
 
   return (
-    <div className="my-4 w-11/12 mx-auto p-6 rounded shadow bg-blue-100">
+    <div className="my-4 w-11/12 mx-auto p-6 rounded shadow bg-blue-50">
       {baseCommit === compareCommit ? (
         <div className="text-center font-sans font-light text-2xl">
           Same commits cannot be compared

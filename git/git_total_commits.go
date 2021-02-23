@@ -8,13 +8,22 @@ import (
 	"go/types"
 )
 
+type AllCommitInterface interface {
+	AllCommits(commitChan chan AllCommitData)
+}
+
+type AllCommitStruct struct {
+	Repo *git.Repository
+}
+
 type AllCommitData struct {
 	TotalCommits float64
 	LatestCommit string
 }
 
 // AllCommits function returns the total number of commits from the repo and commit message of the most recent commit
-func AllCommits(repo *git.Repository, commitChan chan AllCommitData) {
+func (t AllCommitStruct) AllCommits(commitChan chan AllCommitData) {
+	repo := t.Repo
 	logIter, itrErr := repo.Log(&git.LogOptions{})
 	logger := global.Logger{}
 	var commits []*object.Commit

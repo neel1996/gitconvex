@@ -11,6 +11,15 @@ import (
 	"time"
 )
 
+type UnPushedCommitInterface interface {
+	UnPushedCommits() []*string
+}
+
+type UnPushedCommitStruct struct {
+	Repo      *git.Repository
+	RemoteRef string
+}
+
 // commitModel function generates a pipe separated string with the required commit details
 // The resultant string will be sent to the client
 func commitModel(commit object.Commit) string {
@@ -55,7 +64,9 @@ func nilCommit() []*string {
 }
 
 // UnPushedCommits compares the local branch and the remote branch to extract the commits which are not pushed to the remote
-func UnPushedCommits(repo *git.Repository, remoteRef string) []*string {
+func (u UnPushedCommitStruct) UnPushedCommits() []*string {
+	repo := u.Repo
+	remoteRef := u.RemoteRef
 	var commitArray []*string
 	var isAncestor bool
 	isAncestor = true

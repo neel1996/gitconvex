@@ -15,6 +15,22 @@ import (
 	"time"
 )
 
+type AddRepoInterface interface {
+	AddRepo() *model.AddRepoParams
+	repoDataFileWriter(repoId string, repoAddStatus chan string)
+}
+
+type AddRepoInputs struct {
+	RepoName    string
+	RepoPath    string
+	CloneSwitch bool
+	RepoURL     *string
+	InitSwitch  bool
+	AuthOption  string
+	UserName    *string
+	Password    *string
+}
+
 type RepoData struct {
 	Id        string `json:"id"`
 	RepoName  string `json:"repoName"`
@@ -71,13 +87,13 @@ func dataFileWriteHandler(dbFile string, repoDataArray []RepoData) error {
 }
 
 // repoDataFileWriter writes the new repo details to the repo_datastore.json file
-func repoDataFileWriter(repoId string, repoName string, repoPath string, repoAddStatus chan string) {
+func (inputs AddRepoInputs) repoDataFileWriter(repoId string, repoAddStatus chan string) {
 	rArray := make([]RepoData, 1)
 
 	rArray[0] = RepoData{
 		Id:        repoId,
-		RepoName:  repoName,
-		RepoPath:  repoPath,
+		RepoName:  inputs.RepoName,
+		RepoPath:  inputs.RepoPath,
 		TimeStamp: time.Now().String(),
 	}
 
@@ -116,9 +132,7 @@ func repoDataFileWriter(repoId string, repoName string, repoPath string, repoAdd
 // AddRepo function gets the repository details and includes a record to the gitconvex repo datastore file
 // If initSwitch is 'true' then the git repo init function will be invoked to initialize a new repo
 // If cloneSwitch is 'true' then the repo will be cloned to the file system using the repoURL field
-func AddRepo(inputs model.NewRepoInputs) *model.AddRepoParams {
-	var repoIdChannel = make(chan string)
-
+func (inputs AddRepoInputs) AddRepo() *model.AddRepoParams {
 	repoName := inputs.RepoName
 	repoPath := inputs.RepoPath
 	cloneSwitch := inputs.CloneSwitch
@@ -130,8 +144,18 @@ func AddRepo(inputs model.NewRepoInputs) *model.AddRepoParams {
 
 	if cloneSwitch && len(*repoURL) > 0 {
 		repoPath = repoPath + "/" + repoName
+		inputs.RepoPath = repoPath
 
-		_, err := git.CloneHandler(repoPath, *repoURL, authOption, userName, password)
+		var cloneObject git.CloneInterface
+		cloneObject = git.CloneStruct{
+			RepoPath:   repoPath,
+			RepoURL:    *repoURL,
+			AuthOption: authOption,
+			UserName:   userName,
+			Password:   password,
+		}
+
+		_, err := cloneObject.CloneHandler()
 		if err != nil {
 			localLogger(fmt.Sprintf("%v", err), global.StatusError)
 			return &model.AddRepoParams{
@@ -165,11 +189,12 @@ func AddRepo(inputs model.NewRepoInputs) *model.AddRepoParams {
 		}
 	}
 
+	var repoIdChannel = make(chan string)
 	go repoIdGenerator(repoIdChannel)
 	repoId := <-repoIdChannel
 
 	var repoAddStatusChannel = make(chan string)
-	go repoDataFileWriter(repoId, repoName, repoPath, repoAddStatusChannel)
+	go inputs.repoDataFileWriter(repoId, repoAddStatusChannel)
 	status := <-repoAddStatusChannel
 
 	close(repoIdChannel)

@@ -1,6 +1,7 @@
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
+import { faTools } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { actionType } from "./backdropActionType";
 import React, { useEffect } from "react";
@@ -61,22 +62,40 @@ export default function RepoLeftPaneComponent(props) {
     return remoteLogo;
   };
 
+  const remoteUrl = () => {
+    let remoteData = "";
+    if (gitRemoteData) {
+      if (gitRemoteData.match(/(^https)/gi)) {
+        remoteData = (
+          <a href={gitRemoteData} target="_blank" rel="noopener noreferrer">
+            {gitRemoteData}
+          </a>
+        );
+      } else {
+        remoteData = <>{gitRemoteData}</>;
+      }
+    } else {
+      remoteData = " ";
+    }
+    return remoteData;
+  };
+
   return (
     <>
       {props.received ? (
-        <div className="repo-leftpane xl:w-1/2 lg:w-3/4 md:w-11/12 sm:w-11/12">
+        <div className="border-gray-300 rounded-md border-dotted border-2 block my-6 mx-auto p-1 shadow-sm w-11/12 xl:w-1/2 lg:w-3/4 md:w-11/12 sm:w-11/12">
           <div className="block mx-auto my-6">
-            <div className="repo-leftpane--remote">
+            <div className="flex items-center justify-evenly">
               <div className="text-lg text-gray-600 w-1/4">Remote Host</div>
               <div className="flex justify-around items-center align-middle w-1/2">
-                <div className="repo-leftpane--remote--host">
+                <div className="w-3/4 shadow rounded-md border-dashed border cursor-pointer flex items-center justify-center my-auto p-4 align-middle">
                   {gitRemoteHost ? (
                     <div className="mx-2">{getRemoteLogo()}</div>
                   ) : null}
                   <div
                     className={`${
                       gitRemoteHost !== "No Remote Host Available"
-                        ? "text-xl repo-leftpane--remote--name"
+                        ? "text-xl border-gray-300 border-dashed border-b text-center text-gray-800 w-3/4"
                         : "text-base font-sans font-light text-gray-600 text-center"
                     }`}
                   >
@@ -86,34 +105,46 @@ export default function RepoLeftPaneComponent(props) {
                 <div className="w-1/4">
                   <div
                     id="addRemote"
-                    className="add-btn bg-indigo-400 hover:bg-indigo-500"
+                    className="rounded-full cursor-pointer items-center h-10 text-2xl mx-auto shadow text-center text-white align-middle w-10 bg-indigo-400 hover:bg-indigo-500"
                     onMouseEnter={(event) => {
-                      let popUp =
-                        '<div class="tooltip" style="margin-left:-40px;">Click to add a new remote repo</div>';
-                      event.target.innerHTML += popUp;
+                      let popUp = document.createElement("div");
+                      popUp.className =
+                        "text-gray-600 bg-white border-gray-300 p-2 rounded w-40 text-center border text-sm mt-2 mb-2 -ml-10 absolute";
+                      popUp.innerHTML = `Click here to configure remote repo`;
+                      event.currentTarget.insertAdjacentElement(
+                        "afterend",
+                        popUp
+                      );
                     }}
                     onMouseLeave={(event) => {
-                      event.target.innerHTML = "+";
+                      if (event.currentTarget.parentNode.children[1]) {
+                        event.currentTarget.parentNode.children[1].remove();
+                      }
                     }}
                     onClick={() => {
                       actionTrigger(actionType.ADD_REMOTE_REPO);
                     }}
                   >
-                    +
+                    <FontAwesomeIcon
+                      icon={faTools}
+                      className="text-xl text-center text-white"
+                    ></FontAwesomeIcon>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="remote flex-even my-4">
+            <div className="remote  flex justify-evenly my-4">
               <div className="text-lg text-gray-600 w-1/4">
                 {`${gitRemoteHost} URL`}
               </div>
-              <div className="remote--url">{gitRemoteData}</div>
+              <div className="cursor-pointer text-blue-400 break-words w-1/2 hover:text-blue-500">
+                {remoteUrl()}
+              </div>
             </div>
 
             {isMultiRemote ? (
-              <div className="flex-even my-2">
+              <div className=" flex justify-evenly my-2">
                 <div className="font-sans text-gray-800 font-semibold w-1/4 border-dotted border-b-2 border-gray-200">
                   Entry truncated!
                 </div>
@@ -124,17 +155,14 @@ export default function RepoLeftPaneComponent(props) {
             ) : null}
           </div>
 
-          <div className="commitlogs">
-            <div className="flex-even my-3">
-              <div className="commitlogs--label">Commit Logs</div>
-              <div
-                className="p-3 text-gray-600 text-center w-1/2 rounded-md shadow-md bg-yellow-200 text-whtie font-sans font-semibold text-xl hover:bg-yellow-100 hover:shadow-sm cursor-pointer transition"
-                onClick={(event) => {
-                  showCommitLogsView();
-                }}
-              >
-                Show Commit Logs
-              </div>
+          <div className="block my-6 mx-auto">
+            <div
+              className="p-3 text-gray-600 text-center w-3/4 mx-auto rounded-md shadow-md bg-yellow-200 text-whtie font-sans font-semibold text-xl hover:bg-yellow-100 hover:shadow-sm cursor-pointer transition"
+              onClick={(event) => {
+                showCommitLogsView();
+              }}
+            >
+              SHOW COMMIT LOGS
             </div>
           </div>
         </div>
