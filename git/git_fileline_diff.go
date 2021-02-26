@@ -5,6 +5,8 @@ import (
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
+	"regexp"
+	"strings"
 )
 
 type FileLineDiffInterface interface {
@@ -29,8 +31,10 @@ func returnFileDiffErr(msg string) *model.FileLineChangeResult {
 // FileLineDiff function compares the current version of the target file with the recently comitted version of the file
 // and returns the line wise difference. Similar to git diff <filename>
 func (f FileLineDiffStruct) FileLineDiff() *model.FileLineChangeResult {
+	var diffData []*string
 	repo := f.Repo
 	fileName := f.FileName
+	fileData := f.Data
 
 	head, headErr := repo.Head()
 	if headErr != nil {
@@ -48,9 +52,9 @@ func (f FileLineDiffStruct) FileLineDiff() *model.FileLineChangeResult {
 	}
 
 	diff, diffErr := repo.DiffTreeToWorkdir(currentTree, &git2go.DiffOptions{
-		Flags:    git2go.DiffSkipBinaryCheck,
-		Pathspec: []string{fileName},
-		MaxSize:  10000,
+		Flags:        git2go.DiffIgnoreWitespaceEol,
+		Pathspec:     []string{fileName},
+		ContextLines: uint32(len(fileData)),
 	})
 	if diffErr != nil {
 		return returnFileDiffErr("Diff error : " + diffErr.Error())
@@ -75,19 +79,30 @@ func (f FileLineDiffStruct) FileLineDiff() *model.FileLineChangeResult {
 
 		diffStats, diffStatsErr := diff.Stats()
 		if diffStatsErr != nil {
-			logger.Log(diffStatsErr.Error(), global.StatusError)
-			msg := "NO_DIFF"
-			return &model.FileLineChangeResult{
-				DiffStat: msg,
-				FileDiff: []*string{&msg},
-			}
+			return returnFileDiffErr(diffStatsErr.Error())
 		}
-		fmt.Println(patch.String())
+		diffLineData, diffLineErr := patch.String()
+		if diffLineErr != nil {
+			return returnFileDiffErr(diffLineErr.Error())
+		}
+		rx := regexp.MustCompile("@@(.)*@@")
+		splitDiffData := rx.Split(diffLineData, 2)
+
+		if len(splitDiffData) > 0 {
+			splitLineData := strings.Split(splitDiffData[1], "\n")
+			for _, line := range splitLineData {
+				l := line
+				diffData = append(diffData, &l)
+			}
+		} else {
+			return returnFileDiffErr("Unable to split diff context items from file data")
+		}
 
 		diffStat := fmt.Sprintf("%v insertions (+),%v deletions (-)", diffStats.Insertions(), diffStats.Deletions())
+		logger.Log(diffStat, global.StatusInfo)
 		return &model.FileLineChangeResult{
 			DiffStat: diffStat,
-			FileDiff: []*string{&diffStat},
+			FileDiff: diffData,
 		}
 	}
 	return returnFileDiffErr("")

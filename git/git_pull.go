@@ -74,9 +74,14 @@ func (p PullStruct) PullFromRemote() *model.PullResult {
 
 	remoteRef, remoteRefErr := repo.References.Lookup(targetRefPsec)
 	if remoteRefErr == nil {
-		remoteCommit, _ := repo.LookupCommit(remoteRef.Target())
-		fmt.Println(remoteRef.Name())
-		fmt.Println(remoteCommit.Id(), remoteCommit.Message())
+		head, _ := repo.Head()
+		if head == nil {
+			return returnPullErr("HEAD is nil")
+		}
+		headCommit, headCommitErr := repo.LookupCommit(head.Target())
+		if headCommitErr != nil {
+			return returnPullErr("HEAD commit lookup error : " + headCommitErr.Error())
+		}
 
 		annotatedCommit, _ := repo.AnnotatedCommitFromRef(remoteRef)
 		if annotatedCommit != nil {
@@ -91,13 +96,58 @@ func (p PullStruct) PullFromRemote() *model.PullResult {
 						Status:      global.PullNoNewChanges,
 						PulledItems: []*string{&msg},
 					}
+				} else if mergeAnalysis&git2go.MergeAnalysisFastForward != 0 {
+					logger.Log("Fast-forwarding commits...", global.StatusWarning)
+					remoteCommit, _ := repo.LookupCommit(remoteRef.Target())
+					fmt.Println(remoteRef.Name())
+					fmt.Println(remoteCommit.Id(), remoteCommit.Message())
+
+					remoteTree, treeErr := repo.LookupTree(remoteCommit.TreeId())
+					if treeErr != nil {
+						return returnPullErr("Tree Error : " + treeErr.Error())
+					}
+
+					checkoutErr := repo.CheckoutTree(remoteTree, &git2go.CheckoutOptions{
+						Strategy: git2go.CheckoutSafe,
+					})
+					if checkoutErr != nil {
+						return returnPullErr("Tree checkout error : " + checkoutErr.Error())
+					}
+
+					localRef, localRefErr := repo.LookupBranch(remoteBranch, git2go.BranchLocal)
+					if localRefErr != nil {
+						return returnPullErr("Local Reference lookup error :" + localRefErr.Error())
+					}
+					_, targetErr := localRef.SetTarget(remoteRef.Target(), "")
+					if targetErr != nil {
+						return returnPullErr("Target set error : " + targetErr.Error())
+					}
+
+					logger.Log("New changes pulled from remote -> "+targetRemote.Name(), global.StatusInfo)
+					msg := "New changes pulled from remote"
+					return &model.PullResult{
+						Status:      global.PullFromRemoteSuccess,
+						PulledItems: []*string{&msg},
+					}
 				} else {
 					err := repo.Merge([]*git2go.AnnotatedCommit{annotatedCommit}, nil, &git2go.CheckoutOptions{
 						Strategy: git2go.CheckoutSafe,
 					})
+
 					if err != nil {
 						return returnPullErr("Annotated merge failed : " + err.Error())
 					} else {
+						remoteCommit, _ := repo.LookupCommit(remoteRef.Target())
+						fmt.Println(remoteRef.Name())
+						fmt.Println(remoteCommit.Id(), remoteCommit.Message())
+
+						newIdx, _ := repo.MergeCommits(headCommit, remoteCommit, nil)
+						if newIdx != nil {
+							if newIdx.HasConflicts() {
+								return returnPullErr("Conflicts encountered while merge analysis")
+							}
+						}
+
 						repoIndex, _ := repo.Index()
 						if repoIndex.HasConflicts() {
 							return returnPullErr("Conflicts encountered while pulling changes")
@@ -111,29 +161,23 @@ func (p PullStruct) PullFromRemote() *model.PullResult {
 						if treeErr != nil {
 							return returnPullErr("Tree Error : " + treeErr.Error())
 						}
-						checkoutErr := repo.CheckoutTree(remoteTree, &git2go.CheckoutOptions{
-							Strategy: git2go.CheckoutForce,
-						})
-						if checkoutErr != nil {
-							return returnPullErr("Tree checkout error : " + checkoutErr.Error())
-						}
-
-						localRef, localRefErr := repo.LookupBranch(remoteBranch, git2go.BranchLocal)
-						if localRefErr != nil {
-							return returnPullErr("Local Reference lookup error :" + localRefErr.Error())
-						}
-						_, targetErr := localRef.SetTarget(remoteRef.Target(), "")
-						if targetErr != nil {
-							return returnPullErr("Target set error : " + targetErr.Error())
-						}
-						head, _ := repo.Head()
+						head, _ = repo.Head()
 						if head == nil {
 							return returnPullErr("HEAD is nil")
 						}
+						headCommit, _ = repo.LookupCommit(head.Target())
+						if headCommit == nil {
+							return returnPullErr("HEAD commit is nil")
+						}
 
-						headTarget, _ := head.SetTarget(remoteCommit.Id(), "")
-						if headTarget == nil {
-							return returnPullErr("Unable to set target to HEAD")
+						_, newCommitErr := repo.CreateCommit("HEAD", remoteCommit.Author(), remoteCommit.Committer(), remoteCommit.Message(), remoteTree, headCommit, remoteCommit)
+						if newCommitErr != nil {
+							logger.Log(newCommitErr.Error(), global.StatusError)
+						}
+
+						cleanupErr := repo.StateCleanup()
+						if cleanupErr != nil {
+							return returnPullErr(cleanupErr.Error())
 						}
 
 						logger.Log("New changes pulled from remote -> "+targetRemote.Name(), global.StatusInfo)
