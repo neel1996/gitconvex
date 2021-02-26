@@ -26,7 +26,7 @@ export default function RepositoryDetails(props) {
   const [isMultiRemote, setIsMultiRemote] = useState(false);
   const [multiRemoteCount, setMultiRemoteCount] = useState(0);
   const [backdropToggle, setBackdropToggle] = useState(false);
-  const [reloadView, setReloadView] = useState(false);
+  const [viewReload, setViewReload] = useState(false);
   const [codeViewToggle, setCodeViewToggle] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState("");
   const [currentBranch, setCurrentBranch] = useState("");
@@ -85,7 +85,7 @@ export default function RepositoryDetails(props) {
         branchName={selectedBranch}
         closeBackdrop={closeBackdrop}
         switchReloadView={() => {
-          setReloadView(true);
+          setViewReload(true);
         }}
       ></SwitchBranchComponent>
     );
@@ -107,7 +107,7 @@ export default function RepositoryDetails(props) {
   }, [repoIdState]);
 
   useEffect(() => {
-    setReloadView(false);
+    setViewReload(false);
     setCodeViewToggle(false);
     setLoading(true);
     const endpointURL = globalAPIEndpoint;
@@ -127,15 +127,14 @@ export default function RepositoryDetails(props) {
         },
         data: {
           query: `
-
             query
             {
                 gitRepoStatus(repoId:"${repoId}"){
                   gitRemoteData
+                  gitRemoteHost
                   gitRepoName
                   gitBranchList
                   gitCurrentBranch
-                  gitRemoteHost
                   gitTotalCommits
                   gitLatestCommit
                   gitTotalTrackedFiles    
@@ -146,7 +145,6 @@ export default function RepositoryDetails(props) {
       })
         .then((res) => {
           setLoading(false);
-
           if (res.data && res.data.data && !res.data.error) {
             const localRepoStatus = res.data.data.gitRepoStatus;
             let gitRemoteLocal = localRepoStatus.gitRemoteData;
@@ -156,6 +154,9 @@ export default function RepositoryDetails(props) {
               localRepoStatus.gitRemoteData = gitRemoteLocal.split("||")[0];
               setIsMultiRemote(true);
               setMultiRemoteCount(gitRemoteLocal.split("||").length);
+            } else {
+              setIsMultiRemote(false);
+              setMultiRemoteCount(0);
             }
             setGitRepoStatus(localRepoStatus);
           } else {
@@ -171,7 +172,7 @@ export default function RepositoryDetails(props) {
           }
         });
     }
-  }, [props.parentProps, reloadView]);
+  }, [props.parentProps, viewReload]);
 
   let {
     gitRemoteData,
@@ -266,7 +267,7 @@ export default function RepositoryDetails(props) {
             onClick={() => {
               setBackdropToggle(false);
               setCodeViewToggle(false);
-              setReloadView(true);
+              setViewReload(true);
               setAction("");
             }}
           >
