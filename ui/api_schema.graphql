@@ -10,7 +10,7 @@
 
 type HealthCheckParams {
   os: String!
-  git: String!
+  gitconvex: String!
 }
 
 type FetchRepoParams {

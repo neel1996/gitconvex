@@ -5,7 +5,7 @@ import RightPane from "../Components/DashBoard/DashboardPaneComponents/RightPane
 test("Dashboard HC Module test", async () => {
   const hcParams = {
     platform: "Linux",
-    gitVersion: "2.26",
+    gitVersion: "v2.1.0",
   };
 
   const renderedRightPane = render(<RightPane params={hcParams}></RightPane>);
