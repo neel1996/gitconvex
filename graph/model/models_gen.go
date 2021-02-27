@@ -42,8 +42,8 @@ type GitRepoStatusResults struct {
 }
 
 type HealthCheckParams struct {
-	Os  string `json:"os"`
-	Git string `json:"git"`
+	Os        string `json:"os"`
+	Gitconvex string `json:"gitconvex"`
 }
 
 type PullResult struct {

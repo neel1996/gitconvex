@@ -12,7 +12,7 @@ build-ui:
 	mv ./build ../
 build-server:
 	mkdir -p ./dist
-	go build -o ./dist
+	go build -tags static -o ./dist
 build:
 	echo "Initiating gitconvex build"
 	echo "Cleaning up old directories"
@@ -36,12 +36,14 @@ build:
 	mv build/ ./dist/ && \
 	mv ./dist/build ./dist/gitconvex-ui
 	echo "Building final go source with UI bundle" && \
-	go build -o ./dist && \
+	go build -v -a -o ./dist && \
 	echo "Gitconvex build completed!" && \
 	mv ./dist/gitconvex-server ./dist/gitconvex
+	echo "Copying etc files to dist"
+	cp -rp etc/ ./dist/
 	echo "Use ./dist/gitconvex to start Gitconvex on port 9001"
 	echo "Try ./dist/gitconvex --port PORT_NUMBER to run gitconvex on the desired port"
 test:
-	go test -v ./...
+	go test -tags static -v ./...
 start:
 	./dist/gitconvex

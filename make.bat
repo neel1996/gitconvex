@@ -36,10 +36,12 @@ if "%ip%"==%BUILD% (
     mkdir .\dist
 	echo "Moving UI artifacts to dist folder"
     move .\gitconvex-ui .\dist\
+    echo "Moving etc content to dist"
+    move .\etc .\dist\
 	echo "Removing intermediary folder ui/"
 	rd /s /q ui
     echo "Building gitconvex bundle"
-    go build -o ./dist
+    go build -a -o ./dist
 	cd .\dist
     rename gitconvex-server.exe gitconvex.exe
 	echo "Run ./dist/gitconvex.exe to start gitconvex on port 9001"
@@ -48,7 +50,7 @@ if "%ip%"==%BUILD% (
 )
 
 if "%ip%"==%TEST% (
-    go test -v ./...
+    go test -tags static -v ./...
 )
 
 if "%ip%"==%RUN% (

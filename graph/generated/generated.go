@@ -83,8 +83,8 @@ type ComplexityRoot struct {
 	}
 
 	HealthCheckParams struct {
-		Git func(childComplexity int) int
-		Os  func(childComplexity int) int
+		Gitconvex func(childComplexity int) int
+		Os        func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -391,12 +391,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GitRepoStatusResults.GitTotalTrackedFiles(childComplexity), true
 
-	case "HealthCheckParams.git":
-		if e.complexity.HealthCheckParams.Git == nil {
+	case "HealthCheckParams.gitconvex":
+		if e.complexity.HealthCheckParams.Gitconvex == nil {
 			break
 		}
 
-		return e.complexity.HealthCheckParams.Git(childComplexity), true
+		return e.complexity.HealthCheckParams.Gitconvex(childComplexity), true
 
 	case "HealthCheckParams.os":
 		if e.complexity.HealthCheckParams.Os == nil {
@@ -1050,7 +1050,7 @@ var sources = []*ast.Source{
 
 type HealthCheckParams{
     os: String!
-    git: String!
+    gitconvex: String!
 }
 
 type FetchRepoParams{
@@ -2823,7 +2823,7 @@ func (ec *executionContext) _HealthCheckParams_os(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _HealthCheckParams_git(ctx context.Context, field graphql.CollectedField, obj *model.HealthCheckParams) (ret graphql.Marshaler) {
+func (ec *executionContext) _HealthCheckParams_gitconvex(ctx context.Context, field graphql.CollectedField, obj *model.HealthCheckParams) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2841,7 +2841,7 @@ func (ec *executionContext) _HealthCheckParams_git(ctx context.Context, field gr
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Git, nil
+		return obj.Gitconvex, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6546,8 +6546,8 @@ func (ec *executionContext) _HealthCheckParams(ctx context.Context, sel ast.Sele
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "git":
-			out.Values[i] = ec._HealthCheckParams_git(ctx, field, obj)
+		case "gitconvex":
+			out.Values[i] = ec._HealthCheckParams_gitconvex(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
