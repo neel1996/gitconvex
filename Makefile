@@ -27,8 +27,8 @@ build:
 	npm install tailwindcss postcss autoprefixer && \
 	npx tailwindcss build -o ./src/index.css -c ./src/tailwind.config.js && \
 	rm package-*.json && \
-    rm -rf .git/ && \
-    echo "Building react UI bundle" && \
+    	rm -rf .git/ && \
+    	echo "Building react UI bundle" && \
 	npm run build && \
 	mv ./build ../ && \
 	cd .. && \
@@ -40,7 +40,7 @@ build:
 	echo "Gitconvex build completed!" && \
 	mv ./dist/gitconvex-server ./dist/gitconvex
 	echo "Copying etc files to dist"
-	cp -rp etc/ ./dist/
+	cp -rp ./etc ./dist/
 	echo "Use ./dist/gitconvex to start Gitconvex on port 9001"
 	echo "Try ./dist/gitconvex --port PORT_NUMBER to run gitconvex on the desired port"
 test:
