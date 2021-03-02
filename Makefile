@@ -6,13 +6,14 @@ build-ui:
 	git clone https://github.com/neel1996/gitconvex-ui.git ui/
 	cd ui
 	npm install
+	export NODE_ENV=production
 	npm i -g create-react-app tailwindcss@1.6.0
 	npm run build:tailwind
 	npm run build
 	mv ./build ../
 build-server:
 	mkdir -p ./dist
-	go build -tags static -o ./dist
+	go build -o ./dist
 build:
 	echo "Initiating gitconvex build"
 	echo "Cleaning up old directories"
@@ -27,8 +28,8 @@ build:
 	npm install tailwindcss postcss autoprefixer && \
 	npx tailwindcss build -o ./src/index.css -c ./src/tailwind.config.js && \
 	rm package-*.json && \
-    	rm -rf .git/ && \
-    	echo "Building react UI bundle" && \
+	rm -rf .git/ && \
+	echo "Building react UI bundle" && \
 	npm run build && \
 	mv ./build ../ && \
 	cd .. && \
