@@ -186,9 +186,8 @@ export default function GitDiffViewComponent() {
                   No difference could be found. Please check if the file is
                   present.
                 </div>
-                <div className="font-sans text-sm font-light text-yellow-700">
-                  Note : Space based changes will not be displayed here even if
-                  it is considered as a change!
+                <div className="font-sans text-lg text-center font-light text-yellow-700">
+                  Note : Blank space changes will not be displayed here!
                 </div>
               </>
             );
