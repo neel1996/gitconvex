@@ -88,7 +88,7 @@ func (f FileLineDiffStruct) FileLineDiff() *model.FileLineChangeResult {
 		rx := regexp.MustCompile("@@(.)*@@")
 		splitDiffData := rx.Split(diffLineData, 2)
 
-		if len(splitDiffData) > 0 {
+		if len(splitDiffData) > 1 {
 			splitLineData := strings.Split(splitDiffData[1], "\n")
 			for _, line := range splitLineData {
 				l := line

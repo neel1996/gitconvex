@@ -32,12 +32,8 @@ func (s StageItemStruct) StageItem() string {
 	fileItem := s.FileItem
 	repoPath := repo.Workdir()
 
-	fileInfo, fileInfoErr := os.Stat(filepath.Join(repoPath, fileItem))
-	if fileInfoErr != nil {
-		return s.addError("Unable to stat item -> " + fileInfoErr.Error())
-	}
-
-	if fileInfo.IsDir() {
+	fileInfo, _ := os.Stat(filepath.Join(repoPath, fileItem))
+	if fileInfo != nil && fileInfo.IsDir() {
 		itemPath := filepath.Join(repoPath, fileItem)
 		logger.Log(fmt.Sprintf("Item %s is a directory", itemPath), global.StatusInfo)
 		dirContent, dirReadErr := ioutil.ReadDir(itemPath)
@@ -66,30 +62,12 @@ func (s StageItemStruct) StageItem() string {
 			return s.addError("Empty directory cannot be staged")
 		}
 	} else {
-		fileToRead := filepath.Join(repoPath, fileItem)
-		fileByte, fileReadErr := ioutil.ReadFile(fileToRead)
-		if fileReadErr != nil {
-			logger.Log(fmt.Sprintf("Unable to read -> %s", fileToRead), global.StatusWarning)
-			return s.addError(fileReadErr.Error())
-		}
-
-		fileId, fileIdErr := repo.CreateBlobFromBuffer(fileByte)
-		if fileIdErr != nil {
-			return s.addError(fileIdErr.Error())
-		}
-
-		indexEntry := git2go.IndexEntry{
-			Mode: git2go.FilemodeBlob,
-			Id:   fileId,
-			Path: fileItem,
-		}
-
 		repoIndex, repoIndexErr := repo.Index()
 		if repoIndexErr != nil {
 			return s.addError(repoIndexErr.Error())
 		}
 
-		stageErr := repoIndex.Add(&indexEntry)
+		stageErr := repoIndex.AddAll([]string{fileItem}, git2go.IndexAddDefault, nil)
 		if stageErr != nil {
 			return s.addError(stageErr.Error())
 		} else {
