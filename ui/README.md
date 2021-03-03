@@ -63,6 +63,7 @@ After completing the setup process, use `npm start` to start the react app
 ``` shell
 ├── LICENSE
 ├── README.md
+├── api_schema.graphql
 ├── package-lock.json
 ├── package.json
 ├── public
@@ -74,105 +75,121 @@ After completing the setup process, use `npm start` to start the react app
 │   ├── manifest.json
 │   ├── prism.css
 │   └── robots.txt
-└── src
-    ├── App.css
-    ├── App.js
-    ├── Components
-    │   ├── Animations
-    │   │   └── InfiniteLoader.js
-    │   ├── DashBoard
-    │   │   ├── Compare
-    │   │   │   ├── BranchCompareComponent
-    │   │   │   │   ├── BranchCommitLogChanges.js
-    │   │   │   │   └── BranchCompareComponent.js
-    │   │   │   ├── CommitCompareComponent
-    │   │   │   │   ├── ChangedFilesComponent.js
-    │   │   │   │   ├── CommitCompareComponent.js
-    │   │   │   │   ├── CommitFileDifferenceComponent.js
-    │   │   │   │   └── CommitLogCardComponent.js
-    │   │   │   ├── CompareActionButtons.js
-    │   │   │   ├── CompareActiveRepoPane.js
-    │   │   │   ├── CompareComponent.js
-    │   │   │   ├── CompareSelectionHint.js
-    │   │   │   ├── RepoSearchBar.js
-    │   │   │   └── SearchRepoCards.js
-    │   │   ├── Dashboard.js
-    │   │   ├── DashboardPaneComponents
-    │   │   │   ├── LeftPane.js
-    │   │   │   └── RightPane.js
-    │   │   ├── Help
-    │   │   │   └── Help.js
-    │   │   ├── Repository
-    │   │   │   ├── GitComponents
-    │   │   │   │   ├── GitDiffViewComponent.js
-    │   │   │   │   ├── GitOperation
-    │   │   │   │   │   ├── CommitComponent.js
-    │   │   │   │   │   ├── GitOperationComponent.js
-    │   │   │   │   │   ├── PushComponent.js
-    │   │   │   │   │   └── StageComponent.js
-    │   │   │   │   └── GitTrackedComponent.js
-    │   │   │   └── RepoComponents
-    │   │   │       ├── AddRepoForm.js
-    │   │   │       ├── RepoCard.js
-    │   │   │       ├── RepoComponent.js
-    │   │   │       ├── RepoDetails
-    │   │   │       │   ├── FileExplorerComponent.js
-    │   │   │       │   ├── RepoDetailBackdrop
-    │   │   │       │   │   ├── AddBranchComponent.js
-    │   │   │       │   │   ├── AddRemoteRepoComponent.js
-    │   │   │       │   │   ├── BranchListComponent.js
-    │   │   │       │   │   ├── CodeFileViewComponent.js
-    │   │   │       │   │   ├── CommitLogComponent.js
-    │   │   │       │   │   ├── CommitLogFileCard.js
-    │   │   │       │   │   ├── FetchPullActionComponent.js
-    │   │   │       │   │   └── SwitchBranchComponent.js
-    │   │   │       │   ├── RepoInfoComponent.js
-    │   │   │       │   ├── RepoLeftPaneComponent.js
-    │   │   │       │   ├── RepoRightPaneComponent.js
-    │   │   │       │   ├── RepositoryDetails.js
-    │   │   │       │   └── backdropActionType.js
-    │   │   │       └── RepositoryAction.js
-    │   │   └── Settings
-    │   │       └── Settings.js
-    │   ├── LoadingHOC.js
-    │   ├── SplashScreen.css
-    │   ├── SplashScreen.js
-    │   └── styles
-    │       ├── AddRepoForm.css
-    │       ├── Compare.css
-    │       ├── FileExplorer.css
-    │       ├── GitDiffView.css
-    │       ├── GitOperations.css
-    │       ├── GitTrackedComponent.css
-    │       ├── LeftPane.css
-    │       ├── RepoCard.css
-    │       ├── RepoComponent.css
-    │       ├── RepositoryAction.css
-    │       ├── RepositoryDetails.css
-    │       ├── RepositoryDetailsBackdrop.css
-    │       └── RightPane.css
-    ├── actionStore.js
-    ├── assets
-    │   ├── gitconvex.png
-    │   └── icons
-    ├── context.js
-    ├── index.css
-    ├── index.js
-    ├── postcss.config.js
-    ├── prism.css
-    ├── reducer.js
-    ├── serviceWorker.js
-    ├── setupTests.js
-    ├── tailwind.config.js
-    ├── tests
-    │   ├── App.test.js
-    │   └── Dashboard.test.js
-    └── util
-        ├── apiURLSupplier.js
-        ├── env_config.js
-        └── relativeCommitTimeCalculator.js
+├── src
+│   ├── App.css
+│   ├── App.js
+│   ├── Components
+│   │   ├── Animations
+│   │   │   └── InfiniteLoader.js
+│   │   ├── DashBoard
+│   │   │   ├── AddNewRepoComponent
+│   │   │   │   ├── AddNewRepoComponent.tsx
+│   │   │   │   ├── AddNewRepoContainer.tsx
+│   │   │   │   ├── AddRepoActionButtonsComponent.tsx
+│   │   │   │   ├── AddRepoFormComponent.tsx
+│   │   │   │   ├── AddRepoStatusAlert.tsx
+│   │   │   │   ├── AuthComponent
+│   │   │   │   │   ├── AuthComponent.tsx
+│   │   │   │   │   ├── AuthOptionsComponent.tsx
+│   │   │   │   │   ├── HTTPSAuthForm
+│   │   │   │   │   │   ├── HTTPSAuthForm.tsx
+│   │   │   │   │   │   └── HTTPSAuthHintComponent.tsx
+│   │   │   │   │   └── SSHAuthForm.tsx
+│   │   │   │   ├── CloneComponent.tsx
+│   │   │   │   ├── ToggleSwitchComponent.tsx
+│   │   │   │   └── add-new-repo-state
+│   │   │   │       ├── actions.ts
+│   │   │   │       ├── addRepoContext.tsx
+│   │   │   │       └── addRepoReducer.ts
+│   │   │   ├── Compare
+│   │   │   │   ├── BranchCompareComponent
+│   │   │   │   │   ├── BranchCommitLogChanges.js
+│   │   │   │   │   └── BranchCompareComponent.js
+│   │   │   │   ├── CommitCompareComponent
+│   │   │   │   │   ├── CommitCompareComponent.js
+│   │   │   │   │   ├── CommitFileDifferenceComponent.js
+│   │   │   │   │   └── CommitLogCardComponent.js
+│   │   │   │   ├── CompareActionButtons.js
+│   │   │   │   ├── CompareActiveRepoPane.js
+│   │   │   │   ├── CompareComponent.js
+│   │   │   │   ├── CompareSelectionHint.js
+│   │   │   │   ├── RepoSearchBar.js
+│   │   │   │   └── SearchRepoCards.js
+│   │   │   ├── Dashboard.js
+│   │   │   ├── DashboardPaneComponents
+│   │   │   │   ├── LeftPane.js
+│   │   │   │   └── RightPane.js
+│   │   │   ├── Help
+│   │   │   │   └── Help.js
+│   │   │   ├── Repository
+│   │   │   │   ├── GitComponents
+│   │   │   │   │   ├── GitDiffViewComponent.js
+│   │   │   │   │   ├── GitOperation
+│   │   │   │   │   │   ├── CommitComponent.js
+│   │   │   │   │   │   ├── GitOperationComponent.js
+│   │   │   │   │   │   ├── PushComponent.js
+│   │   │   │   │   │   └── StageComponent.js
+│   │   │   │   │   └── GitTrackedComponent.js
+│   │   │   │   └── RepoComponents
+│   │   │   │       ├── AddRepoForm.js
+│   │   │   │       ├── RepoCard.js
+│   │   │   │       ├── RepoComponent.js
+│   │   │   │       ├── RepoDetails
+│   │   │   │       │   ├── FileExplorerComponent.js
+│   │   │   │       │   ├── RepoDetailBackdrop
+│   │   │   │       │   │   ├── AddBranchComponent.js
+│   │   │   │       │   │   ├── BranchListComponent.js
+│   │   │   │       │   │   ├── CodeFileViewComponent.js
+│   │   │   │       │   │   ├── CommitLogComponent.js
+│   │   │   │       │   │   ├── CommitLogFileCard.js
+│   │   │   │       │   │   ├── FetchPullActionComponent.js
+│   │   │   │       │   │   ├── RemoteConfigComponent
+│   │   │   │       │   │   │   ├── AddRemoteRepoFormComponent.js
+│   │   │   │       │   │   │   ├── RemoteCard.js
+│   │   │   │       │   │   │   └── RemoteManagementComponent.js
+│   │   │   │       │   │   └── SwitchBranchComponent.js
+│   │   │   │       │   ├── RepoInfoComponent.js
+│   │   │   │       │   ├── RepoLeftPaneComponent.js
+│   │   │   │       │   ├── RepoRightPaneComponent.js
+│   │   │   │       │   ├── RepositoryDetails.js
+│   │   │   │       │   └── backdropActionType.js
+│   │   │   │       └── RepositoryAction.js
+│   │   │   └── Settings
+│   │   │       ├── Settings.js
+│   │   │       ├── SettingsDataFileComponent.js
+│   │   │       ├── SettingsPortComponent.js
+│   │   │       └── SettingsRepoListComponent
+│   │   │           ├── SettingsRepoDeleteBackDrop.js
+│   │   │           ├── SettingsRepoDeleteComponent.js
+│   │   │           ├── SettingsRepoListCard.js
+│   │   │           └── SettingsRepoListComponent.js
+│   │   ├── LoadingHOC.js
+│   │   ├── SplashScreen.css
+│   │   ├── SplashScreen.js
+│   │   └── styles
+│   │       └── LeftPane.css
+│   ├── actionStore.js
+│   ├── assets
+│   │   ├── gitconvex.png
+│   │   └── icons
+│   ├── context.js
+│   ├── index.css
+│   ├── index.js
+│   ├── prism.css
+│   ├── react-app-env.d.ts
+│   ├── reducer.js
+│   ├── serviceWorker.js
+│   ├── setupTests.js
+│   ├── tailwind.config.js
+│   ├── tests
+│   │   ├── App.test.js
+│   │   └── Dashboard.test.js
+│   └── util
+│       ├── apiURLSupplier.js
+│       ├── env_config.js
+│       └── relativeCommitTimeCalculator.js
+└── tsconfig.json
 
-22 directories, 88 files
-
+28 directories, 100 files
 ```
 
