@@ -5,8 +5,7 @@ WORKDIR /go/src/github.com/neel1996/gitconvex-server
 COPY . .
 
 RUN apk update && apk upgrade
-RUN apk add --update nodejs nodejs-npm
-RUN apk add git
+RUN apk add --update nodejs nodejs-npm openssl libgit2 libssh2 pkgconfig
 
 RUN cd ui/ && \
     npm install && \
@@ -15,7 +14,11 @@ RUN cd ui/ && \
     npx tailwindcss build -o src/index.css -c src/tailwind.config.js && \
     npm run build && \
     mv build/ gitconvex-ui/ && \
-    mv gitconvex-ui/ ../  
+    mv gitconvex-ui/ ../ && \
+    cd .. && \
+    rm -rf ui/
+
+RUN apk del nodejs nodejs-npm
 
 EXPOSE 9001
 
