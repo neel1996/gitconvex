@@ -1,0 +1,17 @@
+###########################################################################
+# libssh2 installation details
+###########################################################################
+
+prefix=F:/C++/cmake_build_libs/libssh2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libssh2
+URL: https://www.libssh2.org/
+Description: The SSH library
+Version: 1.9.0_DEV
+Requires.private: libssl,libcrypto
+Libs: -L${libdir} -lssh2 -lcrypt32
+Libs.private: -lcrypt32
+Cflags: -I${includedir}
