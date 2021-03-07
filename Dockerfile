@@ -1,12 +1,19 @@
-FROM golang:1.15.5-alpine
+FROM golang:1.16.0
 
 WORKDIR /go/src/github.com/neel1996/gitconvex-server
 
 COPY . .
 
-# Alpine package download stage
-RUN apk update && apk upgrade
-RUN apk add --update nodejs nodejs-npm pkgconfig cmake gcc libc-dev perl git linux-headers make
+# Install required packages from apt-get
+RUN apt-get update && \
+    apt-get install apt-transport-https ca-certificates gnupg software-properties-common wget sudo -y && \
+    apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main' && \
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null && \
+    apt-get install cmake -y
+
+# Install node js
+RUN curl -fsSL https://deb.nodesource.com/setup_15.x | sudo -E bash - && \
+    apt-get install nodejs -y
 
 # Building React UI bundle
 RUN cd ui/ && \
@@ -23,7 +30,8 @@ RUN cd ui/ && \
 # Download and build OpenSSL
 RUN cd ~ && git clone https://github.com/openssl/openssl.git && \
     cd openssl && ./Configure && \
-    make && make install
+    make && make install && \
+    cp -rp *.so* /usr/lib/
 
 # Download libssh2
 RUN cd ~ && wget https://github.com/libssh2/libssh2/releases/download/libssh2-1.9.0/libssh2-1.9.0.tar.gz && \
@@ -40,12 +48,13 @@ RUN cd ~ && wget https://github.com/libgit2/libgit2/releases/download/v1.1.0/lib
     cmake -DCMAKE_PREFIX_PATH=../../libssh2-1.9.0/install/ -DCMAKE_INSTALL_PREFIX=../install -DBUILD_CLAR=OFF .. && \
     cmake --build . --target install && \
     make install && \
-    mv ~/libgit2-1.1.0/install/include/* /usr/local/include/ && \
-    mv ~/libgit2-1.1.0/install/lib64/pkgconfig/* /usr/local/lib/
+    cp -rp ~/libgit2-1.1.0/install/include/* /usr/include/ && \
+    cp -rp ~/libgit2-1.1.0/install/lib/pkgconfig/* /usr/lib/ && \
+    cp -rp ~/libgit2-1.1.0/install/lib/lib* /usr/lib/
 
-RUN apk del nodejs nodejs-npm perl git
+RUN apt-get remove cmake nodejs apt-transport-https ca-certificates gnupg software-properties-common wget sudo
 
 EXPOSE 9001
 
-CMD export PKG_CONFIG_PATH=~/libgit2-1.1.0/install/lib64/pkgconfig && \
+CMD export PKG_CONFIG_PATH=/usr/local/lib && \
     go run /go/src/github.com/neel1996/gitconvex-server/server.go
