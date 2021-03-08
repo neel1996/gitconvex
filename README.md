@@ -24,6 +24,8 @@
 
 - **Option - 1** Cloning the repo from **github**
 
+To build gitconvex from scratch, [libgit2](https://github.com/libgit2/libgit2) is required. The [LIBGIT_NOTES](LIBGIT_NOTES.md) includes the guidelines to download and setup libgit for different platforms
+
 **To be Noted:** The `master` branch contains the latest and the stable build of the project. For a reliable experience, always clone the repo from the master branch.
 
 ``` shell
