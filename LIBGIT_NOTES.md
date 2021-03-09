@@ -13,6 +13,7 @@ Make sure you have the following applications installed on your system
 - [cygwin](https://www.cygwin.com/) with the following packages
     - [make](https://cygwin.com/packages/summary/make.html)
     - [pkg-config](https://cygwin.com/packages/summary/pkg-config.html)
+    - [libssh2-devel](https://cygwin.com/packages/summary/libssh2-devel.html)
     - [zlib](https://cygwin.com/packages/summary/zlib.html) (optional)
 
 _After setting up cygwin, add cygwin /bin folder to the **path** environment variable_
@@ -43,10 +44,10 @@ cd <FOLDER WHERE LIBGIT2 IS AVAILABLE>
 
 mkdir build && cd build
 
-cmake -DCMAKE_INSTALL_PREFIX=../install && \
-      -DCMAKE_FIND_ROOT_PATH=../lib && \
-      -DOPENSSL_SSL_LIBRARY=../lib/win/lib && \
-      -DOPENSSL_CRYPTO_LIBRARY=../lib/win/lib && \
+cmake -DCMAKE_INSTALL_PREFIX=../install \
+      -DCMAKE_FIND_ROOT_PATH=../lib \
+      -DOPENSSL_SSL_LIBRARY=../lib/win/lib \
+      -DOPENSSL_CRYPTO_LIBRARY=../lib/win/lib \
       -DEMBED_SSH_PATH=../libssh2 ..
 
 # If the above command completes without any error, execute the following command      
