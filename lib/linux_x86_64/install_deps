@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# This script copies the dependent libraries required for gitconvex to function properly to the /usr/* directory
+# Make sure you run the script as sudo 
+
+# OpenSSL
+echo "Copying OpenSSL libs..."
+cp -rp ./openssl/include/* /usr/include/
+cp -p ./openssl/bin/* /usr/bin/
+cp -rp ./openssl/ssl /usr/
+cp -p ./openssl/lib/pkgconfig/* /usr/lib/pkgconfig/
+cp -rp ./openssl/lib/ossl-modules ./openssl/lib/engines-3 lib* /usr/lib/ 
+
+# Libssh
+echo "Copying libssh libs..."
+cp -rp ./libssh/include/* /usr/include/
+cp -p ./libssh/lib/libssh2.a /usr/lib/
+cp -p ./libssh/lib/pkgconfig/* /usr/lib/pkgconfig/
+
+# Libgit
+echo "Copying libgit libs..."
+cp -rp ./libgit/include/* /usr/include/
+cp -p ./libgit/lib/lib* /usr/lib/
+cp -p ./libgit/lib/pkgconfig/* /usr/lib/pkgconfig/ 
