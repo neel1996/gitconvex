@@ -49,10 +49,11 @@ RUN cd ~ && wget https://github.com/libgit2/libgit2/releases/download/v1.1.0/lib
     cmake --build . --target install && \
     make install && \
     cp -rp ~/libgit2-1.1.0/install/include/* /usr/include/ && \
-    cp -rp ~/libgit2-1.1.0/install/lib/pkgconfig/* /usr/lib/ && \
+    cp -rp ~/libgit2-1.1.0/install/lib/pkgconfig/* /usr/lib/pkgconfig && \
     cp -rp ~/libgit2-1.1.0/install/lib/lib* /usr/lib/
 
-RUN apt-get remove cmake nodejs apt-transport-https ca-certificates gnupg software-properties-common wget sudo
+# Post Cleanup stage
+RUN apt-get remove cmake nodejs apt-transport-https ca-certificates gnupg software-properties-common wget -y
 
 EXPOSE 9001
 
