@@ -56,10 +56,11 @@ cmake -DCMAKE_INSTALL_PREFIX=../install \
 cmake --build . --target install
 ```
 
-- After the command completes execution
-    - copy the `git2.dll` from `../bin/` to `<cygwin>/bin` folder
-    - copy `git2.lib` from `../lib` to `<cygwin>/lib` folder
-    - copy `libgit2.pc` from `../lib/pkgconfig` to `<cygwin>/lib/pkgconfig`
+- After the command completes execution, the required DLL and libs for libgit2 will be available
+  in `<libgit2_root>/install` folder
+    - copy the `git2.dll` from `install/bin/` to `<cygwin>/bin` folder
+    - copy `git2.lib` from `install/lib` to `<cygwin>/lib` folder
+    - copy `libgit2.pc` from `install/lib/pkgconfig` to `<cygwin>/lib/pkgconfig`
 
 Following the above steps will make `libgit2` available as a shared library for `git2go`.
 
@@ -70,7 +71,7 @@ Make sure you have the following packages installed on your system
 - [cmake](https://cmake.org/download/)
 - [curl](https://curl.se/)
 - [wget](https://www.gnu.org/software/wget/)
-- A suitable C/C++ compiler
+- [gcc](https://gcc.gnu.org/)
 
 Make sure you have required rights for running the following commands. If any of these fail due to access errors, then
 try with `sudo`
@@ -112,5 +113,6 @@ Download and setup [brew](https://brew.sh/) to install all the required packages
 - [cmake](https://formulae.brew.sh/formula/cmake)
 - [curl](https://formulae.brew.sh/formula/curl)
 - [wget](https://formulae.brew.sh/formula/wget)
+- [gcc](https://gcc.gnu.org/)
 
 Once the packages are setup, run the same commands mentioned above for Linux to setup libgit2 
