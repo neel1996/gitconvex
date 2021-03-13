@@ -11,12 +11,15 @@ Make sure you have the following applications installed on your system
 - [VS 2019](https://visualstudio.microsoft.com/vs/features/cplusplus/) for the C/C++ compiler
 - [cmake](https://cmake.org/download/)
 - [cygwin](https://www.cygwin.com/) with the following packages
-    - [make](https://cygwin.com/packages/summary/make.html)
+    - [gcc](https://cygwin.com/packages/summary/mingw64-x86_64-gcc-core.html)
+        - The package will be downloaded to `<cygwin_dir>\bin\` as `x86_64-w64-mingw32-gcc.exe`. This has to be renamed
+          to `gcc.exe` so that go can find the package while building gitconvex with libgit2
     - [pkg-config](https://cygwin.com/packages/summary/pkg-config.html)
-    - [libssh2-devel](https://cygwin.com/packages/summary/libssh2-devel.html)
-    - [zlib](https://cygwin.com/packages/summary/zlib.html) (optional)
+        - The `pkg-config` exe will be downloaded with a different name, so rename the `<cygwin_dir>\pkgconf.exe` file
+          to `pkg-config.exe`
 
-_After setting up cygwin, add cygwin /bin folder to the **path** environment variable_
+_After setting up cygwin, add cygwin /bin folder to the **path** environment variable_. Also make sure that you follow
+the package renaming instructions for `gcc` and `pkg-config` without fail to build or run gitconvex with libgit2
 
 The libraries required for setting up `libgit2` with `libssh2` and `openssl` are available as a zip file
 in [lib/win](lib/win). Extract the content of the zip file into the same folder (lib/win)
@@ -45,9 +48,8 @@ cd <FOLDER WHERE LIBGIT2 IS AVAILABLE>
 mkdir build && cd build
 
 cmake -DCMAKE_INSTALL_PREFIX=../install \
-      -DCMAKE_FIND_ROOT_PATH=../lib \
-      -DOPENSSL_SSL_LIBRARY=../lib/win/lib \
-      -DOPENSSL_CRYPTO_LIBRARY=../lib/win/lib \
+      -DOPENSSL_ROOT_DIR=../lib/win/ \
+      -DBUILD_CLAR=OFF \
       -DEMBED_SSH_PATH=../libssh2 ..
 
 # If the above command completes without any error, execute the following command      
