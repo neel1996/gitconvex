@@ -84,18 +84,18 @@ make && make install
 cp -rp *.so* /usr/lib/
 
 # Download and setup libssh2
-cd ~ && wget https://github.com/libssh2/libssh2/releases/download/libssh2-1.9.0/libssh2-1.9.0.tar.gz
-tar -xzf libssh2-1.9.0.tar.gz 
-cd libssh2-1.9.0/ 
+cd ~ && git clone https://github.com/libssh2/libssh2.git libssh2
+cd libssh2/ 
 mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=../install .. && cmake --build . --target install
+cmake -DCMAKE_INSTALL_PREFIX=../install .. 
+cmake --build . --target install
 
 #Download and setup libgit2
 cd ~ && wget https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.tar.gz
 tar -xzf libgit2-1.1.0.tar.gz 
 cd libgit2-1.1.0/
 mkdir build && cd build 
-cmake -DCMAKE_PREFIX_PATH=../../libssh2-1.9.0/install/ -DCMAKE_INSTALL_PREFIX=../install -DBUILD_CLAR=OFF .. 
+cmake -DCMAKE_PREFIX_PATH=../../libssh2/install/ -DCMAKE_INSTALL_PREFIX=../install -DBUILD_CLAR=OFF .. 
 cmake --build . --target install 
 
 # Copy the libgit2 shared object and pkconfig files to the /usr/lib path
@@ -115,4 +115,4 @@ Download and setup [brew](https://brew.sh/) to install all the required packages
 - [wget](https://formulae.brew.sh/formula/wget)
 - [gcc](https://gcc.gnu.org/)
 
-Once the packages are setup, run the same commands mentioned above for Linux to setup libgit2 
+Once the packages are set up, run the same commands mentioned above for Linux to setup libgit2 
