@@ -4,7 +4,7 @@
 # Make sure you run the script as sudo 
 
 # Extract libs from tar
-echo "Extracting the lib folder..."
+echo "Extracting the lib folder for MacOS..."
 tar -xzf macos_amd64.tar.gz
 
 # OpenSSL
