@@ -106,13 +106,15 @@ cp -rp ~/libgit2-1.1.0/install/lib/lib* /usr/lib/
 
 #### For MacOS
 
-The steps are similar to the [Linux](#for-linux-tested-on-ubuntu-2004) guidelines mentioned above.
+The dependencies required to build and run gitconvex are readily available from `brew`
 
 Download and setup [brew](https://brew.sh/) to install all the required packages
 
-- [cmake](https://formulae.brew.sh/formula/cmake)
-- [curl](https://formulae.brew.sh/formula/curl)
-- [wget](https://formulae.brew.sh/formula/wget)
-- [gcc](https://gcc.gnu.org/)
-
-Once the packages are set up, run the same commands mentioned above for Linux to setup libgit2 
+- [libgit2](https://formulae.brew.sh/formula/libgit2)
+  ```shell
+  brew install libgit2
+  ```
+- [libssh2](https://formulae.brew.sh/formula/libssh2)
+  ```shell
+  brew install libssh2
+  ```
