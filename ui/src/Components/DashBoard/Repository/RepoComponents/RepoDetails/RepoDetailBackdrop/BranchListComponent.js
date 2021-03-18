@@ -10,11 +10,9 @@ export default function BranchListComponent({ repoId }) {
 
   const [branchList, setBranchList] = useState([]);
   const [listError, setListError] = useState(false);
-  const [switchSuccess, setSwitchSuccess] = useState(false);
   const [switchError, setSwitchError] = useState(false);
   const [switchedBranch, setSwitchedBranch] = useState("");
   const [errorBranch, setErrorBranch] = useState("");
-  const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [branchSearchTerm, setBranchSearchTerm] = useState("");
@@ -22,12 +20,10 @@ export default function BranchListComponent({ repoId }) {
 
   function resetStates() {
     setListError(false);
-    setSwitchSuccess(false);
     setSwitchError(false);
     setSwitchedBranch("");
     setErrorBranch("");
     setDeleteError(false);
-    setDeleteSuccess(false);
     setBranchSearchTerm("");
     setFilteredBranchList([]);
   }
@@ -114,12 +110,10 @@ export default function BranchListComponent({ repoId }) {
         if (res.data.data && !res.data.error) {
           const checkoutStatus = res.data.data.checkoutBranch;
           if (checkoutStatus === "CHECKOUT_FAILED") {
-            setSwitchSuccess(false);
             setErrorBranch(branchName);
             setSwitchError(true);
             return;
           } else {
-            setSwitchSuccess(true);
             setSwitchedBranch(branchName);
           }
         } else {
@@ -159,7 +153,6 @@ export default function BranchListComponent({ repoId }) {
 
         if (res.data.data && !res.data.error) {
           if (res.data.data.deleteBranch.status === "BRANCH_DELETE_SUCCESS") {
-            setDeleteSuccess(true);
             setSwitchedBranch(branchName);
           } else {
             setDeleteError(true);
