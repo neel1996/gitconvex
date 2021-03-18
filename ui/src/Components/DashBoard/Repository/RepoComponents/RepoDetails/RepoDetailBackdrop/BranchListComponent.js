@@ -38,6 +38,7 @@ export default function BranchListComponent({ repoId }) {
 
     setLoading(true);
     setBranchList([]);
+    setSwitchedBranch("");
 
     axios({
       url: globalAPIEndpoint,
@@ -75,7 +76,6 @@ export default function BranchListComponent({ repoId }) {
             }
             return branch;
           });
-
           setBranchList([...gitAllBranchList]);
         } else {
           setListError(true);
@@ -190,17 +190,6 @@ export default function BranchListComponent({ repoId }) {
     );
   }
 
-  function successComponent(successString) {
-    return (
-      <div className="text-center p-4 rounded bg-green-300 text-xl font-sans mt-10">
-        {successString}
-        <span className="font-semibold border-b border-dashed mx-2">
-          {switchedBranch}
-        </span>
-      </div>
-    );
-  }
-
   const searchBranchFromList = (event) => {
     const searchBranch = event.target.value;
     setBranchSearchTerm(searchBranch);
@@ -232,7 +221,10 @@ export default function BranchListComponent({ repoId }) {
         activeSwitchStyle = "border-dashed border-b-2 text-indigo-700 text-2xl";
       }
       return (
-        <div className="flex items-center justify-center px-14 py-4 mx-auto border-dashed border-b" key={branchType + branchName}>
+        <div
+          className="flex items-center justify-center px-14 py-4 mx-auto border-dashed border-b"
+          key={branchType + branchName}
+        >
           <div
             className={
               icon === "wifi"
@@ -312,7 +304,9 @@ export default function BranchListComponent({ repoId }) {
 
   return (
     <div className="bg-gray-50 p-6 mx-auto my-auto items-center rounded-lg w-11/12 xl:w-3/4 lg:w-3/4 md:w-11/12 sm:w-11/12">
-      <div className="text-4xl my-4 font-sans font-semibold text-gray-600">Available Branches</div>
+      <div className="text-4xl my-4 font-sans font-semibold text-gray-600">
+        Available Branches
+      </div>
       <div className="flex justify-start items-center font-sans text-sm font-semibold text-red-500">
         <div>
           <FontAwesomeIcon
@@ -327,7 +321,10 @@ export default function BranchListComponent({ repoId }) {
       <div className="italic font-sans font-semibold text-lg my-2 border-b-2 border-dashed border-gray-300 text-gray-300">
         Click on a branch to checkout to that branch
       </div>
-      <div className="w-full mx-auto my-6 overflow-y-auto overflow-x-hidden" style={{ height: "400px" }}>
+      <div
+        className="w-full mx-auto my-6 overflow-y-auto overflow-x-hidden"
+        style={{ height: "400px" }}
+      >
         {loading ? (
           <div className="text-center font-sans font-light text-xl my-2 text-gray-600 border-b border-dotted">
             Collecting branch list...
@@ -383,15 +380,9 @@ export default function BranchListComponent({ repoId }) {
         ? errorComponent("Error occurred while switching to", true)
         : null}
 
-      {switchedBranch.length > 0 && switchSuccess
-        ? successComponent("Active branch has been switched to")
+      {switchedBranch && switchedBranch.length > 0 && deleteError
+        ? errorComponent("Branch deletion failed for", true)
         : null}
-
-      {deleteSuccess
-        ? successComponent("Selected branch has been removed")
-        : null}
-
-      {deleteError ? errorComponent("Branch deletion failed for", true) : null}
     </div>
   );
 }

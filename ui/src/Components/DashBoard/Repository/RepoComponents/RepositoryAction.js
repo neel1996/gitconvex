@@ -28,6 +28,7 @@ export default function RepositoryAction() {
   const [toggleSearchSelect, setToggleSearchSelect] = useState(false);
   const [searchBranchValue, setSearchBranchValue] = useState("");
   const [filteredBranchList, setFilteredBranchList] = useState([]);
+  const [viewReload, setViewReload] = useState(0);
 
   const memoizedGitTracker = useMemo(() => {
     if (defaultRepo && defaultRepo.id) {
@@ -142,10 +143,12 @@ export default function RepositoryAction() {
     return () => {
       source.cancel();
     };
-  }, [defaultRepo, activeBranch, presentRepo, dispatch, branchError]);
+  }, [defaultRepo, viewReload, presentRepo, dispatch, branchError]);
 
   function setTrackingBranch(branchName, event) {
     setLoading(true);
+    setToggleSearchSelect(!toggleSearchSelect);
+
     axios({
       url: globalAPIEndpoint,
       method: "POST",
@@ -160,11 +163,11 @@ export default function RepositoryAction() {
       .then((res) => {
         setLoading(false);
         if (res.data.data && !res.data.error) {
-          setActiveBranch(branchName);
           setSearchBranchValue("");
           setFilteredBranchList([]);
-          setToggleSearchSelect(!toggleSearchSelect);
           handleScreenEvents();
+          setActiveBranch(branchName);
+          setViewReload(viewReload + 1);
         }
       })
       .catch((err) => {
@@ -354,8 +357,8 @@ export default function RepositoryAction() {
     if (selectedRepoDetails && selectedRepoDetails.gitBranchList) {
       const { gitBranchList } = selectedRepoDetails;
       if (searchBranchValue !== "") {
-        if (filteredBranchList.length > 0) {
-          return filteredBranchList.map((branch, index) => {
+        if (filteredBranchList && filteredBranchList.length > 0) {
+          return filteredBranchList.map((branch) => {
             if (branch !== "NO_BRANCH") {
               return branchCardComponent(branch);
             }
@@ -372,7 +375,7 @@ export default function RepositoryAction() {
           );
         }
       } else {
-        return gitBranchList.map((branch, index) => {
+        return gitBranchList.map((branch) => {
           if (branch !== "NO_BRANCH") {
             return branchCardComponent(branch);
           }
