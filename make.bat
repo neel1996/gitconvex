@@ -1,4 +1,4 @@
-@echo off
+@ECHO off
 set ip=%1
 
 set INSTALL="install"
@@ -13,39 +13,41 @@ if "%ip%"==%INSTALL% (
 )
 
 if "%ip%"==%BUILD% (
-	echo "Initiating gitconvex build for windows"
-	echo "Cleaning up unwanted folders"
+	echo ⚒ Initiating gitconvex build for windows
+	echo 🗑 Cleaning up unwanted folders
 	rd /s /q ui
 	rd /s /q dist
 	rd /s /q build
-    echo "Cloning UI package from github gitconvex-ui/master"
-    git clone https://github.com/neel1996/gitconvex-ui.git ui/
+    echo ⏳ Cloning UI package from github gitconvex-ui/master
+    git clone -q https://github.com/neel1996/gitconvex-ui.git ui/
     cd ui
-    echo "Installing UI dependencies"
+    echo ⏳ Installing UI dependencies
 	del package-lock.json
-    npm install
-    echo "Building UI bundle"
+    npm install --silent
+    echo ⚒ Building UI bundle
     set NODE_ENV=production
     npm install tailwindcss postcss autoprefixer
     npx tailwindcss build -o src/index.css -c src/tailwind.config.js
     npm run build
-	echo "Moving react bundle to gitconvex-ui"
+	echo 🔹 Moving react bundle to gitconvex-ui
     move .\build gitconvex-ui
     move .\gitconvex-ui ..\
     cd ..
     mkdir .\dist
-	echo "Moving UI artifacts to dist folder"
+	echo 🔹 Moving UI artifacts to dist folder
     move .\gitconvex-ui .\dist\
-    echo "Moving etc content to dist"
-    move .\etc .\dist\
-	echo "Removing intermediary folder ui/"
+    echo 🔹 Copying etc content to dist
+    xcopy /E /I .\etc\ .\dist\etc\
+    copy .\etc\git2.dll .\dist\
+	echo 🔸 Removing intermediary folder ui/
 	rd /s /q ui
-    echo "Building gitconvex bundle"
-    go build -a -o ./dist
+    echo 🚀 Building gitconvex bundle
+    go build -o ./dist/gitconvex.exe
 	cd .\dist
     rename gitconvex-server.exe gitconvex.exe
-	echo "Run ./dist/gitconvex.exe to start gitconvex on port 9001"
-	echo "Try ./dist/gitconvex.exe --port PORT_NUMBER to run gitconvex on the desired port"
+    echo ✅ Gitconvex Build Completed successfully!
+	echo 📬 Run ./dist/gitconvex.exe to start gitconvex on port 9001
+	echo 📬 Try ./dist/gitconvex.exe --port PORT_NUMBER to run gitconvex on the desired port
 	cd ..
 )
 
