@@ -49,7 +49,7 @@ After setting up the dependency libs, just run `gitconvex` from the terminal to 
 Gitconvex is readily available as a [Homebrew](https://brew.sh/) Tap on github. Run the following command to download & install gitconvex on the go
 
 ``` shell
-> brew install itassistors/brew/gitconvex
+> brew install itassistors/taps/gitconvex
 ```
 
 ## Docker 
