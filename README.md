@@ -32,7 +32,7 @@ Gitconvex is available on [chocolatey](https://chocolatey.org/). Install [chocol
 > choco install gitconvex
 ```
 
-If you do not prefer `chocolatey` then the [binaries for windows](https://github.com/neel1996/gitconvex/releases/download/2.1.0/gitconvex-2.1.0.zip) can be downloaded from the [releases](https://github.com/neel1996/gitconvex/releases/tag/2.1.0)
+If you do not prefer `chocolatey` then the [binaries for windows](https://github.com/neel1996/gitconvex/releases/download/2.1.0/gitconvex-v2.1.0-windows.zip) can be downloaded from the [releases](https://github.com/neel1996/gitconvex/releases/tag/2.1.0)
 
 ## Linux
 
