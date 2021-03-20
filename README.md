@@ -44,6 +44,12 @@ Download the tarball for Linux from [releases](https://github.com/neel1996/gitco
 
 After setting up the dependency libs, just run `gitconvex` from the terminal to start gitconvex
 
+Gitconvex is also available as a [homebrew](https://brew.sh/) tap which can be easily installed using the following command (provided [brew](https://brew.sh/) is already installed on the linux machine)
+
+``` shell
+> brew install itassistors/taps/gitconvex
+```
+
 ## MacOS
 
 Gitconvex is readily available as a [Homebrew](https://brew.sh/) Tap on github. Run the following command to download & install gitconvex on the go
