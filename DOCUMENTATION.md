@@ -103,7 +103,7 @@ The repo detail view also provides features for performing the following operati
 
 ### Remote management
 
-- A new remote can be added, an existing remote url can be edited and a remote can be deleted.
+- The Remote management pane lets you add new remotes to the target repo, edit the remote URLs of the exsiting remotes and also to delete existing remotes.
 
 ![remote-management](https://user-images.githubusercontent.com/65342122/111649000-f6c3dd00-8829-11eb-88e7-2bd368b4dbc2.png)
 
