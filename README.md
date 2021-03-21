@@ -68,9 +68,9 @@ docker pull itassistors/gitconvex
 
 **Note:** Make sure you mount the host volume to the container to access the git repos from the host system. If you have git repos stored within your containers then it is not required
 
-## Build from scratch
+## Build from source
 
-To build gitconvex from scratch, [libgit2](https://github.com/libgit2/libgit2) is a requirement. The [LIBGIT_NOTES](LIBGIT_NOTES.md) file includes all the guidelines to download and setup libgit for different platforms
+[Libgit2](https://github.com/libgit2/libgit2) is required for building gitconvex from source. The [LIBGIT_NOTES](LIBGIT_NOTES.md) file includes all the guidelines to download and setup libgit for different platforms
 
 **To be Noted:** The `master` branch contains the latest and the stable build of the project. For a reliable experience, always clone the repo from the master branch.
 
@@ -86,7 +86,7 @@ make build
 ./make.bat build
 
 # After build completion...
-./dist/gitconvex-server
+./dist/gitconvex
 
 2020/11/14 22:57:47 INFO: Starting Gitconvex server modules
 2020/11/14 22:57:47 INFO: Using available env config file
