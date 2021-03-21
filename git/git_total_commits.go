@@ -2,10 +2,8 @@ package git
 
 import (
 	"fmt"
-	git "github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
-	"go/types"
 )
 
 type AllCommitInterface interface {
@@ -13,7 +11,7 @@ type AllCommitInterface interface {
 }
 
 type AllCommitStruct struct {
-	Repo *git.Repository
+	Repo *git2go.Repository
 }
 
 type AllCommitData struct {
@@ -24,9 +22,8 @@ type AllCommitData struct {
 // AllCommits function returns the total number of commits from the repo and commit message of the most recent commit
 func (t AllCommitStruct) AllCommits(commitChan chan AllCommitData) {
 	repo := t.Repo
-	logIter, itrErr := repo.Log(&git.LogOptions{})
-	logger := global.Logger{}
-	var commits []*object.Commit
+	logItr, itrErr := repo.Walk()
+	var commits []git2go.Commit
 
 	if itrErr != nil {
 		logger.Log(fmt.Sprintf("Repo has no logs -> %s", itrErr.Error()), global.StatusError)
@@ -35,12 +32,14 @@ func (t AllCommitStruct) AllCommits(commitChan chan AllCommitData) {
 			LatestCommit: "No Commits Available!",
 		}
 	} else {
-		err := logIter.ForEach(func(commit *object.Commit) error {
+		_ = logItr.PushHead()
+
+		err := logItr.Iterate(func(commit *git2go.Commit) bool {
 			if commit != nil {
-				commits = append(commits, commit)
-				return nil
+				commits = append(commits, *commit)
+				return true
 			} else {
-				return types.Error{Msg: "Empty commit"}
+				return false
 			}
 		})
 
@@ -54,9 +53,11 @@ func (t AllCommitStruct) AllCommits(commitChan chan AllCommitData) {
 		} else {
 			logger.Log(fmt.Sprintf("Total commits in the repo -> %v", len(commits)), global.StatusInfo)
 
-			commitChan <- AllCommitData{
-				TotalCommits: float64(len(commits)),
-				LatestCommit: commits[0].Message,
+			if len(commits) > 0 {
+				commitChan <- AllCommitData{
+					TotalCommits: float64(len(commits)),
+					LatestCommit: commits[0].Message(),
+				}
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 package global
 
-var CurrentVersion = "v2.0.2"
+var CurrentVersion = "2.1.0"
 
 func GetCurrentVersion() string {
 	return CurrentVersion

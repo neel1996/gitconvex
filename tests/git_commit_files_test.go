@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
+	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/graph/model"
 	"os"
@@ -18,7 +18,7 @@ func TestCommitFileList(t *testing.T) {
 
 	if currentEnv == "ci" {
 		repoPath = "/home/runner/work/gitconvex-server/starfleet"
-		r, _ = git.PlainOpen(repoPath)
+		r, _ = git.OpenRepository(repoPath)
 	}
 
 	type args struct {
@@ -35,7 +35,7 @@ func TestCommitFileList(t *testing.T) {
 			commitHash string
 		}{repo: r, commitHash: "46aa56e78f2a26d23f604f8e9bbdc240a0a5dbbe"}, want: []*model.GitCommitFileResult{&model.GitCommitFileResult{
 			Type:     "A",
-			FileName: "codeql-analysis.yml",
+			FileName: ".github/workflows/codeql-analysis.yml",
 		}}},
 	}
 	for _, tt := range tests {
@@ -47,7 +47,12 @@ func TestCommitFileList(t *testing.T) {
 			}
 
 			if got := testObject.CommitFileList(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CommitFileList() = %v, want %v", got, tt.want)
+				for _, fileItem := range got {
+					fmt.Println(fileItem.FileName)
+					if fileItem.FileName != tt.want[0].FileName {
+						t.Errorf("CommitFileList() = %v, want %v", got, tt.want)
+					}
+				}
 			}
 		})
 	}

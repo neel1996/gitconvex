@@ -39,11 +39,13 @@ func TestCloneHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var testObject git.CloneInterface
 			testObject = git.CloneStruct{
+				RepoName:   "starfleet",
 				RepoPath:   tt.args.repoPath,
 				RepoURL:    tt.args.repoURL,
 				AuthOption: "noauth",
-				UserName:   nil,
-				Password:   nil,
+				SSHKeyPath: "",
+				UserName:   "",
+				Password:   "",
 			}
 			got, err := testObject.CloneHandler()
 			if (err != nil) != tt.wantErr {

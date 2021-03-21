@@ -1,15 +1,10 @@
 package git
 
 import (
-	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
-	"go/types"
 	"strings"
-	"time"
 )
 
 type CommitLogInterface interface {
@@ -17,66 +12,40 @@ type CommitLogInterface interface {
 }
 
 type CommitLogStruct struct {
-	Repo            *git.Repository
+	Repo            *git2go.Repository
 	ReferenceCommit string
 }
 
 // commitOrganizer collects and organizes the commit related information in the GitCommits struct
-func commitOrganizer(commits []object.Commit) []*model.GitCommits {
-	logger := global.Logger{}
+func commitOrganizer(repo *git2go.Repository, commits []git2go.Commit) []*model.GitCommits {
 	var commitList []*model.GitCommits
 	for _, commit := range commits {
-		if !commit.Hash.IsZero() {
-			commitHash := commit.Hash.String()
-			commitAuthor := strings.Split(commit.Author.String(), " ")[0]
-			commitMessage := strings.Split(commit.Message, "\n")[0]
-			commitFilesItr, err := commit.Files()
-			commitFileCount := 0
-			commitDate := ""
+		if commit.Id().String() != "" {
+			commitHash := commit.Id().String()
+			commitAuthor := strings.Split(commit.Author().Name, " ")[0]
+			commitMessage := strings.Split(commit.Message(), "\n")[0]
 
-			logger.Log(fmt.Sprintf("Fetching commit details for -> %s", commitHash), global.StatusInfo)
-
-			var prevTree *object.Tree
-			prevCommit, parentErr := commit.Parents().Next()
+			parentCommit := commit.Parent(0)
+			if parentCommit == nil {
+				logger.Log("NIL Commit encountered", global.StatusWarning)
+				continue
+			}
+			parentTree, _ := parentCommit.Tree()
 			currentTree, _ := commit.Tree()
 
-			if parentErr != nil {
-				commitFileCount = 0
-			} else {
-				prevTree, _ = prevCommit.Tree()
-				diff, _ := currentTree.Diff(prevTree)
-				commitFileCount = diff.Len()
-			}
+			commitFileCount := 0
+			commitDate := commit.Committer().When.String()
 
-			// Logic to extract commit timestamp from commit string
-			// go-git commit iterator does not provide an option to extract the timestamp directly
+			if parentTree != nil && currentTree != nil {
+				diff, diffErr := repo.DiffTreeToTree(parentTree, currentTree, nil)
 
-			for _, cString := range strings.Split(commit.String(), "\n") {
-				if strings.Contains(cString, "Date:") {
-					str := strings.Split(cString, "Date:")[1]
-					tempDate := strings.TrimSpace(str)
-
-					if strings.Contains(tempDate, "+") {
-						tempDate = strings.TrimSpace(strings.Split(tempDate, "+")[0])
-					} else if strings.Contains(tempDate, "-") {
-						tempDate = strings.TrimSpace(strings.Split(tempDate, "-")[0])
-					}
-
-					cTime, convErr := time.Parse(time.ANSIC, tempDate)
-					if convErr != nil {
-						logger.Log(convErr.Error(), global.StatusError)
-					} else {
-						commitDate = cTime.String()
-					}
+				if diffErr == nil {
+					commitFileCount, _ = diff.NumDeltas()
+				} else {
+					logger.Log(diffErr.Error(), global.StatusError)
 				}
-			}
-
-			if err != nil {
-				logger.Log(err.Error(), global.StatusError)
 			} else {
-				_ = commitFilesItr.ForEach(func(file *object.File) error {
-					return nil
-				})
+				logger.Log("Unable to fetch commit tree", global.StatusError)
 			}
 
 			commitList = append(commitList, &model.GitCommits{
@@ -88,7 +57,6 @@ func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 			})
 		}
 	}
-
 	return commitList
 }
 
@@ -96,8 +64,7 @@ func commitOrganizer(commits []object.Commit) []*model.GitCommits {
 // Limits the length of commits to 10 for a single function call
 // The referenceCommit is used as a reference to fetch the commits in a linear manner
 func (c CommitLogStruct) CommitLogs() *model.GitCommitLogResults {
-	var commitLogs []object.Commit
-	var logOptions *git.LogOptions
+	var commitLogs []git2go.Commit
 
 	repo := c.Repo
 	referenceCommit := c.ReferenceCommit
@@ -111,39 +78,43 @@ func (c CommitLogStruct) CommitLogs() *model.GitCommitLogResults {
 	acc := <-allCommitChan
 	totalCommits := acc.TotalCommits
 
+	var counter int
+	counter = 0
+
 	if referenceCommit == "" {
 		head, _ := repo.Head()
-		logOptions = &git.LogOptions{
-			From:  head.Hash(),
-			Order: git.LogOrderDFSPost,
-			All:   false,
+		if head != nil {
+			nxt, _ := repo.LookupCommit(head.Target())
+			for nxt != nil && counter <= 10 {
+				commitLogs = append(commitLogs, *nxt)
+				nxt = nxt.Parent(0)
+				counter++
+			}
+		} else {
+			logger.Log("Unable to fetch repo HEAD", global.StatusError)
+			return &model.GitCommitLogResults{
+				TotalCommits: &totalCommits,
+				Commits:      nil,
+			}
 		}
 	} else {
-		hash := plumbing.NewHash(referenceCommit)
-		logOptions = &git.LogOptions{
-			From:  hash,
-			Order: git.LogOrderDFSPost,
-			All:   false,
+		refId, _ := git2go.NewOid(referenceCommit)
+		refCommit, refCommitErr := repo.LookupCommit(refId)
+
+		if refCommitErr == nil {
+			nxt := refCommit.Parent(0)
+			for nxt != nil && counter <= 10 {
+				commitLogs = append(commitLogs, *nxt)
+				nxt = nxt.Parent(0)
+				counter++
+			}
+		} else {
+			logger.Log(refCommitErr.Error(), global.StatusError)
+			return &model.GitCommitLogResults{
+				TotalCommits: &totalCommits,
+				Commits:      nil,
+			}
 		}
-	}
-
-	commitItr, commitErr := repo.Log(logOptions)
-
-	var commitCounter int
-	commitCounter = 0
-
-	if commitErr == nil {
-		_ = commitItr.ForEach(func(commit *object.Commit) error {
-			if commitCounter >= 10 || commit == nil {
-				return types.Error{Msg: "Commit limit reached"}
-			}
-
-			if commit.Hash.String() != referenceCommit {
-				commitLogs = append(commitLogs, *commit)
-				commitCounter++
-			}
-			return nil
-		})
 	}
 
 	if len(commitLogs) == 0 {
@@ -153,7 +124,7 @@ func (c CommitLogStruct) CommitLogs() *model.GitCommitLogResults {
 		}
 	}
 
-	refinedCommits := commitOrganizer(commitLogs)
+	refinedCommits := commitOrganizer(repo, commitLogs)
 	return &model.GitCommitLogResults{
 		TotalCommits: &totalCommits,
 		Commits:      refinedCommits,

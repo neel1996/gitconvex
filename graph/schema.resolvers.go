@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+
 	"github.com/neel1996/gitconvex-server/api"
 	"github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/global"
@@ -12,17 +13,18 @@ import (
 	"github.com/neel1996/gitconvex-server/graph/model"
 )
 
-func (r *mutationResolver) AddRepo(ctx context.Context, repoName string, repoPath string, cloneSwitch bool, repoURL *string, initSwitch bool, authOption string, userName *string, password *string) (*model.AddRepoParams, error) {
+func (r *mutationResolver) AddRepo(ctx context.Context, repoName string, repoPath string, cloneSwitch bool, repoURL *string, initSwitch bool, authOption string, sshKeyPath *string, userName *string, password *string) (*model.AddRepoParams, error) {
 	var addRepoObject api.AddRepoInterface
 	addRepoObject = api.AddRepoInputs{
 		RepoName:    repoName,
 		RepoPath:    repoPath,
 		CloneSwitch: cloneSwitch,
-		RepoURL:     repoURL,
+		RepoURL:     *repoURL,
 		InitSwitch:  initSwitch,
 		AuthOption:  authOption,
-		UserName:    userName,
-		Password:    password,
+		UserName:    *userName,
+		Password:    *password,
+		SSHKeyPath:  *sshKeyPath,
 	}
 	return addRepoObject.AddRepo(), nil
 }
@@ -90,31 +92,8 @@ func (r *mutationResolver) DeleteBranch(ctx context.Context, repoID string, bran
 	deleteBranchObject = git.DeleteBranchInputs{
 		Repo:       repo.GitRepo,
 		BranchName: branchName,
-		ForceFlag:  forceFlag,
 	}
 	return deleteBranchObject.DeleteBranch(), nil
-}
-
-func (r *mutationResolver) AddRemote(ctx context.Context, repoID string, remoteName string, remoteURL string) (string, error) {
-	logger.Log("Initiating remote addition request", global.StatusInfo)
-
-	repoChan := make(chan git.RepoDetails)
-	var repoObject git.RepoInterface
-	repoObject = git.RepoStruct{RepoId: repoID}
-	go repoObject.Repo(repoChan)
-	repo := <-repoChan
-	if repo.GitRepo == nil {
-		logger.Log("Repo is invalid", global.StatusError)
-		return global.RemoteAddError, nil
-	}
-
-	var addRemoteObject git.AddRemoteInterface
-	addRemoteObject = git.AddRemoteStruct{
-		Repo:       repo.GitRepo,
-		RemoteName: remoteName,
-		RemoteURL:  remoteURL,
-	}
-	return addRemoteObject.AddRemote(), nil
 }
 
 func (r *mutationResolver) FetchFromRemote(ctx context.Context, repoID string, remoteURL *string, remoteBranch *string) (*model.FetchResult, error) {
@@ -148,6 +127,11 @@ func (r *mutationResolver) FetchFromRemote(ctx context.Context, repoID string, r
 		RepoPath:     repo.RepoPath,
 		RemoteURL:    *remoteURL,
 		RemoteBranch: *remoteBranch,
+		RepoName:     repo.RepoName,
+		AuthOption:   repo.AuthOption,
+		UserName:     repo.UserName,
+		Password:     repo.Password,
+		SSHKeyPath:   repo.SSHKeyPath,
 	}
 	return fetchObject.FetchFromRemote(), nil
 }
@@ -174,6 +158,11 @@ func (r *mutationResolver) PullFromRemote(ctx context.Context, repoID string, re
 		RemoteURL:    *remoteURL,
 		RemoteBranch: *remoteBranch,
 		RepoPath:     repo.RepoPath,
+		RepoName:     repo.RepoName,
+		AuthOption:   repo.AuthOption,
+		UserName:     repo.UserName,
+		Password:     repo.Password,
+		SSHKeyPath:   repo.SSHKeyPath,
 	}
 	return pullObject.PullFromRemote(), nil
 }
@@ -214,6 +203,7 @@ func (r *mutationResolver) RemoveStagedItem(ctx context.Context, repoID string, 
 
 	var resetObject git.ResetInterface
 	resetObject = git.ResetStruct{
+		Repo:     repo.GitRepo,
 		RepoPath: repo.RepoPath,
 		FileItem: item,
 	}
@@ -273,14 +263,8 @@ func (r *mutationResolver) CommitChanges(ctx context.Context, repoID string, com
 	}
 
 	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
-		w, _ := repo.GitRepo.Worktree()
-		if w != nil {
-
-			return commitObject.CommitChanges(), nil
-		} else {
-			logger.Log("Repo is invalid or worktree is null", global.StatusError)
-			return global.CommitChangeError, nil
-		}
+		logger.Log("Repo is invalid or worktree is null", global.StatusError)
+		return global.CommitChangeError, nil
 	}
 	return commitObject.CommitChanges(), nil
 }
@@ -310,6 +294,11 @@ func (r *mutationResolver) PushToRemote(ctx context.Context, repoID string, remo
 	var pushObject git.PushInterface
 	pushObject = git.PushStruct{
 		Repo:         repo.GitRepo,
+		RepoName:     repo.RepoName,
+		AuthOption:   repo.AuthOption,
+		UserName:     repo.UserName,
+		Password:     repo.Password,
+		SSHKeyPath:   repo.SSHKeyPath,
 		RemoteName:   remoteName,
 		RemoteBranch: branch,
 		RepoPath:     repo.RepoPath,
@@ -335,6 +324,72 @@ func (r *mutationResolver) DeleteRepo(ctx context.Context, repoID string) (*mode
 func (r *mutationResolver) UpdateRepoName(ctx context.Context, repoID string, repoName string) (string, error) {
 	logger.Log("Initiating repo name update request", global.StatusInfo)
 	return api.UpdateRepoName(repoID, repoName)
+}
+
+func (r *mutationResolver) AddRemote(ctx context.Context, repoID string, remoteName string, remoteURL string) (*model.RemoteMutationResult, error) {
+	logger.Log("Initiating remote addition request", global.StatusInfo)
+
+	repoChan := make(chan git.RepoDetails)
+	var repoObject git.RepoInterface
+	repoObject = git.RepoStruct{RepoId: repoID}
+	go repoObject.Repo(repoChan)
+	repo := <-repoChan
+	if repo.GitRepo == nil {
+		logger.Log("Repo is invalid", global.StatusError)
+		return &model.RemoteMutationResult{Status: global.RemoteAddError}, nil
+	}
+
+	var addRemoteObject git.AddRemoteInterface
+	addRemoteObject = git.AddRemoteStruct{
+		Repo:       repo.GitRepo,
+		RemoteName: remoteName,
+		RemoteURL:  remoteURL,
+	}
+	return addRemoteObject.AddRemote(), nil
+}
+
+func (r *mutationResolver) DeleteRemote(ctx context.Context, repoID string, remoteName string) (*model.RemoteMutationResult, error) {
+	logger.Log("Initiating remote deletion request", global.StatusInfo)
+
+	repoChan := make(chan git.RepoDetails)
+	var repoObject git.RepoInterface
+	repoObject = git.RepoStruct{RepoId: repoID}
+	go repoObject.Repo(repoChan)
+	repo := <-repoChan
+	if repo.GitRepo == nil {
+		logger.Log("Repo is invalid", global.StatusError)
+		return &model.RemoteMutationResult{Status: global.RemoteAddError}, nil
+	}
+
+	var addRemoteObject git.DeleteRemoteInterface
+	addRemoteObject = &git.DeleteRemoteStruct{
+		Repo:       repo.GitRepo,
+		RemoteName: remoteName,
+	}
+	return addRemoteObject.DeleteRemote(), nil
+}
+
+func (r *mutationResolver) EditRemote(ctx context.Context, repoID string, remoteName string, remoteURL string) (*model.RemoteMutationResult, error) {
+	logger.Log("Initiating remote edit request", global.StatusInfo)
+
+	repoChan := make(chan git.RepoDetails)
+	var repoObject git.RepoInterface
+	repoObject = git.RepoStruct{RepoId: repoID}
+	go repoObject.Repo(repoChan)
+	repo := <-repoChan
+
+	if repo.GitRepo == nil {
+		logger.Log("Repo is invalid", global.StatusError)
+		return &model.RemoteMutationResult{Status: global.RemoteEditError}, nil
+	}
+
+	var editRemoteObject git.RemoteEditInterface
+	editRemoteObject = git.RemoteEditStruct{
+		Repo:       repo.GitRepo,
+		RemoteName: remoteName,
+		RemoteUrl:  remoteURL,
+	}
+	return editRemoteObject.EditRemoteUrl(), nil
 }
 
 func (r *queryResolver) HealthCheck(ctx context.Context) (*model.HealthCheckParams, error) {
@@ -379,7 +434,6 @@ func (r *queryResolver) GitFolderContent(ctx context.Context, repoID string, dir
 		DirectoryName: *directoryName,
 		FileName:      nil,
 	}
-
 	return listFileObject.ListFiles(), nil
 }
 
@@ -444,6 +498,7 @@ func (r *queryResolver) SearchCommitLogs(ctx context.Context, repoID string, sea
 	repo := <-repoChan
 
 	var searchCommitObject git.SearchCommitInterface
+
 	searchCommitObject = git.SearchCommitStruct{
 		Repo:       repo.GitRepo,
 		SearchType: searchType,
@@ -495,7 +550,7 @@ func (r *queryResolver) GitChanges(ctx context.Context, repoID string) (*model.G
 	repoObject = git.RepoStruct{RepoId: repoID}
 	go repoObject.Repo(repoChan)
 	repo := <-repoChan
-	var gitChangeObject git.ChangeInterface
+	var gitChangeObject git.ChangedItemsInterface
 
 	if repo.GitRepo == nil {
 		logger.Log("Repo is invalid", global.StatusError)
@@ -507,14 +562,14 @@ func (r *queryResolver) GitChanges(ctx context.Context, repoID string) (*model.G
 		}, nil
 	}
 
-	gitChangeObject = git.ChangedStruct{
+	gitChangeObject = git.ChangedItemStruct{
 		Repo:     repo.GitRepo,
 		RepoPath: repo.RepoPath,
 	}
 	return gitChangeObject.ChangedFiles(), nil
 }
 
-func (r *queryResolver) GitUnPushedCommits(ctx context.Context, repoID string, remoteURL string, remoteBranch string) ([]*string, error) {
+func (r *queryResolver) GitUnPushedCommits(ctx context.Context, repoID string, remoteURL string, remoteBranch string) ([]*model.GitCommits, error) {
 	logger.Log("Initiating get un-pushed commits request", global.StatusInfo)
 
 	repoChan := make(chan git.RepoDetails)
@@ -633,6 +688,23 @@ func (r *queryResolver) BranchCompare(ctx context.Context, repoID string, baseBr
 		DiffBranch: compareBranch,
 	}
 	return branchCompareObject.CompareBranch(), nil
+}
+
+func (r *queryResolver) GetRemote(ctx context.Context, repoID string) ([]*model.RemoteDetails, error) {
+	logger.Log("Initating remote data fetching", global.StatusInfo)
+
+	repoChan := make(chan git.RepoDetails)
+	var repoObject git.RepoInterface
+	repoObject = git.RepoStruct{RepoId: repoID}
+	go repoObject.Repo(repoChan)
+	repo := <-repoChan
+
+	var remoteObject git.RemoteDataInterface
+	remoteObject = git.RemoteDataStruct{
+		Repo: repo.GitRepo,
+	}
+	allRemoteData := remoteObject.GetAllRemotes()
+	return allRemoteData, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

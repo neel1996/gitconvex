@@ -22,7 +22,6 @@ func (c CodeViewInputs) CodeFileView() *model.CodeFileType {
 	var codeLines []*string
 
 	targetFile := c.RepoPath + "/" + c.FileName
-	logger := global.Logger{}
 	file, err := os.Open(targetFile)
 
 	if err != nil {
@@ -31,6 +30,21 @@ func (c CodeViewInputs) CodeFileView() *model.CodeFileType {
 			FileData: nil,
 		}
 	} else {
+		fileInfo, fileInfoErr := file.Stat()
+		if fileInfoErr != nil {
+			logger.Log(fileInfoErr.Error(), global.StatusError)
+			return &model.CodeFileType{
+				FileData: nil,
+			}
+		} else {
+			if fileInfo.IsDir() {
+				logger.Log("Directory cannot be read as a file!", global.StatusError)
+				return &model.CodeFileType{
+					FileData: nil,
+				}
+			}
+		}
+
 		logger.Log(fmt.Sprintf("Reading lines from file --> %s", targetFile), global.StatusInfo)
 		scanner := bufio.NewScanner(file)
 		scanner.Split(bufio.ScanLines)

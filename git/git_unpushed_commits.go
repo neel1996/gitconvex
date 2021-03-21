@@ -1,133 +1,84 @@
 package git
 
 import (
-	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
-	"go/types"
-	"strings"
-	"time"
+	"github.com/neel1996/gitconvex-server/graph/model"
 )
 
 type UnPushedCommitInterface interface {
-	UnPushedCommits() []*string
+	UnPushedCommits() []*model.GitCommits
 }
 
 type UnPushedCommitStruct struct {
-	Repo      *git.Repository
+	Repo      *git2go.Repository
 	RemoteRef string
 }
 
 // commitModel function generates a pipe separated string with the required commit details
 // The resultant string will be sent to the client
-func commitModel(commit object.Commit) string {
-	commitHash := commit.Hash.String()
-	commitAuthor := strings.Split(commit.Author.String(), " ")[0]
-	commitMessage := strings.Split(commit.Message, "\n")[0]
-	commitDate := ""
+func commitModel(commit *git2go.Commit) *model.GitCommits {
+	commitHash := commit.Id().String()[:7]
+	commitAuthor := commit.Author().Name
+	commitMessage := commit.Message()
+	commitDate := commit.Author().When.String()
 
-	for _, cString := range strings.Split(commit.String(), "\n") {
-		if strings.Contains(cString, "Date:") {
-			str := strings.Split(cString, "Date:")[1]
-			tempDate := strings.TrimSpace(str)
-
-			if strings.Contains(tempDate, "+") {
-				tempDate = strings.TrimSpace(strings.Split(tempDate, "+")[0])
-			} else if strings.Contains(tempDate, "-") {
-				tempDate = strings.TrimSpace(strings.Split(tempDate, "-")[0])
-			}
-
-			cTime, convErr := time.Parse(time.ANSIC, tempDate)
-			if convErr != nil {
-				logger.Log(convErr.Error(), global.StatusError)
-			} else {
-				tempDate = cTime.String()
-				if strings.Contains(tempDate, "+") {
-					tempDate = strings.TrimSpace(strings.Split(tempDate, "+")[0])
-				} else if strings.Contains(tempDate, "-") {
-					tempDate = strings.TrimSpace(strings.Split(tempDate, "-")[0])
-				}
-				commitDate = tempDate
-			}
-		}
+	return &model.GitCommits{
+		Hash:          &commitHash,
+		Author:        &commitAuthor,
+		CommitTime:    &commitDate,
+		CommitMessage: &commitMessage,
 	}
-
-	commitString := commitHash[:7] + "||" + commitAuthor + "||" + commitDate + "||" + commitMessage
-	return commitString
-}
-
-func nilCommit() []*string {
-	logger.Log("No new commits available to push", global.StatusWarning)
-	return nil
 }
 
 // UnPushedCommits compares the local branch and the remote branch to extract the commits which are not pushed to the remote
-func (u UnPushedCommitStruct) UnPushedCommits() []*string {
+func (u UnPushedCommitStruct) UnPushedCommits() []*model.GitCommits {
 	repo := u.Repo
 	remoteRef := u.RemoteRef
-	var commitArray []*string
-	var isAncestor bool
-	isAncestor = true
+	var commitArray []*model.GitCommits
 
-	revHash, _ := repo.ResolveRevision(plumbing.Revision(remoteRef))
-	remoteCommit, _ := repo.CommitObject(*revHash)
-
-	// Retuning nil commit response if repo has no HEAD
+	// Returning nil commit response if repo has no HEAD
 	head, _ := repo.Head()
 	if head == nil {
-		return nilCommit()
+		return []*model.GitCommits{}
 	}
 
-	localCommit, _ := repo.CommitObject(head.Hash())
-	isAncestor, _ = localCommit.IsAncestor(remoteCommit)
+	remoteBranch, remoteBranchErr := repo.LookupBranch(remoteRef, git2go.BranchRemote)
+	if remoteBranchErr != nil {
+		logger.Log(remoteBranchErr.Error(), global.StatusError)
+		return commitArray
+	}
 
-	if !isAncestor {
-		logItr, _ := repo.Log(&git.LogOptions{
-			From:  localCommit.Hash,
-			Order: git.LogOrderDFSPost,
-			All:   false,
-		})
+	// Checking if both branches have any varying commits
+	diff := head.Cmp(remoteBranch.Reference)
+	if diff == 0 {
+		return commitArray
+	}
 
-		if logItr == nil {
-			if localCommit != nil {
-				commitString := commitModel(*localCommit)
-				logger.Log(fmt.Sprintf("New commit available for pushing to remote -> %s", commitString), global.StatusInfo)
-				commitArray = append(commitArray, &commitString)
-				return commitArray
-			} else {
-				return nilCommit()
+	localCommit, _ := repo.LookupCommit(head.Target())
+	remoteCommit, _ := repo.LookupCommit(remoteBranch.Target())
+
+	if localCommit != nil && remoteCommit != nil {
+		commonAncestor, _ := repo.MergeBase(localCommit.Id(), remoteCommit.Id())
+		if commonAncestor != nil {
+			commitArray = append(commitArray, commitModel(localCommit))
+			n := localCommit.ParentCount()
+			var i uint
+			for i = 0; i < n; i++ {
+				currentCommit := localCommit.Parent(i)
+				if currentCommit != nil && currentCommit.Id().String() != commonAncestor.String() {
+					commitArray = append(commitArray, commitModel(currentCommit))
+				} else {
+					break
+				}
 			}
+		} else {
+			logger.Log("No new commits available to push", global.StatusWarning)
+			return []*model.GitCommits{}
 		}
-
-		_ = logItr.ForEach(func(commit *object.Commit) error {
-			if commit == nil {
-				logger.Log("Commit object is nil", global.StatusError)
-				return types.Error{Msg: "Commit object is nil"}
-			}
-
-			// If the remote branch has no commits to compare, then the first local commit will be returned
-			if remoteCommit == nil {
-				commitString := commitModel(*commit)
-				logger.Log(fmt.Sprintf("New commit available for pushing to remote -> %s", commitString), global.StatusInfo)
-				commitArray = append(commitArray, &commitString)
-				return nil
-			}
-			if commit.Hash == remoteCommit.Hash {
-				logger.Log(fmt.Sprintf("Same commits found in remote and local trees -> %s", commit.Hash.String()), global.StatusInfo)
-				return types.Error{Msg: "Same commit"}
-			}
-
-			commitString := commitModel(*commit)
-			logger.Log(fmt.Sprintf("New commit available for pushing to remote -> %s", commitString), global.StatusInfo)
-			commitArray = append(commitArray, &commitString)
-			return nil
-		})
-		logItr.Close()
 		return commitArray
 	} else {
-		return nilCommit()
+		logger.Log("No new commits available to push", global.StatusWarning)
+		return []*model.GitCommits{}
 	}
-
 }

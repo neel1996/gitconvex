@@ -10,11 +10,9 @@ export default function BranchListComponent({ repoId }) {
 
   const [branchList, setBranchList] = useState([]);
   const [listError, setListError] = useState(false);
-  const [switchSuccess, setSwitchSuccess] = useState(false);
   const [switchError, setSwitchError] = useState(false);
   const [switchedBranch, setSwitchedBranch] = useState("");
   const [errorBranch, setErrorBranch] = useState("");
-  const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [branchSearchTerm, setBranchSearchTerm] = useState("");
@@ -22,12 +20,10 @@ export default function BranchListComponent({ repoId }) {
 
   function resetStates() {
     setListError(false);
-    setSwitchSuccess(false);
     setSwitchError(false);
     setSwitchedBranch("");
     setErrorBranch("");
     setDeleteError(false);
-    setDeleteSuccess(false);
     setBranchSearchTerm("");
     setFilteredBranchList([]);
   }
@@ -38,6 +34,7 @@ export default function BranchListComponent({ repoId }) {
 
     setLoading(true);
     setBranchList([]);
+    setSwitchedBranch("");
 
     axios({
       url: globalAPIEndpoint,
@@ -75,7 +72,6 @@ export default function BranchListComponent({ repoId }) {
             }
             return branch;
           });
-
           setBranchList([...gitAllBranchList]);
         } else {
           setListError(true);
@@ -114,12 +110,10 @@ export default function BranchListComponent({ repoId }) {
         if (res.data.data && !res.data.error) {
           const checkoutStatus = res.data.data.checkoutBranch;
           if (checkoutStatus === "CHECKOUT_FAILED") {
-            setSwitchSuccess(false);
             setErrorBranch(branchName);
             setSwitchError(true);
             return;
           } else {
-            setSwitchSuccess(true);
             setSwitchedBranch(branchName);
           }
         } else {
@@ -159,7 +153,6 @@ export default function BranchListComponent({ repoId }) {
 
         if (res.data.data && !res.data.error) {
           if (res.data.data.deleteBranch.status === "BRANCH_DELETE_SUCCESS") {
-            setDeleteSuccess(true);
             setSwitchedBranch(branchName);
           } else {
             setDeleteError(true);
@@ -186,17 +179,6 @@ export default function BranchListComponent({ repoId }) {
             {errorBranch}
           </span>
         ) : null}
-      </div>
-    );
-  }
-
-  function successComponent(successString) {
-    return (
-      <div className="text-center p-4 rounded bg-green-300 text-xl font-sans mt-10">
-        {successString}
-        <span className="font-semibold border-b border-dashed mx-2">
-          {switchedBranch}
-        </span>
       </div>
     );
   }
@@ -232,7 +214,10 @@ export default function BranchListComponent({ repoId }) {
         activeSwitchStyle = "border-dashed border-b-2 text-indigo-700 text-2xl";
       }
       return (
-        <div className="flex items-center justify-center px-14 py-4 mx-auto border-dashed border-b" key={branchType + branchName}>
+        <div
+          className="flex items-center justify-center px-14 py-4 mx-auto border-dashed border-b"
+          key={branchType + branchName}
+        >
           <div
             className={
               icon === "wifi"
@@ -312,7 +297,9 @@ export default function BranchListComponent({ repoId }) {
 
   return (
     <div className="bg-gray-50 p-6 mx-auto my-auto items-center rounded-lg w-11/12 xl:w-3/4 lg:w-3/4 md:w-11/12 sm:w-11/12">
-      <div className="text-4xl my-4 font-sans font-semibold text-gray-600">Available Branches</div>
+      <div className="text-4xl my-4 font-sans font-semibold text-gray-600">
+        Available Branches
+      </div>
       <div className="flex justify-start items-center font-sans text-sm font-semibold text-red-500">
         <div>
           <FontAwesomeIcon
@@ -327,7 +314,10 @@ export default function BranchListComponent({ repoId }) {
       <div className="italic font-sans font-semibold text-lg my-2 border-b-2 border-dashed border-gray-300 text-gray-300">
         Click on a branch to checkout to that branch
       </div>
-      <div className="w-full mx-auto my-6 overflow-y-auto overflow-x-hidden" style={{ height: "400px" }}>
+      <div
+        className="w-full mx-auto my-6 overflow-y-auto overflow-x-hidden"
+        style={{ height: "400px" }}
+      >
         {loading ? (
           <div className="text-center font-sans font-light text-xl my-2 text-gray-600 border-b border-dotted">
             Collecting branch list...
@@ -383,15 +373,9 @@ export default function BranchListComponent({ repoId }) {
         ? errorComponent("Error occurred while switching to", true)
         : null}
 
-      {switchedBranch.length > 0 && switchSuccess
-        ? successComponent("Active branch has been switched to")
+      {switchedBranch && switchedBranch.length > 0 && deleteError
+        ? errorComponent("Branch deletion failed for", true)
         : null}
-
-      {deleteSuccess
-        ? successComponent("Selected branch has been removed")
-        : null}
-
-      {deleteError ? errorComponent("Branch deletion failed for", true) : null}
     </div>
   );
 }

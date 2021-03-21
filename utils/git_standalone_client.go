@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Not used anymore from v2.1.0
 func GetGitClient(targetPath string, args []string) exec.Cmd {
 	// Checking if git is installed and accessible from command line
 	var git string

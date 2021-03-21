@@ -23,7 +23,7 @@ func TestHealthCheckApi(t *testing.T) {
 				t.Errorf("HealthCheckApi() = %v, want %v", got, tt.want)
 			}
 
-			if got := api.HealthCheckApi(); !strings.Contains(got.Git, "git") {
+			if got := api.HealthCheckApi(); got.Gitconvex == "" {
 				t.Errorf("HealthCheckApi() = git version string empty")
 			}
 		})

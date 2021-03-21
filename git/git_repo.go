@@ -1,7 +1,7 @@
 package git
 
 import (
-	git "github.com/go-git/go-git/v5"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/utils"
 )
@@ -15,14 +15,18 @@ type RepoStruct struct {
 }
 
 type RepoDetails struct {
-	RepoId   string
-	RepoPath string
-	GitRepo  *git.Repository
+	RepoId     string
+	RepoPath   string
+	RepoName   string
+	TimeStamp  string
+	AuthOption string
+	UserName   string
+	Password   string
+	SSHKeyPath string
+	GitRepo    *git2go.Repository
 }
 
 func handlePanic() {
-	logger := global.Logger{}
-
 	panicMsg := recover()
 	if panicMsg != nil {
 		logger.Log("Required fields not received", global.StatusWarning)
@@ -32,8 +36,15 @@ func handlePanic() {
 // Repo function gets the repoId and returns the respective git.Repository object along with additional repo metadata
 func (r RepoStruct) Repo(repoChan chan RepoDetails) {
 	var repoData []utils.RepoData
-	var repoPath string
-	logger := global.Logger{}
+	var (
+		repoName   string
+		repoPath   string
+		authOption string
+		sshKeyPath string
+		userName   string
+		password   string
+		timeStamp  string
+	)
 	repoId := r.RepoId
 
 	defer handlePanic()
@@ -46,14 +57,18 @@ func (r RepoStruct) Repo(repoChan chan RepoDetails) {
 
 	for _, repo := range repoData {
 		if repo.RepoId == repoId {
+			repoName = repo.RepoName
+			authOption = repo.AuthOption
+			sshKeyPath = repo.SSHKeyPath
+			userName = repo.UserName
+			password = repo.Password
 			repoPath = repo.RepoPath
+			timeStamp = repo.TimeStamp
 			break
 		}
 	}
 
-	repository, err := git.PlainOpenWithOptions(repoPath, &git.PlainOpenOptions{
-		DetectDotGit: true,
-	})
+	git2goRepo, err := git2go.OpenRepository(repoPath)
 
 	if err != nil {
 		logger.Log(err.Error(), global.StatusError)
@@ -64,9 +79,15 @@ func (r RepoStruct) Repo(repoChan chan RepoDetails) {
 		}
 	} else {
 		repoChan <- RepoDetails{
-			RepoId:   repoId,
-			RepoPath: repoPath,
-			GitRepo:  repository,
+			RepoId:     repoId,
+			RepoPath:   repoPath,
+			RepoName:   repoName,
+			TimeStamp:  timeStamp,
+			AuthOption: authOption,
+			UserName:   userName,
+			Password:   password,
+			SSHKeyPath: sshKeyPath,
+			GitRepo:    git2goRepo,
 		}
 	}
 	close(repoChan)

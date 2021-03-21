@@ -1,78 +1,42 @@
 package git
 
 import (
-	"bytes"
 	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/protocol/packp/sideband"
-	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
-	"github.com/neel1996/gitconvex-server/utils"
-	"go/types"
-	"io"
-	"strings"
 )
 
 type PullInterface interface {
 	PullFromRemote() *model.PullResult
-	windowsPull() *model.PullResult
 }
 
 type PullStruct struct {
-	Repo         *git.Repository
+	Repo         *git2go.Repository
 	RemoteURL    string
 	RemoteBranch string
 	RemoteName   string
+	RepoName     string
 	RepoPath     string
+	AuthOption   string
+	UserName     string
+	Password     string
+	SSHKeyPath   string
 }
 
-// windowsPull is used for pulling changes using the git client if the platform is windows
-// go-git pull fails in windows due to SSH authentication error
-func (p PullStruct) windowsPull() *model.PullResult {
-	remoteName := p.RemoteName
-	repoPath := p.RepoPath
-	branch := p.RemoteBranch
-
-	args := []string{"pull", remoteName, branch}
-	cmd := utils.GetGitClient(repoPath, args)
-	cmdStr, cmdErr := cmd.Output()
-
-	if cmdErr != nil {
-		logger.Log(fmt.Sprintf("Pull failed -> %s", cmdErr.Error()), global.StatusError)
-
-		return &model.PullResult{
-			Status:      global.PullFromRemoteError,
-			PulledItems: nil,
-		}
-	} else {
-		if strings.Contains(string(cmdStr), "Already up to date") {
-			logger.Log(fmt.Sprintf("No new changes available -> %s", cmdStr), global.StatusInfo)
-
-			msg := "No changes to pull from " + remoteName
-			return &model.PullResult{
-				Status:      global.PullNoNewChanges,
-				PulledItems: []*string{&msg},
-			}
-		}
-		msg := "New Items Pulled from remote " + remoteName
-		logger.Log(fmt.Sprintf("Changes pulled from remote -> %s", cmdStr), global.StatusInfo)
-		return &model.PullResult{
-			Status:      global.PullFromRemoteSuccess,
-			PulledItems: []*string{&msg},
-		}
+func returnPullErr(msg string) *model.PullResult {
+	logger.Log(msg, global.StatusError)
+	return &model.PullResult{
+		Status:      global.PullFromRemoteError,
+		PulledItems: nil,
 	}
 }
 
 // PullFromRemote pulls the changes from the remote repository using the remote URL and branch name received
 func (p PullStruct) PullFromRemote() *model.PullResult {
-	var pullErr error
-	logger := global.Logger{}
-
 	repo := p.Repo
-	remoteURL := p.RemoteURL
 	remoteBranch := p.RemoteBranch
+	remoteURL := p.RemoteURL
 
 	var remoteDataObject RemoteDataInterface
 	remoteDataObject = RemoteDataStruct{
@@ -81,80 +45,153 @@ func (p PullStruct) PullFromRemote() *model.PullResult {
 	}
 
 	remoteName := remoteDataObject.GetRemoteName()
-	p.RemoteName = remoteName
+	localRefSpec := "+refs/heads/" + remoteBranch
+	targetRefPsec := "refs/remotes/" + remoteName + "/" + remoteBranch
+	targetRemote, _ := repo.Remotes.Lookup(remoteName)
 
-	w, _ := repo.Worktree()
-	b := new(bytes.Buffer)
+	if targetRemote == nil {
+		return returnPullErr("Target remote is unavailable")
+	}
 
-	refName := fmt.Sprintf("refs/heads/%s", remoteBranch)
+	var remoteCallbackObject RemoteCallbackInterface
+	remoteCallbackObject = &RemoteCallbackStruct{
+		RepoName:   p.RepoName,
+		UserName:   p.UserName,
+		Password:   p.Password,
+		SSHKeyPath: p.SSHKeyPath,
+		AuthOption: p.AuthOption,
+	}
+	fetchOption := &git2go.FetchOptions{
+		RemoteCallbacks: remoteCallbackObject.RemoteCallbackSelector(),
+		UpdateFetchhead: true,
+	}
 
-	ref, refErr := repo.Storer.Reference(plumbing.ReferenceName(refName))
+	logger.Log(fmt.Sprintf("Fetching changes from -> %s - %s", remoteName, targetRefPsec), global.StatusInfo)
+	fetchErr := targetRemote.Fetch([]string{localRefSpec + ":" + targetRefPsec}, fetchOption, "")
+	if fetchErr != nil {
+		return returnPullErr("Fetch Failed : " + fetchErr.Error())
+	}
 
-	if refErr != nil {
-		fmt.Println(refErr.Error())
-		pullErr = types.Error{Msg: "branch reference does not exist"}
-	} else {
-		logger.Log(fmt.Sprintf("Pulling changes from -> %s : %s", remoteURL, ref.Name()), global.StatusInfo)
-		gitSSHAuth, sshErr := ssh.NewSSHAgentAuth("git")
-
-		if remoteName == "" {
-			return &model.PullResult{
-				Status:      global.PullFromRemoteError,
-				PulledItems: nil,
-			}
+	remoteRef, remoteRefErr := repo.References.Lookup(targetRefPsec)
+	if remoteRefErr == nil {
+		head, _ := repo.Head()
+		if head == nil {
+			return returnPullErr("HEAD is nil")
+		}
+		headCommit, headCommitErr := repo.LookupCommit(head.Target())
+		if headCommitErr != nil {
+			return returnPullErr("HEAD commit lookup error : " + headCommitErr.Error())
 		}
 
-		if sshErr != nil {
-			logger.Log("Authentication method failed -> "+sshErr.Error(), global.StatusError)
-			w, _ := repo.Worktree()
-			if w == nil {
-				return &model.PullResult{
-					Status:      global.PullFromRemoteError,
-					PulledItems: nil,
+		annotatedCommit, _ := repo.AnnotatedCommitFromRef(remoteRef)
+		if annotatedCommit != nil {
+			mergeAnalysis, _, mergeErr := repo.MergeAnalysis([]*git2go.AnnotatedCommit{annotatedCommit})
+			if mergeErr != nil {
+				return returnPullErr("Pull failed - " + mergeErr.Error())
+			} else {
+				if mergeAnalysis&git2go.MergeAnalysisUpToDate != 0 {
+					logger.Log("No new changes to pull from remote", global.StatusWarning)
+					msg := "No new changes to pull from remote"
+					return &model.PullResult{
+						Status:      global.PullNoNewChanges,
+						PulledItems: []*string{&msg},
+					}
+				} else if mergeAnalysis&git2go.MergeAnalysisFastForward != 0 {
+					logger.Log("Fast-forwarding commits...", global.StatusWarning)
+					remoteCommit, _ := repo.LookupCommit(remoteRef.Target())
+					fmt.Println(remoteRef.Name())
+					fmt.Println(remoteCommit.Id(), remoteCommit.Message())
+
+					remoteTree, treeErr := repo.LookupTree(remoteCommit.TreeId())
+					if treeErr != nil {
+						return returnPullErr("Tree Error : " + treeErr.Error())
+					}
+
+					checkoutErr := repo.CheckoutTree(remoteTree, &git2go.CheckoutOptions{
+						Strategy: git2go.CheckoutSafe,
+					})
+					if checkoutErr != nil {
+						return returnPullErr("Tree checkout error : " + checkoutErr.Error())
+					}
+
+					localRef, localRefErr := repo.LookupBranch(remoteBranch, git2go.BranchLocal)
+					if localRefErr != nil {
+						return returnPullErr("Local Reference lookup error :" + localRefErr.Error())
+					}
+					_, targetErr := localRef.SetTarget(remoteRef.Target(), "")
+					if targetErr != nil {
+						return returnPullErr("Target set error : " + targetErr.Error())
+					}
+
+					logger.Log("New changes pulled from remote -> "+targetRemote.Name(), global.StatusInfo)
+					msg := "New changes pulled from remote"
+					return &model.PullResult{
+						Status:      global.PullFromRemoteSuccess,
+						PulledItems: []*string{&msg},
+					}
+				} else {
+					err := repo.Merge([]*git2go.AnnotatedCommit{annotatedCommit}, nil, &git2go.CheckoutOptions{
+						Strategy: git2go.CheckoutSafe,
+					})
+
+					if err != nil {
+						return returnPullErr("Annotated merge failed : " + err.Error())
+					} else {
+						remoteCommit, _ := repo.LookupCommit(remoteRef.Target())
+						fmt.Println(remoteRef.Name())
+						fmt.Println(remoteCommit.Id(), remoteCommit.Message())
+
+						newIdx, _ := repo.MergeCommits(headCommit, remoteCommit, nil)
+						if newIdx != nil {
+							if newIdx.HasConflicts() {
+								return returnPullErr("Conflicts encountered while merge analysis")
+							}
+						}
+
+						repoIndex, _ := repo.Index()
+						if repoIndex.HasConflicts() {
+							return returnPullErr("Conflicts encountered while pulling changes")
+						}
+
+						indexTree, indexTreeErr := repoIndex.WriteTree()
+						if indexTreeErr != nil {
+							return returnPullErr("Index Tree Error : " + indexTreeErr.Error())
+						}
+						remoteTree, treeErr := repo.LookupTree(indexTree)
+						if treeErr != nil {
+							return returnPullErr("Tree Error : " + treeErr.Error())
+						}
+						head, _ = repo.Head()
+						if head == nil {
+							return returnPullErr("HEAD is nil")
+						}
+						headCommit, _ = repo.LookupCommit(head.Target())
+						if headCommit == nil {
+							return returnPullErr("HEAD commit is nil")
+						}
+
+						_, newCommitErr := repo.CreateCommit("HEAD", remoteCommit.Author(), remoteCommit.Committer(), remoteCommit.Message(), remoteTree, headCommit, remoteCommit)
+						if newCommitErr != nil {
+							logger.Log(newCommitErr.Error(), global.StatusError)
+						}
+
+						cleanupErr := repo.StateCleanup()
+						if cleanupErr != nil {
+							return returnPullErr(cleanupErr.Error())
+						}
+
+						logger.Log("New changes pulled from remote -> "+targetRemote.Name(), global.StatusInfo)
+						msg := "New changes pulled from remote"
+						return &model.PullResult{
+							Status:      global.PullFromRemoteSuccess,
+							PulledItems: []*string{&msg},
+						}
+					}
 				}
 			}
-			return p.windowsPull()
-		}
-
-		pullErr = w.Pull(&git.PullOptions{
-			RemoteName:    remoteName,
-			Auth:          gitSSHAuth,
-			ReferenceName: ref.Name(),
-			Progress: sideband.Progress(func(f io.Writer) io.Writer {
-				return f
-			}(b)),
-			SingleBranch: true,
-		})
-	}
-
-	// Logging the pull message stream sent from the remote server
-	logger.Log(b.String(), global.StatusInfo)
-
-	if pullErr != nil {
-		if pullErr.Error() == git.NoErrAlreadyUpToDate.Error() {
-			logger.Log("Pull failed with error : "+pullErr.Error(), global.StatusWarning)
-			msg := "No changes to pull from " + remoteName
-			return &model.PullResult{
-				Status:      global.PullNoNewChanges,
-				PulledItems: []*string{&msg},
-			}
-		} else {
-			if strings.Contains(pullErr.Error(), "ssh: handshake failed: ssh:") || strings.Contains(pullErr.Error(), "invalid auth method") {
-				logger.Log("Pull failed. Retrying pull with git client", global.StatusWarning)
-				return p.windowsPull()
-			}
-			logger.Log(pullErr.Error(), global.StatusError)
-			return &model.PullResult{
-				Status:      global.PullFromRemoteError,
-				PulledItems: nil,
-			}
 		}
 	} else {
-		logger.Log("New items pulled from remote", global.StatusInfo)
-		msg := "New Items Pulled from remote " + remoteName
-		return &model.PullResult{
-			Status:      global.PullFromRemoteSuccess,
-			PulledItems: []*string{&msg},
-		}
+		return returnPullErr(remoteRefErr.Error())
 	}
+	return returnPullErr("")
 }

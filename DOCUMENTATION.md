@@ -67,7 +67,7 @@ $ ./dist/gitconvex.exe
 ![add-a-repo](https://user-images.githubusercontent.com/65342122/88536126-db9d2680-d028-11ea-890f-c5fc11cd7cf0.png)
 
 - Enter repo name and paste the repo path. If the folder is not a git repo then check the "*Check this if the folder is not a git repo*" checkbox to initialize git.
-![repo-details](https://user-images.githubusercontent.com/65342122/101985829-556c3e80-3cb0-11eb-8449-ed9a05621c8e.png)
+![repo-details](https://user-images.githubusercontent.com/65342122/111644706-18bb6080-8826-11eb-9e21-d4052140b370.png)
 
 - The newly added repo will be displayed as a card in the dashboard
 ![repo-card](https://user-images.githubusercontent.com/65342122/89167157-ab113b80-d598-11ea-8985-2469e7ad261e.png)
@@ -76,6 +76,7 @@ $ ./dist/gitconvex.exe
 - Click on the repo card to get the following details about the repo
 ```
 - The list of branches
+- Remote management
 - Commit logs
 - Latest commit
 - Active branch and available local branches
@@ -85,14 +86,14 @@ $ ./dist/gitconvex.exe
 The repo detail view also provides features for performing the following operations,
 ```
 - Adding a new branch
+- Adding/Editing/Deleting a remote
 - Pulling changes from remote
 - Fetching changes from remote
-- Adding a new remote repo
 - Directory navigator to lookup all files and folders within the repo
 - Code view for valid files from the file explorer view
 - Loading commit logs dynamically
 ```
-![repo-card-details](https://user-images.githubusercontent.com/65342122/103479129-82b09600-4df1-11eb-808f-9a6eba736841.png)
+![repo-card-details](https://user-images.githubusercontent.com/65342122/111642465-1fe16f00-8824-11eb-939a-cc52d3f0bdd4.png)
 
 ### Commit logs
 
@@ -100,9 +101,15 @@ The repo detail view also provides features for performing the following operati
 
 ![commit-logs](https://user-images.githubusercontent.com/65342122/90782955-1723cb80-e31d-11ea-9c42-d1d5a6306e6f.png)
 
+### Remote management
+
+- The Remote management pane lets you add new remotes to the target repo, edit the remote URLs of the exsiting remotes and also to delete existing remotes.
+
+![remote-management](https://user-images.githubusercontent.com/65342122/111649000-f6c3dd00-8829-11eb-88e7-2bd368b4dbc2.png)
+
 #### List all branches
 
-![branches](https://user-images.githubusercontent.com/65342122/103480861-f7d59880-4dfc-11eb-9a19-17636d111388.png)
+![branches](https://user-images.githubusercontent.com/65342122/111646521-bbc0aa00-8827-11eb-8d12-adae6cc455d5.png)
 
 Note: In a newly initialized git repo, the newly added branch will be considered by git only after an initial commit
 
@@ -160,4 +167,4 @@ In "Git Difference" click on the modified file to see the difference. The platfo
 
 - Visit help section if you're facing an issue or need any help. If you have any queries or feedback, then discuss it in "Discord" or report an issue in GitHub.
 - You can check the current version of Gitconvex by clicking on the update button in this section.
-![help-and-support](https://user-images.githubusercontent.com/65342122/103891656-3eced100-5110-11eb-9497-3daf8d4195d2.png)
+![help-and-support](https://user-images.githubusercontent.com/65342122/111640522-44d4e280-8822-11eb-9c6c-0b371f99797e.png)

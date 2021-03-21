@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
@@ -9,6 +10,7 @@ import (
 	"github.com/neel1996/gitconvex-server/graph/model"
 	"github.com/neel1996/gitconvex-server/utils"
 	"go/types"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -24,24 +26,23 @@ type AddRepoInputs struct {
 	RepoName    string
 	RepoPath    string
 	CloneSwitch bool
-	RepoURL     *string
+	RepoURL     string
 	InitSwitch  bool
 	AuthOption  string
-	UserName    *string
-	Password    *string
+	UserName    string
+	Password    string
+	SSHKeyPath  string
 }
 
 type RepoData struct {
-	Id        string `json:"id"`
-	RepoName  string `json:"repoName"`
-	RepoPath  string `json:"repoPath"`
-	TimeStamp string `json:"timestamp"`
-}
-
-// localLogger logs messages to the global logger module
-func localLogger(message string, status string) {
-	logger := &global.Logger{Message: message}
-	logger.Log(logger.Message, status)
+	Id         string `json:"id"`
+	RepoName   string `json:"repoName"`
+	RepoPath   string `json:"repoPath"`
+	TimeStamp  string `json:"timestamp"`
+	AuthOption string `json:"authOption"`
+	SSHKeyPath string `json:"sshKeyPath"`
+	UserName   string `json:"userName"`
+	Password   string `json:"password"`
 }
 
 // repoIdGenerator generates a unique ID for the newly added repo
@@ -59,14 +60,14 @@ func repoDataCreator(dbFile string) error {
 	_, err := os.Create(dbFile)
 
 	if err != nil {
-		localLogger(err.Error(), global.StatusError)
+		logger.Log(err.Error(), global.StatusError)
 		return types.Error{Msg: err.Error()}
 	}
 	if dirErr != nil {
-		localLogger(fmt.Sprintf("Error occurred creating database directory \n%v", dirErr), global.StatusError)
+		logger.Log(fmt.Sprintf("Error occurred creating database directory \n%v", dirErr), global.StatusError)
 		return types.Error{Msg: dirErr.Error()}
 	}
-	localLogger("New repo datastore created successfully", global.StatusInfo)
+	logger.Log("New repo datastore created successfully", global.StatusInfo)
 	return nil
 }
 
@@ -90,30 +91,51 @@ func dataFileWriteHandler(dbFile string, repoDataArray []RepoData) error {
 func (inputs AddRepoInputs) repoDataFileWriter(repoId string, repoAddStatus chan string) {
 	rArray := make([]RepoData, 1)
 
+	if inputs.Password != "" {
+		utfBytes := bytes.NewBufferString(inputs.Password)
+		hashedBytes, _ := bcrypt.GenerateFromPassword(utfBytes.Bytes(), bcrypt.MinCost)
+		if hashedBytes != nil {
+			inputs.Password = string(hashedBytes)
+		}
+	}
+
+	if inputs.Password != "" && repoId != "" {
+		var encryptObject utils.PasswordCipherInterface
+		encryptObject = utils.PasswordCipherStruct{
+			PlainPassword: inputs.Password,
+			KeyString:     repoId,
+		}
+		inputs.Password = encryptObject.EncryptPassword()
+	}
+
 	rArray[0] = RepoData{
-		Id:        repoId,
-		RepoName:  inputs.RepoName,
-		RepoPath:  inputs.RepoPath,
-		TimeStamp: time.Now().String(),
+		Id:         repoId,
+		RepoName:   inputs.RepoName,
+		RepoPath:   inputs.RepoPath,
+		TimeStamp:  time.Now().String(),
+		AuthOption: inputs.AuthOption,
+		SSHKeyPath: inputs.SSHKeyPath,
+		UserName:   inputs.UserName,
+		Password:   inputs.Password,
 	}
 
 	envConfig := *utils.EnvConfigFileReader()
 
 	dbFile := envConfig.DataBaseFile
-	localLogger("Opening DB file present in env_config", global.StatusInfo)
+	logger.Log("Opening DB file present in env_config", global.StatusInfo)
 	_, fileOpenErr := os.Open(dbFile)
 
 	if fileOpenErr != nil {
-		localLogger(fmt.Sprintf("Error occurred while opening repo data JSON file \n%v", fileOpenErr), global.StatusError)
+		logger.Log(fmt.Sprintf("Error occurred while opening repo data JSON file \n%v", fileOpenErr), global.StatusError)
 
 		createErr := repoDataCreator(dbFile)
 
 		if createErr != nil {
-			localLogger(createErr.Error(), global.StatusError)
+			logger.Log(createErr.Error(), global.StatusError)
 			panic(createErr)
 		} else {
 			if err := dataFileWriteHandler(dbFile, rArray); err != nil && err.Error() != "" {
-				localLogger(err.Error(), global.StatusError)
+				logger.Log(err.Error(), global.StatusError)
 				repoAddStatus <- "failed"
 			} else {
 				repoAddStatus <- "success"
@@ -121,7 +143,7 @@ func (inputs AddRepoInputs) repoDataFileWriter(repoId string, repoAddStatus chan
 		}
 	} else {
 		if err := dataFileWriteHandler(dbFile, rArray); err != nil && err.Error() != "" {
-			localLogger(err.Error(), global.StatusError)
+			logger.Log(err.Error(), global.StatusError)
 			repoAddStatus <- "failed"
 		} else {
 			repoAddStatus <- "success"
@@ -141,23 +163,32 @@ func (inputs AddRepoInputs) AddRepo() *model.AddRepoParams {
 	authOption := inputs.AuthOption
 	userName := inputs.UserName
 	password := inputs.Password
+	sshKeyPath := inputs.SSHKeyPath
 
-	if cloneSwitch && len(*repoURL) > 0 {
-		repoPath = repoPath + "/" + repoName
+	if cloneSwitch && len(repoURL) > 0 {
+		currentOs := HealthCheckApi().Os
+		if currentOs == "windows" {
+			repoPath = repoPath + "\\" + repoName
+		} else {
+			repoPath = repoPath + "/" + repoName
+		}
+
 		inputs.RepoPath = repoPath
 
 		var cloneObject git.CloneInterface
 		cloneObject = git.CloneStruct{
+			RepoName:   repoName,
 			RepoPath:   repoPath,
-			RepoURL:    *repoURL,
+			RepoURL:    repoURL,
 			AuthOption: authOption,
 			UserName:   userName,
 			Password:   password,
+			SSHKeyPath: sshKeyPath,
 		}
 
 		_, err := cloneObject.CloneHandler()
 		if err != nil {
-			localLogger(fmt.Sprintf("%v", err), global.StatusError)
+			logger.Log(fmt.Sprintf("%v", err), global.StatusError)
 			return &model.AddRepoParams{
 				RepoID:  "",
 				Status:  "Failed",
@@ -168,7 +199,7 @@ func (inputs AddRepoInputs) AddRepo() *model.AddRepoParams {
 	if initSwitch {
 		_, err := git.InitHandler(repoPath)
 		if err != nil {
-			localLogger(fmt.Sprintf("%v", err), global.StatusError)
+			logger.Log(fmt.Sprintf("%v", err), global.StatusError)
 			return &model.AddRepoParams{
 				RepoID:  "",
 				Status:  "Failed",
@@ -180,7 +211,7 @@ func (inputs AddRepoInputs) AddRepo() *model.AddRepoParams {
 	_, invalidRepoErr := git.RepoValidator(repoPath)
 
 	if invalidRepoErr != nil && !initSwitch {
-		localLogger(fmt.Sprintf("The repo is not a valid git repo\n%v", invalidRepoErr), global.StatusError)
+		logger.Log(fmt.Sprintf("The repo is not a valid git repo\n%v", invalidRepoErr), global.StatusError)
 
 		return &model.AddRepoParams{
 			RepoID:  "",
@@ -201,14 +232,14 @@ func (inputs AddRepoInputs) AddRepo() *model.AddRepoParams {
 	close(repoAddStatusChannel)
 
 	if status == "success" {
-		localLogger("Repo entry added to the data store", global.StatusInfo)
+		logger.Log("Repo entry added to the data store", global.StatusInfo)
 		return &model.AddRepoParams{
 			RepoID:  repoId,
 			Status:  "Repo Added",
 			Message: "The new repository has been added to Gitconvex",
 		}
 	} else {
-		localLogger("Failed to add new repo entry", global.StatusError)
+		logger.Log("Failed to add new repo entry", global.StatusError)
 		return &model.AddRepoParams{
 			RepoID: "",
 			Status: "Failed",

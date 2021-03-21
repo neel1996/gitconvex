@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
+	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"io/ioutil"
 	"os"
@@ -17,7 +17,7 @@ func TestResetAllItems(t *testing.T) {
 
 	if currentEnv == "ci" {
 		repoPath = "/home/runner/work/gitconvex-server/starfleet"
-		r, _ = git.PlainOpen(repoPath)
+		r, _ = git.OpenRepository(repoPath)
 	}
 
 	untrackedResult := "untracked.txt"

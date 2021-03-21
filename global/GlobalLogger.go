@@ -25,7 +25,6 @@ const (
 
 // Log gets the log message and the status selector
 // The log flag is chosen and color coded based on the status received
-
 func (logger *Logger) Log(message string, status string) {
 	logger.Message = message
 	switch status {
@@ -52,5 +51,6 @@ func (logger *Logger) LogWarning() {
 }
 
 func (logger *Logger) LogError() {
+	//debug.PrintStack()
 	log.Printf("%v[ERROR]: %v%v\n", color.Red, color.Reset, logger.Message)
 }

@@ -42,8 +42,8 @@ type GitRepoStatusResults struct {
 }
 
 type HealthCheckParams struct {
-	Os  string `json:"os"`
-	Git string `json:"git"`
+	Os        string `json:"os"`
+	Gitconvex string `json:"gitconvex"`
 }
 
 type PullResult struct {
@@ -92,6 +92,15 @@ type GitCommits struct {
 	CommitTime       *string `json:"commitTime"`
 	CommitMessage    *string `json:"commitMessage"`
 	CommitFilesCount *int    `json:"commitFilesCount"`
+}
+
+type RemoteDetails struct {
+	RemoteName string `json:"remoteName"`
+	RemoteURL  string `json:"remoteUrl"`
+}
+
+type RemoteMutationResult struct {
+	Status string `json:"status"`
 }
 
 type SettingsDataResults struct {

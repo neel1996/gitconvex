@@ -2,9 +2,8 @@ package git
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
+	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/global"
-	"github.com/neel1996/gitconvex-server/utils"
 )
 
 type ResetAllInterface interface {
@@ -12,42 +11,31 @@ type ResetAllInterface interface {
 }
 
 type ResetAllStruct struct {
-	Repo *git.Repository
+	Repo *git2go.Repository
 }
 
-// ResetAllItems removes all the staged items back to the staging area.
-//
-// go-git fails to reset all changes for a newly initialized repo, so the function falls back
-// to the git client for resetting all items if the go-git Reset fails
+// ResetAllItems removes all the staged items back to the staging area
 func (r ResetAllStruct) ResetAllItems() string {
 	repo := r.Repo
-	w, wErr := repo.Worktree()
+	head, headErr := repo.Head()
 
-	if wErr != nil {
-		logger.Log(fmt.Sprintf("Error occurred while fetching repo worktree -> %s", wErr.Error()), global.StatusError)
+	if headErr != nil {
+		logger.Log(fmt.Sprintf("Reset All operation failed -> %s", headErr.Error()), global.StatusInfo)
+		return global.RemoveAllItemsError
+	}
+
+	commit, commitErr := repo.LookupCommit(head.Target())
+	if commitErr != nil {
+		logger.Log(fmt.Sprintf("Reset All operation failed -> %s", commitErr.Error()), global.StatusInfo)
+		return global.RemoveAllItemsError
+	}
+
+	err := repo.ResetToCommit(commit, git2go.ResetMixed, nil)
+
+	if err != nil {
+		logger.Log(fmt.Sprintf("Reset All operation failed -> %s", err.Error()), global.StatusInfo)
 		return global.RemoveAllItemsError
 	} else {
-		logger.Log("Proceeding with removing all changes", global.StatusInfo)
-		err := w.Reset(&git.ResetOptions{
-			Mode: git.MixedReset,
-		})
-
-		if err != nil {
-			logger.Log(fmt.Sprintf("Failed while performing git reset -> %s", err.Error()), global.StatusError)
-			logger.Log(fmt.Sprintf("Falling back to git client"), global.StatusWarning)
-			args := []string{"reset"}
-			cmd := utils.GetGitClient(w.Filesystem.Root(), args)
-			removeMsg, err := cmd.Output()
-
-			if err != nil {
-				return global.RemoveAllItemsError
-			} else {
-				logger.Log("All staged items have been removed from staging area -> "+string(removeMsg), global.StatusInfo)
-				return global.ResetAllSuccess
-			}
-		} else {
-			logger.Log("All staged items have been removed from staging area", global.StatusInfo)
-			return global.ResetAllSuccess
-		}
+		return global.ResetAllSuccess
 	}
 }
