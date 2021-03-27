@@ -17,6 +17,7 @@ export default function GitTrackedComponent(props) {
   library.add(fab);
   const [gitDiffFilesState, setGitDiffFilesState] = useState([]);
   const [gitUntrackedFilesState, setGitUntrackedFilesState] = useState([]);
+  const [gitStagedFilesState, setGitStagedFilesState] = useState([]);
   const [topMenuItemState, setTopMenuItemState] = useState("File View");
   const topMenuItems = ["File View", "Git Difference", "Git Operations"];
   const [noChangeMarker, setNoChangeMarker] = useState(false);
@@ -99,13 +100,14 @@ export default function GitTrackedComponent(props) {
               payload: [...gitUntrackedFiles],
             });
           } else {
+            setNoChangeMarker(true);
             if (gitStagedFiles.length === 0) {
-              setNoChangeMarker(true);
               setIsLoading(false);
             }
 
             if (gitStagedFiles.length > 0) {
               setIsLoading(false);
+              setGitStagedFilesState([...gitStagedFiles]);
             }
           }
         } else {
@@ -124,6 +126,7 @@ export default function GitTrackedComponent(props) {
     var modifiedArtifacts = [];
 
     if (gitDiffFilesState && gitDiffFilesState.length > 0) {
+      console.log(gitDiffFilesState);
       gitDiffFilesState.forEach((diffFile, index) => {
         var splitFile = diffFile.split(",");
         var flag = splitFile[0];
@@ -180,19 +183,15 @@ export default function GitTrackedComponent(props) {
         </>
       );
     } else {
-      return (
-        <>
-          {isLoading ? (
-            <div className="mx-auto w-3/4 my-4 p-2 border-b-4 border-dashed border-pink-300 rounded-md text-center font-sans font-semibold text-xl">
-              <span className="text-gray-400">
-                Fetching results from the server...
-              </span>
-            </div>
-          ) : (
-            <>{noChangeMarker ? <span>No changes in the repo!</span> : null}</>
-          )}
-        </>
-      );
+      if (isLoading) {
+        return (
+          <div className="mx-auto w-3/4 my-4 p-2 border-b-4 border-dashed border-pink-300 rounded-md text-center font-sans font-semibold text-xl">
+            <span className="text-gray-400">
+              Fetching results from the server...
+            </span>
+          </div>
+        );
+      }
     }
   }
 
@@ -235,7 +234,19 @@ export default function GitTrackedComponent(props) {
 
     switch (topMenuItemState) {
       case FILE_VIEW:
-        if (!noChangeMarker) {
+        if (noChangeMarker && gitStagedFilesState.length) {
+          return (
+            <div className="mx-auto bg-yellow-100 w-full my-2 p-3 border-dashed rounded-lg shadow border-b-4 border-yellow-400 text-xl font-sans font-semibold text-center text-yellow-600">
+              No file changes to display. All changed have been staged
+            </div>
+          );
+        } else if (noChangeMarker) {
+          return (
+            <div className="mx-auto bg-pink-100 w-full my-2 p-3 border-dashed rounded-lg shadow border-b-4 border-pink-400 text-xl font-sans font-semibold text-center text-pink-600">
+              No file changes to display.
+            </div>
+          );
+        } else {
           return (
             <div className="shadow-md rounded-sm my-2 block justify-center mx-auto border border-gray-100">
               {gitDiffFilesState && !isLoading ? (
@@ -246,12 +257,6 @@ export default function GitTrackedComponent(props) {
                 </div>
               )}
               {gitUntrackedFilesState && !isLoading ? untrackedPane() : null}
-            </div>
-          );
-        } else {
-          return (
-            <div className="rounded-lg shadow-md text-center text-red-700 text-2xl border-b-4 border-dashed border-red-300 p-4 font-sans">
-              No changes available in the repo
             </div>
           );
         }
@@ -286,8 +291,7 @@ export default function GitTrackedComponent(props) {
                 key={item}
                 onClick={() => {
                   setTopMenuItemState(item);
-                  // Resetting branch error in top bar component to prevent the error banner from getting displayed after \
-                  // switching the menu
+                  // Resetting branch error in top bar component to prevent the error banner from getting displayed after switching the menu
                   props.resetBranchError();
                 }}
               >
