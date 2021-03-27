@@ -62,7 +62,7 @@ func TestUnPushedCommits(t *testing.T) {
 				Repo:      tt.args.repo,
 				RemoteRef: tt.args.remoteRef,
 			}
-			if got := testObj.UnPushedCommits(); !strings.Contains(*got[0].CommitMessage, "Test Commit") {
+			if got := testObj.UnPushedCommits(); !strings.Contains(*got.GitCommits[0].CommitMessage, "Test Commit") {
 				t.Errorf("UnPushedCommits() = %v, want %v", got, tt.want)
 			}
 		})

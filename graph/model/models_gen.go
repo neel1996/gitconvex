@@ -51,6 +51,11 @@ type PullResult struct {
 	PulledItems []*string `json:"pulledItems"`
 }
 
+type UnPushedCommitResult struct {
+	IsNewBranch bool          `json:"isNewBranch"`
+	GitCommits  []*GitCommits `json:"gitCommits"`
+}
+
 type BranchCompareResults struct {
 	Date    string        `json:"date"`
 	Commits []*GitCommits `json:"commits"`

@@ -96,7 +96,7 @@ type Query {
     searchCommitLogs(repoId: String!, searchType: String!, searchKey: String!): [gitCommits]!
     codeFileDetails(repoId: String!, fileName: String!): codeFileType!
     gitChanges(repoId: String!): gitChangeResults!
-    gitUnPushedCommits(repoId: String!, remoteURL: String!, remoteBranch: String!): [gitCommits]!
+    gitUnPushedCommits(repoId: String!, remoteURL: String!, remoteBranch: String!): UnPushedCommitResult!
     gitFileLineChanges(repoId: String!, fileName: String!): fileLineChangeResult!
     settingsData: settingsDataResults!
     commitCompare(repoId: String!,baseCommit: String!, compareCommit: String!): [gitCommitFileResult]!
@@ -116,6 +116,11 @@ type FetchResult{
 type PullResult{
     status: String!
     pulledItems: [String]!
+}
+
+type UnPushedCommitResult{
+    isNewBranch: Boolean!
+    gitCommits: [gitCommits]!
 }
 
 type deleteStatus{

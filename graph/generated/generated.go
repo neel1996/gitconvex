@@ -132,6 +132,11 @@ type ComplexityRoot struct {
 		SettingsData       func(childComplexity int) int
 	}
 
+	UnPushedCommitResult struct {
+		GitCommits  func(childComplexity int) int
+		IsNewBranch func(childComplexity int) int
+	}
+
 	BranchCompareResults struct {
 		Commits func(childComplexity int) int
 		Date    func(childComplexity int) int
@@ -221,7 +226,7 @@ type QueryResolver interface {
 	SearchCommitLogs(ctx context.Context, repoID string, searchType string, searchKey string) ([]*model.GitCommits, error)
 	CodeFileDetails(ctx context.Context, repoID string, fileName string) (*model.CodeFileType, error)
 	GitChanges(ctx context.Context, repoID string) (*model.GitChangeResults, error)
-	GitUnPushedCommits(ctx context.Context, repoID string, remoteURL string, remoteBranch string) ([]*model.GitCommits, error)
+	GitUnPushedCommits(ctx context.Context, repoID string, remoteURL string, remoteBranch string) (*model.UnPushedCommitResult, error)
 	GitFileLineChanges(ctx context.Context, repoID string, fileName string) (*model.FileLineChangeResult, error)
 	SettingsData(ctx context.Context) (*model.SettingsDataResults, error)
 	CommitCompare(ctx context.Context, repoID string, baseCommit string, compareCommit string) ([]*model.GitCommitFileResult, error)
@@ -812,6 +817,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.SettingsData(childComplexity), true
 
+	case "UnPushedCommitResult.gitCommits":
+		if e.complexity.UnPushedCommitResult.GitCommits == nil {
+			break
+		}
+
+		return e.complexity.UnPushedCommitResult.GitCommits(childComplexity), true
+
+	case "UnPushedCommitResult.isNewBranch":
+		if e.complexity.UnPushedCommitResult.IsNewBranch == nil {
+			break
+		}
+
+		return e.complexity.UnPushedCommitResult.IsNewBranch(childComplexity), true
+
 	case "branchCompareResults.commits":
 		if e.complexity.BranchCompareResults.Commits == nil {
 			break
@@ -1142,7 +1161,7 @@ type Query {
     searchCommitLogs(repoId: String!, searchType: String!, searchKey: String!): [gitCommits]!
     codeFileDetails(repoId: String!, fileName: String!): codeFileType!
     gitChanges(repoId: String!): gitChangeResults!
-    gitUnPushedCommits(repoId: String!, remoteURL: String!, remoteBranch: String!): [gitCommits]!
+    gitUnPushedCommits(repoId: String!, remoteURL: String!, remoteBranch: String!): UnPushedCommitResult!
     gitFileLineChanges(repoId: String!, fileName: String!): fileLineChangeResult!
     settingsData: settingsDataResults!
     commitCompare(repoId: String!,baseCommit: String!, compareCommit: String!): [gitCommitFileResult]!
@@ -1162,6 +1181,11 @@ type FetchResult{
 type PullResult{
     status: String!
     pulledItems: [String]!
+}
+
+type UnPushedCommitResult{
+    isNewBranch: Boolean!
+    gitCommits: [gitCommits]!
 }
 
 type deleteStatus{
@@ -4127,9 +4151,9 @@ func (ec *executionContext) _Query_gitUnPushedCommits(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.GitCommits)
+	res := resTmp.(*model.UnPushedCommitResult)
 	fc.Result = res
-	return ec.marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
+	return ec.marshalNUnPushedCommitResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐUnPushedCommitResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_gitFileLineChanges(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4404,6 +4428,76 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UnPushedCommitResult_isNewBranch(ctx context.Context, field graphql.CollectedField, obj *model.UnPushedCommitResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UnPushedCommitResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsNewBranch, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UnPushedCommitResult_gitCommits(ctx context.Context, field graphql.CollectedField, obj *model.UnPushedCommitResult) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UnPushedCommitResult",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GitCommits, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.GitCommits)
+	fc.Result = res
+	return ec.marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -6955,6 +7049,38 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
+var unPushedCommitResultImplementors = []string{"UnPushedCommitResult"}
+
+func (ec *executionContext) _UnPushedCommitResult(ctx context.Context, sel ast.SelectionSet, obj *model.UnPushedCommitResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, unPushedCommitResultImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UnPushedCommitResult")
+		case "isNewBranch":
+			out.Values[i] = ec._UnPushedCommitResult_isNewBranch(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "gitCommits":
+			out.Values[i] = ec._UnPushedCommitResult_gitCommits(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var __DirectiveImplementors = []string{"__Directive"}
 
 func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionSet, obj *introspection.Directive) graphql.Marshaler {
@@ -7711,6 +7837,20 @@ func (ec *executionContext) marshalNString2ᚕᚖstring(ctx context.Context, sel
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalNUnPushedCommitResult2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐUnPushedCommitResult(ctx context.Context, sel ast.SelectionSet, v model.UnPushedCommitResult) graphql.Marshaler {
+	return ec._UnPushedCommitResult(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUnPushedCommitResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐUnPushedCommitResult(ctx context.Context, sel ast.SelectionSet, v *model.UnPushedCommitResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UnPushedCommitResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

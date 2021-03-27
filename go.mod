@@ -9,8 +9,14 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0
 	github.com/libgit2/git2go/v31 v31.4.12
+	github.com/onsi/ginkgo v1.8.0 // indirect
+	github.com/onsi/gomega v1.4.3 // indirect
 	github.com/rs/cors v1.7.0
+	github.com/sirupsen/logrus v1.0.5 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/vektah/gqlparser/v2 v2.1.0
 	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c
+	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
+	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
+	gotest.tools/gotestsum v1.6.2 // indirect
 )

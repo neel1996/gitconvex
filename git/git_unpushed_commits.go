@@ -7,12 +7,13 @@ import (
 )
 
 type UnPushedCommitInterface interface {
-	UnPushedCommits() []*model.GitCommits
+	UnPushedCommits() *model.UnPushedCommitResult
 }
 
 type UnPushedCommitStruct struct {
 	Repo      *git2go.Repository
 	RemoteRef string
+	LocalRef  string
 }
 
 // commitModel function generates a pipe separated string with the required commit details
@@ -32,7 +33,7 @@ func commitModel(commit *git2go.Commit) *model.GitCommits {
 }
 
 // UnPushedCommits compares the local branch and the remote branch to extract the commits which are not pushed to the remote
-func (u UnPushedCommitStruct) UnPushedCommits() []*model.GitCommits {
+func (u UnPushedCommitStruct) UnPushedCommits() *model.UnPushedCommitResult {
 	repo := u.Repo
 	remoteRef := u.RemoteRef
 	var commitArray []*model.GitCommits
@@ -40,19 +41,32 @@ func (u UnPushedCommitStruct) UnPushedCommits() []*model.GitCommits {
 	// Returning nil commit response if repo has no HEAD
 	head, _ := repo.Head()
 	if head == nil {
-		return []*model.GitCommits{}
+		logger.Log("HEAD is NULL", global.StatusError)
+		return &model.UnPushedCommitResult{
+			IsNewBranch: false,
+			GitCommits:  []*model.GitCommits{},
+		}
 	}
 
 	remoteBranch, remoteBranchErr := repo.LookupBranch(remoteRef, git2go.BranchRemote)
 	if remoteBranchErr != nil {
 		logger.Log(remoteBranchErr.Error(), global.StatusError)
-		return commitArray
+		logger.Log("Treating remote branch as a newly created branch", global.StatusWarning)
+
+		return &model.UnPushedCommitResult{
+			IsNewBranch: true,
+			GitCommits:  nil,
+		}
 	}
 
 	// Checking if both branches have any varying commits
 	diff := head.Cmp(remoteBranch.Reference)
 	if diff == 0 {
-		return commitArray
+		logger.Log("No difference between remote and local branches", global.StatusError)
+		return &model.UnPushedCommitResult{
+			IsNewBranch: false,
+			GitCommits:  []*model.GitCommits{},
+		}
 	}
 
 	localCommit, _ := repo.LookupCommit(head.Target())
@@ -74,11 +88,17 @@ func (u UnPushedCommitStruct) UnPushedCommits() []*model.GitCommits {
 			}
 		} else {
 			logger.Log("No new commits available to push", global.StatusWarning)
-			return []*model.GitCommits{}
+			return nil
 		}
-		return commitArray
+		return &model.UnPushedCommitResult{
+			IsNewBranch: false,
+			GitCommits:  commitArray,
+		}
 	} else {
 		logger.Log("No new commits available to push", global.StatusWarning)
-		return []*model.GitCommits{}
+		return &model.UnPushedCommitResult{
+			IsNewBranch: false,
+			GitCommits:  []*model.GitCommits{},
+		}
 	}
 }
