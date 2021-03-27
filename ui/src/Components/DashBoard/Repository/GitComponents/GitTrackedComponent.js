@@ -126,7 +126,6 @@ export default function GitTrackedComponent(props) {
     var modifiedArtifacts = [];
 
     if (gitDiffFilesState && gitDiffFilesState.length > 0) {
-      console.log(gitDiffFilesState);
       gitDiffFilesState.forEach((diffFile, index) => {
         var splitFile = diffFile.split(",");
         var flag = splitFile[0];
