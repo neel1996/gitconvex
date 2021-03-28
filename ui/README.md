@@ -7,7 +7,7 @@ This is the front-end react source for [gitconvex](https://github.com/neel1996/g
 
 ## Dependencies
 
-The depedency packages used by this project can be found [here](https://github.com/neel1996/gitconvex-ui/network/dependencies)
+The dependency packages used by this project can be found [here](https://github.com/neel1996/gitconvex-ui/network/dependencies)
 
 - **🎨 Styling** - For styling, the project uses [tailwind](https://github.com/tailwindlabs/tailwindcss) css framework 
 - **📑 Syntax Highlighting** - [prismjs](https://github.com/PrismJS/prism) is used for syntax highlighting within the *Git Difference* and *CodeView* section
