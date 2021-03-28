@@ -112,7 +112,7 @@ type Query {
     repoId: String!
     remoteURL: String!
     remoteBranch: String!
-  ): [String]!
+  ): UnPushedCommitResult!
   gitFileLineChanges(repoId: String!, fileName: String!): fileLineChangeResult!
   settingsData: settingsDataResults!
   commitCompare(
@@ -140,6 +140,11 @@ type FetchResult {
 type PullResult {
   status: String!
   pulledItems: [String]!
+}
+
+type UnPushedCommitResult {
+  isNewBranch: Boolean!
+  gitCommits: [gitCommits]!
 }
 
 type deleteStatus {
@@ -170,7 +175,6 @@ type Mutation {
     branchName: String!
     forceFlag: Boolean!
   ): BranchDeleteStatus!
-  addRemote(repoId: String!, remoteName: String!, remoteUrl: String!): String!
   fetchFromRemote(
     repoId: String!
     remoteUrl: String
@@ -196,10 +200,10 @@ type Mutation {
     remoteName: String!
     remoteUrl: String!
   ): remoteMutationResult!
+  deleteRemote(repoId: String!, remoteName: String!): remoteMutationResult!
   editRemote(
     repoId: String!
     remoteName: String!
     remoteUrl: String!
   ): remoteMutationResult!
-  deleteRemote(repoId: String!, remoteName: String!): remoteMutationResult!
 }
