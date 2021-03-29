@@ -67,7 +67,7 @@ jobs:
           gh version
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
           gh auth login --with-token < auth.txt
-          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
+          gh release
 
   # Build for MacOS
   build-macos:
@@ -112,15 +112,16 @@ jobs:
     steps:
       - name: Install choco dependencies
         run: |
+          choco install cygwin
           choco install msys2
           choco install cmake
           choco install wget
           choco install unzip
           choco install 7zip
 
-      - name: Install pacman dependencies
+      - name: Install cygwin dependencies
         run: |
-          pacman -S mingw-w64-x86_64-gcc
+          setup-x86.exe -q -P mingw64-x86_64-gcc-core,pkg-config
 
       - name: Build libgit2
         run: |
