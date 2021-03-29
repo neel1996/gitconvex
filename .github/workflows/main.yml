@@ -25,8 +25,8 @@ jobs:
           brew install libssh2
           brew install libgit2
           brew info libgit2
-          ls /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0
-          export PKG_CONFIG_PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0"
+          ls /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/pkgconfig
+          export PKG_CONFIG_PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/pkgconfig"
           go get -v ./...
 
       - name: Clone test repo
