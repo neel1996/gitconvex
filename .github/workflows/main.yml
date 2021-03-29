@@ -80,9 +80,19 @@ jobs:
           brew install libgit2
           go get -v ./...
 
-      - name: Run sample build
+      - name: Package gitconvex bundle
         run: |
-          go build -v
+          brew install node
+          make build
+          cd dist 
+          tar -czf gitconvex-v$( ${{ secrets.TARGET_RELEASE_CHANNEL }} ).tar.gz *
+          ls -ltr
+
+      - name: Upload bundle to release channel
+        run: |
+           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
+           gh auth login --with-token < auth.txt
+           gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-v$( ${{ secrets.TARGET_RELEASE_CHANNEL }} ).tar.gz --clobber
 
   # Test Build for Windows
   build-windows:
@@ -103,6 +113,7 @@ jobs:
 
       - name: Build libgit2
         run: |
+          7z x .\lib\win\dep_libs.zip -y
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
           cd libgit2-1.1.0
