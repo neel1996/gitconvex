@@ -25,7 +25,7 @@ jobs:
           brew install libssh2
           brew install libgit2
           brew info libgit2
-          export PKG_CONFIG_PATH="/usr/local/" && go get -v ./...
+          export PKG_CONFIG_PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0" && go get -v ./...
 
       - name: Clone test repo
         run: |
@@ -70,17 +70,12 @@ jobs:
 
       - name: Clone test repo
         run: |
-          mkdir -p /home/runner/work/gitconvex/starfleet/
-          git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex-server/starfleet/
-
-      - name: Overwrite mock test file
-        run: |
-          echo "# gitconvex GoLang project" > /home/runner/work/gitconvex/gitconvex/README.md
+          echo $(PWD)
 
       - name: Run test cases
         run: |
           go get gotest.tools/gotestsum
-          export GOTESTENV=ci && gotestsum --format=testname ./...
+          gotestsum --format=testname ./...
 
       - name: Run sample build
         run: |
