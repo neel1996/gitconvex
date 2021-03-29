@@ -1,19 +1,21 @@
 name: Gitconvex build deploy
 
-on:
-  push:
-    branches: [ v2.0.1 ]
+on: push
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
     steps:
-    
+      - name: Install brew and dependencies
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install libssh2
+          brew install libgit2
+
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.13
+          go-version: ^1.16
         id: go
 
       - name: Check out code into the Go module directory
@@ -21,21 +23,30 @@ jobs:
 
       - name: Get dependencies
         run: |
-          go get -v -t -d ./...
-      
+          go get -v ./...
+
       - name: Clone test repo
         run: |
           mkdir -p /home/runner/work/gitconvex-server/starfleet/
           git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex-server/starfleet/
-      
+
       - name: Overwrite mock test file
         run: |
           echo "# gitconvex GoLang project" > /home/runner/work/gitconvex/gitconvex/README.md
-          
+
       - name: Run test cases
         run: |
-          export GOTESTENV=ci && go test -v ./...
-      
+          go get gotest.tools/gotestsum
+          export GOTESTENV=ci && gotestsum --format=testname ./...
+
       - name: Run sample build
         run: |
           go build -v
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Install choco dependencies 
+        run: |
+          choco install cygwin
+          choco install msys2
+          choco install cmake
