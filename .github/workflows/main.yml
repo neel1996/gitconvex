@@ -3,14 +3,13 @@ name: Gitconvex build deploy
 on: push
 
 jobs:
+  # Build for Ubuntu Linux
   build-linux:
     runs-on: ubuntu-latest
     steps:
-      - name: Install brew and dependencies
+      - name: Install brew
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew install libssh2
-          brew install libgit2
 
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
@@ -23,6 +22,9 @@ jobs:
 
       - name: Get dependencies
         run: |
+          export PKG_CONFIG_PATH="/home/linuxbrew/"
+          brew install libssh2
+          brew install libgit2
           go get -v ./...
 
       - name: Clone test repo
@@ -42,6 +44,49 @@ jobs:
       - name: Run sample build
         run: |
           go build -v
+  
+  # Build for MacOS
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Install brew
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: |
+          brew install libssh2
+          brew install libgit2
+          go get -v ./...
+
+      - name: Clone test repo
+        run: |
+          mkdir -p /home/runner/work/gitconvex-server/starfleet/
+          git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex-server/starfleet/
+
+      - name: Overwrite mock test file
+        run: |
+          echo "# gitconvex GoLang project" > /home/runner/work/gitconvex/gitconvex/README.md
+
+      - name: Run test cases
+        run: |
+          go get gotest.tools/gotestsum
+          export GOTESTENV=ci && gotestsum --format=testname ./...
+
+      - name: Run sample build
+        run: |
+          go build -v
+
+  # Test Build for Windows
   build-windows:
     runs-on: windows-latest
     steps:
