@@ -22,14 +22,14 @@ jobs:
 
       - name: Get dependencies
         run: |
-          export PKG_CONFIG_PATH="/home/linuxbrew/"
           brew install libssh2
           brew install libgit2
-          go get -v ./...
+          brew info libgit2
+          export PKG_CONFIG_PATH="/usr/local/" && go get -v ./...
 
       - name: Clone test repo
         run: |
-          mkdir -p /home/runner/work/gitconvex-server/starfleet/
+          mkdir -p /home/runner/work/gitconvex/starfleet/
           git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex-server/starfleet/
 
       - name: Overwrite mock test file
@@ -70,7 +70,7 @@ jobs:
 
       - name: Clone test repo
         run: |
-          mkdir -p /home/runner/work/gitconvex-server/starfleet/
+          mkdir -p /home/runner/work/gitconvex/starfleet/
           git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex-server/starfleet/
 
       - name: Overwrite mock test file
