@@ -69,7 +69,7 @@ jobs:
       
       - name: Upload to release 
         run: |
-          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
+          gh release upload 2.1.1-alpha ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
           
 
   # Build for MacOS
@@ -127,10 +127,11 @@ jobs:
 
       - name: Build libgit2
         run: |
-          cd D:\a\gitconvex\gitconvex
-          ls
+          cd D:\a\gitconvex\gitconvex\
+          ls -ltr
           dir 
           cd
+          cmake .
           7z x .\lib\win\dep_libs.zip -y
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
