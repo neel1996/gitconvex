@@ -25,7 +25,9 @@ jobs:
           brew install libssh2
           brew install libgit2
           brew info libgit2
-          export PKG_CONFIG_PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0" && go get -v ./...
+          ls /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0
+          export PKG_CONFIG_PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0"
+          go get -v ./...
 
       - name: Clone test repo
         run: |
@@ -44,7 +46,7 @@ jobs:
       - name: Run sample build
         run: |
           go build -v
-  
+
   # Build for MacOS
   build-macos:
     runs-on: macos-latest
@@ -68,15 +70,6 @@ jobs:
           brew install libgit2
           go get -v ./...
 
-      - name: Clone test repo
-        run: |
-          echo $(PWD)
-
-      - name: Run test cases
-        run: |
-          go get gotest.tools/gotestsum
-          gotestsum --format=testname ./...
-
       - name: Run sample build
         run: |
           go build -v
@@ -85,8 +78,41 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - name: Install choco dependencies 
+      - name: Install choco dependencies
         run: |
           choco install cygwin
           choco install msys2
           choco install cmake
+          choco install wget
+          choco install unzip
+
+      - name: Install cygwin dependencies
+        run: |
+          setup-x86.exe -q -P mingw64-x86_64-gcc-core,pkg-config
+
+      - name: Build libgit2
+        run: |
+          wget https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
+          unzip libgit2-1.1.0.zip
+          cd libgit2-1.1.0
+          git clone https://github.com/libssh2/libssh2 libssh2
+          mkdir build && cd build
+          cmake -DCMAKE_INSTALL_PREFIX=..\install -DOPENSSL_ROOT_DIR=..\lib\win\ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=..\libssh2 ..
+          cmake --build . --target install
+          cd ..\install
+          cp .\bin\git2.dll C:\tools\cygwin\bin
+          cp .\lib\git2.lib C:\tools\cygwin\lib
+          cp .\lib\pkgconfig\libgit2.pc C:\tools\cygwin\lib\pkgconfig
+
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: |
+          go get -v ./...
