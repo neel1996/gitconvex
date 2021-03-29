@@ -66,9 +66,6 @@ jobs:
           gh version
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
           gh auth login --with-token < auth.txt
-      
-      - name: Upload to release 
-        run: |
           gh release list
           
 
@@ -127,11 +124,9 @@ jobs:
 
       - name: Build libgit2
         run: |
-          cd D:\a\gitconvex\gitconvex\
-          dir 
-          cd
-          cmake .
-          7z x .\lib\win\dep_libs.zip -y
+          cd D:\a\gitconvex\gitconvex\ && \
+          dir && \
+          7z x .\lib\win\dep_libs.zip -y && \
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
           cd libgit2-1.1.0
