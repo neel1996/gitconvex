@@ -49,6 +49,7 @@ jobs:
 
       - name: Run test cases
         run: |
+          git config --global user.name "${{ secrets.ACTION_USER_NAME }}" && git config --global user.email "${{ secrets.ACTION_USER_EMAIL }}"
           go get gotest.tools/gotestsum
           export GOTESTENV=ci && gotestsum --format=testname ./...
 
@@ -94,6 +95,7 @@ jobs:
           choco install cmake
           choco install wget
           choco install unzip
+          choco install 7zip
 
       - name: Install cygwin dependencies
         run: |
@@ -105,7 +107,7 @@ jobs:
           unzip -q libgit2-1.1.0.zip
           cd libgit2-1.1.0
           git clone https://github.com/libssh2/libssh2 libssh2
-          mkdir build && cd build
+          mkdir build && mkdir install && cd build
           cmake -DCMAKE_INSTALL_PREFIX=..\install -DOPENSSL_ROOT_DIR=..\lib\win\ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=..\libssh2 ..
           cmake --build . --target install
           cd ..\install
