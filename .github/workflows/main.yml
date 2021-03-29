@@ -64,6 +64,7 @@ jobs:
       - name: Upload bundle to release channel
         run: |
           brew install gh
+          gh version
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
           gh auth login --with-token < auth.txt
           gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
