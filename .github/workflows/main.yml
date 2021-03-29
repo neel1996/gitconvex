@@ -123,9 +123,11 @@ jobs:
 
       - name: Build libgit2
         run: |
-          cd D:\a\gitconvex\gitconvex\lib\win\
-          7z x dep_libs.zip -y
-          cd D:\a\gitconvex\gitconvex
+          cd D:\a\gitconvex\
+          ls
+          dir 
+          cd
+          7z x .\lib\win\dep_libs.zip -y
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
           cd libgit2-1.1.0
