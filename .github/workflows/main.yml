@@ -112,20 +112,19 @@ jobs:
     steps:
       - name: Install choco dependencies
         run: |
-          choco install cygwin
           choco install msys2
           choco install cmake
           choco install wget
           choco install unzip
           choco install 7zip
 
-      - name: Install cygwin dependencies
+      - name: Install pacman dependencies
         run: |
-          setup-x86.exe -q -P mingw64-x86_64-gcc-core,pkg-config
+          pacman -S mingw-w64-x86_64-gcc
 
       - name: Build libgit2
         run: |
-          ls
+          cd
           7z x ./lib/win/dep_libs.zip -y
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
