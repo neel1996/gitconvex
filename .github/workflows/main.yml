@@ -61,12 +61,16 @@ jobs:
           tar -czf gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz *
           ls -ltr
 
-      - name: Upload bundle to release channel
+      - name: Login to Github CLI
         run: |
           gh version
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
           gh auth login --with-token < auth.txt
-          echo "## Github bundle deploy" && gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
+      
+      - name: Upload to release 
+        run: |
+          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
+          
 
   # Build for MacOS
   build-macos:
@@ -123,7 +127,7 @@ jobs:
 
       - name: Build libgit2
         run: |
-          cd D:\a\gitconvex\
+          cd D:\a\gitconvex\gitconvex
           ls
           dir 
           cd
