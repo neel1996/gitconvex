@@ -58,14 +58,15 @@ jobs:
           brew install node
           make build
           cd dist 
-          tar -czf gitconvex-linux-amd64-v$( ${{ secrets.TARGET_RELEASE_CHANNEL }} ).tar.gz *
+          tar -czf gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz *
           ls -ltr
 
       - name: Upload bundle to release channel
         run: |
+          brew install gh
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
           gh auth login --with-token < auth.txt
-          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v$( ${{ secrets.TARGET_RELEASE_CHANNEL }} ).tar.gz --clobber
+          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
 
   # Build for MacOS
   build-macos:
@@ -95,14 +96,14 @@ jobs:
           brew install node
           make build
           cd dist 
-          tar -czf gitconvex-macos-amd64-v$( ${{ secrets.TARGET_RELEASE_CHANNEL }} ).tar.gz *
+          tar -czf gitconvex-macos-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz *
           ls -ltr
 
       - name: Upload bundle to release channel
         run: |
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
           gh auth login --with-token < auth.txt
-          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-macos-amd64-v$( ${{ secrets.TARGET_RELEASE_CHANNEL }} ).tar.gz --clobber
+          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-macos-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
 
   # Test Build for Windows
   build-windows:
@@ -123,8 +124,8 @@ jobs:
 
       - name: Build libgit2
         run: |
-          dir
-          7z x .\lib\win\dep_libs.zip -y
+          ls
+          7z x ./lib/win/dep_libs.zip -y
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
           cd libgit2-1.1.0
