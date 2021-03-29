@@ -20,13 +20,22 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
+      - name: Setup libgit2
+        run: |
+          wget https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.tar.gz
+          tar -xzf libgit2-1.1.0.tar.gz
+          cd libgit2-1.1.0
+          mkdir build && cd ./build
+          sudo apt  install cmake -y
+          sudo apt install pkg-config -y
+          sudo apt-get install libssl-dev
+          cmake ..
+          cmake --build .
+          sudo make install
+          sudo /sbin/ldconfig -v
+
       - name: Get dependencies
         run: |
-          brew install libssh2
-          brew install libgit2
-          brew info libgit2
-          ls /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/pkgconfig
-          export PKG_CONFIG_PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/pkgconfig"
           go get -v ./...
 
       - name: Clone test repo
@@ -92,8 +101,8 @@ jobs:
 
       - name: Build libgit2
         run: |
-          wget https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
-          unzip libgit2-1.1.0.zip
+          wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
+          unzip -q libgit2-1.1.0.zip
           cd libgit2-1.1.0
           git clone https://github.com/libssh2/libssh2 libssh2
           mkdir build && cd build
