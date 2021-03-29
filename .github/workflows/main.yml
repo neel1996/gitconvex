@@ -49,7 +49,7 @@ jobs:
 
       - name: Run test cases
         run: |
-          git config --global user.name "${{ secrets.ACTION_USER_NAME }}" && git config --global user.email "${{ secrets.ACTION_USER_EMAIL }}"
+          git config --global user.name "test" && git config --global user.email "test@github.com"
           go get gotest.tools/gotestsum
           export GOTESTENV=ci && gotestsum --format=testname ./...
 
