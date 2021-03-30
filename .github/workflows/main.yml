@@ -42,7 +42,7 @@ jobs:
       - name: Clone test repo
         run: |
           mkdir -p /home/runner/work/gitconvex/starfleet/
-          git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex-server/starfleet/
+          git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex/starfleet/
 
       - name: Overwrite mock test file
         run: |
@@ -60,20 +60,16 @@ jobs:
           tar -czf gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz *
           ls -ltr
           cd ..
-
-      - name: Login to Github CLI
-        run: |
-          gh version
-          echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt 
-          gh auth login --with-token < auth.txt 
       
       - name: Github CLI release
         run: |
+          pwd
+          gh version
+          echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt 
+          gh auth login --with-token < auth.txt
           git status 
-          git branch --all
-          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
+          gh release list
            
-
   # Build for MacOS
   build-macos:
     runs-on: macos-latest
@@ -108,6 +104,7 @@ jobs:
         run: |
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
           gh auth login --with-token < auth.txt
+          gh release list
           gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-macos-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
 
   # Test Build for Windows
@@ -133,7 +130,6 @@ jobs:
       - name: Build libgit2
         run: |
           setx path "%path%;C:\msys64\usr\bin"
-          setx PKG_CONFIG_EXECUTABLE "C:\msys64\usr\bin\pkg-config.exe"
           ls -ltr
           unzip ./lib/win/dep_libs.zip 
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
@@ -141,7 +137,7 @@ jobs:
           cd libgit2-1.1.0
           git clone https://github.com/libssh2/libssh2 libssh2
           mkdir build && mkdir install && cd build
-          cmake -DCMAKE_INSTALL_PREFIX=..\install -DOPENSSL_ROOT_DIR=..\lib\win\ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=..\libssh2 ..
+          cmake -DPKG_CONFIG_EXECUTABLE=C:\msys64\usr\bin\pkg-config.exe -DCMAKE_INSTALL_PREFIX=..\install -DOPENSSL_ROOT_DIR=..\lib\win\ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=..\libssh2 ..
           cmake --build . --target install
           cd ..\install
           cp .\bin\git2.dll C:\msys64\usr\bin
