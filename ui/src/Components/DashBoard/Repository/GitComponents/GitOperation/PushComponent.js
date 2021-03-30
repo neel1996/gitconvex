@@ -294,7 +294,8 @@ export default function PushComponent(props) {
 
             {noRemoteBranchIndicator ? (
               <div className="p-3 text-center mx-auto mt-10 w-full bg-yellow-100 border-b-4 border-dashed border-yellow-200 text-yellow-500 font-semibold font-sans text-xl rounded-lg shadow">
-                Looks like a new branch with no upstream branch
+                Looks like a new branch with no upstream. Click on "PUSH
+                CHANGES" to create an upstream
               </div>
             ) : null}
 
