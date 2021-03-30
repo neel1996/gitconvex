@@ -148,9 +148,8 @@ jobs:
       - name: Get dependencies
         run: |
           rm C:\\Strawberry\\perl\\bin\\pkg-config.bat
-          setx PATH "C:\\msys64\\usr\\bin;%PATH%"
-          export PATH="C:\\msys64\\usr\\bin\\:$PATH"
-          cp C:\\msys64\\usr\\bin\\pkg-config.exe C:\\Strawberry\\perl\\bin\\
+          setx path "C:\\msys64\\usr\\bin"
+          set PATH="C:\\msys64\\usr\\bin"
           go get -v ./...
 
       - name: Build gitconvex bundle for windows 
