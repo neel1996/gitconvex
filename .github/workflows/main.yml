@@ -119,6 +119,9 @@ jobs:
           setx path "%path%;C:\msys64\usr"
           setx path "%path%;C:\msys64\usr\bin"
 
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
@@ -147,15 +150,6 @@ jobs:
           export PATH="/c/msys64/:/c/msys64/usr/:/c/msys64/usr/bin:$PATH" 
           go get -v ./...
           ./make.bat build 
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-
-      - name: Get dependencies
-        run: |
-          rm C:\\Strawberry\\perl\\bin\\pkg-config.bat
-          export PATH="/c/msys64/:/c/msys64/usr/:/c/msys64/usr/bin:$PATH"
-          go get -v ./...
 
       - name: Build gitconvex bundle for windows 
         run: |
