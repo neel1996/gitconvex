@@ -67,7 +67,7 @@ jobs:
           gh auth login --with-token < auth.txt 
       
       - name: Github CLI release
-        run: 
+        run: |
           ls -ltr
           gh release upload 2.0.0 ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
            
@@ -118,9 +118,15 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
       
+      - name: Add choco packages
+        run: |
+          choco install wget
+      
       - name: Add MSYS to PATH
         run: |
           setx path "%path%;C:\msys64"
+          setx path "%path%;C:\msys64\usr\"
+          setx path "%path%;C:\msys64\usr\bin"
 
       - name: Build libgit2
         run: |
