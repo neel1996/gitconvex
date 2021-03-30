@@ -149,7 +149,6 @@ jobs:
         run: |
           rm C:\\Strawberry\\perl\\bin\\pkg-config.bat
           setx path "C:\msys64\usr\bin"
-          set PATH="C:\msys64\usr\bin"
           pkg-config --version
           go get -v ./...
 
