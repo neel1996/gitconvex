@@ -42,7 +42,7 @@ jobs:
       - name: Clone test repo
         run: |
           mkdir -p /home/runner/work/gitconvex/starfleet/
-          git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex/starfleet/
+          git clone https://github.com/neel1996/starfleet.git /home/runner/work/gitconvex-server/starfleet/
 
       - name: Overwrite mock test file
         run: |
@@ -137,7 +137,7 @@ jobs:
           cd libgit2-1.1.0
           git clone https://github.com/libssh2/libssh2 libssh2
           mkdir build && mkdir install && cd build
-          cmake -DPKG_CONFIG_EXECUTABLE=C:\msys64\usr\bin\pkg-config.exe -DCMAKE_INSTALL_PREFIX=..\install -DOPENSSL_ROOT_DIR=..\lib\win\ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=..\libssh2 ..
+          cmake -DPKG_CONFIG_EXECUTABLE=C:\\msys64\\usr\\bin\\pkg-config.exe -DCMAKE_INSTALL_PREFIX=..\install -DOPENSSL_ROOT_DIR=..\lib\win\ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=..\libssh2 ..
           cmake --build . --target install
           cd ..\install
           cp .\bin\git2.dll C:\msys64\usr\bin
