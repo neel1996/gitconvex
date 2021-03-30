@@ -132,9 +132,10 @@ jobs:
           cmake -DPKG_CONFIG_EXECUTABLE=C:\\msys64\\usr\\bin\\pkg-config.exe -DCMAKE_INSTALL_PREFIX=../install -DOPENSSL_ROOT_DIR=../lib/win/ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=../libssh2 ..
           cmake --build . --target install
           cd ../install
-          cp ./bin/git2.dll C:\\msys64\\usr\\bin
-          cp ./lib/git2.lib C:\\msys64\\usr\\lib
-          cp ./lib/pkgconfig/libgit2.pc C:\\msys64\\usr\\lib\\pkgconfig
+          cp ./bin/git2.dll /c/msys64/usr/bin
+          cp ./lib/git2.lib /c/msys64/usr/lib
+          cp ./lib/pkgconfig/libgit2.pc /c/msys64/usr/lib/pkgconfig
+          cp -r ./include/* /c/msys64/usr/include
 
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
