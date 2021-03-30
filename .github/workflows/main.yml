@@ -62,8 +62,7 @@ jobs:
           gh version
           echo "${{ secrets.CLI_AUTH_KEY }}" > auth.txt 
           gh auth login --with-token < auth.txt
-          gh auth status
-          gh release view
+          gh release upload --repo ${{ secrets.USER_NAME }}/gitconvex ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber 
            
   # Build for MacOS
   build-macos:
@@ -133,10 +132,10 @@ jobs:
           mkdir build && mkdir install && cd build
           cmake -DPKG_CONFIG_EXECUTABLE=C:\\msys64\\usr\\bin\\pkg-config.exe -DCMAKE_INSTALL_PREFIX=../install -DOPENSSL_ROOT_DIR=../lib/win/ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=../libssh2 ..
           cmake --build . --target install
-          cd ..\install
-          cp .\bin\git2.dll C:\msys64\usr\bin
-          cp .\lib\git2.lib C:\msys64\usr\lib
-          cp .\lib\pkgconfig\libgit2.pc C:\msys64\usr\lib\pkgconfig
+          cd ../install
+          cp ./bin/git2.dll C:\\msys64\\usr\\bin
+          cp ./lib/git2.lib C:\\msys64\\usr\\lib
+          cp ./lib/pkgconfig/libgit2.pc C:\\msys64\\usr\\lib\\pkgconfig
 
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
