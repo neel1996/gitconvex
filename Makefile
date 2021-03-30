@@ -15,9 +15,6 @@ build-server:
 	mkdir -p ./dist
 	go build -o ./dist
 
-install_deps:
-	if [[ "$(shell uname)" == "Darwin" ]]; then cd ./lib/macos_amd64 && ./install_deps && cd .. ; else cd ./lib/linux_x86_64 && ./install_deps && cd ..; fi
-
 build:
 	@echo "⚒️ Initiating gitconvex build"
 	@echo "🗑️ Cleaning up old directories"
@@ -44,7 +41,6 @@ build:
 	echo "Gitconvex build completed!" && \
 	mv ./dist/gitconvex-server ./dist/gitconvex 
 	@echo "Installing libs"
-	$(MAKE) install_deps
 	@echo "✅ Gitconvex Build Completed successfully!"
 	@echo "📬 Use ./dist/gitconvex to start Gitconvex on port 9001"
 	@echo "📬 Try ./dist/gitconvex --port PORT_NUMBER to run gitconvex on the desired port"
@@ -52,3 +48,4 @@ test:
 	go test -tags static -v ./...
 start:
 	./dist/gitconvex
+
