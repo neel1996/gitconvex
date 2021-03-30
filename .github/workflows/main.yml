@@ -69,6 +69,8 @@ jobs:
       
       - name: Github CLI release
         run: |
+          git status 
+          git branch --all
           gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
            
 
@@ -131,6 +133,7 @@ jobs:
       - name: Build libgit2
         run: |
           setx path "%path%;C:\msys64\usr\bin"
+          setx PKG_CONFIG_EXECUTABLE "C:\msys64\usr\bin\pkg-config.exe"
           ls -ltr
           unzip ./lib/win/dep_libs.zip 
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
