@@ -57,10 +57,10 @@ jobs:
           ls -ltr
           cd ..
       
-      - name: Github CLI release
+      - name: Github CLI release for Linux
         run: |
           gh version
-          echo "${{ secrets.CLI_AUTH_KEY }}" > auth.txt 
+          echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt 
           gh auth login --with-token < auth.txt
           gh release upload --repo ${{ secrets.USER_NAME }}/gitconvex ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber 
            
@@ -93,7 +93,7 @@ jobs:
           cd dist 
           tar -czf gitconvex-macos-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz *
 
-      - name: Upload bundle to release channel
+      - name: Github CLI Release for MacOS
         run: |
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
           gh auth login --with-token < auth.txt
@@ -151,8 +151,14 @@ jobs:
           go get -v ./...
           ./make.bat build 
 
-      - name: Build gitconvex bundle for windows 
+      - name: Archive ZIP bundle for windows 
         run: |
           cd dist 
           7z a -r -tzip gitconvex-windows-v${{ secrets.TARGET_RELEASE_CHANNEL }}.zip *
           ls -ltr
+      
+      - name: Github CLI Release for windows
+        run: |
+          echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
+          gh auth login --with-token < auth.txt
+          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-windows-v${{ secrets.TARGET_RELEASE_CHANNEL }}.zip --clobber
