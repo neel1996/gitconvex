@@ -36,6 +36,7 @@ jobs:
 
       - name: Get dependencies
         run: |
+          go get gotest.tools/gotestsum
           go get -v ./...
 
       - name: Clone test repo
@@ -50,7 +51,6 @@ jobs:
       - name: Run test cases
         run: |
           git config --global user.name "test" && git config --global user.email "test@github.com"
-          go get gotest.tools/gotestsum
           export GOTESTENV=ci && gotestsum --format=testname ./...
 
       - name: Package gitconvex bundle
@@ -117,8 +117,9 @@ jobs:
       - name: Build libgit2
         run: |
           "C:\Program Files\Git\bin\bash.exe"
+          cd /d/a/gitconvex/gitconvex
           ls 
-          7z x .\lib\win\dep_libs.zip -y 
+          unzip ./lib/win/dep_libs.zip 
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
           cd libgit2-1.1.0
