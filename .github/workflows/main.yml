@@ -68,7 +68,7 @@ jobs:
       
       - name: Github CLI release
         run: 
-          gh release upload
+          gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
            
 
   # Build for MacOS
@@ -117,16 +117,13 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
       
-      - name: Install choco dependencies
+      - name: Add MSYS to PATH
         run: |
-          choco install cygwin
-          choco install msys2
-          choco install wget
-          choco install unzip
+          setx path "%path%;C:\msys64"
 
       - name: Build libgit2
         run: |
-          setx path "%path%;C:\msys64"
+          pacman -Su
           ls -ltr
           unzip ./lib/win/dep_libs.zip 
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
