@@ -119,7 +119,13 @@ jobs:
           setx path "%path%;C:\msys64\usr"
           setx path "%path%;C:\msys64\usr\bin"
 
-      - name: Build libgit2
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+        id: go
+
+      - name: Build libgit2 and gitconvex
         run: |
           setx path "%path%;C:\msys64\usr\bin"
           unzip -q ./lib/win/dep_libs.zip
@@ -140,12 +146,7 @@ jobs:
           rm C:\\Strawberry\\perl\\bin\\pkg-config.bat
           export PATH="/c/msys64/:/c/msys64/usr/:/c/msys64/usr/bin:$PATH" 
           go get -v ./...
-
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.16
-        id: go
+          ./make.bat build 
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
@@ -158,7 +159,6 @@ jobs:
 
       - name: Build gitconvex bundle for windows 
         run: |
-          ./make.bat build 
           cd dist 
           7z a -r -tzip gitconvex-windows-v${{ secrets.TARGET_RELEASE_CHANNEL }}.zip *
           ls -ltr
