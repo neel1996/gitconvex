@@ -7,10 +7,6 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-      - name: Install brew
-        run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
@@ -63,13 +59,11 @@ jobs:
       
       - name: Github CLI release
         run: |
-          pwd
           gh version
           echo "${{ secrets.CLI_AUTH_KEY }}" > auth.txt 
           gh auth login --with-token < auth.txt
-          git status 
-          gh repo list
-          gh release list
+          gh auth status
+          gh release view
            
   # Build for MacOS
   build-macos:
@@ -105,7 +99,6 @@ jobs:
         run: |
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
           gh auth login --with-token < auth.txt
-          gh release list
           gh release upload ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-macos-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
 
   # Test Build for Windows
@@ -131,8 +124,7 @@ jobs:
       - name: Build libgit2
         run: |
           setx path "%path%;C:\msys64\usr\bin"
-          ls -ltr
-          unzip ./lib/win/dep_libs.zip -q
+          unzip -q ./lib/win/dep_libs.zip
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
           cd libgit2-1.1.0
