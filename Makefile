@@ -48,4 +48,3 @@ test:
 	go test -tags static -v ./...
 start:
 	./dist/gitconvex
-

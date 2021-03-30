@@ -65,6 +65,11 @@ type ComplexityRoot struct {
 		Status       func(childComplexity int) int
 	}
 
+	GitCommitLogResults struct {
+		Commits      func(childComplexity int) int
+		TotalCommits func(childComplexity int) int
+	}
+
 	GitFolderContentResults struct {
 		FileBasedCommits func(childComplexity int) int
 		TrackedFiles     func(childComplexity int) int
@@ -165,11 +170,6 @@ type ComplexityRoot struct {
 	GitCommitFileResult struct {
 		FileName func(childComplexity int) int
 		Type     func(childComplexity int) int
-	}
-
-	GitCommitLogResults struct {
-		Commits      func(childComplexity int) int
-		TotalCommits func(childComplexity int) int
 	}
 
 	GitCommits struct {
@@ -318,6 +318,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.FetchResult.Status(childComplexity), true
+
+	case "GitCommitLogResults.commits":
+		if e.complexity.GitCommitLogResults.Commits == nil {
+			break
+		}
+
+		return e.complexity.GitCommitLogResults.Commits(childComplexity), true
+
+	case "GitCommitLogResults.totalCommits":
+		if e.complexity.GitCommitLogResults.TotalCommits == nil {
+			break
+		}
+
+		return e.complexity.GitCommitLogResults.TotalCommits(childComplexity), true
 
 	case "GitFolderContentResults.fileBasedCommits":
 		if e.complexity.GitFolderContentResults.FileBasedCommits == nil {
@@ -915,20 +929,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GitCommitFileResult.Type(childComplexity), true
 
-	case "gitCommitLogResults.commits":
-		if e.complexity.GitCommitLogResults.Commits == nil {
-			break
-		}
-
-		return e.complexity.GitCommitLogResults.Commits(childComplexity), true
-
-	case "gitCommitLogResults.totalCommits":
-		if e.complexity.GitCommitLogResults.TotalCommits == nil {
-			break
-		}
-
-		return e.complexity.GitCommitLogResults.TotalCommits(childComplexity), true
-
 	case "gitCommits.author":
 		if e.complexity.GitCommits.Author == nil {
 			break
@@ -1067,155 +1067,300 @@ var sources = []*ast.Source{
 #
 # https://gqlgen.com/getting-started/
 
+"""
+Returns the host OS and the current version of gitconvex
+"""
 type HealthCheckParams{
+    "OS on which gitconvex is running"
     os: String!
+    "Current version of gitconvex"
     gitconvex: String!
 }
 
+"""
+Details about the repo data stored in gitconvex JSON data file
+"""
 type FetchRepoParams{
+    "UUID based ID generated for the repo"
     repoId: [String]!
+    "Name of the repo given while adding the repo"
     repoName: [String]!
+    "Path of the git repository"
     repoPath: [String]!
+    "Timestamp at which the repo was added to gitconvex"
     timeStamp: [String]!
 }
 
-type AddRepoParams{
-    repoId: String!
-    status: String!
-    message: String!
-}
-
+"""
+Basic information about the target repository
+"""
 type GitRepoStatusResults {
+    "The remote repos available in the target repository"
     gitRemoteData: String
+    "Name of the repo"
     gitRepoName: String
+    "List of all the local branches available in the repo"
     gitBranchList: [String]
+    "List of all the local branches + remote branches available in the repo"
     gitAllBranchList: [String]
+    "The current branch"
     gitCurrentBranch: String
+    "Remote host name based on the remote URL (E.g: https://github.com/github/repo.git -> Github)"
     gitRemoteHost: String
+    "Total number of commits tracked by the current branch"
     gitTotalCommits: Float
+    "The latest commit (HEAD commit)"
     gitLatestCommit: String
+    "Total number of files tracked by git repo"
     gitTotalTrackedFiles: Int
 }
 
+"""
+Returns the content of the target directory along with the latest commit message
+(File explorer similar to github)
+"""
 type GitFolderContentResults{
+    "List of all the files and folders tracked by git from the target directory"
     trackedFiles: [String]!
+    "The respective commit messages"
     fileBasedCommits: [String]!
 }
 
-
-type gitCommitLogResults {
+"""
+Returns the total number of commits in the repo and the array of 10 commit log entries
+"""
+type GitCommitLogResults {
+    "Total number of commits tracked by the branch"
     totalCommits: Float
+    "Array of commit log entries ` + "`" + `gitCommits` + "`" + `"
     commits: [gitCommits]
 }
 
+"""
+The required information about commits
+"""
 type gitCommits {
+    "The SHA of the commit"
     hash: String
+    "The author of the commit"
     author: String
+    "The timestamp of the commit"
     commitTime: String
+    "The message of the commit"
     commitMessage: String
+    "The number of files changed as part of the commit"
     commitFilesCount: Int
 }
 
+"""
+Returns type of the file change (M | D | A) and the file name
+"""
 type gitCommitFileResult{
+    "Type of change (M | D | A)"
     type: String!
+    "Name of the file"
     fileName: String!
 }
 
+"""
+Content of the file selected for viewing
+"""
 type codeFileType{
+    "File content split line by line as array"
     fileData: [String]!
 }
 
+"""
+The results with the Modified, Staged and Untracked files
+"""
 type gitChangeResults{
+    "List of untracked files"
     gitUntrackedFiles: [String]!
+    "Files deviating from the index"
     gitChangedFiles: [String]!
+    "Files which are already staged"
     gitStagedFiles: [String]!
 }
 
+"""
+The status of git diff and the content of the file with diff indicators
+"""
 type fileLineChangeResult{
+    "The status of the git diff for the file denoting the number of changes (Additions and Deletions)"
     diffStat: String!
+    "The content of the file with the diff indicators (+/-)"
     fileDiff: [String]!
 }
 
+"""
+The current path of the data fle and the port to which gitconvex server listens
+"""
 type settingsDataResults{
+    "The path of the JSON data file"
     settingsDatabasePath: String!
+    "The current port that gitconvex is configured to listen"
     settingsPortDetails: String!
 }
 
+"""
+Result after comparing two branches from the repo
+"""
 type branchCompareResults{
+    "The date used to group differing commits"
     date: String!
+    "The list of differing commits"
     commits: [gitCommits]!
 }
 
+"""
+Details about the remote repositories
+"""
 type remoteDetails {
+    "Name of the remote"
     remoteName: String!
+    "URL of the upstream remote"
     remoteUrl: String!
 }
 
-type Query {
-    healthCheck: HealthCheckParams!
-    fetchRepo: FetchRepoParams!
-    gitRepoStatus(repoId: String!): GitRepoStatusResults!
-    gitFolderContent(repoId: String!, directoryName: String): GitFolderContentResults!
-    gitCommitLogs(repoId: String!, referenceCommit: String!): gitCommitLogResults!
-    gitCommitFiles(repoId: String!, commitHash: String!): [gitCommitFileResult]!
-    searchCommitLogs(repoId: String!, searchType: String!, searchKey: String!): [gitCommits]!
-    codeFileDetails(repoId: String!, fileName: String!): codeFileType!
-    gitChanges(repoId: String!): gitChangeResults!
-    gitUnPushedCommits(repoId: String!, remoteURL: String!, remoteBranch: String!): UnPushedCommitResult!
-    gitFileLineChanges(repoId: String!, fileName: String!): fileLineChangeResult!
-    settingsData: settingsDataResults!
-    commitCompare(repoId: String!,baseCommit: String!, compareCommit: String!): [gitCommitFileResult]!
-    branchCompare(repoId: String!, baseBranch: String!, compareBranch: String!): [branchCompareResults]!
-    getRemote(repoId: String!): [remoteDetails]!
-}
-
-type BranchDeleteStatus{
-    status: String!
-}
-
-type FetchResult{
-    status: String!
-    fetchedItems: [String]!
-}
-
-type PullResult{
-    status: String!
-    pulledItems: [String]!
-}
-
+"""
+Indicator showing if branch has an upstream or not and the list of commits
+"""
 type UnPushedCommitResult{
+    "Indicator that denotes if the branch has an upstream or not"
     isNewBranch: Boolean!
+    "List of commits that are not pushed to the remote branch"
     gitCommits: [gitCommits]!
 }
 
-type deleteStatus{
+type Query {
+    "To check if gitconvex API is reachable"
+    healthCheck: HealthCheckParams!
+    "Fetches the details of the repo stored in the JSON repo data file"
+    fetchRepo: FetchRepoParams!
+    "Returns the current status of the target repo"
+    gitRepoStatus(repoId: String!): GitRepoStatusResults!
+    "Displays the content of a directory from the git worktree along with its respective commit message"
+    gitFolderContent(repoId: String!, directoryName: String): GitFolderContentResults!
+    "Lists up to 10 commit logs"
+    gitCommitLogs(repoId: String!, referenceCommit: String!): GitCommitLogResults!
+    "Returns the files that are changed as part of a commit based on the ` + "`" + `commitHash` + "`" + `"
+    gitCommitFiles(repoId: String!, commitHash: String!): [gitCommitFileResult]!
+    "Returns the commit logs based on the search query"
+    searchCommitLogs(repoId: String!, searchType: String!, searchKey: String!): [gitCommits]!
+    "Displays the content of a selected file from the repository work tree"
+    codeFileDetails(repoId: String!, fileName: String!): codeFileType!
+    "Returns the items that are modified (similar to ` + "`" + `git status` + "`" + `)"
+    gitChanges(repoId: String!): gitChangeResults!
+    "Returns the list of commits that are not pushed to remote"
+    gitUnPushedCommits(repoId: String!, remoteURL: String!, remoteBranch: String!): UnPushedCommitResult!
+    "Line by Line git difference for text files"
+    gitFileLineChanges(repoId: String!, fileName: String!): fileLineChangeResult!
+    "Returns the current config data from gitconvex env_config JSON data file"
+    settingsData: settingsDataResults!
+    "Compares two commits and returns the results"
+    commitCompare(repoId: String!,baseCommit: String!, compareCommit: String!): [gitCommitFileResult]!
+    "Compares two branches and returns the list of differing commits"
+    branchCompare(repoId: String!, baseBranch: String!, compareBranch: String!): [branchCompareResults]!
+    "Returns the details about a repository's remote repos"
+    getRemote(repoId: String!): [remoteDetails]!
+}
+
+"""
+The response holding the data of the newly added repo
+"""
+type AddRepoParams{
+    "The UUID generated for the new repo"
+    repoId: String!
+    "Status denoting if the repo has been added successfully or not"
     status: String!
+    "A message stating if the repo is added to the data file or not"
+    message: String!
+}
+
+"""
+Result returned after attempting to delete a repo entry from the gitconvex data file
+"""
+type deleteStatus{
+    "String based status denoting the outcome of the delete"
+    status: String!
+    "UUID of the repo deleted from the data file"
     repoId: String!
 }
 
+"""
+Shows the status if the branch has been deleted or not
+"""
+type BranchDeleteStatus{
+    "Branch delete status"
+    status: String!
+}
+
+"""
+Result of the remote fetch operation
+"""
+type FetchResult{
+    "Status string denoting the fetch operation"
+    status: String!
+    "Message denoting the outcome of the fetch"
+    fetchedItems: [String]!
+}
+
+"""
+Result of the remote pull operation
+"""
+type PullResult{
+    "Status string denoting the pull operation"
+    status: String!
+    "Message denoting the outcome of the pull"
+    pulledItems: [String]!
+}
+
+"""
+Returns the status after attempting remote data manipulation operations such as adding / deleting or editing a remote
+"""
 type remoteMutationResult{
+    "Status denoting the outcome of the remote operation"
     status: String!
 }
 
 type Mutation {
+    "Adds a new repo to the gitconvex repo datastore"
     addRepo(repoName: String!, repoPath: String!, cloneSwitch: Boolean!, repoURL: String, initSwitch: Boolean!, authOption: String!, sshKeyPath: String, userName: String, password: String): AddRepoParams!
+    "Adds a new branch to the repo"
     addBranch(repoId: String!, branchName: String!): String!
+    "Checks out to the target branch"
     checkoutBranch(repoId: String!, branchName: String!): String!
+    "Deletes the selected local branch from the repo"
     deleteBranch(repoId: String!, branchName: String!, forceFlag: Boolean!): BranchDeleteStatus!
+    "Fetches the changes from the target remote"
     fetchFromRemote(repoId: String!, remoteUrl: String, remoteBranch: String): FetchResult!
+    "Pulls the changes from the remote repo"
     pullFromRemote(repoId: String!, remoteUrl: String, remoteBranch: String): PullResult!
+    "Stages a single item. Similar to ` + "`" + `git add <item>` + "`" + `"
     stageItem(repoId: String!, item: String!): String!
+    "Removes a staged item from the index. Similar to ` + "`" + `git reset <item>` + "`" + `"
     removeStagedItem(repoId: String!, item: String!): String!
+    "Removes all the staged items from the index. Similar to ` + "`" + `git reset` + "`" + `"
     removeAllStagedItem(repoId: String!): String!
+    "Stages all the changes. Similar to ` + "`" + `git add --all` + "`" + `"
     stageAllItems(repoId: String!): String!
+    "Commits the staged changes with a commit message"
     commitChanges(repoId: String!, commitMessage: String!): String!
+    "Pushes the commits to the remote"
     pushToRemote(repoId: String!, remoteHost: String!, branch: String!): String!
+    "To change the port to which gitconvex server listens"
     settingsEditPort(newPort: String!): String!
+    "To update the path of the JSON data file which holds the data of all the repositories tracked by gitconvex"
     updateRepoDataFile(newDbFile: String!): String!
+    "To delete a repo from the JSON data file. The actual repo will not be affected in anyway."
     deleteRepo(repoId: String!): deleteStatus!
+    "To update the name of the repo in the JSON data file"
     updateRepoName(repoId: String!, repoName: String!): String!
+    "To add a new remote to the repository"
     addRemote(repoId: String!, remoteName: String!, remoteUrl: String!): remoteMutationResult!
+    "To remove an existing remote from the repo"
     deleteRemote(repoId: String!, remoteName: String!): remoteMutationResult!
+    "To edit the name of the existing remote"
     editRemote(repoId: String!, remoteName: String!, remoteUrl: String!): remoteMutationResult!
 }
 `, BuiltIn: false},
@@ -2452,6 +2597,70 @@ func (ec *executionContext) _FetchResult_fetchedItems(ctx context.Context, field
 	res := resTmp.([]*string)
 	fc.Result = res
 	return ec.marshalNString2ᚕᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _GitCommitLogResults_totalCommits(ctx context.Context, field graphql.CollectedField, obj *model.GitCommitLogResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "GitCommitLogResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCommits, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _GitCommitLogResults_commits(ctx context.Context, field graphql.CollectedField, obj *model.GitCommitLogResults) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "GitCommitLogResults",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Commits, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.GitCommits)
+	fc.Result = res
+	return ec.marshalOgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GitFolderContentResults_trackedFiles(ctx context.Context, field graphql.CollectedField, obj *model.GitFolderContentResults) (ret graphql.Marshaler) {
@@ -3943,7 +4152,7 @@ func (ec *executionContext) _Query_gitCommitLogs(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.GitCommitLogResults)
 	fc.Result = res
-	return ec.marshalNgitCommitLogResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitLogResults(ctx, field.Selections, res)
+	return ec.marshalNGitCommitLogResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitLogResults(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_gitCommitFiles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6003,70 +6212,6 @@ func (ec *executionContext) _gitCommitFileResult_fileName(ctx context.Context, f
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _gitCommitLogResults_totalCommits(ctx context.Context, field graphql.CollectedField, obj *model.GitCommitLogResults) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "gitCommitLogResults",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalCommits, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*float64)
-	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _gitCommitLogResults_commits(ctx context.Context, field graphql.CollectedField, obj *model.GitCommitLogResults) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "gitCommitLogResults",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Commits, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.GitCommits)
-	fc.Result = res
-	return ec.marshalOgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _gitCommits_hash(ctx context.Context, field graphql.CollectedField, obj *model.GitCommits) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6541,6 +6686,32 @@ func (ec *executionContext) _FetchResult(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var gitCommitLogResultsImplementors = []string{"GitCommitLogResults"}
+
+func (ec *executionContext) _GitCommitLogResults(ctx context.Context, sel ast.SelectionSet, obj *model.GitCommitLogResults) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, gitCommitLogResultsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GitCommitLogResults")
+		case "totalCommits":
+			out.Values[i] = ec._GitCommitLogResults_totalCommits(ctx, field, obj)
+		case "commits":
+			out.Values[i] = ec._GitCommitLogResults_commits(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7514,32 +7685,6 @@ func (ec *executionContext) _gitCommitFileResult(ctx context.Context, sel ast.Se
 	return out
 }
 
-var gitCommitLogResultsImplementors = []string{"gitCommitLogResults"}
-
-func (ec *executionContext) _gitCommitLogResults(ctx context.Context, sel ast.SelectionSet, obj *model.GitCommitLogResults) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, gitCommitLogResultsImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("gitCommitLogResults")
-		case "totalCommits":
-			out.Values[i] = ec._gitCommitLogResults_totalCommits(ctx, field, obj)
-		case "commits":
-			out.Values[i] = ec._gitCommitLogResults_commits(ctx, field, obj)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var gitCommitsImplementors = []string{"gitCommits"}
 
 func (ec *executionContext) _gitCommits(ctx context.Context, sel ast.SelectionSet, obj *model.GitCommits) graphql.Marshaler {
@@ -7736,6 +7881,20 @@ func (ec *executionContext) marshalNFetchResult2ᚖgithubᚗcomᚋneel1996ᚋgit
 		return graphql.Null
 	}
 	return ec._FetchResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNGitCommitLogResults2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitLogResults(ctx context.Context, sel ast.SelectionSet, v model.GitCommitLogResults) graphql.Marshaler {
+	return ec._GitCommitLogResults(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGitCommitLogResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitLogResults(ctx context.Context, sel ast.SelectionSet, v *model.GitCommitLogResults) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._GitCommitLogResults(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNGitFolderContentResults2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitFolderContentResults(ctx context.Context, sel ast.SelectionSet, v model.GitFolderContentResults) graphql.Marshaler {
@@ -8210,20 +8369,6 @@ func (ec *executionContext) marshalNgitCommitFileResult2ᚕᚖgithubᚗcomᚋnee
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) marshalNgitCommitLogResults2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitLogResults(ctx context.Context, sel ast.SelectionSet, v model.GitCommitLogResults) graphql.Marshaler {
-	return ec._gitCommitLogResults(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNgitCommitLogResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitLogResults(ctx context.Context, sel ast.SelectionSet, v *model.GitCommitLogResults) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._gitCommitLogResults(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx context.Context, sel ast.SelectionSet, v []*model.GitCommits) graphql.Marshaler {
