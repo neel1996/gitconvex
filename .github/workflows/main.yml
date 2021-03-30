@@ -136,6 +136,10 @@ jobs:
           cp ./lib/git2.lib /c/msys64/usr/lib
           cp ./lib/pkgconfig/libgit2.pc /c/msys64/usr/lib/pkgconfig
           cp -r ./include/* /c/msys64/usr/include
+          cd ../..
+          rm C:\\Strawberry\\perl\\bin\\pkg-config.bat
+          export PATH="/c/msys64/:/c/msys64/usr/:/c/msys64/usr/bin:$PATH" 
+          go get -v ./...
 
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
