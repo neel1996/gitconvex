@@ -62,10 +62,14 @@ jobs:
 
       - name: Login to Github CLI
         run: |
-          gh version && \
-          echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt && \
-          gh auth login --with-token < auth.txt && \
+          gh version
+          echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt 
+          gh auth login --with-token < auth.txt 
+      
+      - name: Github CLI release
+        run: 
           gh release list
+           
 
   # Build for MacOS
   build-macos:
@@ -106,7 +110,13 @@ jobs:
   # Test Build for Windows
   build-windows:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
     steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      
       - name: Install choco dependencies
         run: |
           choco install cygwin
@@ -116,8 +126,6 @@ jobs:
 
       - name: Build libgit2
         run: |
-          "C:\Program Files\Git\bin\bash.exe"
-          cd /a/gitconvex/gitconvex
           pwd
           ls -ltr
           unzip ./lib/win/dep_libs.zip 
