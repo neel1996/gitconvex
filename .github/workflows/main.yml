@@ -68,7 +68,7 @@ jobs:
       
       - name: Github CLI release
         run: 
-          gh release list
+          gh release upload
            
 
   # Build for MacOS
@@ -126,7 +126,7 @@ jobs:
 
       - name: Build libgit2
         run: |
-          pwd
+          setx path "%path%;C:\msys64"
           ls -ltr
           unzip ./lib/win/dep_libs.zip 
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
