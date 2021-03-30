@@ -65,9 +65,10 @@ jobs:
         run: |
           pwd
           gh version
-          echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt 
+          echo "${{ secrets.CLI_AUTH_KEY }}" > auth.txt 
           gh auth login --with-token < auth.txt
           git status 
+          gh repo list
           gh release list
            
   # Build for MacOS
@@ -131,13 +132,14 @@ jobs:
         run: |
           setx path "%path%;C:\msys64\usr\bin"
           ls -ltr
-          unzip ./lib/win/dep_libs.zip 
+          unzip ./lib/win/dep_libs.zip -q
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
           cd libgit2-1.1.0
+          cp -rp ../lib/ .
           git clone https://github.com/libssh2/libssh2 libssh2
           mkdir build && mkdir install && cd build
-          cmake -DPKG_CONFIG_EXECUTABLE=C:\\msys64\\usr\\bin\\pkg-config.exe -DCMAKE_INSTALL_PREFIX=..\install -DOPENSSL_ROOT_DIR=..\lib\win\ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=..\libssh2 ..
+          cmake -DPKG_CONFIG_EXECUTABLE=C:\\msys64\\usr\\bin\\pkg-config.exe -DCMAKE_INSTALL_PREFIX=../install -DOPENSSL_ROOT_DIR=../lib/win/ -DBUILD_CLAR=OFF -DEMBED_SSH_PATH=../libssh2 ..
           cmake --build . --target install
           cd ..\install
           cp .\bin\git2.dll C:\msys64\usr\bin
