@@ -55,7 +55,6 @@ jobs:
 
       - name: Package gitconvex bundle
         run: |
-          brew install node
           make build
           cd dist 
           tar -czf gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz *
@@ -117,7 +116,7 @@ jobs:
 
       - name: Build libgit2
         run: |
-          C:\Program Files\Git\bin\bash.exe
+          "C:\Program Files\Git\bin\bash.exe"
           ls 
           7z x .\lib\win\dep_libs.zip -y 
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
