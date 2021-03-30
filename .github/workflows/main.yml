@@ -22,8 +22,6 @@ jobs:
           tar -xzf libgit2-1.1.0.tar.gz
           cd libgit2-1.1.0
           mkdir build && cd ./build
-          sudo apt  install cmake -y
-          sudo apt install pkg-config -y
           sudo apt-get install libssl-dev
           cmake ..
           cmake --build .
@@ -112,12 +110,6 @@ jobs:
       - name: Add choco packages
         run: |
           choco install wget
-      
-      - name: Add MSYS to PATH
-        run: |
-          setx path "%path%;C:\msys64"
-          setx path "%path%;C:\msys64\usr"
-          setx path "%path%;C:\msys64\usr\bin"
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
@@ -130,7 +122,6 @@ jobs:
 
       - name: Build libgit2 and gitconvex
         run: |
-          setx path "%path%;C:\msys64\usr\bin"
           unzip -q ./lib/win/dep_libs.zip
           wget -q https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.zip
           unzip -q libgit2-1.1.0.zip
@@ -154,6 +145,7 @@ jobs:
       - name: Archive ZIP bundle for windows 
         run: |
           cd dist 
+          cp -rp ../etc .
           7z a -r -tzip gitconvex-windows-v${{ secrets.TARGET_RELEASE_CHANNEL }}.zip *
           ls -ltr
       
