@@ -148,4 +148,5 @@ jobs:
 
       - name: Get dependencies
         run: |
+          setx path "C:\msys64\usr\bin;%path%"
           go get -v ./...
