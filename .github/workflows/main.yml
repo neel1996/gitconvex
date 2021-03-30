@@ -89,7 +89,6 @@ jobs:
 
       - name: Package gitconvex bundle
         run: |
-          brew install node
           make build
           cd dist 
           tar -czf gitconvex-macos-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz *
@@ -148,5 +147,13 @@ jobs:
 
       - name: Get dependencies
         run: |
-          setx path "C:\msys64\usr\bin;%path%"
+          rm C:\\Strawberry\\perl\\bin\\pkg-config.bat
+          setx path "C:\\msys64\\usr\\bin;%path%"
           go get -v ./...
+
+      - name: Build gitconvex bundle for windows 
+        run: |
+          ./make.bat build 
+          cd dist 
+          7z a -r -tzip gitconvex-windows-v${{ secrets.TARGET_RELEASE_CHANNEL }}.zip *
+          ls -ltr
