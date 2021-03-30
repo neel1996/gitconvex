@@ -150,6 +150,8 @@ jobs:
           rm C:\\Strawberry\\perl\\bin\\pkg-config.bat
           set path="C:\\msys64\\usr\\bin"
           set PATH="C:\\msys64\\usr\\bin"
+          echo $PATH 
+          echo $path
           go get -v ./...
 
       - name: Build gitconvex bundle for windows 
