@@ -1235,34 +1235,110 @@ type UnPushedCommitResult{
 type Query {
     "To check if gitconvex API is reachable"
     healthCheck: HealthCheckParams!
+
     "Fetches the details of the repo stored in the JSON repo data file"
     fetchRepo: FetchRepoParams!
+
     "Returns the current status of the target repo"
-    gitRepoStatus(repoId: String!): GitRepoStatusResults!
+    gitRepoStatus(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!
+    ): GitRepoStatusResults!
+
     "Displays the content of a directory from the git worktree along with its respective commit message"
-    gitFolderContent(repoId: String!, directoryName: String): GitFolderContentResults!
+    gitFolderContent(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The name of the directory from which the content (files and sub-dirs) will be fetched"
+        directoryName: String
+    ): GitFolderContentResults!
+
     "Lists up to 10 commit logs"
-    gitCommitLogs(repoId: String!, referenceCommit: String!): GitCommitLogResults!
+    gitCommitLogs(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The commit SHA which will be used as reference to pick the next 10 (or less if there are less than 10 commits) commits"
+        referenceCommit: String!
+    ): GitCommitLogResults!
+
     "Returns the files that are changed as part of a commit based on the ` + "`" + `commitHash` + "`" + `"
-    gitCommitFiles(repoId: String!, commitHash: String!): [gitCommitFileResult]!
+    gitCommitFiles(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The SHA of the target commit"
+        commitHash: String!
+    ): [gitCommitFileResult]!
+
     "Returns the commit logs based on the search query"
-    searchCommitLogs(repoId: String!, searchType: String!, searchKey: String!): [gitCommits]!
+    searchCommitLogs(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The type of the search (commit hash, commit message or the commit author"
+        searchType: String!,
+        "The search query to lookup for the commit"
+        searchKey: String!
+    ): [gitCommits]!
+
     "Displays the content of a selected file from the repository work tree"
-    codeFileDetails(repoId: String!, fileName: String!): codeFileType!
+    codeFileDetails(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The name of the file which will be displayed with code highlighting"
+        fileName: String!
+    ): codeFileType!
+
     "Returns the items that are modified (similar to ` + "`" + `git status` + "`" + `)"
-    gitChanges(repoId: String!): gitChangeResults!
+    gitChanges(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!
+    ): gitChangeResults!
+
     "Returns the list of commits that are not pushed to remote"
-    gitUnPushedCommits(repoId: String!, remoteURL: String!, remoteBranch: String!): UnPushedCommitResult!
+    gitUnPushedCommits(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The URL of the remote repo"
+        remoteURL: String!,
+        "The target remote / upstream branch"
+        remoteBranch: String!
+    ): UnPushedCommitResult!
+
     "Line by Line git difference for text files"
-    gitFileLineChanges(repoId: String!, fileName: String!): fileLineChangeResult!
+    gitFileLineChanges(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The name of the file to look for the difference"
+        fileName: String!
+    ): fileLineChangeResult!
+
     "Returns the current config data from gitconvex env_config JSON data file"
     settingsData: settingsDataResults!
+
     "Compares two commits and returns the results"
-    commitCompare(repoId: String!,baseCommit: String!, compareCommit: String!): [gitCommitFileResult]!
+    commitCompare(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The commit to which the selected commit needs to be compared"
+        baseCommit: String!,
+        "The commit which will be compared with the base commit and the difference will be returned"
+        compareCommit: String!
+    ): [gitCommitFileResult]!
+
     "Compares two branches and returns the list of differing commits"
-    branchCompare(repoId: String!, baseBranch: String!, compareBranch: String!): [branchCompareResults]!
+    branchCompare(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The branch to which the target branch needs to be compared"
+        baseBranch: String!,
+        "The branch which will be compared with the base branch and the commits will be returned"
+        compareBranch: String!
+    ): [branchCompareResults]!
+
     "Returns the details about a repository's remote repos"
-    getRemote(repoId: String!): [remoteDetails]!
+    getRemote(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!
+    ): [remoteDetails]!
 }
 
 """
@@ -1325,43 +1401,172 @@ type remoteMutationResult{
 
 type Mutation {
     "Adds a new repo to the gitconvex repo datastore"
-    addRepo(repoName: String!, repoPath: String!, cloneSwitch: Boolean!, repoURL: String, initSwitch: Boolean!, authOption: String!, sshKeyPath: String, userName: String, password: String): AddRepoParams!
+    addRepo(
+        "The user defiend name of the repo. This will be used only for display purposes and nothing else"
+        repoName: String!,
+        "The actual path of the git repo"
+        repoPath: String!,
+        "Boolean switch to denote if the repo needs to be cloned from the remote source or not"
+        cloneSwitch: Boolean!,
+        "The URL of the remote repo"
+        repoURL: String,
+        "Switch to enable repo init if the path is not a git repository"
+        initSwitch: Boolean!,
+        "The authentication to be used to access the remote repo (SSH or Basic auth)"
+        authOption: String!,
+        "If SSH is the auth option, then this field holds the path of the SSH private key"
+        sshKeyPath: String,
+        "User name for basic auth"
+        userName: String,
+        "Password for basic auth. This will be encrypted and stored in the JSON file"
+        password: String
+    ): AddRepoParams!
+
     "Adds a new branch to the repo"
-    addBranch(repoId: String!, branchName: String!): String!
+    addBranch(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "Name of the new branch to be added"
+        branchName: String!
+    ): String!
+
     "Checks out to the target branch"
-    checkoutBranch(repoId: String!, branchName: String!): String!
+    checkoutBranch(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "Name of the branch to be checked out"
+        branchName: String!
+    ): String!
+
     "Deletes the selected local branch from the repo"
-    deleteBranch(repoId: String!, branchName: String!, forceFlag: Boolean!): BranchDeleteStatus!
+    deleteBranch(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "Name of the branch to be deleted from the repo (works only for local branched and not remote branches)"
+        branchName: String!,
+        "Switch to enable force deletion of the branch ignoring unmerged changes"
+        forceFlag: Boolean!
+    ): BranchDeleteStatus!
+
     "Fetches the changes from the target remote"
-    fetchFromRemote(repoId: String!, remoteUrl: String, remoteBranch: String): FetchResult!
+    fetchFromRemote(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The URL of the target remote repo"
+        remoteUrl: String,
+        "The target upstream / remote branch"
+        remoteBranch: String
+    ): FetchResult!
+
     "Pulls the changes from the remote repo"
-    pullFromRemote(repoId: String!, remoteUrl: String, remoteBranch: String): PullResult!
+    pullFromRemote(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The URL of the target remote repo"
+        remoteUrl: String,
+        "The target upstream / remote branch"
+        remoteBranch: String
+    ): PullResult!
+
     "Stages a single item. Similar to ` + "`" + `git add <item>` + "`" + `"
-    stageItem(repoId: String!, item: String!): String!
+    stageItem(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The file item / change to be staged"
+        item: String!
+    ): String!
+
     "Removes a staged item from the index. Similar to ` + "`" + `git reset <item>` + "`" + `"
-    removeStagedItem(repoId: String!, item: String!): String!
+    removeStagedItem(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The change item to be removed from the index"
+        item: String!
+    ): String!
+
     "Removes all the staged items from the index. Similar to ` + "`" + `git reset` + "`" + `"
-    removeAllStagedItem(repoId: String!): String!
+    removeAllStagedItem(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!
+    ): String!
+
     "Stages all the changes. Similar to ` + "`" + `git add --all` + "`" + `"
-    stageAllItems(repoId: String!): String!
+    stageAllItems(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!
+    ): String!
+
     "Commits the staged changes with a commit message"
-    commitChanges(repoId: String!, commitMessage: String!): String!
+    commitChanges(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The message for the commit"
+        commitMessage: String!
+    ): String!
+
     "Pushes the commits to the remote"
-    pushToRemote(repoId: String!, remoteHost: String!, branch: String!): String!
+    pushToRemote(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The name of the remote repo"
+        remoteHost: String!,
+        "The target upstream branch"
+        branch: String!
+    ): String!
+
     "To change the port to which gitconvex server listens"
-    settingsEditPort(newPort: String!): String!
+    settingsEditPort(
+        "The new port number to which you wish gitconvex to listen to"
+        newPort: String!
+    ): String!
+
     "To update the path of the JSON data file which holds the data of all the repositories tracked by gitconvex"
-    updateRepoDataFile(newDbFile: String!): String!
+    updateRepoDataFile(
+        "The path of the new JSON data file"
+        newDbFile: String!
+    ): String!
+
     "To delete a repo from the JSON data file. The actual repo will not be affected in anyway."
-    deleteRepo(repoId: String!): deleteStatus!
+    deleteRepo(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!
+    ): deleteStatus!
+
     "To update the name of the repo in the JSON data file"
-    updateRepoName(repoId: String!, repoName: String!): String!
+    updateRepoName(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The new name for the repo"
+        repoName: String!
+    ): String!
+
     "To add a new remote to the repository"
-    addRemote(repoId: String!, remoteName: String!, remoteUrl: String!): remoteMutationResult!
+    addRemote(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The name of the remote repo"
+        remoteName: String!,
+        "The URL of the remote repo"
+        remoteUrl: String!
+    ): remoteMutationResult!
+
     "To remove an existing remote from the repo"
-    deleteRemote(repoId: String!, remoteName: String!): remoteMutationResult!
+    deleteRemote(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The name of the remote to be deleted"
+        remoteName: String!
+    ): remoteMutationResult!
+
     "To edit the name of the existing remote"
-    editRemote(repoId: String!, remoteName: String!, remoteUrl: String!): remoteMutationResult!
+    editRemote(
+        "The UUID of the repo. It will be available in the JSON data file"
+        repoId: String!,
+        "The name of the remote"
+        remoteName: String!,
+        "The URL of the remote repo"
+        remoteUrl: String!
+    ): remoteMutationResult!
 }
 `, BuiltIn: false},
 }
