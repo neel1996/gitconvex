@@ -357,7 +357,7 @@ export default function FileExplorerComponent(props) {
                   icon={["fas", "times"]}
                 ></FontAwesomeIcon>
               </div>
-              <div className="w-full h-full mx-auto my-auto block mt-4 mb-10">
+              <div className="w-full h-full mx-auto my-auto flex mt-4 mb-10">
                 {memoizedCodeFileViewComponent}
               </div>
             </div>

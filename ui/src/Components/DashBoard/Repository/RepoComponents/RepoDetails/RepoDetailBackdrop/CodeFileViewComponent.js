@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import "../../../../../../prism.css";
 import InfiniteLoader from "../../../../../Animations/InfiniteLoader";
 import { globalAPIEndpoint } from "../../../../../../util/env_config";
+import { isText } from "istextorbinary";
 import "prismjs/components/prism-markdown";
 
 export default function CodeFileViewComponent(props) {
@@ -14,7 +15,8 @@ export default function CodeFileViewComponent(props) {
   const [prismIndicator, setPrismIndicator] = useState("");
   const [highlightedCode, setHighlightedCode] = useState([]);
   const [fileDataState, setFileDataState] = useState([]);
-  const [isInvalidFile, setIsInvalidFile] = useState(false);
+  const [isEmptyFile, setIsEmptyFile] = useState(false);
+  const [isNotATextFile, setIsNotATextFile] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const repoId = props.repoId;
@@ -22,6 +24,13 @@ export default function CodeFileViewComponent(props) {
 
   useEffect(() => {
     setLoading(true);
+
+    if (fileItem && !isText(fileItem)) {
+      setIsNotATextFile(true);
+      setLoading(false);
+      return;
+    }
+
     axios({
       url: globalAPIEndpoint,
       method: "POST",
@@ -44,7 +53,7 @@ export default function CodeFileViewComponent(props) {
           const { fileData } = res.data.data.codeFileDetails;
 
           if (fileData.length === 0) {
-            setIsInvalidFile(true);
+            setIsEmptyFile(true);
           }
 
           let l = new LangLine();
@@ -87,7 +96,7 @@ export default function CodeFileViewComponent(props) {
       })
       .catch((err) => {
         console.log(err);
-        setIsInvalidFile(true);
+        setIsEmptyFile(true);
       });
   }, [repoId, fileItem, props.commitMessage]);
 
@@ -118,8 +127,18 @@ export default function CodeFileViewComponent(props) {
 
   function invalidFileAlert() {
     return (
-      <div className="w-3/4 mx-auto my-auto p-6 rounded bg-red-200 text-red-600 font-sans text-2xl font-light text-center border-b-8 border-red-400 border-dashed">
-        {isInvalidFile ? "File cannot be opened!" : "Loading..."}
+      <div
+        className={`w-3/4 mx-auto my-auto p-8 rounded ${
+          isEmptyFile
+            ? "bg-yellow-100 text-yellow-400 border-yellow-400"
+            : "bg-pink-100 text-pink-400 border-pink-400"
+        } font-sans text-2xl font-medium text-center border-b-4 border-dashed`}
+      >
+        {isEmptyFile
+          ? "File is empty and has no content to show!"
+          : isNotATextFile
+          ? "File cannot be opened!"
+          : "Loading..."}
       </div>
     );
   }
@@ -136,8 +155,12 @@ export default function CodeFileViewComponent(props) {
           </div>
         </div>
       ) : (
-        <div className="w-5/6 mx-auto my-auto bg-white rounded-lg p-5">
-          {isInvalidFile ? (
+        <div
+          className={`${
+            isEmptyFile || isNotATextFile ? "w-full" : "w-5/6 bg-white"
+          } mx-auto my-auto rounded-lg p-5`}
+        >
+          {isEmptyFile || isNotATextFile ? (
             invalidFileAlert()
           ) : (
             <div className="w-full mx-auto my-auto overflow-auto h-full">
