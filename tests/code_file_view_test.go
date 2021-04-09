@@ -1,16 +1,20 @@
 package tests
 
 import (
-	"github.com/go-git/go-git/v5"
+	"os"
+	"path"
+	"testing"
+
+	git "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex-server/api"
 	"github.com/neel1996/gitconvex-server/graph/model"
-	"testing"
 )
 
 func TestCodeFileView(t *testing.T) {
-	r, _ := git.PlainOpen("..")
-	w, _ := r.Worktree()
-	repoPath := w.Filesystem.Root()
+	cwd, _ := os.Getwd()
+	r, _ := git.OpenRepository(path.Join(cwd, ".."))
+
+	repoPath := r.Path()
 	expectedLine := "# gitconvex GoLang project"
 
 	type args struct {
@@ -27,7 +31,7 @@ func TestCodeFileView(t *testing.T) {
 			repo     *git.Repository
 			repoPath string
 			fileName string
-		}{repo: r, repoPath: repoPath, fileName: "README.md"}, want: &model.CodeFileType{FileData: []*string{&expectedLine}}},
+		}{repo: r, repoPath: path.Join(repoPath, ".."), fileName: "README.md"}, want: &model.CodeFileType{FileData: []*string{&expectedLine}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
