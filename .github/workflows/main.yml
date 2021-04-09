@@ -3,8 +3,17 @@ name: Gitconvex build deploy
 on: push
 
 jobs:
+  gitconvex-test:
+    name: Gitconvex test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Go Test
+        run: |
+          go test -v ./...
+
   # Build for Ubuntu Linux
   build-linux:
+    needs: gitconvex-test
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.x
@@ -42,11 +51,6 @@ jobs:
         run: |
           echo "# gitconvex GoLang project" > /home/runner/work/gitconvex/gitconvex/README.md
 
-      - name: Run test cases
-        run: |
-          git config --global user.name "${{ secrets.USER_NAME }}" && git config --global user.email "${{ secrets.USER_EMAIL }}"
-          export GOTESTENV=ci && gotestsum --format=testname ./...
-
       - name: Package gitconvex bundle
         run: |
           make build
@@ -64,6 +68,7 @@ jobs:
            
   # Build for MacOS
   build-macos:
+    needs: gitconvex-test
     runs-on: macos-latest
     steps:
       - name: Install brew
@@ -99,6 +104,7 @@ jobs:
 
   # Test Build for Windows
   build-windows:
+    needs: gitconvex-test
     runs-on: windows-latest
     defaults:
       run:
