@@ -13,6 +13,7 @@ jobs:
           brew install libgit2
 
   gitconvex-test:
+    needs: libgit2-setup-test
     name: Gitconvex server test
     runs-on: ubuntu-latest
     env:
