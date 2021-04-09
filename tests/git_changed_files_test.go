@@ -2,13 +2,15 @@ package tests
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
+	"strings"
+	"testing"
+
 	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/graph/model"
-	"io/ioutil"
-	"os"
-	"strings"
-	"testing"
 )
 
 func TestChangedFiles(t *testing.T) {
@@ -20,6 +22,9 @@ func TestChangedFiles(t *testing.T) {
 	if currentEnv == "ci" {
 		repoPath = "/home/runner/work/gitconvex-server/starfleet"
 		r, _ = git.OpenRepository(repoPath)
+	} else {
+		cwd, _ := os.Getwd()
+		r, _ = git.OpenRepository(path.Join(cwd, ".."))
 	}
 
 	untrackedResult := "untracked.txt"
