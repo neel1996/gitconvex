@@ -3,22 +3,42 @@ name: Gitconvex build deploy
 on: push
 
 jobs:
-  gitconvex-test:
-    name: Gitconvex test
+  libgit2-setup-test:
+    name: Setup Libgit2 with Homebrew
     runs-on: ubuntu-latest
     steps:
+      - name: Install libssh2 and libgit2
+        run: |
+          brew install libssh2
+          brew install libgit2
+
+  gitconvex-test:
+    name: Gitconvex server test
+    runs-on: ubuntu-latest
+    env:
+      PKG_CONFIG_PATH: /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/pkgconfig/
+
+    steps:
+      - name: Install libgit2 from Homebrew
+        run: |
+          brew install libssh2
+          brew install libgit2
+
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
           go-version: ^1.16
         id: go
-      
+
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
       - name: Run Go Test
         run: |
-          go test -v ./...
+          sudo cp /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/lib* /usr/lib
+          export PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/:$PATH"
+          git config --global user.name "${{ secrets.ACTION_USER_NAME }}" && git config --global user.email "${{ secrets.ACTION_USER_EMAIL }}"
+          export GOTESTENV=ci && go test -v ./...
 
   # Build for Ubuntu Linux
   build-linux:
@@ -67,14 +87,14 @@ jobs:
           tar -czf gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz *
           ls -ltr
           cd ..
-      
+
       - name: Github CLI release for Linux
         run: |
           gh version
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt 
           gh auth login --with-token < auth.txt
-          gh release upload --repo ${{ secrets.USER_NAME }}/gitconvex ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber 
-           
+          gh release upload --repo ${{ secrets.USER_NAME }}/gitconvex ${{ secrets.TARGET_RELEASE_CHANNEL }} ./dist/gitconvex-linux-amd64-v${{ secrets.TARGET_RELEASE_CHANNEL }}.tar.gz --clobber
+
   # Build for MacOS
   build-macos:
     needs: gitconvex-test
@@ -121,7 +141,7 @@ jobs:
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
-      
+
       - name: Add choco packages
         run: |
           choco install wget
@@ -155,15 +175,15 @@ jobs:
           rm C:\\Strawberry\\perl\\bin\\pkg-config.bat
           export PATH="/c/msys64/:/c/msys64/usr/:/c/msys64/usr/bin:$PATH" 
           go get -v ./...
-          ./make.bat build 
+          ./make.bat build
 
-      - name: Archive ZIP bundle for windows 
+      - name: Archive ZIP bundle for windows
         run: |
           cd dist 
           cp -rp ../etc .
           7z a -r -tzip gitconvex-windows-v${{ secrets.TARGET_RELEASE_CHANNEL }}.zip *
           ls -ltr
-      
+
       - name: Github CLI Release for windows
         run: |
           echo ${{ secrets.CLI_AUTH_KEY }} > auth.txt
