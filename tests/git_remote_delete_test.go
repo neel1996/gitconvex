@@ -1,28 +1,41 @@
 package tests
 
 import (
+	"fmt"
 	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/global"
 	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
-	"reflect"
 	"testing"
 )
 
 func TestDeleteRemoteStruct_DeleteRemote(t *testing.T) {
+	var repoPath string
 	var r *git.Repository
-	cwd, _ := os.Getwd()
-	var testRemoteName string
 
-	if os.Getenv("GOTESTENV") == "ci" {
-		r, _ = git.OpenRepository(path.Join(cwd, ".."))
-		testRemoteName = "origin"
+	cwd, _ := os.Getwd()
+	currentEnv := os.Getenv("GOTESTENV")
+	fmt.Println("Environment : " + currentEnv)
+
+	if currentEnv == "ci" {
+		repoPath = path.Join(cwd, "..")
+		r, _ = git.OpenRepository(repoPath)
 	} else {
-		r, _ = git.OpenRepository(os.Getenv("REPODIR"))
-		testRemoteName = "github"
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
 	}
+
+	testRemoteName := "test_remote"
+	var testObj git2.AddRemoteInterface
+	testObj = git2.AddRemoteStruct{
+		Repo:       r,
+		RemoteName: testRemoteName,
+		RemoteURL:  "git@github.com:neel1996/gitconvex-server.git",
+	}
+	_ = testObj.AddRemote()
 
 	type fields struct {
 		Repo       git.Repository
@@ -44,9 +57,9 @@ func TestDeleteRemoteStruct_DeleteRemote(t *testing.T) {
 				Repo:       &tt.fields.Repo,
 				RemoteName: tt.fields.RemoteName,
 			}
-			if got := d.DeleteRemote(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("DeleteRemote() = %v, want %v", got, tt.want)
-			}
+			got := d.DeleteRemote()
+
+			assert.Equal(t, tt.want.Status, got.Status)
 		})
 	}
 }

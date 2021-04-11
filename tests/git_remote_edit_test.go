@@ -1,22 +1,30 @@
 package tests
 
 import (
+	"fmt"
 	"github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/global"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
 	"testing"
 )
 
 func TestRemoteEditStruct_EditRemoteUrl(t *testing.T) {
+	var repoPath string
 	var r *git.Repository
-	cwd, _ := os.Getwd()
 
-	if os.Getenv("GOTESTENV") == "ci" {
-		r, _ = git.OpenRepository(path.Join(cwd, ".."))
+	cwd, _ := os.Getwd()
+	currentEnv := os.Getenv("GOTESTENV")
+	fmt.Println("Environment : " + currentEnv)
+
+	if currentEnv == "ci" {
+		repoPath = path.Join(cwd, "..")
+		r, _ = git.OpenRepository(repoPath)
 	} else {
-		r, _ = git.OpenRepository(os.Getenv("REPODIR"))
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
 	}
 
 	type fields struct {
@@ -42,9 +50,9 @@ func TestRemoteEditStruct_EditRemoteUrl(t *testing.T) {
 				RemoteName: tt.fields.RemoteName,
 				RemoteUrl:  tt.fields.RemoteUrl,
 			}
-			if got := e.EditRemoteUrl(); got.Status != tt.want {
-				t.Errorf("EditRemote() = %v, want %v", got, tt.want)
-			}
+			got := e.EditRemoteUrl()
+
+			assert.Equal(t, tt.want, got.Status)
 		})
 	}
 }

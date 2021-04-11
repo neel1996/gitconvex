@@ -4,27 +4,28 @@ import (
 	"fmt"
 	"github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
-	assert2 "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
 	"testing"
 )
 
 func TestListFiles(t *testing.T) {
-	assert := assert2.New(t)
 	lsFileChan := make(chan *git2.LsFileInfo)
 	var repoPath string
-
+	var r *git.Repository
 	cwd, _ := os.Getwd()
-	repoPath = path.Join(cwd, "..")
-
+	mockRepoPath := path.Join(cwd, "../..") + "/starfleet"
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
+		repoPath = mockRepoPath
+		r, _ = git.OpenRepository(repoPath)
+	} else {
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
 	}
-	r, _ := git.OpenRepository(repoPath)
 
 	type args struct {
 		repo       *git.Repository
@@ -54,8 +55,8 @@ func TestListFiles(t *testing.T) {
 			trackedFiles := repoContent.TrackedFiles
 			commits := repoContent.FileBasedCommits
 
-			assert.Greater(len(trackedFiles), 0, "Repo has no files")
-			assert.Greater(len(commits), 0, "File based commit list is empty")
+			assert.NotZerof(t, len(trackedFiles), "Repo has no files")
+			assert.NotZerof(t, len(commits), "File based commit list is empty")
 		})
 	}
 }

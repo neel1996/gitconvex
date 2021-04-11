@@ -4,19 +4,23 @@ import (
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 )
 
 func TestCommitChanges(t *testing.T) {
 	var repoPath string
 	var r *git2go.Repository
+	cwd, _ := os.Getwd()
+	mockRepoPath := path.Join(cwd, "../..") + "/starfleet"
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
+		repoPath = mockRepoPath
 		r, _ = git2go.OpenRepository(repoPath)
 	}
 
@@ -52,9 +56,8 @@ func TestCommitChanges(t *testing.T) {
 				RepoPath:      repoPath,
 			}
 
-			if got := testObj.CommitChanges(); got != tt.want {
-				t.Errorf("CommitChanges() = %v, want %v", got, tt.want)
-			}
+			got := testObj.CommitChanges()
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

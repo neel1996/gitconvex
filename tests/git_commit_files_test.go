@@ -4,22 +4,33 @@ import (
 	"fmt"
 	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
-	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/stretchr/testify/assert"
 	"os"
-	"reflect"
+	"path"
 	"testing"
 )
 
 func TestCommitFileList(t *testing.T) {
 	var repoPath string
 	var r *git.Repository
+	cwd, _ := os.Getwd()
 	currentEnv := os.Getenv("GOTESTENV")
+	mockRepoPath := path.Join(cwd, "../..") + "/starfleet"
+
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
+		repoPath = mockRepoPath
+		r, _ = git.OpenRepository(repoPath)
+	} else {
+		repoPath = path.Join(cwd, "../..")
 		r, _ = git.OpenRepository(repoPath)
 	}
+
+	sampleCommits := git2.CommitLogStruct{
+		Repo:            r,
+		ReferenceCommit: "",
+	}.CommitLogs()
 
 	type args struct {
 		repo       *git.Repository
@@ -28,15 +39,11 @@ func TestCommitFileList(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []*model.GitCommitFileResult
 	}{
 		{name: "Git commit file list test case", args: struct {
 			repo       *git.Repository
 			commitHash string
-		}{repo: r, commitHash: "46aa56e78f2a26d23f604f8e9bbdc240a0a5dbbe"}, want: []*model.GitCommitFileResult{&model.GitCommitFileResult{
-			Type:     "A",
-			FileName: ".github/workflows/codeql-analysis.yml",
-		}}},
+		}{repo: r, commitHash: *sampleCommits.Commits[1].Hash}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -46,14 +53,9 @@ func TestCommitFileList(t *testing.T) {
 				CommitHash: tt.args.commitHash,
 			}
 
-			if got := testObject.CommitFileList(); !reflect.DeepEqual(got, tt.want) {
-				for _, fileItem := range got {
-					fmt.Println(fileItem.FileName)
-					if fileItem.FileName != tt.want[0].FileName {
-						t.Errorf("CommitFileList() = %v, want %v", got, tt.want)
-					}
-				}
-			}
+			got := testObject.CommitFileList()
+
+			assert.NotZero(t, len(got))
 		})
 	}
 }

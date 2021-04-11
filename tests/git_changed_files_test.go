@@ -2,52 +2,50 @@ package tests
 
 import (
 	"fmt"
+	git "github.com/libgit2/git2go/v31"
+	git2 "github.com/neel1996/gitconvex-server/git"
+	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 	"testing"
-
-	git "github.com/libgit2/git2go/v31"
-	git2 "github.com/neel1996/gitconvex-server/git"
-	"github.com/neel1996/gitconvex-server/graph/model"
 )
 
 func TestChangedFiles(t *testing.T) {
 	var repoPath string
 	var r *git.Repository
+	cwd, _ := os.Getwd()
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
+		repoPath = path.Join(cwd, "..")
 		r, _ = git.OpenRepository(repoPath)
 	} else {
-		cwd, _ := os.Getwd()
-		r, _ = git.OpenRepository(path.Join(cwd, ".."))
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
 	}
 
-	untrackedResult := "untracked.txt"
-	changedResult := "README.md"
-	stagedResult := "README.md"
-
-	uErr := ioutil.WriteFile(repoPath+"/"+untrackedResult, []byte{byte(63)}, 0755)
-	cErr := ioutil.WriteFile(repoPath+"/"+changedResult, []byte{byte(83)}, 0755)
-
+	mockFile := "mockFile.txt"
+	_ = ioutil.WriteFile(repoPath+"/"+mockFile, []byte{byte(63)}, 0755)
 	var stageObject git2.StageItemInterface
 	stageObject = git2.StageItemStruct{
 		Repo:     r,
-		FileItem: changedResult,
+		FileItem: mockFile,
 	}
-	stageObject.StageItem()
 
-	sErr := ioutil.WriteFile(repoPath+"/"+changedResult, []byte{byte(70)}, 0755)
-	fmt.Println(uErr, cErr, sErr)
+	stageObject.StageItem()
+	_ = ioutil.WriteFile(repoPath+"/"+mockFile, []byte{byte(83)}, 0755)
+
+	untrackedMockFile := "mockFileTwo.txt"
+	_ = ioutil.WriteFile(repoPath+"/"+untrackedMockFile, []byte{byte(63)}, 0755)
 
 	expectedResults := &model.GitChangeResults{
-		GitUntrackedFiles: []*string{&untrackedResult},
-		GitChangedFiles:   []*string{&changedResult},
-		GitStagedFiles:    []*string{&stagedResult},
+		GitUntrackedFiles: []*string{&untrackedMockFile},
+		GitChangedFiles:   []*string{&mockFile},
+		GitStagedFiles:    []*string{&mockFile},
 	}
 
 	type args struct {
@@ -67,6 +65,7 @@ func TestChangedFiles(t *testing.T) {
 				Repo:     tt.args.repo,
 				RepoPath: "",
 			}
+
 			got := testObj.ChangedFiles()
 
 			stagedFile := *got.GitStagedFiles[0]
@@ -74,15 +73,17 @@ func TestChangedFiles(t *testing.T) {
 			changedFile := *got.GitChangedFiles[0]
 			changedFile = strings.Split(changedFile, ",")[1]
 
-			fmt.Println(stagedFile)
-			fmt.Println(untrackedFile)
-			fmt.Println(changedFile)
+			assert.Equal(t, *tt.want.GitStagedFiles[0], stagedFile)
+			assert.Equal(t, *tt.want.GitChangedFiles[0], changedFile)
+			assert.Equal(t, *tt.want.GitUntrackedFiles[0], untrackedFile)
 
-			if stagedFile == *tt.want.GitStagedFiles[0] && untrackedFile == *tt.want.GitUntrackedFiles[0] && changedFile == *tt.want.GitChangedFiles[0] {
-				fmt.Println("Test Passed")
-			} else {
-				t.Errorf("ChangedFiles() = %v, want %v", *got.GitStagedFiles[0], *tt.want.GitStagedFiles[0])
+			reset := git2.ResetAllStruct{
+				Repo: r,
 			}
+			reset.ResetAllItems()
+
+			fmt.Println(os.Remove(repoPath + "/" + mockFile))
+			fmt.Println(os.Remove(repoPath + "/" + untrackedMockFile))
 		})
 	}
 }

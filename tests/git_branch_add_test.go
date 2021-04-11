@@ -1,16 +1,30 @@
 package tests
 
 import (
+	"fmt"
 	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
 	"testing"
 )
 
 func TestAddBranch(t *testing.T) {
+	var repoPath string
+	var r *git.Repository
+
 	cwd, _ := os.Getwd()
-	r, _ := git.OpenRepository(path.Join(cwd, ".."))
+	currentEnv := os.Getenv("GOTESTENV")
+	fmt.Println("Environment : " + currentEnv)
+
+	if currentEnv == "ci" {
+		repoPath = path.Join(cwd, "..")
+		r, _ = git.OpenRepository(repoPath)
+	} else {
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
+	}
 
 	type args struct {
 		repo       *git.Repository
@@ -33,10 +47,13 @@ func TestAddBranch(t *testing.T) {
 				Repo:       tt.args.repo,
 				BranchName: tt.args.branchName,
 			}
+			got := obj.AddBranch()
+			assert.Equal(t, tt.want, got)
 
-			if got := obj.AddBranch(); got != tt.want {
-				t.Errorf("AddBranch() = %v, want %v", got, tt.want)
-			}
+			git2.DeleteBranchInputs{
+				Repo:       r,
+				BranchName: "test",
+			}.DeleteBranch()
 		})
 	}
 }

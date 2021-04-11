@@ -3,6 +3,7 @@ package tests
 import (
 	"github.com/neel1996/gitconvex-server/api"
 	"github.com/neel1996/gitconvex-server/utils"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -32,13 +33,9 @@ func TestUpdateRepoName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := api.UpdateRepoName(tt.args.repoId, tt.args.repoName)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("UpdateRepoName() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("UpdateRepoName() got = %v, want %v", got, tt.want)
-			}
+
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	assert2 "github.com/stretchr/testify/assert"
@@ -11,8 +12,20 @@ import (
 
 func TestRemoteData(t *testing.T) {
 	remoteChan := make(chan git2.RemoteDataModel)
+	var repoPath string
+	var r *git.Repository
+
 	cwd, _ := os.Getwd()
-	r, _ := git.OpenRepository(path.Join(cwd, ".."))
+	currentEnv := os.Getenv("GOTESTENV")
+	fmt.Println("Environment : " + currentEnv)
+
+	if currentEnv == "ci" {
+		repoPath = path.Join(cwd, "..")
+		r, _ = git.OpenRepository(repoPath)
+	} else {
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
+	}
 
 	type args struct {
 		repo       *git.Repository
