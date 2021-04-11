@@ -15,9 +15,9 @@
 
 > Use any of the below options to get gitconvex for your system
 
-[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v2.1.0&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex-package/releases)
+[![github release](https://img.shields.io/static/v1?label=gitconvex&message=v2.1.1&color=green&style=for-the-badge&logo=github)](https://github.com/neel1996/gitconvex/releases/tag/2.1.1)
 [![gitconvex-choco](https://img.shields.io/chocolatey/v/gitconvex?logo=C&style=for-the-badge)](https://chocolatey.org/packages/gitconvex)
-[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v2.1.0&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
+[![docker image](https://img.shields.io/static/v1?label=gitconvex&message=v2.1.1&color=blue&style=for-the-badge&logo=docker)](https://hub.docker.com/repository/docker/itassistors/gitconvex)
 
 - [Windows](#windows)
 - [Linux](#linux)
@@ -29,7 +29,7 @@
 Gitconvex is available on [chocolatey](https://chocolatey.org/). Install [chocolatey](https://chocolatey.org/install) and run the following command to install gitconvex
 
 ```shell
-> choco install gitconvex --version=2.1.0
+> choco install gitconvex
 ```
 
 If you do not prefer `chocolatey` then the [binaries for windows](https://github.com/neel1996/gitconvex/releases/download/2.1.0/gitconvex-v2.1.0-windows.zip) can be downloaded from the [releases](https://github.com/neel1996/gitconvex/releases/tag/2.1.0)
