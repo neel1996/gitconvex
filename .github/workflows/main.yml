@@ -219,7 +219,7 @@ jobs:
       - name: Pick only required content for the Homebrew Tap
         run: |
           mkdir brew
-          cp -rp api/ git/ global/ graph/ tests/ utils/ go.mod go.sum gqlgen.yml LICENSE server.go dist/ ./brew/
+          cp -rp api git global graph tests utils go.mod go.sum gqlgen.yml LICENSE server.go dist ./brew/
           cd brew 
           tar -czf gitconvex-v${{ secrets.TARGET_RELEASE_CHANNEL }}-brew.tar.gz *
 
