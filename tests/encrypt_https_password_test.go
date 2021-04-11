@@ -2,6 +2,7 @@ package tests
 
 import (
 	"github.com/neel1996/gitconvex-server/utils"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -60,9 +61,7 @@ func TestPasswordCipherStruct_DecryptPassword(t *testing.T) {
 				EncryptedPassword: tt.fields.EncryptedPassword,
 				KeyString:         tt.fields.KeyString,
 			}
-			if got := x.DecryptPassword(); got != tt.want {
-				t.Errorf("DecryptPassword() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, tt.want, x.DecryptPassword())
 		})
 	}
 }

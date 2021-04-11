@@ -4,22 +4,32 @@ import (
 	"fmt"
 	"github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
-	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/stretchr/testify/assert"
 	"os"
-	"reflect"
+	"path"
 	"testing"
 )
 
 func TestCompareCommit(t *testing.T) {
 	var repoPath string
 	var r *git.Repository
+	cwd, _ := os.Getwd()
+	mockRepoPath := path.Join(cwd, "../..") + "/starfleet"
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
+		repoPath = mockRepoPath
+		r, _ = git.OpenRepository(repoPath)
+	} else {
+		repoPath = path.Join(cwd, "../..")
 		r, _ = git.OpenRepository(repoPath)
 	}
+
+	sampleCommits := git2.CommitLogStruct{
+		Repo:            r,
+		ReferenceCommit: "",
+	}.CommitLogs()
 
 	type args struct {
 		repo                *git.Repository
@@ -29,16 +39,12 @@ func TestCompareCommit(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []*model.GitCommitFileResult
 	}{
 		{name: "Git commit compare test case", args: struct {
 			repo                *git.Repository
 			baseCommitString    string
 			compareCommitString string
-		}{repo: r, baseCommitString: "46aa56e78f2a26d23f604f8e9bbdc240a0a5dbbe", compareCommitString: "bc87f72ab7206afa091d648fc5a001761b6b890c"}, want: []*model.GitCommitFileResult{&model.GitCommitFileResult{
-			Type:     "D",
-			FileName: ".github/workflows/codeql-analysis.yml",
-		}}},
+		}{repo: r, baseCommitString: *sampleCommits.Commits[1].Hash, compareCommitString: *sampleCommits.Commits[2].Hash}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -48,9 +54,10 @@ func TestCompareCommit(t *testing.T) {
 				BaseCommitString:    tt.args.baseCommitString,
 				CompareCommitString: tt.args.compareCommitString,
 			}
-			if got := testObj.CompareCommit(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CompareCommit() = %v, want %v", got, tt.want)
-			}
+
+			got := testObj.CompareCommit()
+
+			assert.NotZero(t, len(got))
 		})
 	}
 }

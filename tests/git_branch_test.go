@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
-	"github.com/neel1996/gitconvex-server/global"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
 	"testing"
@@ -12,18 +12,19 @@ import (
 
 func TestGetBranchList(t *testing.T) {
 	b := make(chan git2.Branch)
-	cwd, _ := os.Getwd()
-
 	var repoPath string
 	var r *git.Repository
+
+	cwd, _ := os.Getwd()
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
+		repoPath = path.Join(cwd, "..")
 		r, _ = git.OpenRepository(repoPath)
 	} else {
-		r, _ = git.OpenRepository(path.Join(cwd, ".."))
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
 	}
 
 	type args struct {
@@ -52,12 +53,9 @@ func TestGetBranchList(t *testing.T) {
 			aBranch := branchList.AllBranchList
 			bList := branchList.BranchList
 
-			logger := global.Logger{}
-			logger.Log(fmt.Sprintf("%s - %+v - %+v", cBranch, aBranch, bList), global.StatusInfo)
-
-			if cBranch == "" || len(aBranch) == 0 || len(bList) == 0 {
-				t.Error("Required results are not available")
-			}
+			assert.NotZero(t, len(cBranch))
+			assert.NotZero(t, len(aBranch))
+			assert.NotZero(t, len(bList))
 		})
 	}
 }

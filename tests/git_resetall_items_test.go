@@ -4,29 +4,36 @@ import (
 	"fmt"
 	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 )
 
 func TestResetAllItems(t *testing.T) {
 	var repoPath string
 	var r *git.Repository
+
+	cwd, _ := os.Getwd()
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
+		repoPath = path.Join(cwd, "..")
+		r, _ = git.OpenRepository(repoPath)
+	} else {
+		repoPath = path.Join(cwd, "../..")
 		r, _ = git.OpenRepository(repoPath)
 	}
 
-	untrackedResult := "untracked.txt"
-	_ = ioutil.WriteFile(untrackedResult, []byte{byte(63)}, 0755)
+	mockFile := "untracked.txt"
+	_ = ioutil.WriteFile(mockFile, []byte{byte(63)}, 0755)
 
 	var stageObject git2.StageItemInterface
 	stageObject = git2.StageItemStruct{
 		Repo:     r,
-		FileItem: untrackedResult,
+		FileItem: mockFile,
 	}
 	stageObject.StageItem()
 
@@ -44,9 +51,11 @@ func TestResetAllItems(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var testObj git2.ResetAllInterface
 			testObj = git2.ResetAllStruct{Repo: tt.args.repo}
-			if got := testObj.ResetAllItems(); got != tt.want {
-				t.Errorf("ResetAllItems() = %v, want %v", got, tt.want)
-			}
+			got := testObj.ResetAllItems()
+
+			assert.Equal(t, tt.want, got)
+
+			_ = os.Remove(mockFile)
 		})
 	}
 }

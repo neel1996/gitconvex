@@ -2,48 +2,51 @@ package tests
 
 import (
 	"fmt"
-	git2go "github.com/libgit2/git2go/v31"
+	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
-	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/stretchr/testify/assert"
 	"os"
+	"path"
 	"testing"
 )
 
 func TestSearchCommitLogs(t *testing.T) {
 	var repoPath string
-	var r *git2go.Repository
+	var r *git.Repository
+	cwd, _ := os.Getwd()
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
+	mockRepoPath := path.Join(cwd, "../..") + "/starfleet"
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
-		r, _ = git2go.OpenRepository(repoPath)
+		repoPath = mockRepoPath
+		r, _ = git.OpenRepository(repoPath)
+	} else {
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
 	}
+
+	sampleCommits := git2.CommitLogStruct{
+		Repo:            r,
+		ReferenceCommit: "",
+	}.CommitLogs()
+	hash := *sampleCommits.Commits[0].Hash
 
 	type args struct {
-		repo       *git2go.Repository
+		repo       *git.Repository
 		searchType string
 		searchKey  string
-	}
-
-	hash := "46aa56e78f2a26d23f604f8e9bbdc240a0a5dbbe"
-	author := "Neel"
-
-	expectedResult := &model.GitCommits{
-		Hash:   &hash,
-		Author: &author,
 	}
 
 	tests := []struct {
 		name string
 		args args
-		want []*model.GitCommits
 	}{
 		{name: "Git commit log search test case", args: struct {
-			repo       *git2go.Repository
+			repo       *git.Repository
 			searchType string
 			searchKey  string
-		}{repo: r, searchType: "hash", searchKey: "46aa56e"}, want: []*model.GitCommits{expectedResult}},
+		}{repo: r, searchType: "hash", searchKey: hash}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -54,9 +57,9 @@ func TestSearchCommitLogs(t *testing.T) {
 				SearchKey:  tt.args.searchKey,
 			}
 
-			if got := testObj.SearchCommitLogs(); *got[0].Hash != *tt.want[0].Hash {
-				t.Errorf("SearchCommitLogs() = %v, want %v", got, tt.want)
-			}
+			got := testObj.SearchCommitLogs()
+
+			assert.NotZero(t, len(got))
 		})
 	}
 }

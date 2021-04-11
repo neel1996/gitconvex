@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	assert2 "github.com/stretchr/testify/assert"
@@ -15,13 +16,18 @@ func TestRemoteDataStruct_GetAllRemotes(t *testing.T) {
 		RemoteURL string
 	}
 
+	var repoPath string
 	var r *git.Repository
 	cwd, _ := os.Getwd()
+	currentEnv := os.Getenv("GOTESTENV")
+	fmt.Println("Environment : " + currentEnv)
 
-	if os.Getenv("GOTESTENV") == "ci" {
-		r, _ = git.OpenRepository(path.Join(cwd, ".."))
+	if currentEnv == "ci" {
+		repoPath = path.Join(cwd, "..")
+		r, _ = git.OpenRepository(repoPath)
 	} else {
-		r, _ = git.OpenRepository(os.Getenv("REPODIR"))
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
 	}
 
 	tests := []struct {
@@ -40,9 +46,8 @@ func TestRemoteDataStruct_GetAllRemotes(t *testing.T) {
 				RemoteURL: tt.fields.RemoteURL,
 			}
 			got := res.GetAllRemotes()
-			if !assert2.NotZerof(t, got, "Testing non-zero array for GetAllRemotes result") {
-				t.Errorf("GetAllRemotes() => Received empty array as result")
-			}
+
+			assert2.NotZero(t, got)
 		})
 	}
 }

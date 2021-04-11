@@ -1,21 +1,34 @@
 package tests
 
 import (
-	git2go "github.com/libgit2/git2go/v31"
+	"fmt"
+	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
-	"reflect"
 	"testing"
 )
 
 func TestDeleteBranch(t *testing.T) {
+	var repoPath string
+	var r *git.Repository
+
 	cwd, _ := os.Getwd()
-	r, _ := git2go.OpenRepository(path.Join(cwd, ".."))
+	currentEnv := os.Getenv("GOTESTENV")
+	fmt.Println("Environment : " + currentEnv)
+
+	if currentEnv == "ci" {
+		repoPath = path.Join(cwd, "..")
+		r, _ = git.OpenRepository(repoPath)
+	} else {
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
+	}
 
 	type args struct {
-		repo       *git2go.Repository
+		repo       *git.Repository
 		branchName string
 	}
 	tests := []struct {
@@ -24,7 +37,7 @@ func TestDeleteBranch(t *testing.T) {
 		want *model.BranchDeleteStatus
 	}{
 		{name: "Git branch deletion test case", args: struct {
-			repo       *git2go.Repository
+			repo       *git.Repository
 			branchName string
 		}{repo: r, branchName: "test"}, want: &model.BranchDeleteStatus{Status: "BRANCH_DELETE_SUCCESS"}},
 	}
@@ -35,9 +48,14 @@ func TestDeleteBranch(t *testing.T) {
 				Repo:       tt.args.repo,
 				BranchName: tt.args.branchName,
 			}
-			if got := testObj.DeleteBranch(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("DeleteBranch() = %v, want %v", got, tt.want)
-			}
+
+			_ = git2.AddBranchInput{
+				Repo:       r,
+				BranchName: "test",
+			}.AddBranch()
+
+			got := testObj.DeleteBranch()
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

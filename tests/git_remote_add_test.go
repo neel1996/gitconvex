@@ -4,6 +4,7 @@ import (
 	"fmt"
 	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex-server/git"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
 	"testing"
@@ -12,15 +13,16 @@ import (
 func TestAddRemote(t *testing.T) {
 	var repoPath string
 	var r *git.Repository
+	cwd, _ := os.Getwd()
 	currentEnv := os.Getenv("GOTESTENV")
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
+		repoPath = path.Join(cwd, "..")
 		r, _ = git.OpenRepository(repoPath)
 	} else {
-		cwd, _ := os.Getwd()
-		r, _ = git.OpenRepository(path.Join(cwd, ".."))
+		repoPath = path.Join(cwd, "../..")
+		r, _ = git.OpenRepository(repoPath)
 	}
 
 	type args struct {
@@ -37,7 +39,7 @@ func TestAddRemote(t *testing.T) {
 			repo       *git.Repository
 			remoteName string
 			remoteURL  string
-		}{repo: r, remoteName: "github", remoteURL: "https://github.com/neel1996/starfleet.git"}, want: "REMOTE_ADD_SUCCESS"},
+		}{repo: r, remoteName: "test_remote", remoteURL: "https://github.com/neel1996/starfleet.git"}, want: "REMOTE_ADD_SUCCESS"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -47,9 +49,15 @@ func TestAddRemote(t *testing.T) {
 				RemoteName: tt.args.remoteName,
 				RemoteURL:  tt.args.remoteURL,
 			}
-			if got := testObj.AddRemote(); got.Status != tt.want {
-				t.Errorf("AddRemote() = %v, want %v", got, tt.want)
+			got := testObj.AddRemote()
+
+			assert.Equal(t, tt.want, got.Status)
+
+			obj := git2.DeleteRemoteStruct{
+				Repo:       r,
+				RemoteName: tt.args.remoteName,
 			}
+			obj.DeleteRemote()
 		})
 	}
 }

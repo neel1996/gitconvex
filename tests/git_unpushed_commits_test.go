@@ -6,19 +6,20 @@ import (
 	git2 "github.com/neel1996/gitconvex-server/git"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 	"testing"
 )
 
 func TestUnPushedCommits(t *testing.T) {
-	var repoPath string
 	var r *git.Repository
 	currentEnv := os.Getenv("GOTESTENV")
+	cwd, _ := os.Getwd()
+	mockRepoPath := path.Join(cwd, "../..") + "/starfleet"
 	fmt.Println("Environment : " + currentEnv)
 
 	if currentEnv == "ci" {
-		repoPath = "/home/runner/work/gitconvex-server/starfleet"
-		r, _ = git.OpenRepository(repoPath)
+		r, _ = git.OpenRepository(mockRepoPath)
 	}
 
 	untrackedResult := "untracked.txt"
@@ -62,7 +63,7 @@ func TestUnPushedCommits(t *testing.T) {
 				Repo:      tt.args.repo,
 				RemoteRef: tt.args.remoteRef,
 			}
-			if got := testObj.UnPushedCommits(); !strings.Contains(*got[0].CommitMessage, "Test Commit") {
+			if got := testObj.UnPushedCommits(); !strings.Contains(*got.GitCommits[0].CommitMessage, "Test Commit") {
 				t.Errorf("UnPushedCommits() = %v, want %v", got, tt.want)
 			}
 		})

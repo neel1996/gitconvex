@@ -12,6 +12,7 @@ export default function PushComponent(props) {
   const [isRemoteSet, setIsRemoteSet] = useState(false);
   const [unPushedCommits, setUnPushedCommits] = useState([]);
   const [isCommitEmpty, setIsCommitEmpty] = useState(false);
+  const [noRemoteBranchIndicator, setNoRemoteBranchIndicator] = useState(false);
 
   const [pushDone, setPushDone] = useState(false);
   const [pushFailed, setPushFailed] = useState(false);
@@ -62,10 +63,13 @@ export default function PushComponent(props) {
           query 
           {
             gitUnPushedCommits(repoId: "${props.repoId}", remoteURL: "${remoteHost}", remoteBranch: "${branchName}"){
-              hash
-              author
-              commitTime
-              commitMessage
+              isNewBranch
+              gitCommits{
+                hash
+                author
+                commitTime
+                commitMessage
+              }
             }
           }
         `,
@@ -73,11 +77,16 @@ export default function PushComponent(props) {
     })
       .then((res) => {
         if (res.data.data && !res.data.error) {
-          const commits = res.data.data.gitUnPushedCommits;
-          if (commits.length === 0) {
-            setIsCommitEmpty(true);
+          const { gitCommits, isNewBranch } = res.data.data.gitUnPushedCommits;
+          if (isNewBranch) {
+            setNoRemoteBranchIndicator(true);
+          } else {
+            if (gitCommits.length === 0) {
+              setIsCommitEmpty(true);
+            } else {
+              setUnPushedCommits([...gitCommits]);
+            }
           }
-          setUnPushedCommits([...commits]);
         }
       })
       .catch((err) => {
@@ -283,7 +292,15 @@ export default function PushComponent(props) {
               </>
             ) : null}
 
-            {isRemoteSet && unPushedCommits.length > 0 && !loading ? (
+            {noRemoteBranchIndicator ? (
+              <div className="p-3 text-center mx-auto mt-10 w-full bg-yellow-100 border-b-4 border-dashed border-yellow-200 text-yellow-500 font-semibold font-sans text-xl rounded-lg shadow">
+                Looks like a new branch with no upstream. Click on "PUSH
+                CHANGES" to create an upstream
+              </div>
+            ) : null}
+
+            {noRemoteBranchIndicator ||
+            (isRemoteSet && unPushedCommits.length > 0 && !loading) ? (
               <div
                 className="w-full text-center font-sans font-semibold p-3 my-4 bg-indigo-300 text-xl text-white rounded shadow-md cursor-pointer hover:bg-indigo-400 hover:shadow-sm"
                 onClick={() => {

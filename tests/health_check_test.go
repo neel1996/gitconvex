@@ -3,7 +3,7 @@ package tests
 import (
 	"github.com/neel1996/gitconvex-server/api"
 	"github.com/neel1996/gitconvex-server/graph/model"
-	"strings"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -13,19 +13,15 @@ func TestHealthCheckApi(t *testing.T) {
 		want *model.HealthCheckParams
 	}{
 		{name: "HealthCheck OS test case", want: &model.HealthCheckParams{
-			Os: "linux||darwin||win",
+			Os: "linux||darwin||windows",
 		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			if got := api.HealthCheckApi(); strings.Contains(got.Os, tt.want.Os) {
-				t.Errorf("HealthCheckApi() = %v, want %v", got, tt.want)
-			}
-
-			if got := api.HealthCheckApi(); got.Gitconvex == "" {
-				t.Errorf("HealthCheckApi() = git version string empty")
-			}
+			got := api.HealthCheckApi()
+			assert.Contains(t, tt.want.Os, got.Os)
+			assert.NotEmpty(t, got.Gitconvex)
 		})
 	}
 }

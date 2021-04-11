@@ -230,8 +230,8 @@ export default function RepositoryAction() {
               setBranchError(false);
             }}
             onChange={(event) => {
-              setActiveBranch("...");
               if (event.currentTarget.value !== defaultRepo.repoName) {
+                setActiveBranch("...");
                 setSelectedRepoDetails({
                   ...selectedRepoDetails,
                   gitCurrentBranch: "",

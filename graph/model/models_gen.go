@@ -2,108 +2,185 @@
 
 package model
 
+// The response holding the data of the newly added repo
 type AddRepoParams struct {
-	RepoID  string `json:"repoId"`
-	Status  string `json:"status"`
+	// The UUID generated for the new repo
+	RepoID string `json:"repoId"`
+	// Status denoting if the repo has been added successfully or not
+	Status string `json:"status"`
+	// A message stating if the repo is added to the data file or not
 	Message string `json:"message"`
 }
 
+// Shows the status if the branch has been deleted or not
 type BranchDeleteStatus struct {
+	// Branch delete status
 	Status string `json:"status"`
 }
 
+// Details about the repo data stored in gitconvex JSON data file
 type FetchRepoParams struct {
-	RepoID    []*string `json:"repoId"`
-	RepoName  []*string `json:"repoName"`
-	RepoPath  []*string `json:"repoPath"`
+	// UUID based ID generated for the repo
+	RepoID []*string `json:"repoId"`
+	// Name of the repo given while adding the repo
+	RepoName []*string `json:"repoName"`
+	// Path of the git repository
+	RepoPath []*string `json:"repoPath"`
+	// Timestamp at which the repo was added to gitconvex
 	TimeStamp []*string `json:"timeStamp"`
 }
 
+// Result of the remote fetch operation
 type FetchResult struct {
-	Status       string    `json:"status"`
+	// Status string denoting the fetch operation
+	Status string `json:"status"`
+	// Message denoting the outcome of the fetch
 	FetchedItems []*string `json:"fetchedItems"`
 }
 
-type GitFolderContentResults struct {
-	TrackedFiles     []*string `json:"trackedFiles"`
-	FileBasedCommits []*string `json:"fileBasedCommits"`
-}
-
-type GitRepoStatusResults struct {
-	GitRemoteData        *string   `json:"gitRemoteData"`
-	GitRepoName          *string   `json:"gitRepoName"`
-	GitBranchList        []*string `json:"gitBranchList"`
-	GitAllBranchList     []*string `json:"gitAllBranchList"`
-	GitCurrentBranch     *string   `json:"gitCurrentBranch"`
-	GitRemoteHost        *string   `json:"gitRemoteHost"`
-	GitTotalCommits      *float64  `json:"gitTotalCommits"`
-	GitLatestCommit      *string   `json:"gitLatestCommit"`
-	GitTotalTrackedFiles *int      `json:"gitTotalTrackedFiles"`
-}
-
-type HealthCheckParams struct {
-	Os        string `json:"os"`
-	Gitconvex string `json:"gitconvex"`
-}
-
-type PullResult struct {
-	Status      string    `json:"status"`
-	PulledItems []*string `json:"pulledItems"`
-}
-
-type BranchCompareResults struct {
-	Date    string        `json:"date"`
+// Returns the total number of commits in the repo and the array of 10 commit log entries
+type GitCommitLogResults struct {
+	// Total number of commits tracked by the branch
+	TotalCommits *float64 `json:"totalCommits"`
+	// Array of commit log entries `gitCommits`
 	Commits []*GitCommits `json:"commits"`
 }
 
+// Returns the content of the target directory along with the latest commit message
+// (File explorer similar to github)
+type GitFolderContentResults struct {
+	// List of all the files and folders tracked by git from the target directory
+	TrackedFiles []*string `json:"trackedFiles"`
+	// The respective commit messages
+	FileBasedCommits []*string `json:"fileBasedCommits"`
+}
+
+// Basic information about the target repository
+type GitRepoStatusResults struct {
+	// The remote repos available in the target repository
+	GitRemoteData *string `json:"gitRemoteData"`
+	// Name of the repo
+	GitRepoName *string `json:"gitRepoName"`
+	// List of all the local branches available in the repo
+	GitBranchList []*string `json:"gitBranchList"`
+	// List of all the local branches + remote branches available in the repo
+	GitAllBranchList []*string `json:"gitAllBranchList"`
+	// The current branch
+	GitCurrentBranch *string `json:"gitCurrentBranch"`
+	// Remote host name based on the remote URL (E.g: https://github.com/github/repo.git -> Github)
+	GitRemoteHost *string `json:"gitRemoteHost"`
+	// Total number of commits tracked by the current branch
+	GitTotalCommits *float64 `json:"gitTotalCommits"`
+	// The latest commit (HEAD commit)
+	GitLatestCommit *string `json:"gitLatestCommit"`
+	// Total number of files tracked by git repo
+	GitTotalTrackedFiles *int `json:"gitTotalTrackedFiles"`
+}
+
+// Returns the host OS and the current version of gitconvex
+type HealthCheckParams struct {
+	// OS on which gitconvex is running
+	Os string `json:"os"`
+	// Current version of gitconvex
+	Gitconvex string `json:"gitconvex"`
+}
+
+// Result of the remote pull operation
+type PullResult struct {
+	// Status string denoting the pull operation
+	Status string `json:"status"`
+	// Message denoting the outcome of the pull
+	PulledItems []*string `json:"pulledItems"`
+}
+
+// Indicator showing if branch has an upstream or not and the list of commits
+type UnPushedCommitResult struct {
+	// Indicator that denotes if the branch has an upstream or not
+	IsNewBranch bool `json:"isNewBranch"`
+	// List of commits that are not pushed to the remote branch
+	GitCommits []*GitCommits `json:"gitCommits"`
+}
+
+// Result after comparing two branches from the repo
+type BranchCompareResults struct {
+	// The date used to group differing commits
+	Date string `json:"date"`
+	// The list of differing commits
+	Commits []*GitCommits `json:"commits"`
+}
+
+// Content of the file selected for viewing
 type CodeFileType struct {
+	// File content split line by line as array
 	FileData []*string `json:"fileData"`
 }
 
+// Result returned after attempting to delete a repo entry from the gitconvex data file
 type DeleteStatus struct {
+	// String based status denoting the outcome of the delete
 	Status string `json:"status"`
+	// UUID of the repo deleted from the data file
 	RepoID string `json:"repoId"`
 }
 
+// The status of git diff and the content of the file with diff indicators
 type FileLineChangeResult struct {
-	DiffStat string    `json:"diffStat"`
+	// The status of the git diff for the file denoting the number of changes (Additions and Deletions)
+	DiffStat string `json:"diffStat"`
+	// The content of the file with the diff indicators (+/-)
 	FileDiff []*string `json:"fileDiff"`
 }
 
+// The results with the Modified, Staged and Untracked files
 type GitChangeResults struct {
+	// List of untracked files
 	GitUntrackedFiles []*string `json:"gitUntrackedFiles"`
-	GitChangedFiles   []*string `json:"gitChangedFiles"`
-	GitStagedFiles    []*string `json:"gitStagedFiles"`
+	// Files deviating from the index
+	GitChangedFiles []*string `json:"gitChangedFiles"`
+	// Files which are already staged
+	GitStagedFiles []*string `json:"gitStagedFiles"`
 }
 
+// Returns type of the file change (M | D | A) and the file name
 type GitCommitFileResult struct {
-	Type     string `json:"type"`
+	// Type of change (M | D | A)
+	Type string `json:"type"`
+	// Name of the file
 	FileName string `json:"fileName"`
 }
 
-type GitCommitLogResults struct {
-	TotalCommits *float64      `json:"totalCommits"`
-	Commits      []*GitCommits `json:"commits"`
-}
-
+// The required information about commits
 type GitCommits struct {
-	Hash             *string `json:"hash"`
-	Author           *string `json:"author"`
-	CommitTime       *string `json:"commitTime"`
-	CommitMessage    *string `json:"commitMessage"`
-	CommitFilesCount *int    `json:"commitFilesCount"`
+	// The SHA of the commit
+	Hash *string `json:"hash"`
+	// The author of the commit
+	Author *string `json:"author"`
+	// The timestamp of the commit
+	CommitTime *string `json:"commitTime"`
+	// The message of the commit
+	CommitMessage *string `json:"commitMessage"`
+	// The number of files changed as part of the commit
+	CommitFilesCount *int `json:"commitFilesCount"`
 }
 
+// Details about the remote repositories
 type RemoteDetails struct {
+	// Name of the remote
 	RemoteName string `json:"remoteName"`
-	RemoteURL  string `json:"remoteUrl"`
+	// URL of the upstream remote
+	RemoteURL string `json:"remoteUrl"`
 }
 
+// Returns the status after attempting remote data manipulation operations such as adding / deleting or editing a remote
 type RemoteMutationResult struct {
+	// Status denoting the outcome of the remote operation
 	Status string `json:"status"`
 }
 
+// The current path of the data fle and the port to which gitconvex server listens
 type SettingsDataResults struct {
+	// The path of the JSON data file
 	SettingsDatabasePath string `json:"settingsDatabasePath"`
-	SettingsPortDetails  string `json:"settingsPortDetails"`
+	// The current port that gitconvex is configured to listen
+	SettingsPortDetails string `json:"settingsPortDetails"`
 }

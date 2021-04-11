@@ -56,7 +56,7 @@ export default function AddRemoteRepoComponent({ repoId }) {
       setRemoteDetails([]);
       setReloadView(false);
     };
-  }, [reloadView]);
+  }, [reloadView, repoId]);
 
   const statusPillComponent = (border, bgColor, textColor, message) => {
     return (
