@@ -1,3 +1,6 @@
+![react](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) 
+![tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
 # gitconvex react project
 This is the front-end react source for [gitconvex](https://github.com/neel1996/gitconvex).
 
