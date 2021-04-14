@@ -18,11 +18,11 @@ The dependency packages used by this project can be found [here](https://github.
 
 ## Contribute!
 
-If you are interested in contributing to the project, fork the repo and submit a PR. Currently there are only 3 maintainers working on the project, so the review may take some time. Hopefully will get a couple more on board soon to maintain the repo
+If you are interested in contributing to the project, fork the repo and submit a PR. Currently there are only 3 maintainers working on the project, so the review may take some time
 
 ### Guidelines 
 
-Fork the repo and raise a new Pull Request to merge your branch with the `development` branch of this repo. Once the review is complete, the PR will be approved and merged with `master`
+Fork the repo and raise a new Pull Request to merge your branch with the `master` branch of this repo. Once the review is complete, the PR will be approved and merged
 
 ##### API schema request
 
