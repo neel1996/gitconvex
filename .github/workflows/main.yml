@@ -57,7 +57,9 @@ jobs:
   # Build for Ubuntu Linux
   build-linux:
     name: Build gitconvex for linux
-    needs: gitconvex-test
+    needs:
+      - gitconvex-test
+      - hold-release
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.x
@@ -113,7 +115,9 @@ jobs:
   # Build for MacOS
   build-macos:
     name: Build gitconvex for MacOS
-    needs: gitconvex-test
+    needs:
+      - gitconvex-test
+      - hold-release
     runs-on: macos-latest
     steps:
       - name: Set up Go 1.x
@@ -146,7 +150,9 @@ jobs:
   # Test Build for Windows
   build-windows:
     name: Build gitconvex for Windows
-    needs: gitconvex-test
+    needs:
+      - gitconvex-test
+      - hold-release
     runs-on: windows-latest
     defaults:
       run:
@@ -206,7 +212,9 @@ jobs:
   # Build for Homebrew
   build-for-homebrew:
     name: Build gitconvex Homebrew Tap bundle
-    needs: gitconvex-test
+    needs:
+      - gitconvex-test
+      - hold-release
     runs-on: macos-latest
     steps:
       - name: Set up Go 1.x
