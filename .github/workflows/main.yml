@@ -41,10 +41,25 @@ jobs:
           git config --global user.name "${{ secrets.USER_NAME }}" && git config --global user.email "${{ secrets.USER_EMAIL }}"
           export GOTESTENV=ci && go test -v ./...
 
+  # Stage to hold the deployment
+  hold-release:
+    name: Wait for review
+    needs: gitconvex-test
+    runs-on: ubuntu-latest
+    environment:
+      name: gitconvexRelease
+
+    steps:
+      - name: Wait for reviewer to initiate the build and release
+        run: |
+          echo "Awaiting Review!"
+
   # Build for Ubuntu Linux
   build-linux:
     name: Build gitconvex for linux
-    needs: gitconvex-test
+    needs:
+      - gitconvex-test
+      - hold-release
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.x
@@ -100,7 +115,9 @@ jobs:
   # Build for MacOS
   build-macos:
     name: Build gitconvex for MacOS
-    needs: gitconvex-test
+    needs:
+      - gitconvex-test
+      - hold-release
     runs-on: macos-latest
     steps:
       - name: Set up Go 1.x
@@ -133,7 +150,9 @@ jobs:
   # Test Build for Windows
   build-windows:
     name: Build gitconvex for Windows
-    needs: gitconvex-test
+    needs:
+      - gitconvex-test
+      - hold-release
     runs-on: windows-latest
     defaults:
       run:
@@ -193,7 +212,9 @@ jobs:
   # Build for Homebrew
   build-for-homebrew:
     name: Build gitconvex Homebrew Tap bundle
-    needs: gitconvex-test
+    needs:
+      - gitconvex-test
+      - hold-release
     runs-on: macos-latest
     steps:
       - name: Set up Go 1.x
