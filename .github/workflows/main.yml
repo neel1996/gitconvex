@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Wait for reviewer to initiate the build and release
-      - run: |
+        run: |
           echo "Awaiting Review!"
 
   # Build for Ubuntu Linux
