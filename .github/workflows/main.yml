@@ -49,6 +49,11 @@ jobs:
     environment:
       name: gitconvexRelease
 
+    steps:
+      - name: Wait for reviewer to initiate the build and release
+      - run: |
+          echo "Awaiting Review!"
+
   # Build for Ubuntu Linux
   build-linux:
     name: Build gitconvex for linux
