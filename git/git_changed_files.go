@@ -59,14 +59,24 @@ func (c ChangedItemStruct) ChangedFiles() *model.GitChangeResults {
 			entry, entryErr := statusList.ByIndex(i)
 
 			if entryErr == nil {
-				diff := entry.HeadToIndex
-				unTrackedList = append(unTrackedList, &diff.NewFile.Path)
+				diff := entry.IndexToWorkdir
+				stagedDiff := entry.HeadToIndex
+
+				if stagedDiff.Status.String() != "Unmodified" {
+					fileEntry := stagedDiff.NewFile.Path
+					stagedMap[fileEntry] = true
+					stagedFileList = append(stagedFileList, &fileEntry)
+				}
+
+				if diff.NewFile.Path != "" {
+					unTrackedList = append(unTrackedList, &diff.NewFile.Path)
+				}
 			}
 		}
 		return &model.GitChangeResults{
 			GitUntrackedFiles: unTrackedList,
 			GitChangedFiles:   nil,
-			GitStagedFiles:    nil,
+			GitStagedFiles:    stagedFileList,
 		}
 	}
 
