@@ -12,6 +12,11 @@ import (
 
 func TestCloneHandler(t *testing.T) {
 	cwd, _ := os.Getwd()
+	currentEnv := os.Getenv("GOTESTENV")
+	if currentEnv != "ci" {
+		t.Skip("Not supported in non-CI mode")
+	}
+
 	testRepoPath := path.Join(cwd, "../..") + "/starfleet"
 	fmt.Printf("\n\nRepo Path for Testing : %v\n\n", testRepoPath)
 	testURL := "https://github.com/neel1996/starfleet.git"

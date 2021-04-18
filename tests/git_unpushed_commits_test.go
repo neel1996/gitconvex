@@ -20,6 +20,8 @@ func TestUnPushedCommits(t *testing.T) {
 
 	if currentEnv == "ci" {
 		r, _ = git.OpenRepository(mockRepoPath)
+	} else {
+		t.Skip("Not supported in non-CI mode")
 	}
 
 	untrackedResult := "untracked.txt"

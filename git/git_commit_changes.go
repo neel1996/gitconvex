@@ -31,6 +31,8 @@ func checkCommitError(err error) bool {
 // Rewrites the repo index tree with the staged files to commit the changes
 func (c CommitStruct) CommitChanges() string {
 	var errStatus bool
+	var headCommit *git2go.Commit
+
 	commitMessage := c.CommitMessage
 	repo := c.Repo
 
@@ -57,10 +59,14 @@ func (c CommitStruct) CommitChanges() string {
 	}
 
 	head, headErr := repo.Head()
-	errStatus = checkCommitError(headErr)
-
-	headCommit, headCommitErr := repo.LookupCommit(head.Target())
-	errStatus = checkCommitError(headCommitErr)
+	if headErr != nil {
+		logger.Log("Repo has no HEAD. Proceeding with a NIL HEAD", global.StatusWarning)
+		headCommit = nil
+	} else {
+		var headCommitErr error
+		headCommit, headCommitErr = repo.LookupCommit(head.Target())
+		errStatus = checkCommitError(headCommitErr)
+	}
 
 	repoIndex, indexErr := repo.Index()
 	errStatus = checkCommitError(indexErr)
@@ -71,8 +77,15 @@ func (c CommitStruct) CommitChanges() string {
 	newTree, newTreeErr := repo.LookupTree(newTreeId)
 	errStatus = checkCommitError(newTreeErr)
 
-	newCommitId, err := repo.CreateCommit("HEAD", signature, signature, formattedMessage, newTree, headCommit)
-	errStatus = checkCommitError(err)
+	var (
+		newCommitId    *git2go.Oid
+		newCommitIdErr error
+	)
+	if headErr != nil {
+		newCommitId, newCommitIdErr = repo.CreateCommit("HEAD", signature, signature, formattedMessage, newTree)
+	}
+	newCommitId, newCommitIdErr = repo.CreateCommit("HEAD", signature, signature, formattedMessage, newTree, headCommit)
+	errStatus = checkCommitError(newCommitIdErr)
 
 	_, newCommitErr := repo.LookupCommit(newCommitId)
 	errStatus = checkCommitError(newCommitErr)

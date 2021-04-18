@@ -262,10 +262,6 @@ func (r *mutationResolver) CommitChanges(ctx context.Context, repoID string, com
 		RepoPath:      repo.RepoPath,
 	}
 
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
-		logger.Log("Repo is invalid or worktree is null", global.StatusError)
-		return global.CommitChangeError, nil
-	}
 	return commitObject.CommitChanges(), nil
 }
 

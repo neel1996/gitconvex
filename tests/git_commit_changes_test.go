@@ -22,6 +22,8 @@ func TestCommitChanges(t *testing.T) {
 	if currentEnv == "ci" {
 		repoPath = mockRepoPath
 		r, _ = git2go.OpenRepository(repoPath)
+	} else {
+		t.Skip("Not supported in non-CI mode")
 	}
 
 	sampleFile := "untracked.txt"
