@@ -20,8 +20,22 @@ func (r ResetAllStruct) ResetAllItems() string {
 	head, headErr := repo.Head()
 
 	if headErr != nil {
-		logger.Log(fmt.Sprintf("Reset All operation failed -> %s", headErr.Error()), global.StatusInfo)
-		return global.RemoveAllItemsError
+		logger.Log("Repo has no HEAD", global.StatusWarning)
+		idx, idxErr := repo.Index()
+
+		if idxErr != nil {
+			return global.RemoveAllItemsError
+		}
+
+		if idxRemoveErr := idx.RemoveAll([]string{}, nil); idxRemoveErr != nil {
+			return global.RemoveAllItemsError
+		}
+
+		if writeErr := idx.Write(); writeErr != nil {
+			return global.RemoveAllItemsError
+		}
+
+		return global.ResetAllSuccess
 	}
 
 	commit, commitErr := repo.LookupCommit(head.Target())

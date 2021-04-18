@@ -17,7 +17,6 @@ type ResetStruct struct {
 }
 
 func removeErr(fileItem string, errMsg string) string {
-	logger := global.Logger{}
 	logger.Log(fmt.Sprintf("Error occurred while removeing item %s -> %s", fileItem, errMsg), global.StatusError)
 	return global.RemoveItemError
 }
@@ -29,7 +28,21 @@ func (r ResetStruct) RemoveItem() string {
 
 	head, headErr := repo.Head()
 	if headErr != nil {
-		return removeErr(fileItem, headErr.Error())
+		logger.Log("Repo has no HEAD", global.StatusWarning)
+		idx, idxErr := repo.Index()
+
+		if idxErr != nil {
+			return removeErr(fileItem, idxErr.Error())
+		}
+
+		if idxRemoveErr := idx.RemoveByPath(fileItem); idxRemoveErr != nil {
+			return removeErr(fileItem, idxRemoveErr.Error())
+		}
+
+		if writeErr := idx.Write(); writeErr != nil {
+			return removeErr(fileItem, writeErr.Error())
+		}
+		return global.RemoveItemSuccess
 	}
 
 	commit, commitErr := repo.LookupCommit(head.Target())
