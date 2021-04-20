@@ -83,8 +83,9 @@ func (c CommitStruct) CommitChanges() string {
 	)
 	if headErr != nil {
 		newCommitId, newCommitIdErr = repo.CreateCommit("HEAD", signature, signature, formattedMessage, newTree)
+	} else {
+		newCommitId, newCommitIdErr = repo.CreateCommit("HEAD", signature, signature, formattedMessage, newTree, headCommit)
 	}
-	newCommitId, newCommitIdErr = repo.CreateCommit("HEAD", signature, signature, formattedMessage, newTree, headCommit)
 	errStatus = checkCommitError(newCommitIdErr)
 
 	_, newCommitErr := repo.LookupCommit(newCommitId)
