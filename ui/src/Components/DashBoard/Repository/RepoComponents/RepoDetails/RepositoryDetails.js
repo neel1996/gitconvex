@@ -4,14 +4,15 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router";
 import { globalAPIEndpoint } from "../../../../../util/env_config";
 import LoadingHOC from "../../../../LoadingHOC";
 import FileExplorerComponent from "./FileExplorerComponent";
 import AddBranchComponent from "./RepoDetailBackdrop/AddBranchComponent";
-import AddRemoteRepoComponent from "./RepoDetailBackdrop/RemoteConfigComponent/RemoteManagementComponent";
 import BranchListComponent from "./RepoDetailBackdrop/BranchListComponent";
 import CommitLogComponent from "./RepoDetailBackdrop/CommitLogComponent";
 import FetchPullActionComponent from "./RepoDetailBackdrop/FetchPullActionComponent";
+import AddRemoteRepoComponent from "./RepoDetailBackdrop/RemoteConfigComponent/RemoteManagementComponent";
 import SwitchBranchComponent from "./RepoDetailBackdrop/SwitchBranchComponent";
 import RepoInfoComponent from "./RepoInfoComponent";
 import RepoLeftPaneComponent from "./RepoLeftPaneComponent";
@@ -106,27 +107,23 @@ export default function RepositoryDetails(props) {
     );
   }, [repoIdState]);
 
+  const { repoId } = useParams();
   useEffect(() => {
     setViewReload(false);
     setCodeViewToggle(false);
     setLoading(true);
     const endpointURL = globalAPIEndpoint;
 
-    if (props.parentProps.location) {
-      const repoId = props.parentProps.location.pathname.split(
-        "/repository/"
-      )[1];
+    setRepoIdState(repoId);
 
-      setRepoIdState(repoId);
-
-      axios({
-        url: endpointURL,
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        data: {
-          query: `
+    axios({
+      url: endpointURL,
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      data: {
+        query: `
             query
             {
                 gitRepoStatus(repoId:"${repoId}"){
@@ -141,38 +138,37 @@ export default function RepositoryDetails(props) {
                 }
             }
           `,
-        },
-      })
-        .then((res) => {
-          setLoading(false);
-          if (res.data && res.data.data && !res.data.error) {
-            const localRepoStatus = res.data.data.gitRepoStatus;
-            let gitRemoteLocal = localRepoStatus.gitRemoteData;
-            setCurrentBranch(localRepoStatus.gitCurrentBranch);
-            if (gitRemoteLocal.includes("||")) {
-              setIsMultiRemote(true);
-              localRepoStatus.gitRemoteData = gitRemoteLocal.split("||")[0];
-              setIsMultiRemote(true);
-              setMultiRemoteCount(gitRemoteLocal.split("||").length);
-            } else {
-              setIsMultiRemote(false);
-              setMultiRemoteCount(0);
-            }
-            setGitRepoStatus(localRepoStatus);
+      },
+    })
+      .then((res) => {
+        setLoading(false);
+        if (res.data && res.data.data && !res.data.error) {
+          const localRepoStatus = res.data.data.gitRepoStatus;
+          let gitRemoteLocal = localRepoStatus.gitRemoteData;
+          setCurrentBranch(localRepoStatus.gitCurrentBranch);
+          if (gitRemoteLocal.includes("||")) {
+            setIsMultiRemote(true);
+            localRepoStatus.gitRemoteData = gitRemoteLocal.split("||")[0];
+            setIsMultiRemote(true);
+            setMultiRemoteCount(gitRemoteLocal.split("||").length);
           } else {
-            setRepoFetchFailed(true);
+            setIsMultiRemote(false);
+            setMultiRemoteCount(0);
           }
-        })
-        .catch((err) => {
-          setLoading(false);
+          setGitRepoStatus(localRepoStatus);
+        } else {
+          setRepoFetchFailed(true);
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
 
-          if (err) {
-            console.log("API GitStatus error occurred : " + err);
-            setRepoFetchFailed(true);
-          }
-        });
-    }
-  }, [props.parentProps, viewReload]);
+        if (err) {
+          console.log("API GitStatus error occurred : " + err);
+          setRepoFetchFailed(true);
+        }
+      });
+  }, [repoId, props.parentProps, viewReload]);
 
   let {
     gitRemoteData,

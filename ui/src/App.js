@@ -30,7 +30,10 @@ export default function App(props) {
               exact
               component={Dashboard}
             ></Route>
-            <Route path="/dashboard/repository/*" component={Dashboard}></Route>
+            <Route
+              path="/dashboard/repository/:repoId"
+              component={Dashboard}
+            ></Route>
           </Switch>
         </BrowserRouter>
       </ContextProvider.Provider>
