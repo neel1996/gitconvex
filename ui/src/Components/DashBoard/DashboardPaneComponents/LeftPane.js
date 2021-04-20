@@ -111,21 +111,22 @@ export default function LeftPane(props) {
           })}
         </div>
       </div>
-      <div
-        className="xl:flex lg:flex md:hidden sm:hidden hidden absolute w-1/8 h-full items-end my-auto mx-auto cursor-pointer -mt-10"
-        onClick={() => {
-          setHideMenuIcons(!hideMenuIcons);
-        }}
-      >
+      <div className="xl:flex lg:flex md:hidden sm:hidden hidden absolute w-1/8 h-full items-end my-auto mx-auto cursor-pointer -mt-10">
         {hideMenuIcons ? (
           <FontAwesomeIcon
             icon={faChevronRight}
             className="text-center text-gray-500 text-2xl"
+            onClick={() => {
+              setHideMenuIcons(!hideMenuIcons);
+            }}
           ></FontAwesomeIcon>
         ) : (
           <FontAwesomeIcon
             icon={faChevronLeft}
             className="text-center text-gray-500 text-2xl"
+            onClick={() => {
+              setHideMenuIcons(!hideMenuIcons);
+            }}
           ></FontAwesomeIcon>
         )}
       </div>
