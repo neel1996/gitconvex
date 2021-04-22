@@ -69,6 +69,14 @@ export default function FetchFromRemoteComponent(props) {
           );
         });
       } else {
+        if (gitRemoteData === "No Remotes Available") {
+          return (
+            <option disabled className="font-medium text-gray-500">
+              {gitRemoteData}
+            </option>
+          );
+        }
+
         return <option>{gitRemoteData}</option>;
       }
     }
@@ -78,15 +86,33 @@ export default function FetchFromRemoteComponent(props) {
     if (remoteData) {
       const { gitBranchList } = remoteData;
 
-      return gitBranchList.map((branch) => {
-        if (branch !== "NO_BRANCH") {
+      return gitBranchList.map((branch, idx) => {
+        if (branch !== "No Branches available") {
+          if (idx === 0) {
+            return (
+              <>
+                <option disabled hidden value="checked">
+                  Select upstream branch
+                </option>
+                <option value={branch} key={branch}>
+                  {branch}
+                </option>
+              </>
+            );
+          }
+
           return (
             <option value={branch} key={branch}>
               {branch}
             </option>
           );
         }
-        return null;
+
+        return (
+          <option disabled hidden value="checked">
+            {branch}
+          </option>
+        );
       });
     }
   }
@@ -235,9 +261,6 @@ export default function FetchFromRemoteComponent(props) {
                 }}
                 ref={branchRef}
               >
-                <option disabled hidden value="checked">
-                  Select upstream branch
-                </option>
                 {remoteData ? branchListGenerator() : null}
               </select>
             </div>
