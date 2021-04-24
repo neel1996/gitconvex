@@ -24,18 +24,23 @@ func commitOrganizer(repo *git2go.Repository, commits []git2go.Commit) []*model.
 			commitHash := commit.Id().String()
 			commitAuthor := strings.Split(commit.Author().Name, " ")[0]
 			commitMessage := strings.Split(commit.Message(), "\n")[0]
+			commitDate := commit.Committer().When.String()
 
 			parentCommit := commit.Parent(0)
 			if parentCommit == nil {
-				logger.Log("NIL Commit encountered", global.StatusWarning)
+				logger.Log("NIL parent Commit encountered", global.StatusWarning)
+				commitList = append(commitList, &model.GitCommits{
+					Hash:          &commitHash,
+					Author:        &commitAuthor,
+					CommitTime:    &commitDate,
+					CommitMessage: &commitMessage,
+				})
 				continue
 			}
 			parentTree, _ := parentCommit.Tree()
 			currentTree, _ := commit.Tree()
 
 			commitFileCount := 0
-			commitDate := commit.Committer().When.String()
-
 			if parentTree != nil && currentTree != nil {
 				diff, diffErr := repo.DiffTreeToTree(parentTree, currentTree, nil)
 
@@ -81,15 +86,34 @@ func (c CommitLogStruct) CommitLogs() *model.GitCommitLogResults {
 	var counter int
 	counter = 0
 
+	logItr, itrErr := repo.Walk()
+	if itrErr != nil {
+		logger.Log(itrErr.Error(), global.StatusError)
+		return &model.GitCommitLogResults{
+			TotalCommits: &totalCommits,
+			Commits:      nil,
+		}
+	}
+
 	if referenceCommit == "" {
 		head, _ := repo.Head()
 		if head != nil {
-			nxt, _ := repo.LookupCommit(head.Target())
-			for nxt != nil && counter <= 10 {
-				commitLogs = append(commitLogs, *nxt)
-				nxt = nxt.Parent(0)
-				counter++
+			if pushErr := logItr.PushHead(); pushErr != nil {
+				logger.Log(pushErr.Error(), global.StatusError)
+				return &model.GitCommitLogResults{
+					TotalCommits: &totalCommits,
+					Commits:      nil,
+				}
 			}
+
+			_ = logItr.Iterate(func(commit *git2go.Commit) bool {
+				if counter <= 10 {
+					commitLogs = append(commitLogs, *commit)
+					counter++
+					return true
+				}
+				return false
+			})
 		} else {
 			logger.Log("Unable to fetch repo HEAD", global.StatusError)
 			return &model.GitCommitLogResults{
@@ -102,12 +126,22 @@ func (c CommitLogStruct) CommitLogs() *model.GitCommitLogResults {
 		refCommit, refCommitErr := repo.LookupCommit(refId)
 
 		if refCommitErr == nil {
-			nxt := refCommit.Parent(0)
-			for nxt != nil && counter <= 10 {
-				commitLogs = append(commitLogs, *nxt)
-				nxt = nxt.Parent(0)
-				counter++
+			if pushErr := logItr.Push(refCommit.Id()); pushErr != nil {
+				logger.Log(pushErr.Error(), global.StatusError)
+				return &model.GitCommitLogResults{
+					TotalCommits: &totalCommits,
+					Commits:      nil,
+				}
 			}
+
+			_ = logItr.Iterate(func(commit *git2go.Commit) bool {
+				if counter <= 10 {
+					commitLogs = append(commitLogs, *commit)
+					counter++
+					return true
+				}
+				return false
+			})
 		} else {
 			logger.Log(refCommitErr.Error(), global.StatusError)
 			return &model.GitCommitLogResults{

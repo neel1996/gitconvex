@@ -19,8 +19,6 @@ type AddBranchInput struct {
 
 // AddBranch adds a new branch to the target repo
 func (input AddBranchInput) AddBranch() string {
-	logger := global.Logger{}
-
 	targetCommit := input.TargetCommit
 	repo := input.Repo
 	branchName := input.BranchName
