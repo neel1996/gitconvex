@@ -23,9 +23,9 @@ var (
 )
 
 func main() {
-	// To get the current version of gitconvex
 	versionFlag := flag.Bool("version", false, "To get the current version of gitconvex")
-	argFlag := flag.String("port", "", "To define the port dynamically while starting gitconvex")
+	portFlag := flag.String("port", "", "To define the port dynamically while starting gitconvex")
+	baseDirFlag := flag.String("basedir", "/usr/local/gitconvex", "Default gitconvex directory path for Linux and MacOS")
 	flag.Parse()
 
 	if *versionFlag == true {
@@ -41,7 +41,6 @@ func main() {
 
 	// checks if the env_config file is accessible. If not then the EnvConfigFileGenerator will be invoked
 	// to generate a default env_config file
-
 	if envError := utils.EnvConfigValidator(); envError == nil {
 		logger.Log("Using available env config file", global.StatusInfo)
 		envConfig := *utils.EnvConfigFileReader()
@@ -70,55 +69,60 @@ func main() {
 	router.Handle("/query", srv)
 	router.Handle("/gitconvexapi", srv)
 
-	execName, _ := os.Executable()
+	execName, execErr := os.Executable()
 	var (
-		staticPath string
-		buildPath  string
+		uiStaticPath string
+		uiBuildPath  string
 	)
-	if execName != "" {
-		currentDir := filepath.Dir(execName)
-		buildPath = fmt.Sprintf("%s/gitconvex-ui", currentDir)
-		staticPath = fmt.Sprintf("%s/static", buildPath)
+	if execErr != nil {
+		logger.Log(fmt.Sprintf("Unable to find exec path - %s", execErr.Error()), global.StatusError)
 	} else {
-		logger.Log("Unable to serve UI bundle", global.StatusError)
+		currentDir := filepath.Dir(execName)
+		uiBuildPath = fmt.Sprintf("%s/gitconvex-ui", currentDir)
+		uiStaticPath = fmt.Sprintf("%s/static", uiBuildPath)
 	}
 
 	// Setting the server to use the UI bundle from the current directory if the bundle is unavailable in the executable directory
 	// Resolved UI file server issue when running docker containers
-	_, uiOpenErr := os.Open(buildPath)
+	_, uiOpenErr := os.Open(uiBuildPath)
 	if uiOpenErr != nil {
 		logger.Log(uiOpenErr.Error(), global.StatusError)
 		cwd, _ := os.Getwd()
 		if cwd != "" {
-			logger.Log("Using UI bundle from the current directory -> "+cwd, global.StatusInfo)
-			buildPath = fmt.Sprintf("%s/gitconvex-ui", cwd)
-			staticPath = fmt.Sprintf("%s/static", buildPath)
+			logger.Log("Trying to use the UI bundle from the current directory -> "+cwd, global.StatusInfo)
+			uiBuildPath = fmt.Sprintf("%s/gitconvex-ui", cwd)
+
+			if _, localUIOpenErr := os.Open(uiBuildPath); localUIOpenErr != nil {
+				logger.Log("Unable to find local ui directory. Falling back to the UI directory lookup in basedir -> "+*baseDirFlag, global.StatusWarning)
+				uiBuildPath = fmt.Sprintf("%s/gitconvex-ui", *baseDirFlag)
+			}
+			uiStaticPath = fmt.Sprintf("%s/static", uiBuildPath)
 		}
 	}
 
 	// Static file supplier for hosting the react static assets and scripts
-	logger.Log(fmt.Sprintf("Serving static files from -> %s", staticPath), global.StatusInfo)
-	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(staticPath))))
+	logger.Log(fmt.Sprintf("Serving static files from -> %s", uiStaticPath), global.StatusInfo)
+	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(uiStaticPath))))
 
 	// Route for serving the webpage logo from the reach build bundle
 	router.PathPrefix("/gitconvex.png").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Log(fmt.Sprintf("Serving logo from directory -> %s", buildPath), global.StatusInfo)
-		http.ServeFile(w, r, buildPath+"/gitconvex.png")
+		logger.Log(fmt.Sprintf("Serving logo from directory -> %s", uiBuildPath), global.StatusInfo)
+		http.ServeFile(w, r, uiBuildPath+"/gitconvex.png")
 	})
 
 	// A default fallback route for handling all routes with '/' prefix.
 	// For making it compatible with react router
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Log(fmt.Sprintf("Serving UI from directory -> %s", buildPath), global.StatusInfo)
-		http.ServeFile(w, r, buildPath+"/index.html")
+		logger.Log(fmt.Sprintf("Serving UI from directory -> %s", uiBuildPath), global.StatusInfo)
+		http.ServeFile(w, r, uiBuildPath+"/index.html")
 	})
 
 	// Checking and Assigning port received from the command line ( --port args )
 	flag.Parse()
 
-	if *argFlag != "" {
-		logger.Log(fmt.Sprintf("Setting port received from the command line -> %s", *argFlag), global.StatusInfo)
-		Port, portErr = strconv.Atoi(*argFlag)
+	if *portFlag != "" {
+		logger.Log(fmt.Sprintf("Setting port received from the command line -> %s", *portFlag), global.StatusInfo)
+		Port, portErr = strconv.Atoi(*portFlag)
 		if portErr != nil {
 			Port, _ = strconv.Atoi(global.DefaultPort)
 		}
