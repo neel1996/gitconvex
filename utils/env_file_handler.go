@@ -2,11 +2,13 @@ package utils
 
 import (
 	"encoding/json"
+	"flag"
 	"github.com/neel1996/gitconvex-server/global"
 	"go/types"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 type EnvConfig struct {
@@ -19,15 +21,38 @@ func localLogger(message string, status string) {
 	logger.Log(message, status)
 }
 
+// getEnvFilePath returns the default filepath for Gitconvex to store the data file
+func getEnvFilePath() (string, error) {
+	var baseDirPath string
+	baseDirFlag := flag.Lookup("basedir")
+
+	if baseDirFlag != nil {
+		baseDirPath = flag.Lookup("basedir").Value.String()
+		flag.Parse()
+
+		if runtime.GOOS != "windows" || baseDirPath != "" {
+			localLogger("Using default path for data file access -> "+baseDirPath, global.StatusInfo)
+			return baseDirPath, nil
+		}
+	}
+
+	execName, execErr := os.Executable()
+	if execErr != nil {
+		localLogger(execErr.Error(), global.StatusError)
+		return "", execErr
+	}
+
+	execPath := filepath.Dir(execName)
+	localLogger("Using current exe path for data file access -> "+execPath, global.StatusInfo)
+	return execPath, nil
+}
+
 // EnvConfigValidator checks if the env_config json file is present and accessible
 // If the file is missing or unable to access, then an error will be thrown
 func EnvConfigValidator() error {
-	execName, execErr := os.Executable()
-	cwd := filepath.Dir(execName)
-
-	if execErr != nil {
-		localLogger(execErr.Error(), global.StatusError)
-		return execErr
+	cwd, cwdErr := getEnvFilePath()
+	if cwdErr != nil {
+		return cwdErr
 	}
 
 	fileString := cwd + "/" + global.EnvFileName
@@ -47,11 +72,8 @@ func EnvConfigValidator() error {
 
 // EnvConfigFileReader reads the env_config json file and returns the config data as a struct
 func EnvConfigFileReader() *EnvConfig {
-	execName, execErr := os.Executable()
-	cwd := filepath.Dir(execName)
-
-	if execErr != nil {
-		localLogger(execErr.Error(), global.StatusError)
+	cwd, cwdErr := getEnvFilePath()
+	if cwdErr != nil {
 		return nil
 	}
 
@@ -80,12 +102,9 @@ func EnvConfigFileReader() *EnvConfig {
 // EnvConfigFileGenerator will be invoked when the EnvConfigValidator returns an error or if EnvConfigFileReader returns no data
 // The function generates a new env_config.json file and populates it with the default config data
 func EnvConfigFileGenerator() error {
-	execName, execErr := os.Executable()
-	cwd := filepath.Dir(execName)
-
-	if execErr != nil {
-		localLogger(execErr.Error(), global.StatusError)
-		return types.Error{Msg: execErr.Error()}
+	cwd, cwdErr := getEnvFilePath()
+	if cwdErr != nil {
+		return cwdErr
 	}
 
 	fileString := cwd + "/" + global.EnvFileName
