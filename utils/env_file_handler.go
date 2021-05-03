@@ -30,7 +30,7 @@ func getEnvFilePath() (string, error) {
 		baseDirPath = flag.Lookup("basedir").Value.String()
 		flag.Parse()
 
-		if runtime.GOOS != "windows" || baseDirPath != "" {
+		if runtime.GOOS != "windows" && baseDirPath != "" {
 			localLogger("Using default path for data file access -> "+baseDirPath, global.StatusInfo)
 			return baseDirPath, nil
 		}
