@@ -22,10 +22,15 @@ var (
 	Port int
 )
 
+var logger global.Logger
+
 func main() {
 	versionFlag := flag.Bool("version", false, "To get the current version of gitconvex")
 	portFlag := flag.String("port", "", "To define the port dynamically while starting gitconvex")
-	baseDirFlag := flag.String("basedir", "/usr/local/gitconvex", "Default gitconvex directory path for Linux and MacOS")
+	defaultPath, dirCreateErr := utils.DefaultDirSetup()
+	if dirCreateErr != nil {
+		logger.Log(dirCreateErr.Error(), global.StatusError)
+	}
 	flag.Parse()
 
 	if *versionFlag == true {
@@ -36,7 +41,6 @@ func main() {
 	var portErr error
 	Port = 0
 
-	logger := global.Logger{}
 	logger.Log("Starting Gitconvex server modules", global.StatusInfo)
 
 	// checks if the env_config file is accessible. If not then the EnvConfigFileGenerator will be invoked
@@ -93,8 +97,8 @@ func main() {
 			uiBuildPath = fmt.Sprintf("%s/gitconvex-ui", cwd)
 
 			if _, localUIOpenErr := os.Open(uiBuildPath); localUIOpenErr != nil {
-				logger.Log("Unable to find local ui directory. Falling back to the UI directory lookup in basedir -> "+*baseDirFlag, global.StatusWarning)
-				uiBuildPath = fmt.Sprintf("%s/gitconvex-ui", *baseDirFlag)
+				logger.Log("Unable to find local ui directory. Falling back to the UI directory lookup in basedir -> "+defaultPath, global.StatusWarning)
+				uiBuildPath = fmt.Sprintf("%s/gitconvex-ui", defaultPath)
 			}
 			uiStaticPath = fmt.Sprintf("%s/static", uiBuildPath)
 		}

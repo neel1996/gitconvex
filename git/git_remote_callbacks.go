@@ -114,7 +114,7 @@ func (grc *RemoteCallbackStruct) invokeWindowsPageant() error {
 
 	execPath = filepath.Dir(execPath)
 	etcPath := execPath + "\\etc\\"
-	keyGenPath := etcPath + "\\" + global.PuttyGenExeName
+	keyGenPath := etcPath + global.PuttyGenExeName
 	ppkFileName := etcPath + "\\" + grc.RepoName + ".ppk"
 
 	var (
