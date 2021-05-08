@@ -39,6 +39,8 @@ jobs:
           sudo cp /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/lib* /usr/lib
           export PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/:$PATH"
           git config --global user.name "${{ secrets.USER_NAME }}" && git config --global user.email "${{ secrets.USER_EMAIL }}"
+          sudo mkdir -p /usr/local/gitconvex
+          sudo chown $(whoami) /usr/local/gitconvex/
           export GOTESTENV=ci && go test -v ./...
 
   # Stage to hold the deployment
