@@ -9,7 +9,7 @@ import (
 )
 
 type CloneInterface interface {
-	CloneHandler() (*model.ResponseModel, error)
+	CloneRepo() (*model.ResponseModel, error)
 }
 
 type CloneStruct struct {
@@ -22,9 +22,9 @@ type CloneStruct struct {
 	SSHKeyPath string
 }
 
-// CloneHandler clones the remote repo to the target directory
+// CloneRepo clones the remote repo to the target directory
 // It supports options for SSH and HTTPS authentications
-func (c CloneStruct) CloneHandler() (*model.ResponseModel, error) {
+func (c CloneStruct) CloneRepo() (*model.ResponseModel, error) {
 	authOption := c.AuthOption
 	repoPath := c.RepoPath
 	repoURL := c.RepoURL

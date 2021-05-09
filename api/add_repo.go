@@ -186,7 +186,7 @@ func (inputs AddRepoInputs) AddRepo() *model.AddRepoParams {
 			SSHKeyPath: sshKeyPath,
 		}
 
-		_, err := cloneObject.CloneHandler()
+		_, err := cloneObject.CloneRepo()
 		if err != nil {
 			logger.Log(fmt.Sprintf("%v", err), global.StatusError)
 			return &model.AddRepoParams{

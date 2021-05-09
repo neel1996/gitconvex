@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"github.com/neel1996/gitconvex-server/git"
 	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"path"
 	"reflect"
 	"testing"
 )
 
-func TestCloneHandler(t *testing.T) {
+func TestCloneRepo_ShouldCloneTheTestRepo(t *testing.T) {
 	cwd, _ := os.Getwd()
 	currentEnv := os.Getenv("GOTESTENV")
 	if currentEnv != "ci" {
@@ -52,14 +53,42 @@ func TestCloneHandler(t *testing.T) {
 				UserName:   "",
 				Password:   "",
 			}
-			got, err := testObject.CloneHandler()
+			got, err := testObject.CloneRepo()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("CloneHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("CloneRepo() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CloneHandler() got = %v, want %v", got, tt.want)
+				t.Errorf("CloneRepo() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
+}
+
+func TestCloneRepo_ShouldFailCloneForInvalidRepoURL(t *testing.T) {
+	cwd, _ := os.Getwd()
+	currentEnv := os.Getenv("GOTESTENV")
+	if currentEnv != "ci" {
+		t.Skip("Not supported in non-CI mode")
+	}
+
+	testRepoPath := path.Join(cwd, "../..") + "/starfleet"
+	fmt.Printf("\n\nRepo Path for Testing : %v\n\n", testRepoPath)
+	testURL := "https://github.com/neel1996/wrong_repo.git"
+
+	var testObject git.CloneInterface
+	testObject = git.CloneStruct{
+		RepoName:   "starfleet",
+		RepoPath:   testRepoPath,
+		RepoURL:    testURL,
+		AuthOption: "noauth",
+		SSHKeyPath: "",
+		UserName:   "",
+		Password:   "",
+	}
+
+	got, err := testObject.CloneRepo()
+
+	assert.Nil(t, got)
+	assert.NotNil(t, err)
 }
