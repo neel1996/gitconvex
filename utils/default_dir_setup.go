@@ -2,7 +2,7 @@ package utils
 
 import (
 	"flag"
-	"github.com/neel1996/gitconvex-server/global"
+	"github.com/neel1996/gitconvex/global"
 	"go/types"
 	"os"
 	"path/filepath"

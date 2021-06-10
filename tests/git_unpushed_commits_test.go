@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"github.com/libgit2/git2go/v31"
-	git2 "github.com/neel1996/gitconvex-server/git"
+	git2 "github.com/neel1996/gitconvex/git"
 	"io/ioutil"
 	"os"
 	"path"

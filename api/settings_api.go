@@ -3,9 +3,9 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/neel1996/gitconvex-server/global"
-	"github.com/neel1996/gitconvex-server/graph/model"
-	"github.com/neel1996/gitconvex-server/utils"
+	"github.com/neel1996/gitconvex/global"
+	"github.com/neel1996/gitconvex/graph/model"
+	"github.com/neel1996/gitconvex/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"

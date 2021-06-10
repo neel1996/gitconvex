@@ -2,7 +2,7 @@ package utils
 
 import (
 	"encoding/json"
-	"github.com/neel1996/gitconvex-server/global"
+	"github.com/neel1996/gitconvex/global"
 	"go/types"
 	"io/ioutil"
 	"os"

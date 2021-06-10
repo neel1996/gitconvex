@@ -2,8 +2,8 @@ package git
 
 import (
 	git2go "github.com/libgit2/git2go/v31"
-	"github.com/neel1996/gitconvex-server/global"
-	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/neel1996/gitconvex/global"
+	"github.com/neel1996/gitconvex/graph/model"
 	"strings"
 )
 

@@ -1,4 +1,4 @@
-module github.com/neel1996/gitconvex-server
+module github.com/neel1996/gitconvex
 
 go 1.16
 

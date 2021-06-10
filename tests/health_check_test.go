@@ -1,8 +1,8 @@
 package tests
 
 import (
-	"github.com/neel1996/gitconvex-server/api"
-	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/neel1996/gitconvex/api"
+	"github.com/neel1996/gitconvex/graph/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

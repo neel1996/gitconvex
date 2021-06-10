@@ -3,8 +3,8 @@ package api
 import (
 	"bufio"
 	"fmt"
-	"github.com/neel1996/gitconvex-server/global"
-	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/neel1996/gitconvex/global"
+	"github.com/neel1996/gitconvex/graph/model"
 	"os"
 )
 

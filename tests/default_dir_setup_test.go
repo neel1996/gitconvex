@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/neel1996/gitconvex-server/utils"
+	"github.com/neel1996/gitconvex/utils"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"

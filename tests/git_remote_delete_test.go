@@ -3,9 +3,9 @@ package tests
 import (
 	"fmt"
 	git "github.com/libgit2/git2go/v31"
-	git2 "github.com/neel1996/gitconvex-server/git"
-	"github.com/neel1996/gitconvex-server/global"
-	"github.com/neel1996/gitconvex-server/graph/model"
+	git2 "github.com/neel1996/gitconvex/git"
+	"github.com/neel1996/gitconvex/global"
+	"github.com/neel1996/gitconvex/graph/model"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path"

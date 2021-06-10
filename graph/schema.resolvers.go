@@ -6,11 +6,11 @@ package graph
 import (
 	"context"
 
-	"github.com/neel1996/gitconvex-server/api"
-	"github.com/neel1996/gitconvex-server/git"
-	"github.com/neel1996/gitconvex-server/global"
-	"github.com/neel1996/gitconvex-server/graph/generated"
-	"github.com/neel1996/gitconvex-server/graph/model"
+	"github.com/neel1996/gitconvex/api"
+	"github.com/neel1996/gitconvex/git"
+	"github.com/neel1996/gitconvex/global"
+	"github.com/neel1996/gitconvex/graph/generated"
+	"github.com/neel1996/gitconvex/graph/model"
 )
 
 func (r *mutationResolver) AddRepo(ctx context.Context, repoName string, repoPath string, cloneSwitch bool, repoURL *string, initSwitch bool, authOption string, sshKeyPath *string, userName *string, password *string) (*model.AddRepoParams, error) {
