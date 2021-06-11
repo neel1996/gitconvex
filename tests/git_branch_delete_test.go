@@ -1,31 +1,15 @@
 package tests
 
 import (
-	"fmt"
 	git "github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex/git"
 	"github.com/neel1996/gitconvex/graph/model"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"path"
 	"testing"
 )
 
 func TestDeleteBranch(t *testing.T) {
-	var repoPath string
-	var r *git.Repository
-
-	cwd, _ := os.Getwd()
-	currentEnv := os.Getenv("GOTESTENV")
-	fmt.Println("Environment : " + currentEnv)
-
-	if currentEnv == "ci" {
-		repoPath = path.Join(cwd, "..")
-		r, _ = git.OpenRepository(repoPath)
-	} else {
-		repoPath = path.Join(cwd, "../..")
-		r, _ = git.OpenRepository(repoPath)
-	}
+	r, _ := git.OpenRepository(TestRepo)
 
 	type args struct {
 		repo       *git.Repository
@@ -49,10 +33,7 @@ func TestDeleteBranch(t *testing.T) {
 				BranchName: tt.args.branchName,
 			}
 
-			_ = git2.AddBranchInput{
-				Repo:       r,
-				BranchName: "test",
-			}.AddBranch()
+			git2.NewAddBranch(r, "test", false, nil).AddBranch()
 
 			got := testObj.DeleteBranch()
 			assert.Equal(t, tt.want, got)

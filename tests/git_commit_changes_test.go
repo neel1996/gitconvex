@@ -6,25 +6,12 @@ import (
 	git2 "github.com/neel1996/gitconvex/git"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
-	"os"
-	"path"
 	"testing"
 )
 
 func TestCommitChanges(t *testing.T) {
-	var repoPath string
-	var r *git2go.Repository
-	cwd, _ := os.Getwd()
-	mockRepoPath := path.Join(cwd, "../..") + "/starfleet"
-	currentEnv := os.Getenv("GOTESTENV")
-	fmt.Println("Environment : " + currentEnv)
-
-	if currentEnv == "ci" {
-		repoPath = mockRepoPath
-		r, _ = git2go.OpenRepository(repoPath)
-	} else {
-		t.Skip("Not supported in non-CI mode")
-	}
+	r, _ := git2go.OpenRepository(TestRepo)
+	repoPath := r.Workdir()
 
 	sampleFile := "untracked.txt"
 	err := ioutil.WriteFile(repoPath+"/"+sampleFile, []byte{byte(63)}, 0755)

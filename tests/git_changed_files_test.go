@@ -8,25 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
-	"path"
 	"strings"
 	"testing"
 )
 
 func TestChangedFiles(t *testing.T) {
-	var repoPath string
-	var r *git.Repository
-	cwd, _ := os.Getwd()
-	currentEnv := os.Getenv("GOTESTENV")
-	fmt.Println("Environment : " + currentEnv)
-
-	if currentEnv == "ci" {
-		repoPath = path.Join(cwd, "..")
-		r, _ = git.OpenRepository(repoPath)
-	} else {
-		repoPath = path.Join(cwd, "../..")
-		r, _ = git.OpenRepository(repoPath)
-	}
+	r, _ := git.OpenRepository(TestRepo)
+	repoPath := r.Workdir()
 
 	mockFile := "mockFile.txt"
 	_ = ioutil.WriteFile(repoPath+"/"+mockFile, []byte{byte(63)}, 0755)

@@ -81,16 +81,11 @@ func (inputs BranchCheckoutInputs) CheckoutBranch() string {
 		if localLookupErr != nil {
 			logger.Log(localLookupErr.Error(), global.StatusError)
 
-			var addBranchObject AddBranchInterface
-			addBranchObject = AddBranchInput{
-				Repo:         repo,
-				BranchName:   branchName,
-				RemoteSwitch: false,
-				TargetCommit: remoteCommit,
-			}
+			var addBranch AddBranch
+			addBranch = NewAddBranch(repo, branchName, false, remoteCommit)
 
-			branchCreateStatus := addBranchObject.AddBranch()
-			if branchCreateStatus != "BRANCH_ADD_FAILED" {
+			branchCreateStatus := addBranch.AddBranch()
+			if branchCreateStatus != global.BranchAddError {
 				err := repo.SetHead(referenceBranchName)
 				if err != nil {
 					return returnCheckoutError(err)

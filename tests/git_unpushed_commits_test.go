@@ -1,32 +1,20 @@
 package tests
 
 import (
-	"fmt"
 	"github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex/git"
 	"io/ioutil"
-	"os"
-	"path"
 	"strings"
 	"testing"
 )
 
 func TestUnPushedCommits(t *testing.T) {
-	var r *git.Repository
-	currentEnv := os.Getenv("GOTESTENV")
-	cwd, _ := os.Getwd()
-	mockRepoPath := path.Join(cwd, "../..") + "/starfleet"
-	fmt.Println("Environment : " + currentEnv)
-
-	if currentEnv == "ci" {
-		r, _ = git.OpenRepository(mockRepoPath)
-	} else {
-		t.Skip("Not supported in non-CI mode")
-	}
+	r, _ := git.OpenRepository(TestRepo)
+	repoPath := r.Workdir()
 
 	untrackedResult := "untracked.txt"
 
-	_ = ioutil.WriteFile(untrackedResult, []byte{byte(63)}, 0755)
+	_ = ioutil.WriteFile(repoPath+untrackedResult, []byte{byte(63)}, 0755)
 
 	var stageObject git2.StageItemInterface
 	var commitObject git2.CommitInterface
