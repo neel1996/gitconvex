@@ -24,6 +24,8 @@ var (
 
 var logger global.Logger
 
+//go:generate go run ./generators/default_dir_const_gen.go
+
 func main() {
 	versionFlag := flag.Bool("version", false, "To get the current version of gitconvex")
 	portFlag := flag.String("port", "", "To define the port dynamically while starting gitconvex")

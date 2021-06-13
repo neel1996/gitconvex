@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"flag"
 	"github.com/neel1996/gitconvex/global"
 	"go/types"
 	"os"
@@ -10,19 +9,10 @@ import (
 )
 
 func DefaultDirSetup() (string, error) {
-	var baseDirPath *string
-	baseDirFlag := flag.Lookup("basedir")
+	baseDirPath := global.GetDefaultDirectory()
 
-	if baseDirFlag == nil {
-		baseDirPath = flag.String("basedir", "/usr/local/gitconvex", "Default gitconvex directory path for Linux and MacOS")
-		flag.Parse()
-	} else {
-		flagPath := baseDirFlag.Value.String()
-		baseDirPath = &flagPath
-	}
-
-	if baseDirPath == nil {
-		return "", types.Error{Msg: "Unable to parse basedir flag"}
+	if baseDirPath == "" {
+		return "", types.Error{Msg: "Default directory path value is empty"}
 	}
 
 	if runtime.GOOS == "windows" {
@@ -38,15 +28,15 @@ func DefaultDirSetup() (string, error) {
 		return execPath, nil
 	}
 
-	_, statErr := os.Stat(*baseDirPath)
+	_, statErr := os.Stat(baseDirPath)
 	if statErr != nil {
-		err := os.Mkdir(*baseDirPath, 0755)
+		err := os.Mkdir(baseDirPath, 0644)
 		if err != nil {
 			logger.Log(err.Error(), global.StatusError)
 			return "", err
 		}
 	} else {
-		return *baseDirPath, nil
+		return baseDirPath, nil
 	}
 
 	return "", nil

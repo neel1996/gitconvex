@@ -42,6 +42,7 @@ func EnvConfigValidator() error {
 func EnvConfigFileReader() *EnvConfig {
 	cwd, cwdErr := DefaultDirSetup()
 	if cwdErr != nil {
+		logger.Log(cwdErr.Error(), global.StatusError)
 		return nil
 	}
 
