@@ -669,14 +669,8 @@ func (r *queryResolver) BranchCompare(ctx context.Context, repoID string, baseBr
 			},
 		}, nil
 	}
-
-	var branchCompareObject git.BranchCompareInterface
-	branchCompareObject = git.BranchCompareInputs{
-		Repo:       repo.GitRepo,
-		BaseBranch: baseBranch,
-		DiffBranch: compareBranch,
-	}
-	return branchCompareObject.CompareBranch(), nil
+ 
+	return git.NewBranchCompare(repo.GitRepo, baseBranch, compareBranch).CompareBranch(), nil
 }
 
 func (r *queryResolver) GetRemote(ctx context.Context, repoID string) ([]*model.RemoteDetails, error) {
