@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"github.com/neel1996/gitconvex/git/branch"
 
 	"github.com/neel1996/gitconvex/api"
 	"github.com/neel1996/gitconvex/git"
@@ -42,9 +43,10 @@ func (r *mutationResolver) AddBranch(ctx context.Context, repoID string, branchN
 		return global.BranchAddError, nil
 	}
 
-	var addBranch git.AddBranch
-	addBranch = git.NewAddBranch(repo.GitRepo, branchName, false, nil)
-	return addBranch.AddBranch(), nil
+	addBranch := branch.NewAddBranch(repo.GitRepo, branchName, false, nil)
+	b := branch.NewBranchOperation(addBranch, nil, nil)
+
+	return b.GitAddBranch()
 }
 
 func (r *mutationResolver) CheckoutBranch(ctx context.Context, repoID string, branchName string) (string, error) {
@@ -62,7 +64,10 @@ func (r *mutationResolver) CheckoutBranch(ctx context.Context, repoID string, br
 		return global.BranchCheckoutError, nil
 	}
 
-	return git.NewBranchCheckout(repo.GitRepo, branchName).CheckoutBranch(), nil
+	checkOutBranch := branch.NewBranchCheckout(repo.GitRepo, branchName)
+	b := branch.NewBranchOperation(nil, checkOutBranch, nil)
+
+	return b.GitCheckoutBranch()
 }
 
 func (r *mutationResolver) DeleteBranch(ctx context.Context, repoID string, branchName string, forceFlag bool) (*model.BranchDeleteStatus, error) {
@@ -669,8 +674,10 @@ func (r *queryResolver) BranchCompare(ctx context.Context, repoID string, baseBr
 			},
 		}, nil
 	}
- 
-	return git.NewBranchCompare(repo.GitRepo, baseBranch, compareBranch).CompareBranch(), nil
+
+	branchCompare := branch.NewBranchCompare(repo.GitRepo, baseBranch, compareBranch)
+	b := branch.NewBranchOperation(nil, nil, branchCompare)
+	return b.GitCompareBranches()
 }
 
 func (r *queryResolver) GetRemote(ctx context.Context, repoID string) ([]*model.RemoteDetails, error) {
