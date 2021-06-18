@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type BranchCompare interface {
+type Compare interface {
 	CompareBranch() []*model.BranchCompareResults
 }
 
@@ -166,7 +166,7 @@ func sortCommitsBasedOnDate(commitMap map[string][]*model.GitCommits, diffCommit
 	return diffCommits
 }
 
-func NewBranchCompare(repo *git2go.Repository, baseBranch string, diffBranch string) BranchCompare {
+func NewBranchCompare(repo *git2go.Repository, baseBranch string, diffBranch string) Compare {
 	return branchCompare{
 		Repo:       repo,
 		BaseBranch: baseBranch,

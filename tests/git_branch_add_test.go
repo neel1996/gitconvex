@@ -2,7 +2,6 @@ package tests
 
 import (
 	git "github.com/libgit2/git2go/v31"
-	git2 "github.com/neel1996/gitconvex/git"
 	"github.com/neel1996/gitconvex/git/branch"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -31,10 +30,7 @@ func TestAddBranch(t *testing.T) {
 			got := obj.AddBranch()
 			assert.Equal(t, tt.want, got)
 
-			git2.DeleteBranchInputs{
-				Repo:       r,
-				BranchName: "test",
-			}.DeleteBranch()
+			_, _ = branch.Operation{Delete: branch.NewDeleteBranch(r, "test")}.GitDeleteBranch()
 		})
 	}
 }

@@ -2,7 +2,6 @@ package tests
 
 import (
 	git "github.com/libgit2/git2go/v31"
-	git2 "github.com/neel1996/gitconvex/git"
 	"github.com/neel1996/gitconvex/git/branch"
 	"github.com/neel1996/gitconvex/graph/model"
 	"github.com/stretchr/testify/assert"
@@ -28,15 +27,17 @@ func TestDeleteBranch(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var testObj git2.DeleteBranchInterface
-			testObj = git2.DeleteBranchInputs{
-				Repo:       tt.args.repo,
-				BranchName: tt.args.branchName,
+			b := branch.Operation{
+				Delete: branch.NewDeleteBranch(r, "test"),
+				Add:    branch.NewAddBranch(r, "test", false, nil),
 			}
 
-			branch.NewAddBranch(r, "test", false, nil).AddBranch()
+			_, err := b.GitAddBranch()
+			assert.Nil(t, err)
 
-			got := testObj.DeleteBranch()
+			got, err := b.GitDeleteBranch()
+
+			assert.Nil(t, err)
 			assert.Equal(t, tt.want, got)
 		})
 	}

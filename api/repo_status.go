@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/neel1996/gitconvex/git"
+	"github.com/neel1996/gitconvex/git/branch"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/model"
 	"github.com/neel1996/gitconvex/utils"
@@ -10,12 +11,11 @@ import (
 
 // RepoStatus collects the basic details of the target repo and returns the consolidated result
 func RepoStatus(repoId string) *model.GitRepoStatusResults {
-	logger := global.Logger{}
 	logger.Log("Collecting repo status information", global.StatusInfo)
 
 	repoChan := make(chan git.RepoDetails)
 	remoteChan := make(chan git.RemoteDataModel)
-	branchChan := make(chan git.Branch)
+	branchChan := make(chan branch.ListOfBranches)
 	commitChan := make(chan git.AllCommitData)
 	trackedFileCountChan := make(chan int)
 
@@ -80,9 +80,9 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 		*remoteURL = *remotes[0]
 	}
 
-	var branchListObject git.BranchListInterface
-	branchListObject = git.BranchListInputs{Repo: repo}
-	go branchListObject.GetBranchList(branchChan)
+	branchListObj := branch.NewBranchListInterface(repo)
+	b := branch.Operation{List: branchListObj}
+	go b.GitListBranches(branchChan)
 
 	branchList := <-branchChan
 	currentBranch := &branchList.CurrentBranch

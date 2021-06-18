@@ -6,7 +6,7 @@ import (
 	"github.com/neel1996/gitconvex/global"
 )
 
-type AddBranch interface {
+type Add interface {
 	AddBranch() string
 }
 
@@ -17,7 +17,6 @@ type addBranch struct {
 	TargetCommit *git2go.Commit
 }
 
-// AddBranch adds a new branch to the target repo
 func (a addBranch) AddBranch() string {
 	targetCommit := a.TargetCommit
 	repo := a.Repo
@@ -58,7 +57,7 @@ func (a addBranch) validateTargetCommit(targetCommit *git2go.Commit, repo *git2g
 	return headCommit, false
 }
 
-func NewAddBranch(repo *git2go.Repository, branchName string, remoteSwitch bool, targetCommit *git2go.Commit) AddBranch {
+func NewAddBranch(repo *git2go.Repository, branchName string, remoteSwitch bool, targetCommit *git2go.Commit) Add {
 	return addBranch{
 		Repo:         repo,
 		BranchName:   branchName,

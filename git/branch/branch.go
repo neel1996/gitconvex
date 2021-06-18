@@ -12,16 +12,19 @@ type Branch interface {
 	GitAddBranch() (string, error)
 	GitCheckoutBranch() (string, error)
 	GitCompareBranches() ([]*model.BranchCompareResults, error)
+	GitListBranches(chan ListOfBranches)
 }
 
-type branch struct {
-	addBranch       AddBranch
-	checkoutBranch  BranchCheckout
-	compareBranches BranchCompare
+type Operation struct {
+	Add      Add
+	Checkout Checkout
+	Compare  Compare
+	Delete   Delete
+	List     List
 }
 
-func (b branch) GitAddBranch() (string, error) {
-	addBranchResult := b.addBranch.AddBranch()
+func (b Operation) GitAddBranch() (string, error) {
+	addBranchResult := b.Add.AddBranch()
 
 	if addBranchResult == global.BranchAddError {
 		return "", errors.New(global.BranchAddError)
@@ -30,8 +33,8 @@ func (b branch) GitAddBranch() (string, error) {
 	return addBranchResult, nil
 }
 
-func (b branch) GitCheckoutBranch() (string, error) {
-	checkoutBranchResult := b.checkoutBranch.CheckoutBranch()
+func (b Operation) GitCheckoutBranch() (string, error) {
+	checkoutBranchResult := b.Checkout.CheckoutBranch()
 
 	if checkoutBranchResult == global.BranchCheckoutError {
 		return "", errors.New(global.BranchCheckoutError)
@@ -40,8 +43,8 @@ func (b branch) GitCheckoutBranch() (string, error) {
 	return checkoutBranchResult, nil
 }
 
-func (b branch) GitCompareBranches() ([]*model.BranchCompareResults, error) {
-	branchDiff := b.compareBranches.CompareBranch()
+func (b Operation) GitCompareBranches() ([]*model.BranchCompareResults, error) {
+	branchDiff := b.Compare.CompareBranch()
 
 	if len(branchDiff) == 0 {
 		return []*model.BranchCompareResults{}, errors.New("no difference between the two branches")
@@ -50,10 +53,16 @@ func (b branch) GitCompareBranches() ([]*model.BranchCompareResults, error) {
 	return branchDiff, nil
 }
 
-func NewBranchOperation(addBranch AddBranch, branchCheckout BranchCheckout, branchCompare BranchCompare) Branch {
-	return branch{
-		addBranch:       addBranch,
-		checkoutBranch:  branchCheckout,
-		compareBranches: branchCompare,
+func (b Operation) GitDeleteBranch() (*model.BranchDeleteStatus, error) {
+	deleteStatus := b.Delete.DeleteBranch()
+
+	if deleteStatus.Status == global.BranchDeleteError {
+		return nil, errors.New("branch deletion failed")
 	}
+
+	return deleteStatus, nil
+}
+
+func (b Operation) GitListBranches(branchChannel chan ListOfBranches) {
+	b.List.ListBranches(branchChannel)
 }

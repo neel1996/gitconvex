@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type BranchCheckout interface {
+type Checkout interface {
 	CheckoutBranch() string
 }
 
@@ -140,8 +140,7 @@ func (b branchCheckout) checkoutLocalBranch(branchDetails validatedBranchDetails
 }
 
 func addAndCheckoutNewBranch(repo *git2go.Repository, branchName string, remoteCommit *git2go.Commit, branchDetails validatedBranchDetails) error {
-	var addBranch AddBranch
-	addBranch = NewAddBranch(repo, branchName, false, remoteCommit)
+	addBranch := NewAddBranch(repo, branchName, false, remoteCommit)
 
 	branchCreateStatus := addBranch.AddBranch()
 	if branchCreateStatus == global.BranchAddError {
@@ -187,7 +186,7 @@ func splitAndReturnBranchName(delimiter string, branchName string) string {
 	return splitString[len(splitString)-1]
 }
 
-func NewBranchCheckout(repo *git2go.Repository, branchName string) BranchCheckout {
+func NewBranchCheckout(repo *git2go.Repository, branchName string) Checkout {
 	return branchCheckout{
 		Repo:       repo,
 		BranchName: branchName,
