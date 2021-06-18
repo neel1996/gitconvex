@@ -12,14 +12,14 @@ type Delete interface {
 }
 
 type deleteBranch struct {
-	Repo       *git2go.Repository
-	BranchName string
+	repo       *git2go.Repository
+	branchName string
 }
 
 // DeleteBranch deletes a branch from the repo
 func (inputs deleteBranch) DeleteBranch() *model.BranchDeleteStatus {
-	repo := inputs.Repo
-	branchName := inputs.BranchName
+	repo := inputs.repo
+	branchName := inputs.branchName
 	branch, deleteBranchErr := repo.LookupBranch(branchName, git2go.BranchLocal)
 
 	if deleteBranchErr != nil {
@@ -41,7 +41,7 @@ func (inputs deleteBranch) DeleteBranch() *model.BranchDeleteStatus {
 
 func NewDeleteBranch(repo *git2go.Repository, branchName string) Delete {
 	return deleteBranch{
-		Repo:       repo,
-		BranchName: branchName,
+		repo:       repo,
+		branchName: branchName,
 	}
 }

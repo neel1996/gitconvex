@@ -13,8 +13,8 @@ type Checkout interface {
 }
 
 type branchCheckout struct {
-	Repo       *git2go.Repository
-	BranchName string
+	repo       *git2go.Repository
+	branchName string
 }
 
 type validatedBranchDetails struct {
@@ -41,7 +41,7 @@ func checkErrorAndPanic(err error) bool {
 // CheckoutBranch checks out the branchName received as argument
 func (b branchCheckout) CheckoutBranch() string {
 	var errStatus bool
-	branchName := b.BranchName
+	branchName := b.branchName
 
 	defer func() string {
 		if r := recover(); r != nil {
@@ -69,8 +69,8 @@ func (b branchCheckout) CheckoutBranch() string {
 
 func (b branchCheckout) checkoutRemoteBranch(branchDetails validatedBranchDetails) bool {
 	var errStatus bool
-	branchName := b.BranchName
-	repo := b.Repo
+	branchName := b.branchName
+	repo := b.repo
 
 	logger.Log(fmt.Sprintf("Branch - %s is a remote branch. Trying with intermediate remote fetch!", branchName), global.StatusWarning)
 
@@ -107,8 +107,8 @@ func (b branchCheckout) checkoutRemoteBranch(branchDetails validatedBranchDetail
 
 func (b branchCheckout) checkoutLocalBranch(branchDetails validatedBranchDetails) bool {
 	errStatus := false
-	repo := b.Repo
-	branchName := b.BranchName
+	repo := b.repo
+	branchName := b.branchName
 
 	branch, branchErr := repo.LookupBranch(branchName, git2go.BranchLocal)
 	errStatus = checkErrorAndPanic(branchErr)
@@ -188,7 +188,7 @@ func splitAndReturnBranchName(delimiter string, branchName string) string {
 
 func NewBranchCheckout(repo *git2go.Repository, branchName string) Checkout {
 	return branchCheckout{
-		Repo:       repo,
-		BranchName: branchName,
+		repo:       repo,
+		branchName: branchName,
 	}
 }

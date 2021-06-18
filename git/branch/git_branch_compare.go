@@ -13,9 +13,9 @@ type Compare interface {
 }
 
 type branchCompare struct {
-	Repo       *git2go.Repository
-	BaseBranch string
-	DiffBranch string
+	repo       *git2go.Repository
+	baseBranch string
+	diffBranch string
 }
 
 func returnBranchCompareError(errString string) []*model.BranchCompareResults {
@@ -31,10 +31,10 @@ func returnBranchCompareError(errString string) []*model.BranchCompareResults {
 func (b branchCompare) CompareBranch() []*model.BranchCompareResults {
 	var diffCommits []*model.BranchCompareResults
 	var filteredCommits []model.GitCommits
-	repo := b.Repo
+	repo := b.repo
 
-	baseBranch, baseBranchErr := repo.LookupBranch(b.BaseBranch, git2go.BranchLocal)
-	compareBranch, compareBranchErr := repo.LookupBranch(b.DiffBranch, git2go.BranchLocal)
+	baseBranch, baseBranchErr := repo.LookupBranch(b.baseBranch, git2go.BranchLocal)
+	compareBranch, compareBranchErr := repo.LookupBranch(b.diffBranch, git2go.BranchLocal)
 
 	if baseBranchErr != nil || compareBranchErr != nil {
 		return returnBranchCompareError("Unable to lookup target branches from the repo")
@@ -168,8 +168,8 @@ func sortCommitsBasedOnDate(commitMap map[string][]*model.GitCommits, diffCommit
 
 func NewBranchCompare(repo *git2go.Repository, baseBranch string, diffBranch string) Compare {
 	return branchCompare{
-		Repo:       repo,
-		BaseBranch: baseBranch,
-		DiffBranch: diffBranch,
+		repo:       repo,
+		baseBranch: baseBranch,
+		diffBranch: diffBranch,
 	}
 }

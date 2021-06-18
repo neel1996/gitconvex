@@ -11,16 +11,16 @@ type Add interface {
 }
 
 type addBranch struct {
-	Repo         *git2go.Repository
-	BranchName   string
-	RemoteSwitch bool
-	TargetCommit *git2go.Commit
+	repo         *git2go.Repository
+	branchName   string
+	remoteSwitch bool
+	targetCommit *git2go.Commit
 }
 
 func (a addBranch) AddBranch() string {
-	targetCommit := a.TargetCommit
-	repo := a.Repo
-	branchName := a.BranchName
+	targetCommit := a.targetCommit
+	repo := a.repo
+	branchName := a.branchName
 	head, headErr := repo.Head()
 
 	logger.Log(fmt.Sprintf("Adding new branch -> %s", branchName), global.StatusInfo)
@@ -59,9 +59,9 @@ func (a addBranch) validateTargetCommit(targetCommit *git2go.Commit, repo *git2g
 
 func NewAddBranch(repo *git2go.Repository, branchName string, remoteSwitch bool, targetCommit *git2go.Commit) Add {
 	return addBranch{
-		Repo:         repo,
-		BranchName:   branchName,
-		RemoteSwitch: remoteSwitch,
-		TargetCommit: targetCommit,
+		repo:         repo,
+		branchName:   branchName,
+		remoteSwitch: remoteSwitch,
+		targetCommit: targetCommit,
 	}
 }

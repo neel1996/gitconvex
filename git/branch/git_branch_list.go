@@ -13,7 +13,7 @@ type List interface {
 }
 
 type listBranch struct {
-	Repo            *git2go.Repository
+	repo            *git2go.Repository
 	localBranchList []*string
 	allBranchList   []*string
 }
@@ -28,7 +28,7 @@ type ListOfBranches struct {
 // The result will be returned as a struct with the current branch and all the available branches
 func (l listBranch) ListBranches(branchChan chan ListOfBranches) {
 	var currentBranch string
-	repo := l.Repo
+	repo := l.repo
 
 	defer close(branchChan)
 
@@ -105,6 +105,6 @@ func getCurrentBranchName(head *git2go.Reference) string {
 
 func NewBranchListInterface(repo *git2go.Repository) List {
 	return listBranch{
-		Repo: repo,
+		repo: repo,
 	}
 }
