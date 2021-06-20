@@ -28,7 +28,7 @@ func TestCompareCommit(t *testing.T) {
 			repo                *git.Repository
 			baseCommitString    string
 			compareCommitString string
-		}{repo: r, baseCommitString: *sampleCommits.Commits[1].Hash, compareCommitString: *sampleCommits.Commits[2].Hash}},
+		}{repo: r, baseCommitString: *sampleCommits.Commits[0].Hash, compareCommitString: *sampleCommits.Commits[1].Hash}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

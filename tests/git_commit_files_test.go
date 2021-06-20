@@ -26,7 +26,7 @@ func TestCommitFileList(t *testing.T) {
 		{name: "Git commit file list test case", args: struct {
 			repo       *git.Repository
 			commitHash string
-		}{repo: r, commitHash: *sampleCommits.Commits[1].Hash}},
+		}{repo: r, commitHash: *sampleCommits.Commits[0].Hash}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -3,8 +3,8 @@ package tests
 import (
 	"github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex/git"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
-	"strings"
 	"testing"
 )
 
@@ -53,9 +53,11 @@ func TestUnPushedCommits(t *testing.T) {
 				Repo:      tt.args.repo,
 				RemoteRef: tt.args.remoteRef,
 			}
-			if got := testObj.UnPushedCommits(); !strings.Contains(*got.GitCommits[0].CommitMessage, "Test Commit") {
-				t.Errorf("UnPushedCommits() = %v, want %v", got, tt.want)
-			}
+
+			got := testObj.UnPushedCommits()
+
+			assert.NotNil(t, got)
+			assert.NotEmpty(t, *got.GitCommits[0].CommitMessage)
 		})
 	}
 }
