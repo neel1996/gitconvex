@@ -164,6 +164,7 @@ func (inputs AddRepoInputs) AddRepo() *model.AddRepoParams {
 	userName := inputs.UserName
 	password := inputs.Password
 	sshKeyPath := inputs.SSHKeyPath
+	repoValidator := git.NewRepoValidator(repoPath, nil)
 
 	if cloneSwitch && len(repoURL) > 0 {
 		currentOs := HealthCheckApi().Os
@@ -208,7 +209,7 @@ func (inputs AddRepoInputs) AddRepo() *model.AddRepoParams {
 		}
 	}
 
-	_, invalidRepoErr := git.RepoValidator(repoPath)
+	invalidRepoErr := repoValidator.ValidateRepoWithPath()
 
 	if invalidRepoErr != nil && !initSwitch {
 		logger.Log(fmt.Sprintf("The repo is not a valid git repo\n%v", invalidRepoErr), global.StatusError)

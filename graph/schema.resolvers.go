@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"github.com/neel1996/gitconvex/git/branch"
+	"github.com/neel1996/gitconvex/git/remote"
 
 	"github.com/neel1996/gitconvex/api"
 	"github.com/neel1996/gitconvex/git"
@@ -333,13 +334,10 @@ func (r *mutationResolver) AddRemote(ctx context.Context, repoID string, remoteN
 		return &model.RemoteMutationResult{Status: global.RemoteAddError}, nil
 	}
 
-	var addRemoteObject git.AddRemoteInterface
-	addRemoteObject = git.AddRemoteStruct{
-		Repo:       repo.GitRepo,
-		RemoteName: remoteName,
-		RemoteURL:  remoteURL,
-	}
-	return addRemoteObject.AddRemote(), nil
+	addRemote := remote.NewAddRemote(repo.GitRepo, remoteName, remoteURL)
+	remoteObject := remote.Operation{Add: addRemote}
+
+	return remoteObject.GitAddRemote()
 }
 
 func (r *mutationResolver) DeleteRemote(ctx context.Context, repoID string, remoteName string) (*model.RemoteMutationResult, error) {
@@ -355,12 +353,12 @@ func (r *mutationResolver) DeleteRemote(ctx context.Context, repoID string, remo
 		return &model.RemoteMutationResult{Status: global.RemoteAddError}, nil
 	}
 
-	var addRemoteObject git.DeleteRemoteInterface
-	addRemoteObject = &git.DeleteRemoteStruct{
-		Repo:       repo.GitRepo,
-		RemoteName: remoteName,
+	deleteRemote := remote.NewDeleteRemoteInterface(repo.GitRepo, remoteName)
+	remoteObject := remote.Operation{
+		Delete: deleteRemote,
 	}
-	return addRemoteObject.DeleteRemote(), nil
+
+	return remoteObject.GitDeleteRemote()
 }
 
 func (r *mutationResolver) EditRemote(ctx context.Context, repoID string, remoteName string, remoteURL string) (*model.RemoteMutationResult, error) {

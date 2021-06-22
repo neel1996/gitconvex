@@ -2,7 +2,7 @@ package tests
 
 import (
 	git "github.com/libgit2/git2go/v31"
-	git2 "github.com/neel1996/gitconvex/git"
+	"github.com/neel1996/gitconvex/git/remote"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/model"
 	"github.com/stretchr/testify/assert"
@@ -13,13 +13,8 @@ func TestDeleteRemoteStruct_DeleteRemote(t *testing.T) {
 	r, _ := git.OpenRepository(TestRepo)
 
 	testRemoteName := "test_remote"
-	var testObj git2.AddRemoteInterface
-	testObj = git2.AddRemoteStruct{
-		Repo:       r,
-		RemoteName: testRemoteName,
-		RemoteURL:  "git@github.com:neel1996/gitconvex-server.git",
-	}
-	_ = testObj.AddRemote()
+	addRemote := remote.NewAddRemote(r, testRemoteName, "git@github.com:neel1996/gitconvex-server.git")
+	_ = addRemote.NewRemote()
 
 	type fields struct {
 		Repo       git.Repository
@@ -37,11 +32,8 @@ func TestDeleteRemoteStruct_DeleteRemote(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &git2.DeleteRemoteStruct{
-				Repo:       &tt.fields.Repo,
-				RemoteName: tt.fields.RemoteName,
-			}
-			got := d.DeleteRemote()
+			remoteObj := remote.NewDeleteRemoteInterface(&tt.fields.Repo, tt.fields.RemoteName)
+			got := remoteObj.DeleteRemote()
 
 			assert.Equal(t, tt.want.Status, got.Status)
 		})

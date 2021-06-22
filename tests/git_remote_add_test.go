@@ -2,7 +2,7 @@ package tests
 
 import (
 	git "github.com/libgit2/git2go/v31"
-	git2 "github.com/neel1996/gitconvex/git"
+	"github.com/neel1996/gitconvex/git/remote"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -28,21 +28,13 @@ func TestAddRemote(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var testObj git2.AddRemoteInterface
-			testObj = git2.AddRemoteStruct{
-				Repo:       tt.args.repo,
-				RemoteName: tt.args.remoteName,
-				RemoteURL:  tt.args.remoteURL,
-			}
-			got := testObj.AddRemote()
+			var testObj remote.Add
+
+			testObj = remote.NewAddRemote(r, tt.args.remoteName, tt.args.remoteURL)
+			got := testObj.NewRemote()
 
 			assert.Equal(t, tt.want, got.Status)
-
-			obj := git2.DeleteRemoteStruct{
-				Repo:       r,
-				RemoteName: tt.args.remoteName,
-			}
-			obj.DeleteRemote()
+			remote.NewDeleteRemoteInterface(r, tt.args.remoteName).DeleteRemote()
 		})
 	}
 }
