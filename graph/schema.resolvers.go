@@ -353,7 +353,7 @@ func (r *mutationResolver) DeleteRemote(ctx context.Context, repoID string, remo
 		return &model.RemoteMutationResult{Status: global.RemoteAddError}, nil
 	}
 
-	deleteRemote := remote.NewDeleteRemoteInterface(repo.GitRepo, remoteName)
+	deleteRemote := remote.NewDeleteRemote(repo.GitRepo, remoteName)
 	remoteObject := remote.Operation{
 		Delete: deleteRemote,
 	}

@@ -73,9 +73,11 @@ func tearDownTests() {
 		return
 	}
 
-	err := os.RemoveAll(os.Getenv("GITCONVEX_TEST_REPO"))
-	if err != nil {
-		logger.Error(err)
-		return
-	}
+	// Enable for deleting the test repo after running the tests
+
+	//err := os.RemoveAll(os.Getenv("GITCONVEX_TEST_REPO"))
+	//if err != nil {
+	//	logger.Error(err)
+	//	return
+	//}
 }

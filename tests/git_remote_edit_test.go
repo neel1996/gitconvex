@@ -25,7 +25,7 @@ func TestRemoteEditStruct_EditRemoteUrl(t *testing.T) {
 			Repo       *git.Repository
 			RemoteName string
 			RemoteUrl  string
-		}{Repo: r, RemoteName: "origin", RemoteUrl: "git@github.com:neel1996/gitconvex-server.git"}, want: global.RemoteEditSuccess},
+		}{Repo: r, RemoteName: "origin", RemoteUrl: "https://github.com/neel1996/gitconvex-test.git"}, want: global.RemoteEditSuccess},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
