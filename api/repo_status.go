@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/neel1996/gitconvex/git"
 	"github.com/neel1996/gitconvex/git/branch"
+	"github.com/neel1996/gitconvex/git/remote"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/model"
 	"github.com/neel1996/gitconvex/utils"
@@ -14,7 +15,6 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	logger.Log("Collecting repo status information", global.StatusInfo)
 
 	repoChan := make(chan git.RepoDetails)
-	remoteChan := make(chan git.RemoteDataModel)
 	branchChan := make(chan branch.ListOfBranches)
 	commitChan := make(chan git.AllCommitData)
 	trackedFileCountChan := make(chan int)
@@ -41,21 +41,26 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 		}
 	}
 
-	remote := ""
-	var remoteURL *string
-	remoteURL = &remote
+	tempRemote := ""
+	var (
+		remoteURL  *string
+		remoteName string
+	)
+	remoteURL = &tempRemote
 
-	var remoteDataObject git.RemoteDataInterface
-	remoteDataObject = git.RemoteDataStruct{
-		Repo:      repo,
-		RemoteURL: *remoteURL,
+	remoteValidation := remote.NewRemoteValidation()
+	remoteUrlList := remote.NewRemoteUrlData(repo, remoteValidation)
+	listRemoteUrl := remote.Operation{ListRemoteUrl: remoteUrlList}
+
+	remotes, remoteErr := listRemoteUrl.GitGetAllRemoteUrl()
+	if remoteErr != nil {
+		logger.Log(remoteErr.Error(), global.StatusError)
+		return nil
 	}
 
-	go remoteDataObject.RemoteData(remoteChan)
-	remoteData := <-remoteChan
-	remotes := remoteData.RemoteURL
-
 	if len(remotes) > 0 && *remotes[0] != "" {
+		remoteNameObject := remote.NewGetRemoteName(repo, *remotes[0], remoteValidation)
+		remoteName = remoteNameObject.GetRemoteNameWithUrl()
 		sRemote := strings.Split(*remotes[0], "/")
 		repoName = &sRemote[len(sRemote)-1]
 	} else {
@@ -115,7 +120,7 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 		GitBranchList:        branches,
 		GitAllBranchList:     allBranches,
 		GitCurrentBranch:     currentBranch,
-		GitRemoteHost:        remoteData.RemoteHost,
+		GitRemoteHost:        &remoteName,
 		GitTotalCommits:      totalCommitsPtr,
 		GitLatestCommit:      latestCommit,
 		GitTotalTrackedFiles: trackedFilePtr,

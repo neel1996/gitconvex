@@ -12,6 +12,7 @@ type GetRemoteNameTestSuite struct {
 	suite.Suite
 	getRemoteName Name
 	repo          *git2go.Repository
+	validation    Validation
 }
 
 func (suite *GetRemoteNameTestSuite) SetupTest() {
@@ -19,7 +20,8 @@ func (suite *GetRemoteNameTestSuite) SetupTest() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	suite.getRemoteName = NewGetRemoteName(r, "https://github.com/neel1996/gitconvex-test.git")
+	suite.validation = NewRemoteValidation()
+	suite.getRemoteName = NewGetRemoteName(r, "https://github.com/neel1996/gitconvex-test.git", suite.validation)
 }
 
 func TestGetRemoteNameTestSuite(t *testing.T) {
@@ -36,7 +38,7 @@ func (suite *GetRemoteNameTestSuite) TestGetRemoteName_ShouldReturnRemoteName_Wh
 
 func (suite *GetRemoteNameTestSuite) TestGetRemoteName_ShouldReturnEmptyString_WhenRepoIsNil() {
 	expectedRemote := ""
-	getRemoteName := NewGetRemoteName(nil, "https://github.com/neel1996/gitconvex-test.git")
+	getRemoteName := NewGetRemoteName(nil, "https://github.com/neel1996/gitconvex-test.git", suite.validation)
 
 	actualRemote := getRemoteName.GetRemoteNameWithUrl()
 

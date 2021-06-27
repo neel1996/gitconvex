@@ -13,13 +13,14 @@ type Name interface {
 type remoteName struct {
 	repo      *git2go.Repository
 	remoteUrl string
+	validate  Validation
 }
 
 func (r remoteName) GetRemoteNameWithUrl() string {
 	repo := r.repo
 
-	if repo == nil {
-		logger.Log("Repo is nil", global.StatusError)
+	if validationErr := r.validate.ValidateRemoteFields(repo); validationErr != nil {
+		logger.Log(validationErr.Error(), global.StatusError)
 		return ""
 	}
 
@@ -54,9 +55,10 @@ func (r remoteName) isRemoteAvailable(remoteEntry *git2go.Remote, remote string)
 	return false
 }
 
-func NewGetRemoteName(repo *git2go.Repository, remoteUrl string) Name {
+func NewGetRemoteName(repo *git2go.Repository, remoteUrl string, validate Validation) Name {
 	return remoteName{
 		repo:      repo,
 		remoteUrl: remoteUrl,
+		validate:  validate,
 	}
 }

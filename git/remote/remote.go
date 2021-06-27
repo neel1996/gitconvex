@@ -11,6 +11,7 @@ var logger global.Logger
 type Remote interface {
 	GitAddRemote() (*model.RemoteMutationResult, error)
 	GitDeleteRemote() (*model.RemoteMutationResult, error)
+	GitEditRemote() (*model.RemoteMutationResult, error)
 	GitGetAllRemote() ([]*model.RemoteDetails, error)
 	GitGetRemoteHostName() (string, error)
 	GitRemoteName() (string, error)
@@ -20,6 +21,7 @@ type Remote interface {
 type Operation struct {
 	Add           Add
 	Delete        Delete
+	Edit          Edit
 	Host          Host
 	List          List
 	Name          Name
@@ -44,6 +46,16 @@ func (r Operation) GitDeleteRemote() (*model.RemoteMutationResult, error) {
 	}
 
 	return &model.RemoteMutationResult{Status: global.RemoteDeleteSuccess}, nil
+}
+
+func (r Operation) GitEditRemote() (*model.RemoteMutationResult, error) {
+	err := r.Edit.EditRemote()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.RemoteMutationResult{Status: global.RemoteEditSuccess}, nil
 }
 
 func (r Operation) GitGetRemoteHostName() (string, error) {

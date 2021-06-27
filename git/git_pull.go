@@ -36,15 +36,8 @@ func returnPullErr(msg string) *model.PullResult {
 func (p PullStruct) PullFromRemote() *model.PullResult {
 	repo := p.Repo
 	remoteBranch := p.RemoteBranch
-	remoteURL := p.RemoteURL
+	remoteName := p.RemoteName
 
-	var remoteDataObject RemoteDataInterface
-	remoteDataObject = RemoteDataStruct{
-		Repo:      repo,
-		RemoteURL: remoteURL,
-	}
-
-	remoteName := remoteDataObject.GetRemoteName()
 	localRefSpec := "+refs/heads/" + remoteBranch
 	targetRefPsec := "refs/remotes/" + remoteName + "/" + remoteBranch
 	targetRemote, _ := repo.Remotes.Lookup(remoteName)

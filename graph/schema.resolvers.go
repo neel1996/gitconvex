@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/neel1996/gitconvex/git/branch"
 	"github.com/neel1996/gitconvex/git/remote"
+	"github.com/neel1996/gitconvex/init"
 
 	"github.com/neel1996/gitconvex/api"
 	"github.com/neel1996/gitconvex/git"
@@ -113,16 +114,15 @@ func (r *mutationResolver) FetchFromRemote(ctx context.Context, repoID string, r
 		}, nil
 	}
 
-	var remoteDataObject git.RemoteDataInterface
-	remoteDataObject = git.RemoteDataStruct{
-		Repo:      repo.GitRepo,
-		RemoteURL: *remoteURL,
-	}
+	context.WithValue(ctx, initialize.Repo, repo.GitRepo)
+	context.WithValue(ctx, initialize.RemoteUrl, remoteURL)
+
+	remoteName := initialize.RemoteObjects(ctx).RemoteName
 
 	var fetchObject git.FetchInterface
 	fetchObject = git.FetchStruct{
 		Repo:         repo.GitRepo,
-		RemoteName:   remoteDataObject.GetRemoteName(),
+		RemoteName:   remoteName.GetRemoteNameWithUrl(),
 		RepoPath:     repo.RepoPath,
 		RemoteURL:    *remoteURL,
 		RemoteBranch: *remoteBranch,
@@ -273,13 +273,8 @@ func (r *mutationResolver) PushToRemote(ctx context.Context, repoID string, remo
 	go repoObject.Repo(repoChan)
 	repo := <-repoChan
 
-	var remoteDataObject git.RemoteDataInterface
-	remoteDataObject = git.RemoteDataStruct{
-		Repo:      repo.GitRepo,
-		RemoteURL: remoteHost,
-	}
-
-	remoteName := remoteDataObject.GetRemoteName()
+	context.WithValue(ctx, initialize.Repo, repo.GitRepo)
+	remoteName := initialize.RemoteObjects(ctx).RemoteName.GetRemoteNameWithUrl()
 
 	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil || remoteName == "" {
 		logger.Log("Repo is invalid or HEAD is nil", global.StatusError)
@@ -334,7 +329,11 @@ func (r *mutationResolver) AddRemote(ctx context.Context, repoID string, remoteN
 		return &model.RemoteMutationResult{Status: global.RemoteAddError}, nil
 	}
 
-	addRemote := remote.NewAddRemote(repo.GitRepo, remoteName, remoteURL)
+	context.WithValue(ctx, initialize.Repo, repo.GitRepo)
+	context.WithValue(ctx, initialize.RemoteName, remoteName)
+	context.WithValue(ctx, initialize.RemoteUrl, remoteURL)
+
+	addRemote := initialize.RemoteObjects(ctx).AddRemote
 	remoteObject := remote.Operation{Add: addRemote}
 
 	return remoteObject.GitAddRemote()
@@ -353,7 +352,11 @@ func (r *mutationResolver) DeleteRemote(ctx context.Context, repoID string, remo
 		return &model.RemoteMutationResult{Status: global.RemoteAddError}, nil
 	}
 
-	deleteRemote := remote.NewDeleteRemote(repo.GitRepo, remoteName)
+	context.WithValue(ctx, initialize.Repo, repo.GitRepo)
+	context.WithValue(ctx, initialize.RemoteName, remoteName)
+
+	deleteRemote := initialize.RemoteObjects(ctx).DeleteRemote
+
 	remoteObject := remote.Operation{
 		Delete: deleteRemote,
 	}
@@ -375,13 +378,15 @@ func (r *mutationResolver) EditRemote(ctx context.Context, repoID string, remote
 		return &model.RemoteMutationResult{Status: global.RemoteEditError}, nil
 	}
 
-	var editRemoteObject git.RemoteEditInterface
-	editRemoteObject = git.RemoteEditStruct{
-		Repo:       repo.GitRepo,
-		RemoteName: remoteName,
-		RemoteUrl:  remoteURL,
+	context.WithValue(ctx, initialize.Repo, repo.GitRepo)
+	context.WithValue(ctx, initialize.RemoteName, remoteName)
+
+	editRemote := initialize.RemoteObjects(ctx).EditRemote
+	editRemoteObject := remote.Operation{
+		Edit: editRemote,
 	}
-	return editRemoteObject.EditRemoteUrl(), nil
+
+	return editRemoteObject.GitEditRemote()
 }
 
 func (r *queryResolver) HealthCheck(ctx context.Context) (*model.HealthCheckParams, error) {
@@ -573,12 +578,10 @@ func (r *queryResolver) GitUnPushedCommits(ctx context.Context, repoID string, r
 		logger.Log("Repo is invalid or HEAD is nil", global.StatusError)
 		return nil, nil
 	}
-	var remoteDataObject git.RemoteDataInterface
-	remoteDataObject = git.RemoteDataStruct{
-		Repo:      repo.GitRepo,
-		RemoteURL: remoteURL,
-	}
-	remoteName := remoteDataObject.GetRemoteName()
+
+	context.WithValue(ctx, initialize.Repo, repo.GitRepo)
+	remoteName := initialize.RemoteObjects(ctx).RemoteName.GetRemoteNameWithUrl()
+
 	remoteRef := remoteName + "/" + remoteBranch
 
 	var unPushedObject git.UnPushedCommitInterface
@@ -690,12 +693,12 @@ func (r *queryResolver) GetRemote(ctx context.Context, repoID string) ([]*model.
 	go repoObject.Repo(repoChan)
 	repo := <-repoChan
 
-	var remoteObject git.RemoteDataInterface
-	remoteObject = git.RemoteDataStruct{
-		Repo: repo.GitRepo,
-	}
-	allRemoteData := remoteObject.GetAllRemotes()
-	return allRemoteData, nil
+	context.WithValue(ctx, initialize.Repo, repo.GitRepo)
+
+	listRemote := initialize.RemoteObjects(ctx).ListRemote
+	remoteUrlList := remote.Operation{List: listRemote}
+
+	return remoteUrlList.GitGetAllRemote()
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -707,10 +710,4 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
 var logger global.Logger

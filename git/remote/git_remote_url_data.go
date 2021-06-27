@@ -1,7 +1,6 @@
 package remote
 
 import (
-	"errors"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/global"
 )
@@ -11,7 +10,8 @@ type ListRemoteUrl interface {
 }
 
 type listRemoteUrl struct {
-	repo *git2go.Repository
+	repo       *git2go.Repository
+	validation Validation
 }
 
 func (u listRemoteUrl) GetAllRemoteUrl() []*string {
@@ -19,7 +19,7 @@ func (u listRemoteUrl) GetAllRemoteUrl() []*string {
 
 	repo := u.repo
 
-	if validationErr := u.validateFields(repo); validationErr != nil {
+	if validationErr := u.validation.ValidateRemoteFields(repo); validationErr != nil {
 		logger.Log(validationErr.Error(), global.StatusError)
 		return nil
 	}
@@ -46,19 +46,6 @@ func (u listRemoteUrl) GetAllRemoteUrl() []*string {
 	return remoteURL
 }
 
-func (u listRemoteUrl) validateFields(repo *git2go.Repository) error {
-	if repo == nil {
-		return errors.New("repo is nil")
-	}
-
-	remoteCollection := repo.Remotes
-	if remoteCollection == (git2go.RemoteCollection{}) {
-		return errors.New("remote collection is empty")
-	}
-
-	return nil
-}
-
-func NewRemoteUrlData(repo *git2go.Repository) ListRemoteUrl {
-	return listRemoteUrl{repo: repo}
+func NewRemoteUrlData(repo *git2go.Repository, validation Validation) ListRemoteUrl {
+	return listRemoteUrl{repo: repo, validation: validation}
 }

@@ -15,6 +15,7 @@ type addRemote struct {
 	repo       *git2go.Repository
 	remoteName string
 	remoteURL  string
+	validate   Validation
 }
 
 // NewRemote adds a new remote to the target git repo
@@ -35,12 +36,9 @@ func (a addRemote) NewRemote() error {
 }
 
 func (a addRemote) validateRemoteFields() error {
-	if a.repo == nil {
-		return errors.New("repo is nil")
-	}
-
-	if a.remoteName == "" {
-		return errors.New("remote name cannot be empty")
+	validationErr := a.validate.ValidateRemoteFields(a.repo)
+	if validationErr != nil {
+		return validationErr
 	}
 
 	if a.remoteURL == "" {
@@ -50,10 +48,11 @@ func (a addRemote) validateRemoteFields() error {
 	return nil
 }
 
-func NewAddRemote(repo *git2go.Repository, remoteName string, remoteURL string) Add {
+func NewAddRemote(repo *git2go.Repository, remoteName string, remoteURL string, validate Validation) Add {
 	return addRemote{
 		repo:       repo,
 		remoteName: remoteName,
 		remoteURL:  remoteURL,
+		validate:   validate,
 	}
 }

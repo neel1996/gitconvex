@@ -1,7 +1,6 @@
 package remote
 
 import (
-	"errors"
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/global"
@@ -13,14 +12,16 @@ type List interface {
 }
 
 type listRemotes struct {
-	repo *git2go.Repository
+	repo     *git2go.Repository
+	validate Validation
 }
 
 func (l listRemotes) GetAllRemotes() []*model.RemoteDetails {
 	var remoteList []*model.RemoteDetails
 	repo := l.repo
 
-	if validationErr := l.validateRepo(repo); validationErr != nil {
+	if validationErr := l.validate.ValidateRemoteFields(repo); validationErr != nil {
+		logger.Log(validationErr.Error(), global.StatusError)
 		return nil
 	}
 
@@ -54,19 +55,6 @@ func (l listRemotes) GetAllRemotes() []*model.RemoteDetails {
 	return remoteList
 }
 
-func (l listRemotes) validateRepo(repo *git2go.Repository) error {
-	if repo == nil {
-		logger.Log("Repo is nil", global.StatusError)
-		return errors.New("repo is nil")
-	}
-
-	if repo.Remotes == (git2go.RemoteCollection{}) {
-		logger.Log("Remote collection is nil", global.StatusError)
-		return errors.New("repo remote collection is nil")
-	}
-	return nil
-}
-
-func NewRemoteList(repo *git2go.Repository) List {
-	return listRemotes{repo: repo}
+func NewRemoteList(repo *git2go.Repository, validation Validation) List {
+	return listRemotes{repo: repo, validate: validation}
 }

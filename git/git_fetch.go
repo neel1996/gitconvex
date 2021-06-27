@@ -28,16 +28,9 @@ type FetchStruct struct {
 // If the remoteBranch is empty, then a fetch is performed with no branch name (similar to `git fetch`)
 func (f FetchStruct) FetchFromRemote() *model.FetchResult {
 	repo := f.Repo
-	remoteURL := f.RemoteURL
 	remoteBranch := f.RemoteBranch
+	remoteName := f.RemoteName
 
-	var remoteDataObject RemoteDataInterface
-	remoteDataObject = RemoteDataStruct{
-		Repo:      repo,
-		RemoteURL: remoteURL,
-	}
-
-	remoteName := remoteDataObject.GetRemoteName()
 	localRefSpec := "+refs/heads/" + remoteBranch
 	targetRefPsec := "refs/remotes/" + remoteName + "/" + remoteBranch
 	targetRemote, _ := repo.Remotes.Lookup(remoteName)
