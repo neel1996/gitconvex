@@ -34,13 +34,13 @@ func (b Operation) GitAddBranch() (string, error) {
 }
 
 func (b Operation) GitCheckoutBranch() (string, error) {
-	checkoutBranchResult := b.Checkout.CheckoutBranch()
+	err := b.Checkout.CheckoutBranch()
 
-	if checkoutBranchResult == global.BranchCheckoutError {
-		return "", errors.New(global.BranchCheckoutError)
+	if err != nil {
+		return global.BranchCheckoutError, err
 	}
 
-	return checkoutBranchResult, nil
+	return global.BranchCheckoutSuccess, nil
 }
 
 func (b Operation) GitCompareBranches() ([]*model.BranchCompareResults, error) {
@@ -66,3 +66,4 @@ func (b Operation) GitDeleteBranch() (*model.BranchDeleteStatus, error) {
 func (b Operation) GitListBranches(branchChannel chan ListOfBranches) {
 	b.List.ListBranches(branchChannel)
 }
+

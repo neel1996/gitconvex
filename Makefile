@@ -21,7 +21,7 @@ bundle:
 
 pack:
 	cd ./dist && \
-	tar -cvzf gitconvex-$(GITCONVEX_VERSION).tar.gz .
+	tar -cvzf gitconvex-$$GITCONVEX_VERSION.tar.gz .
 
 build: clean build-ui bundle build-server
 	@echo "✅ Gitconvex Build Completed successfully!"
@@ -29,10 +29,13 @@ build: clean build-ui bundle build-server
 	@echo "📬 Try ./dist/gitconvex --port PORT_NUMBER to run gitconvex on the desired port"
 
 test:
-	mkdir -p testRepo
-	export GITCONVEX_TEST_REPO=$(pwd)/testRepo && export GITCONVEX_DEFAULT_PATH=$(pwd)/testRepo
-	cd $GITCONVEX_TEST_REPO
-	go test -v ./...
+	export GITCONVEX_TEST_REPO="$(PWD)/gitconvex-test" && \
+	export GITCONVEX_DEFAULT_PATH="$(PWD)/gitconvex-test" && \
+	rm -rf $$GITCONVEX_TEST_REPO && \
+ 	go clean --cache && \
+ 	./build_scripts/clone_test_repo.sh && \
+ 	go test ./... -count=1 && \
+	rm -rf $$GITCONVEX_TEST_REPO
 
 start:
 	./dist/gitconvex

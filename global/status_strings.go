@@ -2,6 +2,7 @@ package global
 
 const (
 	BranchAddSuccess       = "BRANCH_CREATION_SUCCESS"
+	BranchCheckoutSuccess  = "BRANCH_CHECKOUT_SUCCESS"
 	BranchDeleteSuccess    = "BRANCH_DELETE_SUCCESS"
 	RemoteAddSuccess       = "REMOTE_ADD_SUCCESS"
 	RemoteDeleteSuccess    = "REMOTE_DELETE_SUCCESS"

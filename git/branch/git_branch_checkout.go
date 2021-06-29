@@ -8,7 +8,7 @@ import (
 )
 
 type Checkout interface {
-	CheckoutBranch() string
+	CheckoutBranch() error
 }
 
 type branchCheckout struct {
@@ -23,102 +23,99 @@ type validatedBranchDetails struct {
 	isRemoteBranch      bool
 }
 
-func branchCheckoutError(err error) string {
+func printAndReturnError(err error) error {
 	logger.Log(err.Error(), global.StatusError)
-	return global.BranchCheckoutError
-}
-
-func checkErrorAndPanic(err error) bool {
-	if err != nil {
-		logger.Log(err.Error(), global.StatusError)
-		panic(err)
-		return true
-	}
-	return false
+	return err
 }
 
 // CheckoutBranch checks out the branchName received as argument
-func (b branchCheckout) CheckoutBranch() string {
-	var errStatus bool
-	branchName := b.branchName
+func (b branchCheckout) CheckoutBranch() error {
+	err := b.validateBranchFields()
+	if err != nil {
+		return err
+	}
 
-	defer func() string {
-		if r := recover(); r != nil {
-			logger.Log(fmt.Sprintf("%v", r), global.StatusError)
-			return global.BranchCheckoutError
-		}
-		return global.BranchCheckoutError
-	}()
-
-	branchDetails := b.validateAndSetBranchDetails(branchName)
+	branchDetails := b.validateAndSetBranchDetails()
 
 	if branchDetails.isRemoteBranch {
-		errStatus = b.checkoutRemoteBranch(branchDetails)
+		return b.checkoutRemoteBranch(branchDetails)
 	}
 
-	errStatus = b.checkoutLocalBranch(branchDetails)
-
-	if errStatus {
-		return global.BranchCheckoutError
-	} else {
-		logger.Log(fmt.Sprintf("Current branch checked out to -> %s", branchName), global.StatusInfo)
-		return fmt.Sprintf("Head checked out to branch - %v", branchName)
-	}
+	return b.checkoutLocalBranch(branchDetails)
 }
 
-func (b branchCheckout) checkoutRemoteBranch(branchDetails validatedBranchDetails) bool {
-	var errStatus bool
+func (b branchCheckout) validateBranchFields() error {
+	validation := NewBranchFieldsValidation(b.repo, b.branchName)
+	err := validation.ValidateBranchFields()
+	if err != nil {
+		logger.Log(err.Error(), global.StatusError)
+		return err
+	}
+	return nil
+}
+
+func (b branchCheckout) checkoutRemoteBranch(branchDetails validatedBranchDetails) error {
 	branchName := b.branchName
 	repo := b.repo
 
 	logger.Log(fmt.Sprintf("Branch - %s is a remote branch. Trying with intermediate remote fetch!", branchName), global.StatusWarning)
 
 	remoteBranch, remoteBranchErr := repo.LookupBranch(branchDetails.remoteBranchName, git2go.BranchRemote)
-	errStatus = checkErrorAndPanic(remoteBranchErr)
+	if remoteBranchErr != nil {
+		return printAndReturnError(remoteBranchErr)
+	}
 
 	remoteHead := remoteBranch.Target()
-
 	remoteCommit, remoteCommitErr := repo.LookupCommit(remoteHead)
-	errStatus = checkErrorAndPanic(remoteCommitErr)
+	if remoteCommitErr != nil {
+		return printAndReturnError(remoteCommitErr)
+
+	}
 
 	remoteTree, remoteTreeErr := remoteCommit.Tree()
-	errStatus = checkErrorAndPanic(remoteTreeErr)
+	if remoteTreeErr != nil {
+		return printAndReturnError(remoteTreeErr)
+	}
 
-	checkoutErr := repo.CheckoutTree(remoteTree, &git2go.CheckoutOptions{Strategy: git2go.CheckoutSafe})
-	errStatus = checkErrorAndPanic(checkoutErr)
+	if checkoutErr := repo.CheckoutTree(remoteTree, &git2go.CheckoutOptions{Strategy: git2go.CheckoutSafe}); checkoutErr != nil {
+		return printAndReturnError(checkoutErr)
+	}
 
 	_, localLookupErr := repo.LookupBranch(branchName, git2go.BranchLocal)
 	if localLookupErr != nil {
 		logger.Log(localLookupErr.Error(), global.StatusError)
-		if err := addAndCheckoutNewBranch(repo, branchName, remoteCommit, branchDetails); err != nil {
-			return true
-		}
-		return errStatus
+		return addAndCheckoutNewBranch(repo, branchName, remoteCommit, branchDetails)
 	}
 
 	if err := repo.SetHead(branchDetails.referenceBranchName); err != nil {
-		branchCheckoutError(err)
-		return errStatus
+		return printAndReturnError(err)
 	}
 
-	return errStatus
+	logger.Log(fmt.Sprintf("Remote branch %v has been checked out", branchDetails.remoteBranchName), global.StatusInfo)
+	return nil
 }
 
-func (b branchCheckout) checkoutLocalBranch(branchDetails validatedBranchDetails) bool {
-	errStatus := false
+func (b branchCheckout) checkoutLocalBranch(branchDetails validatedBranchDetails) error {
 	repo := b.repo
 	branchName := b.branchName
 
 	branch, branchErr := repo.LookupBranch(branchName, git2go.BranchLocal)
-	errStatus = checkErrorAndPanic(branchErr)
-
-	topCommit, _ := repo.LookupCommit(branch.Target())
-	if topCommit == nil {
-		return true
+	if branchErr != nil {
+		fmt.Println("Lookup error")
+		return printAndReturnError(branchErr)
 	}
 
-	tree, treeErr := topCommit.Tree()
-	errStatus = checkErrorAndPanic(treeErr)
+	lookupCommit, lookupCommitErr := repo.LookupCommit(branch.Target())
+	if lookupCommit == nil {
+		fmt.Println("Lookup commit error")
+		return printAndReturnError(lookupCommitErr)
+	}
+
+	tree, treeErr := lookupCommit.Tree()
+	if treeErr != nil {
+		fmt.Println("Lookup tree error")
+		return printAndReturnError(treeErr)
+	}
 
 	checkoutErr := repo.CheckoutTree(tree, &git2go.CheckoutOptions{
 		Strategy:       git2go.CheckoutSafe,
@@ -126,16 +123,16 @@ func (b branchCheckout) checkoutLocalBranch(branchDetails validatedBranchDetails
 	})
 
 	if checkoutErr != nil {
-		branchCheckoutError(checkoutErr)
-		return true
+		return printAndReturnError(checkoutErr)
 	}
 
 	err := repo.SetHead(branchDetails.referenceBranchName)
 	if err != nil {
-		branchCheckoutError(err)
-		return true
+		return printAndReturnError(err)
 	}
-	return errStatus
+
+	logger.Log(fmt.Sprintf("Local branch %v has been checked out", b.branchName), global.StatusInfo)
+	return nil
 }
 
 func addAndCheckoutNewBranch(repo *git2go.Repository, branchName string, remoteCommit *git2go.Commit, branchDetails validatedBranchDetails) error {
@@ -143,20 +140,19 @@ func addAndCheckoutNewBranch(repo *git2go.Repository, branchName string, remoteC
 
 	branchAddError := addBranch.AddBranch()
 	if branchAddError != nil {
-		branchCheckoutError(branchAddError)
 		return branchAddError
 	}
 
 	if err := repo.SetHead(branchDetails.referenceBranchName); err != nil {
-		branchCheckoutError(err)
 		return err
 	}
 
 	return nil
 }
 
-func (b branchCheckout) validateAndSetBranchDetails(branchName string) validatedBranchDetails {
+func (b branchCheckout) validateAndSetBranchDetails() validatedBranchDetails {
 	var (
+		branchName          = b.branchName
 		referenceBranchName string
 		remoteBranchName    string
 		isRemoteBranch      bool
