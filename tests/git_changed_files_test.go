@@ -13,7 +13,7 @@ import (
 )
 
 func TestChangedFiles(t *testing.T) {
-	r, _ := git.OpenRepository(TestRepo)
+	r, _ := git.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
 	repoPath := r.Workdir()
 
 	mockFile := "mockFile.txt"

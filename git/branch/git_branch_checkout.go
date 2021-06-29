@@ -1,7 +1,6 @@
 package branch
 
 import (
-	"errors"
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/global"
@@ -142,11 +141,10 @@ func (b branchCheckout) checkoutLocalBranch(branchDetails validatedBranchDetails
 func addAndCheckoutNewBranch(repo *git2go.Repository, branchName string, remoteCommit *git2go.Commit, branchDetails validatedBranchDetails) error {
 	addBranch := NewAddBranch(repo, branchName, false, remoteCommit)
 
-	branchCreateStatus := addBranch.AddBranch()
-	if branchCreateStatus == global.BranchAddError {
-		err := errors.New("branch creation failed")
-		branchCheckoutError(err)
-		return err
+	branchAddError := addBranch.AddBranch()
+	if branchAddError != nil {
+		branchCheckoutError(branchAddError)
+		return branchAddError
 	}
 
 	if err := repo.SetHead(branchDetails.referenceBranchName); err != nil {

@@ -24,13 +24,13 @@ type Operation struct {
 }
 
 func (b Operation) GitAddBranch() (string, error) {
-	addBranchResult := b.Add.AddBranch()
+	err := b.Add.AddBranch()
 
-	if addBranchResult == global.BranchAddError {
-		return "", errors.New(global.BranchAddError)
+	if err != nil {
+		return global.BranchAddError, err
 	}
 
-	return addBranchResult, nil
+	return global.BranchAddSuccess, nil
 }
 
 func (b Operation) GitCheckoutBranch() (string, error) {

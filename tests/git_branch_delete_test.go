@@ -5,11 +5,12 @@ import (
 	"github.com/neel1996/gitconvex/git/branch"
 	"github.com/neel1996/gitconvex/graph/model"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
 func TestDeleteBranch(t *testing.T) {
-	r, _ := git.OpenRepository(TestRepo)
+	r, _ := git.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
 
 	type args struct {
 		repo       *git.Repository

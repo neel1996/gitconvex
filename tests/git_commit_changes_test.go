@@ -6,11 +6,12 @@ import (
 	git2 "github.com/neel1996/gitconvex/git"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func TestCommitChanges(t *testing.T) {
-	r, _ := git2go.OpenRepository(TestRepo)
+	r, _ := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
 	repoPath := r.Workdir()
 
 	sampleFile := "untracked.txt"

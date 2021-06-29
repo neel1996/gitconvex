@@ -4,12 +4,13 @@ import (
 	"github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex/git"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
 func TestListFiles(t *testing.T) {
 	lsFileChan := make(chan *git2.LsFileInfo)
-	r, _ := git.OpenRepository(TestRepo)
+	r, _ := git.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
 	repoPath := r.Workdir()
 
 	type args struct {

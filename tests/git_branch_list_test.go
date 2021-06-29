@@ -4,12 +4,13 @@ import (
 	"github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/git/branch"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
 func TestGetBranchList(t *testing.T) {
 	b := make(chan branch.ListOfBranches)
-	r, _ := git.OpenRepository(TestRepo)
+	r, _ := git.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
 
 	type args struct {
 		repo       *git.Repository
@@ -27,7 +28,7 @@ func TestGetBranchList(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			testObj := branch.NewBranchListInterface(tt.args.repo)
-			
+
 			go testObj.ListBranches(tt.args.branchChan)
 			branchList := <-tt.args.branchChan
 

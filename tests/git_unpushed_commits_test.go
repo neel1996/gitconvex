@@ -5,11 +5,12 @@ import (
 	git2 "github.com/neel1996/gitconvex/git"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func TestUnPushedCommits(t *testing.T) {
-	r, _ := git.OpenRepository(TestRepo)
+	r, _ := git.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
 	repoPath := r.Workdir()
 
 	untrackedResult := "untracked.txt"

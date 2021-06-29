@@ -4,11 +4,12 @@ import (
 	"github.com/libgit2/git2go/v31"
 	git2 "github.com/neel1996/gitconvex/git"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
 func TestCompareCommit(t *testing.T) {
-	r, _ := git.OpenRepository(TestRepo)
+	r, _ := git.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
 
 	sampleCommits := git2.CommitLogStruct{
 		Repo:            r,

@@ -10,7 +10,7 @@ import (
 )
 
 func TestResetAllItems(t *testing.T) {
-	r, _ := git.OpenRepository(TestRepo)
+	r, _ := git.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
 
 	mockFile := "untracked.txt"
 	_ = ioutil.WriteFile(mockFile, []byte{byte(63)}, 0755)
