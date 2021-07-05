@@ -29,8 +29,8 @@ build: clean build-ui bundle build-server
 	@echo "📬 Try ./dist/gitconvex --port PORT_NUMBER to run gitconvex on the desired port"
 
 git-testuser-setup:
-	git config user.name test
-	git config user.email test@test.com
+	git config --global user.name "test"
+	git config --global user.email "test@test.com"
 
 test:
 	export GITCONVEX_TEST_REPO="$(PWD)/gitconvex-test" && \
