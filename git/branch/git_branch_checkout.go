@@ -45,9 +45,7 @@ func (b branchCheckout) CheckoutBranch() error {
 }
 
 func (b branchCheckout) validateBranchFields() error {
-	validation := NewBranchFieldsValidation(b.repo, b.branchName)
-	err := validation.ValidateBranchFields()
-	if err != nil {
+	if err := NewBranchFieldsValidation(b.repo, b.branchName).ValidateBranchFields(); err != nil {
 		logger.Log(err.Error(), global.StatusError)
 		return err
 	}

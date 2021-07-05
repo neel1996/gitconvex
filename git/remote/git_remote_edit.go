@@ -2,6 +2,7 @@ package remote
 
 import (
 	"errors"
+	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/global"
 )
@@ -14,13 +15,12 @@ type editRemote struct {
 	repo       *git2go.Repository
 	remoteName string
 	remoteURL  string
-	validate   Validation
 }
 
 func (e editRemote) EditRemote() error {
 	repo := e.repo
 
-	validationErr := e.validateRemoteFields()
+	validationErr := NewRemoteValidation(e.repo, e.remoteName, e.remoteURL).ValidateRemoteFields()
 	if validationErr != nil {
 		logger.Log(validationErr.Error(), global.StatusError)
 		return validationErr
@@ -34,6 +34,11 @@ func (e editRemote) EditRemote() error {
 		return listErr
 	}
 
+	if remoteAvailabilityErr := e.isRemotePresentInRepo(); remoteAvailabilityErr != nil {
+		logger.Log(remoteAvailabilityErr.Error(), global.StatusError)
+		return remoteAvailabilityErr
+	}
+
 	err := repo.Remotes.SetUrl(e.remoteName, e.remoteURL)
 	if err != nil {
 		logger.Log(err.Error(), global.StatusError)
@@ -44,23 +49,30 @@ func (e editRemote) EditRemote() error {
 	return nil
 }
 
-func (e editRemote) validateRemoteFields() error {
-	validationError := e.validate.ValidateRemoteFields(e.repo)
-	if validationError != nil {
-		return validationError
+func (e editRemote) isRemotePresentInRepo() error {
+	var err error
+	remoteList := NewRemoteList(e.repo).GetAllRemotes()
+
+	if remoteList == nil {
+		err = errors.New("no remotes are present in the repo")
+		return err
 	}
 
-	if e.remoteName == "" || e.remoteURL == "" {
-		return errors.New("required field(s) are empty")
+	for _, remote := range remoteList {
+		if remote.RemoteName == e.remoteName {
+			logger.Log(fmt.Sprintf("Remote - %s is available in the repo", e.remoteName), global.StatusInfo)
+			return nil
+		}
 	}
-	return nil
+
+	err = errors.New(fmt.Sprintf("remote %s is not available in the repo", e.remoteName))
+	return err
 }
 
-func NewEditRemote(repo *git2go.Repository, remoteName string, remoteURL string, validation Validation) Edit {
+func NewEditRemote(repo *git2go.Repository, remoteName string, remoteURL string) Edit {
 	return editRemote{
 		repo:       repo,
 		remoteName: remoteName,
 		remoteURL:  remoteURL,
-		validate:   validation,
 	}
 }

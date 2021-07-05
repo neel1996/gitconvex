@@ -1,7 +1,6 @@
 package branch
 
 import (
-	"errors"
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/global"
@@ -54,12 +53,9 @@ func (a addBranch) AddBranch() error {
 }
 
 func (a addBranch) validateAddBranchFields() error {
-	if a.repo == nil {
-		return errors.New("repo is nil")
-	}
-
-	if a.branchName == "" {
-		return errors.New("branch name is empty")
+	err := NewBranchFieldsValidation(a.repo, a.branchName).ValidateBranchFields()
+	if err != nil {
+		return err
 	}
 	return nil
 }

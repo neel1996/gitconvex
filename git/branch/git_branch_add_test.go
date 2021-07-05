@@ -5,13 +5,16 @@ import (
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/stretchr/testify/suite"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
 type BranchAddTestSuite struct {
 	suite.Suite
-	repo      *git2go.Repository
-	branchAdd Add
+	repo       *git2go.Repository
+	noHeadRepo *git2go.Repository
+	branchName string
+	branchAdd  Add
 }
 
 func TestBranchAddTestSuite(t *testing.T) {
@@ -23,13 +26,18 @@ func (suite *BranchAddTestSuite) SetupTest() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	noHeadPath := os.Getenv("GITCONVEX_TEST_REPO") + string(filepath.Separator) + "no_head"
+	noHeadRepo, _ := git2go.OpenRepository(noHeadPath)
+
 	suite.repo = r
-	suite.branchAdd = NewAddBranch(suite.repo, "test_1", false, nil)
+	suite.noHeadRepo = noHeadRepo
+	suite.branchName = "test_1"
+	suite.branchAdd = NewAddBranch(suite.repo, suite.branchName, false, nil)
 }
 
-func (suite *BranchAddTestSuite) TearDownTest() {
+func (suite *BranchAddTestSuite) TearDownSuite() {
 	r, _ := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	NewDeleteBranch(r, "test_1").DeleteBranch()
+	_ = NewDeleteBranch(r, suite.branchName).DeleteBranch()
 }
 
 func (suite *BranchAddTestSuite) TestAddBranch_WhenBranchAdditionSucceeds_ShouldReturnNil() {
@@ -46,8 +54,14 @@ func (suite *BranchAddTestSuite) TestAddBranch_WhenRepoIsNil_ShouldReturnError()
 }
 
 func (suite *BranchAddTestSuite) TestAddBranch_WhenBranchNameIsEmpty_ShouldReturnError() {
-	r, _ := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	suite.branchAdd = NewAddBranch(r, "", false, nil)
+	suite.branchAdd = NewAddBranch(suite.repo, "", false, nil)
+	branchAddError := suite.branchAdd.AddBranch()
+
+	suite.NotNil(branchAddError)
+}
+
+func (suite *BranchAddTestSuite) TestAddBranch_WhenHeadIsNil_ShouldReturnError() {
+	suite.branchAdd = NewAddBranch(suite.noHeadRepo, suite.branchName, false, nil)
 	branchAddError := suite.branchAdd.AddBranch()
 
 	suite.NotNil(branchAddError)
@@ -55,7 +69,7 @@ func (suite *BranchAddTestSuite) TestAddBranch_WhenBranchNameIsEmpty_ShouldRetur
 
 func (suite *BranchAddTestSuite) TestAddBranch_WhenBranchAdditionFails_ShouldReturnError() {
 	r, _ := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	suite.branchAdd = NewAddBranch(r, "test_1", false, nil)
+	suite.branchAdd = NewAddBranch(r, "master", false, nil)
 
 	//Adding duplicate branches
 	_ = suite.branchAdd.AddBranch()

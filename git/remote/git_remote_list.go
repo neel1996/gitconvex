@@ -12,15 +12,14 @@ type List interface {
 }
 
 type listRemotes struct {
-	repo     *git2go.Repository
-	validate Validation
+	repo *git2go.Repository
 }
 
 func (l listRemotes) GetAllRemotes() []*model.RemoteDetails {
 	var remoteList []*model.RemoteDetails
 	repo := l.repo
 
-	if validationErr := l.validate.ValidateRemoteFields(repo); validationErr != nil {
+	if validationErr := NewRemoteValidation(repo).ValidateRemoteFields(); validationErr != nil {
 		logger.Log(validationErr.Error(), global.StatusError)
 		return nil
 	}
@@ -55,6 +54,6 @@ func (l listRemotes) GetAllRemotes() []*model.RemoteDetails {
 	return remoteList
 }
 
-func NewRemoteList(repo *git2go.Repository, validation Validation) List {
-	return listRemotes{repo: repo, validate: validation}
+func NewRemoteList(repo *git2go.Repository) List {
+	return listRemotes{repo: repo}
 }

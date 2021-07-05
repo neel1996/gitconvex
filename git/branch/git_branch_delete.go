@@ -4,11 +4,10 @@ import (
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/global"
-	"github.com/neel1996/gitconvex/graph/model"
 )
 
 type Delete interface {
-	DeleteBranch() *model.BranchDeleteStatus
+	DeleteBranch() error
 }
 
 type deleteBranch struct {
@@ -17,26 +16,30 @@ type deleteBranch struct {
 }
 
 // DeleteBranch deletes a branch from the repo
-func (inputs deleteBranch) DeleteBranch() *model.BranchDeleteStatus {
-	repo := inputs.repo
-	branchName := inputs.branchName
-	branch, deleteBranchErr := repo.LookupBranch(branchName, git2go.BranchLocal)
+func (d deleteBranch) DeleteBranch() error {
+	repo := d.repo
+	branchName := d.branchName
 
+	validationErr := NewBranchFieldsValidation(repo, branchName).ValidateBranchFields()
+	if validationErr != nil {
+		logger.Log(validationErr.Error(), global.StatusError)
+		return validationErr
+	}
+
+	branch, deleteBranchErr := repo.LookupBranch(branchName, git2go.BranchLocal)
 	if deleteBranchErr != nil {
 		logger.Log(fmt.Sprintf("Failed to delete branch %s -> %v", branchName, deleteBranchErr.Error()), global.StatusError)
-		return &model.BranchDeleteStatus{Status: global.BranchDeleteError}
+		return deleteBranchErr
 	}
 
 	deleteErr := branch.Delete()
 	if deleteErr != nil {
 		logger.Log(fmt.Sprintf("Failed to delete branch %s -> %v", branchName, deleteErr.Error()), global.StatusError)
-		return &model.BranchDeleteStatus{Status: global.BranchDeleteError}
+		return deleteErr
 	}
 
 	logger.Log(fmt.Sprintf("Branch - %s has been removed from the repo", branchName), global.StatusInfo)
-	return &model.BranchDeleteStatus{
-		Status: global.BranchDeleteSuccess,
-	}
+	return nil
 }
 
 func NewDeleteBranch(repo *git2go.Repository, branchName string) Delete {

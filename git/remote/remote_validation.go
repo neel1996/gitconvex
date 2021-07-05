@@ -6,16 +6,15 @@ import (
 )
 
 type Validation interface {
-	ValidateRemoteFields(*git2go.Repository) error
+	ValidateRemoteFields() error
 }
 
 type validation struct {
-	repo *git2go.Repository
+	repo         *git2go.Repository
+	remoteFields []string
 }
 
-func (v validation) ValidateRemoteFields(repository *git2go.Repository) error {
-	v.repo = repository
-
+func (v validation) ValidateRemoteFields() error {
 	validateRepoErr := v.validateRepo()
 	if validateRepoErr != nil {
 		return validateRepoErr
@@ -26,6 +25,20 @@ func (v validation) ValidateRemoteFields(repository *git2go.Repository) error {
 		return validateRemotesErr
 	}
 
+	fieldValidationErr := v.validateRemoteFields()
+	if fieldValidationErr != nil {
+		return fieldValidationErr
+	}
+
+	return nil
+}
+
+func (v validation) validateRemoteFields() error {
+	for _, field := range v.remoteFields {
+		if field == "" {
+			return errors.New("one or more remote fields are empty")
+		}
+	}
 	return nil
 }
 
@@ -45,6 +58,9 @@ func (v validation) validateRemoteCollection() error {
 	return nil
 }
 
-func NewRemoteValidation() Validation {
-	return validation{}
+func NewRemoteValidation(repo *git2go.Repository, remoteFields ...string) Validation {
+	return validation{
+		repo:         repo,
+		remoteFields: remoteFields,
+	}
 }

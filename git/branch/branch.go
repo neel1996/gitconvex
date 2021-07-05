@@ -12,7 +12,7 @@ type Branch interface {
 	GitAddBranch() (string, error)
 	GitCheckoutBranch() (string, error)
 	GitCompareBranches() ([]*model.BranchCompareResults, error)
-	GitListBranches(chan ListOfBranches)
+	GitListBranches() (model.ListOfBranches, error)
 }
 
 type Operation struct {
@@ -54,16 +54,20 @@ func (b Operation) GitCompareBranches() ([]*model.BranchCompareResults, error) {
 }
 
 func (b Operation) GitDeleteBranch() (*model.BranchDeleteStatus, error) {
-	deleteStatus := b.Delete.DeleteBranch()
+	err := b.Delete.DeleteBranch()
 
-	if deleteStatus.Status == global.BranchDeleteError {
-		return nil, errors.New("branch deletion failed")
+	if err != nil {
+		return &model.BranchDeleteStatus{Status: global.BranchDeleteError}, err
 	}
 
-	return deleteStatus, nil
+	return &model.BranchDeleteStatus{Status: global.BranchDeleteSuccess}, nil
 }
 
-func (b Operation) GitListBranches(branchChannel chan ListOfBranches) {
-	b.List.ListBranches(branchChannel)
-}
+func (b Operation) GitListBranches() (model.ListOfBranches, error) {
+	listOfBranches, err := b.List.ListBranches()
+	if err != nil {
+		return model.ListOfBranches{}, err
+	}
 
+	return listOfBranches, nil
+}

@@ -10,8 +10,7 @@ type ListRemoteUrl interface {
 }
 
 type listRemoteUrl struct {
-	repo       *git2go.Repository
-	validation Validation
+	repo *git2go.Repository
 }
 
 func (u listRemoteUrl) GetAllRemoteUrl() []*string {
@@ -19,23 +18,19 @@ func (u listRemoteUrl) GetAllRemoteUrl() []*string {
 
 	repo := u.repo
 
-	if validationErr := u.validation.ValidateRemoteFields(repo); validationErr != nil {
+	if validationErr := NewRemoteValidation(repo).ValidateRemoteFields(); validationErr != nil {
 		logger.Log(validationErr.Error(), global.StatusError)
 		return nil
 	}
 
-	remotes, listErr := repo.Remotes.List()
-	if listErr != nil {
-		logger.Log(listErr.Error(), global.StatusError)
+	remoteList := NewRemoteList(u.repo).GetAllRemotes()
+	if remoteList == nil {
+		logger.Log("repo has no remotes", global.StatusError)
 		return nil
 	}
 
-	for _, remoteName := range remotes {
-		remote, _ := repo.Remotes.Lookup(remoteName)
-		if remote != nil {
-			url := remote.Url()
-			remoteURL = append(remoteURL, &url)
-		}
+	for _, remote := range remoteList {
+		remoteURL = append(remoteURL, &remote.RemoteURL)
 	}
 
 	if len(remoteURL) == 0 {
@@ -46,6 +41,6 @@ func (u listRemoteUrl) GetAllRemoteUrl() []*string {
 	return remoteURL
 }
 
-func NewRemoteUrlData(repo *git2go.Repository, validation Validation) ListRemoteUrl {
-	return listRemoteUrl{repo: repo, validation: validation}
+func NewRemoteUrlData(repo *git2go.Repository) ListRemoteUrl {
+	return listRemoteUrl{repo: repo}
 }

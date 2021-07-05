@@ -18,3 +18,9 @@ type NewRepoInputs struct {
 	UserName    *string
 	Password    *string
 }
+
+type ListOfBranches struct {
+	CurrentBranch string
+	BranchList    []string
+	AllBranchList []string
+}

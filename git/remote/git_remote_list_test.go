@@ -1,23 +1,33 @@
 package remote
 
 import (
+	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/graph/model"
 	"github.com/stretchr/testify/suite"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
 type ListRemoteTestSuite struct {
 	suite.Suite
+	repo       *git2go.Repository
+	noHeadRepo *git2go.Repository
 	listRemote List
-	validate   Validation
 }
 
 func (suite *ListRemoteTestSuite) SetupTest() {
-	r, _ := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	suite.validate = NewRemoteValidation()
-	suite.listRemote = NewRemoteList(r, suite.validate)
+	r, err := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
+	if err != nil {
+		fmt.Println(err)
+	}
+	noHeadPath := os.Getenv("GITCONVEX_TEST_REPO") + string(filepath.Separator) + "no_head"
+	noHeadRepo, _ := git2go.OpenRepository(noHeadPath)
+
+	suite.repo = r
+	suite.noHeadRepo = noHeadRepo
+	suite.listRemote = NewRemoteList(suite.repo)
 }
 
 func TestListRemoteTestSuite(t *testing.T) {
@@ -38,7 +48,7 @@ func (suite *ListRemoteTestSuite) TestGetAllRemotes_WhenRepoIsValid_ShouldReturn
 }
 
 func (suite *ListRemoteTestSuite) TestGetAllRemotes_WhenRepoIsNil_ShouldReturnNil() {
-	suite.listRemote = NewRemoteList(nil, suite.validate)
+	suite.listRemote = NewRemoteList(nil)
 
 	remoteList := suite.listRemote.GetAllRemotes()
 
@@ -46,11 +56,7 @@ func (suite *ListRemoteTestSuite) TestGetAllRemotes_WhenRepoIsNil_ShouldReturnNi
 }
 
 func (suite *ListRemoteTestSuite) TestGetAllRemotes_WhenRepoHasNoRemotes_ShouldReturnNil() {
-	r := &git2go.Repository{
-		Remotes: git2go.RemoteCollection{},
-	}
-
-	suite.listRemote = NewRemoteList(r, suite.validate)
+	suite.listRemote = NewRemoteList(suite.noHeadRepo)
 
 	remoteList := suite.listRemote.GetAllRemotes()
 

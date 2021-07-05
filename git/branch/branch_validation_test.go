@@ -10,9 +10,9 @@ import (
 
 type BranchFieldValidationTestSuite struct {
 	suite.Suite
-	repo       *git2go.Repository
-	branchName string
-	validation Validation
+	repo        *git2go.Repository
+	branchNames []string
+	validation  Validation
 }
 
 func TestBranchFieldValidationTestSuite(t *testing.T) {
@@ -26,8 +26,8 @@ func (suite *BranchFieldValidationTestSuite) SetupTest() {
 	}
 
 	suite.repo = r
-	suite.branchName = "test_branch"
-	suite.validation = NewBranchFieldsValidation(suite.repo, suite.branchName)
+	suite.branchNames = []string{"test_branch_1", "test_branch_2"}
+	suite.validation = NewBranchFieldsValidation(suite.repo, suite.branchNames[0], suite.branchNames[1])
 }
 
 func (suite *BranchFieldValidationTestSuite) TestValidateBranchFields_WhenAllFieldsAreValid_ShouldReturnNil() {
@@ -45,7 +45,7 @@ func (suite *BranchFieldValidationTestSuite) TestValidateBranchFields_WhenRepoIs
 }
 
 func (suite *BranchFieldValidationTestSuite) TestValidateBranchFields_WhenBranchNameIsEmpty_ShouldReturnError() {
-	suite.validation = NewBranchFieldsValidation(suite.repo, "")
+	suite.validation = NewBranchFieldsValidation(suite.repo, "", "")
 	err := suite.validation.ValidateBranchFields()
 
 	suite.NotNil(err)

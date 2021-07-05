@@ -11,7 +11,7 @@ type Validation interface {
 
 type validateBranch struct {
 	repo       *git2go.Repository
-	branchName string
+	branchName []string
 }
 
 func (v validateBranch) ValidateBranchFields() error {
@@ -20,15 +20,17 @@ func (v validateBranch) ValidateBranchFields() error {
 		return errors.New(err)
 	}
 
-	if v.branchName == "" {
-		err := "branch name is empty"
-		return errors.New(err)
+	for _, branchName := range v.branchName {
+		if branchName == "" {
+			err := "branch name is empty"
+			return errors.New(err)
+		}
 	}
 
 	return nil
 }
 
-func NewBranchFieldsValidation(repo *git2go.Repository, branchName string) Validation {
+func NewBranchFieldsValidation(repo *git2go.Repository, branchName ...string) Validation {
 	return validateBranch{
 		repo:       repo,
 		branchName: branchName,

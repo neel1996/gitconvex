@@ -1,0 +1,18 @@
+version: "3.3"
+
+networks:
+  gitconvex-test-network:
+
+services:
+  gitconvex-test:
+    build:
+      context: .
+      dockerfile: Test.Dockerfile
+    environment:
+      - GITCONVEX_TEST_REPO=/home/gitconvex/gitconvex-test
+      - GITCONVEX_DEFAULT_PATH=/home/gitconvex/gitconvex-test
+    networks:
+      - gitconvex-test-network
+    volumes:
+      - ./:/home/gitconvex
+    command: [ "make","test-ci" ]

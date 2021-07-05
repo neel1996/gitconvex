@@ -1,6 +1,7 @@
 package branch
 
 import (
+	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/model"
@@ -33,11 +34,15 @@ func (b branchCompare) CompareBranch() []*model.BranchCompareResults {
 	var filteredCommits []model.GitCommits
 	repo := b.repo
 
+	if err := NewBranchFieldsValidation(repo, b.baseBranch, b.diffBranch).ValidateBranchFields(); err != nil {
+		return returnBranchCompareError(err.Error())
+	}
+
 	baseBranch, baseBranchErr := repo.LookupBranch(b.baseBranch, git2go.BranchLocal)
 	compareBranch, compareBranchErr := repo.LookupBranch(b.diffBranch, git2go.BranchLocal)
 
 	if baseBranchErr != nil || compareBranchErr != nil {
-		return returnBranchCompareError("Unable to lookup target branches from the repo")
+		return returnBranchCompareError(fmt.Sprintf("Unable to lookup target branches from the repo : %v %v", baseBranchErr, compareBranchErr))
 	}
 
 	compareResult := baseBranch.Cmp(compareBranch.Reference)

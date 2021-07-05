@@ -11,6 +11,7 @@ import (
 type RemoteValidationTestSuite struct {
 	suite.Suite
 	repo                 *git2go.Repository
+	remoteFields         []string
 	validateRemoteFields Validation
 }
 
@@ -23,12 +24,14 @@ func (suite *RemoteValidationTestSuite) SetupTest() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	suite.remoteFields = []string{"origin", "origin_1"}
 	suite.repo = r
-	suite.validateRemoteFields = NewRemoteValidation()
+	suite.validateRemoteFields = NewRemoteValidation(suite.repo, suite.remoteFields[0], suite.remoteFields[1])
 }
 
 func (suite *RemoteValidationTestSuite) TestValidateRemoteFields_WhenAllFieldsAreValid_ShouldReturnNil() {
-	wantErr := suite.validateRemoteFields.ValidateRemoteFields(suite.repo)
+	wantErr := suite.validateRemoteFields.ValidateRemoteFields()
 
 	fmt.Println(wantErr)
 
@@ -36,7 +39,8 @@ func (suite *RemoteValidationTestSuite) TestValidateRemoteFields_WhenAllFieldsAr
 }
 
 func (suite *RemoteValidationTestSuite) TestValidateRemoteFields_WhenRepoIsNil_ShouldReturnError() {
-	wantErr := suite.validateRemoteFields.ValidateRemoteFields(nil)
+	suite.validateRemoteFields = NewRemoteValidation(nil)
+	wantErr := suite.validateRemoteFields.ValidateRemoteFields()
 	wantErrorText := "repo is nil"
 
 	suite.NotNil(wantErr)
@@ -44,10 +48,20 @@ func (suite *RemoteValidationTestSuite) TestValidateRemoteFields_WhenRepoIsNil_S
 }
 
 func (suite *RemoteValidationTestSuite) TestValidateRemoteFields_WhenRemoteCollectionIsNil_ShouldReturnError() {
-	wantErr := suite.validateRemoteFields.ValidateRemoteFields(&git2go.Repository{
+	suite.validateRemoteFields = NewRemoteValidation(&git2go.Repository{
 		Remotes: git2go.RemoteCollection{},
 	})
+	wantErr := suite.validateRemoteFields.ValidateRemoteFields()
 	wantErrorText := "remote collection is nil"
+
+	suite.NotNil(wantErr)
+	suite.Equal(wantErrorText, wantErr.Error())
+}
+
+func (suite *RemoteValidationTestSuite) TestValidateRemoteFields_WhenRemoteFieldsAreEmpty_ShouldReturnError() {
+	suite.validateRemoteFields = NewRemoteValidation(suite.repo, "", "")
+	wantErr := suite.validateRemoteFields.ValidateRemoteFields()
+	wantErrorText := "one or more remote fields are empty"
 
 	suite.NotNil(wantErr)
 	suite.Equal(wantErrorText, wantErr.Error())

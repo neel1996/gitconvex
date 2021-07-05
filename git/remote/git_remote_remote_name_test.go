@@ -5,6 +5,7 @@ import (
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/stretchr/testify/suite"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ type GetRemoteNameTestSuite struct {
 	suite.Suite
 	getRemoteName Name
 	repo          *git2go.Repository
-	validation    Validation
+	noHeadRepo    *git2go.Repository
 }
 
 func (suite *GetRemoteNameTestSuite) SetupTest() {
@@ -20,8 +21,12 @@ func (suite *GetRemoteNameTestSuite) SetupTest() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	suite.validation = NewRemoteValidation()
-	suite.getRemoteName = NewGetRemoteName(r, "https://github.com/neel1996/gitconvex-test.git", suite.validation)
+	noHeadPath := os.Getenv("GITCONVEX_TEST_REPO") + string(filepath.Separator) + "no_head"
+	noHeadRepo, _ := git2go.OpenRepository(noHeadPath)
+
+	suite.repo = r
+	suite.noHeadRepo = noHeadRepo
+	suite.getRemoteName = NewGetRemoteName(suite.repo, "https://github.com/neel1996/gitconvex-test.git")
 }
 
 func TestGetRemoteNameTestSuite(t *testing.T) {
@@ -38,7 +43,16 @@ func (suite *GetRemoteNameTestSuite) TestGetRemoteName_ShouldReturnRemoteName_Wh
 
 func (suite *GetRemoteNameTestSuite) TestGetRemoteName_ShouldReturnEmptyString_WhenRepoIsNil() {
 	expectedRemote := ""
-	getRemoteName := NewGetRemoteName(nil, "https://github.com/neel1996/gitconvex-test.git", suite.validation)
+	getRemoteName := NewGetRemoteName(nil, "https://github.com/neel1996/gitconvex-test.git")
+
+	actualRemote := getRemoteName.GetRemoteNameWithUrl()
+
+	suite.Equal(expectedRemote, actualRemote)
+}
+
+func (suite *GetRemoteNameTestSuite) TestGetRemoteName_ShouldReturnEmptyString_WhenRepoHasNoRemotes() {
+	expectedRemote := ""
+	getRemoteName := NewGetRemoteName(suite.noHeadRepo, "https://github.com/neel1996/gitconvex-test.git")
 
 	actualRemote := getRemoteName.GetRemoteNameWithUrl()
 
