@@ -10,7 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 )
 
 type BranchCompareTestSuite struct {
@@ -68,27 +67,13 @@ func (suite *BranchCompareTestSuite) TearDownSuite() {
 func (suite *BranchCompareTestSuite) TestCompareBranch_WhenBranchesHaveDifferentCommits_ShouldReturnDifference() {
 	compareResults := suite.branchCompare.CompareBranch()
 
-	currentTime := time.Now()
-	timeString := time.Date(
-		currentTime.Year(),
-		currentTime.Month(),
-		currentTime.Day(),
-		0,
-		0,
-		0,
-		0,
-		time.UTC,
-	).String()
-
-	fmt.Println(compareResults)
-
 	suite.NotNil(compareResults)
 	suite.NotZero(len(compareResults))
 	suite.NotZero(len(compareResults[0].Commits))
 
 	suite.NotNil(*compareResults[0].Commits[0])
 	suite.NotEmpty(*compareResults[0].Commits[0].CommitMessage)
-	suite.Contains(timeString, compareResults[0].Date)
+	suite.NotEmpty(compareResults[0].Date)
 	suite.Equal(1, len(compareResults[0].Commits))
 }
 
