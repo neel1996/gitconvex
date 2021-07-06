@@ -80,6 +80,8 @@ func (suite *BranchCompareTestSuite) TestCompareBranch_WhenBranchesHaveDifferent
 		time.UTC,
 	).String()
 
+	fmt.Println(compareResults)
+
 	suite.NotNil(compareResults)
 	suite.NotZero(len(compareResults))
 	suite.NotZero(len(compareResults[0].Commits))

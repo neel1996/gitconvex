@@ -58,6 +58,7 @@ test-ci: git-testuser-setup
     rm -rf $$GITCONVEX_TEST_REPO
 
 dockerise-test:
+	rm -rf $$GITCONVEX_TEST_REPO && \
 	docker-compose -f docker-compose.test.yaml up
 
 show-coverage:
