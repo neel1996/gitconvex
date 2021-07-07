@@ -66,6 +66,8 @@ Following the above steps will make `libgit2` available as a shared library for 
 
 #### For Linux (tested on Ubuntu 20.04)
 
+>If you have brew installed on your linux machine then you can follow the same instructions [mentioned below for MacOS](#for-macos) to setup libgit2 
+
 Make sure you have the following packages installed on your system
 
 - [cmake](https://cmake.org/download/)
@@ -73,7 +75,7 @@ Make sure you have the following packages installed on your system
 - [wget](https://www.gnu.org/software/wget/)
 - [gcc](https://gcc.gnu.org/)
 
-Make sure you have required rights for running the following commands. If any of these fail due to access errors, then
+Make sure you have required rights for running the following commands. If any of these fail due to access errors then
 try with `sudo`
 
 ```shell
@@ -110,11 +112,12 @@ The dependencies required to build and run gitconvex are readily available from 
 
 Download and setup [brew](https://brew.sh/) to install all the required packages
 
-- [libgit2](https://formulae.brew.sh/formula/libgit2)
-  ```shell
-  brew install libgit2
-  ```
 - [libssh2](https://formulae.brew.sh/formula/libssh2)
   ```shell
   brew install libssh2
+  ```
+  
+- [libgit2](https://formulae.brew.sh/formula/libgit2)
+  ```shell
+  brew install libgit2
   ```
