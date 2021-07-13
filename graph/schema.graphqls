@@ -436,7 +436,7 @@ type Mutation {
         "The UUID of the repo. It will be available in the JSON data file"
         repoId: String!,
         "The message for the commit"
-        commitMessage: String!
+        commitMessage: [String]!
     ): String!
 
     "Pushes the commits to the remote"

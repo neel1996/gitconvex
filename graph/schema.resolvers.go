@@ -5,15 +5,17 @@ package graph
 
 import (
 	"context"
-	"github.com/neel1996/gitconvex/git/branch"
-	"github.com/neel1996/gitconvex/git/remote"
-	"github.com/neel1996/gitconvex/init"
+	"github.com/neel1996/gitconvex/utils"
 
 	"github.com/neel1996/gitconvex/api"
 	"github.com/neel1996/gitconvex/git"
+	"github.com/neel1996/gitconvex/git/branch"
+	"github.com/neel1996/gitconvex/git/commit"
+	"github.com/neel1996/gitconvex/git/remote"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/generated"
 	"github.com/neel1996/gitconvex/graph/model"
+	initialize "github.com/neel1996/gitconvex/init"
 )
 
 func (r *mutationResolver) AddRepo(ctx context.Context, repoName string, repoPath string, cloneSwitch bool, repoURL *string, initSwitch bool, authOption string, sshKeyPath *string, userName *string, password *string) (*model.AddRepoParams, error) {
@@ -245,7 +247,7 @@ func (r *mutationResolver) StageAllItems(ctx context.Context, repoID string) (st
 	return stageAllObject.StageAllItems(), nil
 }
 
-func (r *mutationResolver) CommitChanges(ctx context.Context, repoID string, commitMessage string) (string, error) {
+func (r *mutationResolver) CommitChanges(ctx context.Context, repoID string, commitMessage []*string) (string, error) {
 	logger.Log("Initiating commit changes request", global.StatusInfo)
 
 	repoChan := make(chan git.RepoDetails)
@@ -254,14 +256,10 @@ func (r *mutationResolver) CommitChanges(ctx context.Context, repoID string, com
 	go repoObject.Repo(repoChan)
 	repo := <-repoChan
 
-	var commitObject git.CommitInterface
-	commitObject = git.CommitStruct{
-		Repo:          repo.GitRepo,
-		CommitMessage: commitMessage,
-		RepoPath:      repo.RepoPath,
-	}
+	commitChanges := commit.NewCommitChanges(repo.GitRepo, utils.GenerateNonPointerArrayFrom(commitMessage))
+	commitOperation := commit.Operation{Changes: commitChanges}
 
-	return commitObject.CommitChanges(), nil
+	return commitOperation.GitCommitChange()
 }
 
 func (r *mutationResolver) PushToRemote(ctx context.Context, repoID string, remoteHost string, branch string) (string, error) {
@@ -710,4 +708,10 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
 var logger global.Logger

@@ -97,7 +97,7 @@ type ComplexityRoot struct {
 		AddRemote           func(childComplexity int, repoID string, remoteName string, remoteURL string) int
 		AddRepo             func(childComplexity int, repoName string, repoPath string, cloneSwitch bool, repoURL *string, initSwitch bool, authOption string, sshKeyPath *string, userName *string, password *string) int
 		CheckoutBranch      func(childComplexity int, repoID string, branchName string) int
-		CommitChanges       func(childComplexity int, repoID string, commitMessage string) int
+		CommitChanges       func(childComplexity int, repoID string, commitMessage []*string) int
 		DeleteBranch        func(childComplexity int, repoID string, branchName string, forceFlag bool) int
 		DeleteRemote        func(childComplexity int, repoID string, remoteName string) int
 		DeleteRepo          func(childComplexity int, repoID string) int
@@ -206,7 +206,7 @@ type MutationResolver interface {
 	RemoveStagedItem(ctx context.Context, repoID string, item string) (string, error)
 	RemoveAllStagedItem(ctx context.Context, repoID string) (string, error)
 	StageAllItems(ctx context.Context, repoID string) (string, error)
-	CommitChanges(ctx context.Context, repoID string, commitMessage string) (string, error)
+	CommitChanges(ctx context.Context, repoID string, commitMessage []*string) (string, error)
 	PushToRemote(ctx context.Context, repoID string, remoteHost string, branch string) (string, error)
 	SettingsEditPort(ctx context.Context, newPort string) (string, error)
 	UpdateRepoDataFile(ctx context.Context, newDbFile string) (string, error)
@@ -482,7 +482,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CommitChanges(childComplexity, args["repoId"].(string), args["commitMessage"].(string)), true
+		return e.complexity.Mutation.CommitChanges(childComplexity, args["repoId"].(string), args["commitMessage"].([]*string)), true
 
 	case "Mutation.deleteBranch":
 		if e.complexity.Mutation.DeleteBranch == nil {
@@ -1501,7 +1501,7 @@ type Mutation {
         "The UUID of the repo. It will be available in the JSON data file"
         repoId: String!,
         "The message for the commit"
-        commitMessage: String!
+        commitMessage: [String]!
     ): String!
 
     "Pushes the commits to the remote"
@@ -1756,10 +1756,10 @@ func (ec *executionContext) field_Mutation_commitChanges_args(ctx context.Contex
 		}
 	}
 	args["repoId"] = arg0
-	var arg1 string
+	var arg1 []*string
 	if tmp, ok := rawArgs["commitMessage"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commitMessage"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		arg1, err = ec.unmarshalNString2ᚕᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2865,7 +2865,7 @@ func (ec *executionContext) _GitCommitLogResults_commits(ctx context.Context, fi
 	}
 	res := resTmp.([]*model.GitCommits)
 	fc.Result = res
-	return ec.marshalOgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
+	return ec.marshalOgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GitFolderContentResults_trackedFiles(ctx context.Context, field graphql.CollectedField, obj *model.GitFolderContentResults) (ret graphql.Marshaler) {
@@ -3335,7 +3335,7 @@ func (ec *executionContext) _Mutation_addRepo(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.AddRepoParams)
 	fc.Result = res
-	return ec.marshalNAddRepoParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐAddRepoParams(ctx, field.Selections, res)
+	return ec.marshalNAddRepoParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐAddRepoParams(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_addBranch(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3461,7 +3461,7 @@ func (ec *executionContext) _Mutation_deleteBranch(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.BranchDeleteStatus)
 	fc.Result = res
-	return ec.marshalNBranchDeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐBranchDeleteStatus(ctx, field.Selections, res)
+	return ec.marshalNBranchDeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐBranchDeleteStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_fetchFromRemote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3503,7 +3503,7 @@ func (ec *executionContext) _Mutation_fetchFromRemote(ctx context.Context, field
 	}
 	res := resTmp.(*model.FetchResult)
 	fc.Result = res
-	return ec.marshalNFetchResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐFetchResult(ctx, field.Selections, res)
+	return ec.marshalNFetchResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐFetchResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_pullFromRemote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3545,7 +3545,7 @@ func (ec *executionContext) _Mutation_pullFromRemote(ctx context.Context, field 
 	}
 	res := resTmp.(*model.PullResult)
 	fc.Result = res
-	return ec.marshalNPullResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐPullResult(ctx, field.Selections, res)
+	return ec.marshalNPullResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐPullResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_stageItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3741,7 +3741,7 @@ func (ec *executionContext) _Mutation_commitChanges(ctx context.Context, field g
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CommitChanges(rctx, args["repoId"].(string), args["commitMessage"].(string))
+		return ec.resolvers.Mutation().CommitChanges(rctx, args["repoId"].(string), args["commitMessage"].([]*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3923,7 +3923,7 @@ func (ec *executionContext) _Mutation_deleteRepo(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.DeleteStatus)
 	fc.Result = res
-	return ec.marshalNdeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐDeleteStatus(ctx, field.Selections, res)
+	return ec.marshalNdeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐDeleteStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateRepoName(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4007,7 +4007,7 @@ func (ec *executionContext) _Mutation_addRemote(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.RemoteMutationResult)
 	fc.Result = res
-	return ec.marshalNremoteMutationResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐRemoteMutationResult(ctx, field.Selections, res)
+	return ec.marshalNremoteMutationResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐRemoteMutationResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteRemote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4049,7 +4049,7 @@ func (ec *executionContext) _Mutation_deleteRemote(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.RemoteMutationResult)
 	fc.Result = res
-	return ec.marshalNremoteMutationResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐRemoteMutationResult(ctx, field.Selections, res)
+	return ec.marshalNremoteMutationResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐRemoteMutationResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_editRemote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4091,7 +4091,7 @@ func (ec *executionContext) _Mutation_editRemote(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.RemoteMutationResult)
 	fc.Result = res
-	return ec.marshalNremoteMutationResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐRemoteMutationResult(ctx, field.Selections, res)
+	return ec.marshalNremoteMutationResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐRemoteMutationResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PullResult_status(ctx context.Context, field graphql.CollectedField, obj *model.PullResult) (ret graphql.Marshaler) {
@@ -4196,7 +4196,7 @@ func (ec *executionContext) _Query_healthCheck(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.HealthCheckParams)
 	fc.Result = res
-	return ec.marshalNHealthCheckParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐHealthCheckParams(ctx, field.Selections, res)
+	return ec.marshalNHealthCheckParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐHealthCheckParams(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_fetchRepo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4231,7 +4231,7 @@ func (ec *executionContext) _Query_fetchRepo(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.FetchRepoParams)
 	fc.Result = res
-	return ec.marshalNFetchRepoParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐFetchRepoParams(ctx, field.Selections, res)
+	return ec.marshalNFetchRepoParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐFetchRepoParams(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_gitRepoStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4273,7 +4273,7 @@ func (ec *executionContext) _Query_gitRepoStatus(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.GitRepoStatusResults)
 	fc.Result = res
-	return ec.marshalNGitRepoStatusResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitRepoStatusResults(ctx, field.Selections, res)
+	return ec.marshalNGitRepoStatusResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitRepoStatusResults(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_gitFolderContent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4315,7 +4315,7 @@ func (ec *executionContext) _Query_gitFolderContent(ctx context.Context, field g
 	}
 	res := resTmp.(*model.GitFolderContentResults)
 	fc.Result = res
-	return ec.marshalNGitFolderContentResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitFolderContentResults(ctx, field.Selections, res)
+	return ec.marshalNGitFolderContentResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitFolderContentResults(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_gitCommitLogs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4357,7 +4357,7 @@ func (ec *executionContext) _Query_gitCommitLogs(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.GitCommitLogResults)
 	fc.Result = res
-	return ec.marshalNGitCommitLogResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitLogResults(ctx, field.Selections, res)
+	return ec.marshalNGitCommitLogResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommitLogResults(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_gitCommitFiles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4399,7 +4399,7 @@ func (ec *executionContext) _Query_gitCommitFiles(ctx context.Context, field gra
 	}
 	res := resTmp.([]*model.GitCommitFileResult)
 	fc.Result = res
-	return ec.marshalNgitCommitFileResult2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitFileResult(ctx, field.Selections, res)
+	return ec.marshalNgitCommitFileResult2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommitFileResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_searchCommitLogs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4441,7 +4441,7 @@ func (ec *executionContext) _Query_searchCommitLogs(ctx context.Context, field g
 	}
 	res := resTmp.([]*model.GitCommits)
 	fc.Result = res
-	return ec.marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
+	return ec.marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_codeFileDetails(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4483,7 +4483,7 @@ func (ec *executionContext) _Query_codeFileDetails(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.CodeFileType)
 	fc.Result = res
-	return ec.marshalNcodeFileType2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐCodeFileType(ctx, field.Selections, res)
+	return ec.marshalNcodeFileType2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐCodeFileType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_gitChanges(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4525,7 +4525,7 @@ func (ec *executionContext) _Query_gitChanges(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.GitChangeResults)
 	fc.Result = res
-	return ec.marshalNgitChangeResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitChangeResults(ctx, field.Selections, res)
+	return ec.marshalNgitChangeResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitChangeResults(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_gitUnPushedCommits(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4567,7 +4567,7 @@ func (ec *executionContext) _Query_gitUnPushedCommits(ctx context.Context, field
 	}
 	res := resTmp.(*model.UnPushedCommitResult)
 	fc.Result = res
-	return ec.marshalNUnPushedCommitResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐUnPushedCommitResult(ctx, field.Selections, res)
+	return ec.marshalNUnPushedCommitResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐUnPushedCommitResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_gitFileLineChanges(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4609,7 +4609,7 @@ func (ec *executionContext) _Query_gitFileLineChanges(ctx context.Context, field
 	}
 	res := resTmp.(*model.FileLineChangeResult)
 	fc.Result = res
-	return ec.marshalNfileLineChangeResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐFileLineChangeResult(ctx, field.Selections, res)
+	return ec.marshalNfileLineChangeResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐFileLineChangeResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_settingsData(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4644,7 +4644,7 @@ func (ec *executionContext) _Query_settingsData(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.SettingsDataResults)
 	fc.Result = res
-	return ec.marshalNsettingsDataResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐSettingsDataResults(ctx, field.Selections, res)
+	return ec.marshalNsettingsDataResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐSettingsDataResults(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_commitCompare(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4686,7 +4686,7 @@ func (ec *executionContext) _Query_commitCompare(ctx context.Context, field grap
 	}
 	res := resTmp.([]*model.GitCommitFileResult)
 	fc.Result = res
-	return ec.marshalNgitCommitFileResult2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitFileResult(ctx, field.Selections, res)
+	return ec.marshalNgitCommitFileResult2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommitFileResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_branchCompare(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4728,7 +4728,7 @@ func (ec *executionContext) _Query_branchCompare(ctx context.Context, field grap
 	}
 	res := resTmp.([]*model.BranchCompareResults)
 	fc.Result = res
-	return ec.marshalNbranchCompareResults2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐBranchCompareResults(ctx, field.Selections, res)
+	return ec.marshalNbranchCompareResults2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐBranchCompareResults(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_getRemote(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4770,7 +4770,7 @@ func (ec *executionContext) _Query_getRemote(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.RemoteDetails)
 	fc.Result = res
-	return ec.marshalNremoteDetails2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐRemoteDetails(ctx, field.Selections, res)
+	return ec.marshalNremoteDetails2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐRemoteDetails(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4911,7 +4911,7 @@ func (ec *executionContext) _UnPushedCommitResult_gitCommits(ctx context.Context
 	}
 	res := resTmp.([]*model.GitCommits)
 	fc.Result = res
-	return ec.marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
+	return ec.marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -6064,7 +6064,7 @@ func (ec *executionContext) _branchCompareResults_commits(ctx context.Context, f
 	}
 	res := resTmp.([]*model.GitCommits)
 	fc.Result = res
-	return ec.marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
+	return ec.marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommits(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _codeFileType_fileData(ctx context.Context, field graphql.CollectedField, obj *model.CodeFileType) (ret graphql.Marshaler) {
@@ -8017,11 +8017,11 @@ func (ec *executionContext) _settingsDataResults(ctx context.Context, sel ast.Se
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAddRepoParams2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐAddRepoParams(ctx context.Context, sel ast.SelectionSet, v model.AddRepoParams) graphql.Marshaler {
+func (ec *executionContext) marshalNAddRepoParams2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐAddRepoParams(ctx context.Context, sel ast.SelectionSet, v model.AddRepoParams) graphql.Marshaler {
 	return ec._AddRepoParams(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNAddRepoParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐAddRepoParams(ctx context.Context, sel ast.SelectionSet, v *model.AddRepoParams) graphql.Marshaler {
+func (ec *executionContext) marshalNAddRepoParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐAddRepoParams(ctx context.Context, sel ast.SelectionSet, v *model.AddRepoParams) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8046,11 +8046,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNBranchDeleteStatus2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐBranchDeleteStatus(ctx context.Context, sel ast.SelectionSet, v model.BranchDeleteStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNBranchDeleteStatus2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐBranchDeleteStatus(ctx context.Context, sel ast.SelectionSet, v model.BranchDeleteStatus) graphql.Marshaler {
 	return ec._BranchDeleteStatus(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNBranchDeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐBranchDeleteStatus(ctx context.Context, sel ast.SelectionSet, v *model.BranchDeleteStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNBranchDeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐBranchDeleteStatus(ctx context.Context, sel ast.SelectionSet, v *model.BranchDeleteStatus) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8060,11 +8060,11 @@ func (ec *executionContext) marshalNBranchDeleteStatus2ᚖgithubᚗcomᚋneel199
 	return ec._BranchDeleteStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFetchRepoParams2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐFetchRepoParams(ctx context.Context, sel ast.SelectionSet, v model.FetchRepoParams) graphql.Marshaler {
+func (ec *executionContext) marshalNFetchRepoParams2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐFetchRepoParams(ctx context.Context, sel ast.SelectionSet, v model.FetchRepoParams) graphql.Marshaler {
 	return ec._FetchRepoParams(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNFetchRepoParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐFetchRepoParams(ctx context.Context, sel ast.SelectionSet, v *model.FetchRepoParams) graphql.Marshaler {
+func (ec *executionContext) marshalNFetchRepoParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐFetchRepoParams(ctx context.Context, sel ast.SelectionSet, v *model.FetchRepoParams) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8074,11 +8074,11 @@ func (ec *executionContext) marshalNFetchRepoParams2ᚖgithubᚗcomᚋneel1996�
 	return ec._FetchRepoParams(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFetchResult2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐFetchResult(ctx context.Context, sel ast.SelectionSet, v model.FetchResult) graphql.Marshaler {
+func (ec *executionContext) marshalNFetchResult2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐFetchResult(ctx context.Context, sel ast.SelectionSet, v model.FetchResult) graphql.Marshaler {
 	return ec._FetchResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNFetchResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐFetchResult(ctx context.Context, sel ast.SelectionSet, v *model.FetchResult) graphql.Marshaler {
+func (ec *executionContext) marshalNFetchResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐFetchResult(ctx context.Context, sel ast.SelectionSet, v *model.FetchResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8088,11 +8088,11 @@ func (ec *executionContext) marshalNFetchResult2ᚖgithubᚗcomᚋneel1996ᚋgit
 	return ec._FetchResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNGitCommitLogResults2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitLogResults(ctx context.Context, sel ast.SelectionSet, v model.GitCommitLogResults) graphql.Marshaler {
+func (ec *executionContext) marshalNGitCommitLogResults2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommitLogResults(ctx context.Context, sel ast.SelectionSet, v model.GitCommitLogResults) graphql.Marshaler {
 	return ec._GitCommitLogResults(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNGitCommitLogResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitLogResults(ctx context.Context, sel ast.SelectionSet, v *model.GitCommitLogResults) graphql.Marshaler {
+func (ec *executionContext) marshalNGitCommitLogResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommitLogResults(ctx context.Context, sel ast.SelectionSet, v *model.GitCommitLogResults) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8102,11 +8102,11 @@ func (ec *executionContext) marshalNGitCommitLogResults2ᚖgithubᚗcomᚋneel19
 	return ec._GitCommitLogResults(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNGitFolderContentResults2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitFolderContentResults(ctx context.Context, sel ast.SelectionSet, v model.GitFolderContentResults) graphql.Marshaler {
+func (ec *executionContext) marshalNGitFolderContentResults2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitFolderContentResults(ctx context.Context, sel ast.SelectionSet, v model.GitFolderContentResults) graphql.Marshaler {
 	return ec._GitFolderContentResults(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNGitFolderContentResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitFolderContentResults(ctx context.Context, sel ast.SelectionSet, v *model.GitFolderContentResults) graphql.Marshaler {
+func (ec *executionContext) marshalNGitFolderContentResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitFolderContentResults(ctx context.Context, sel ast.SelectionSet, v *model.GitFolderContentResults) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8116,11 +8116,11 @@ func (ec *executionContext) marshalNGitFolderContentResults2ᚖgithubᚗcomᚋne
 	return ec._GitFolderContentResults(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNGitRepoStatusResults2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitRepoStatusResults(ctx context.Context, sel ast.SelectionSet, v model.GitRepoStatusResults) graphql.Marshaler {
+func (ec *executionContext) marshalNGitRepoStatusResults2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitRepoStatusResults(ctx context.Context, sel ast.SelectionSet, v model.GitRepoStatusResults) graphql.Marshaler {
 	return ec._GitRepoStatusResults(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNGitRepoStatusResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitRepoStatusResults(ctx context.Context, sel ast.SelectionSet, v *model.GitRepoStatusResults) graphql.Marshaler {
+func (ec *executionContext) marshalNGitRepoStatusResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitRepoStatusResults(ctx context.Context, sel ast.SelectionSet, v *model.GitRepoStatusResults) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8130,11 +8130,11 @@ func (ec *executionContext) marshalNGitRepoStatusResults2ᚖgithubᚗcomᚋneel1
 	return ec._GitRepoStatusResults(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNHealthCheckParams2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐHealthCheckParams(ctx context.Context, sel ast.SelectionSet, v model.HealthCheckParams) graphql.Marshaler {
+func (ec *executionContext) marshalNHealthCheckParams2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐHealthCheckParams(ctx context.Context, sel ast.SelectionSet, v model.HealthCheckParams) graphql.Marshaler {
 	return ec._HealthCheckParams(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNHealthCheckParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐHealthCheckParams(ctx context.Context, sel ast.SelectionSet, v *model.HealthCheckParams) graphql.Marshaler {
+func (ec *executionContext) marshalNHealthCheckParams2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐHealthCheckParams(ctx context.Context, sel ast.SelectionSet, v *model.HealthCheckParams) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8144,11 +8144,11 @@ func (ec *executionContext) marshalNHealthCheckParams2ᚖgithubᚗcomᚋneel1996
 	return ec._HealthCheckParams(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPullResult2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐPullResult(ctx context.Context, sel ast.SelectionSet, v model.PullResult) graphql.Marshaler {
+func (ec *executionContext) marshalNPullResult2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐPullResult(ctx context.Context, sel ast.SelectionSet, v model.PullResult) graphql.Marshaler {
 	return ec._PullResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPullResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐPullResult(ctx context.Context, sel ast.SelectionSet, v *model.PullResult) graphql.Marshaler {
+func (ec *executionContext) marshalNPullResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐPullResult(ctx context.Context, sel ast.SelectionSet, v *model.PullResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8203,11 +8203,11 @@ func (ec *executionContext) marshalNString2ᚕᚖstring(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) marshalNUnPushedCommitResult2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐUnPushedCommitResult(ctx context.Context, sel ast.SelectionSet, v model.UnPushedCommitResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUnPushedCommitResult2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐUnPushedCommitResult(ctx context.Context, sel ast.SelectionSet, v model.UnPushedCommitResult) graphql.Marshaler {
 	return ec._UnPushedCommitResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUnPushedCommitResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐUnPushedCommitResult(ctx context.Context, sel ast.SelectionSet, v *model.UnPushedCommitResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUnPushedCommitResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐUnPushedCommitResult(ctx context.Context, sel ast.SelectionSet, v *model.UnPushedCommitResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8446,7 +8446,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalNbranchCompareResults2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐBranchCompareResults(ctx context.Context, sel ast.SelectionSet, v []*model.BranchCompareResults) graphql.Marshaler {
+func (ec *executionContext) marshalNbranchCompareResults2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐBranchCompareResults(ctx context.Context, sel ast.SelectionSet, v []*model.BranchCompareResults) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8470,7 +8470,7 @@ func (ec *executionContext) marshalNbranchCompareResults2ᚕᚖgithubᚗcomᚋne
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalObranchCompareResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐBranchCompareResults(ctx, sel, v[i])
+			ret[i] = ec.marshalObranchCompareResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐBranchCompareResults(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8483,11 +8483,11 @@ func (ec *executionContext) marshalNbranchCompareResults2ᚕᚖgithubᚗcomᚋne
 	return ret
 }
 
-func (ec *executionContext) marshalNcodeFileType2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐCodeFileType(ctx context.Context, sel ast.SelectionSet, v model.CodeFileType) graphql.Marshaler {
+func (ec *executionContext) marshalNcodeFileType2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐCodeFileType(ctx context.Context, sel ast.SelectionSet, v model.CodeFileType) graphql.Marshaler {
 	return ec._codeFileType(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNcodeFileType2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐCodeFileType(ctx context.Context, sel ast.SelectionSet, v *model.CodeFileType) graphql.Marshaler {
+func (ec *executionContext) marshalNcodeFileType2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐCodeFileType(ctx context.Context, sel ast.SelectionSet, v *model.CodeFileType) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8497,11 +8497,11 @@ func (ec *executionContext) marshalNcodeFileType2ᚖgithubᚗcomᚋneel1996ᚋgi
 	return ec._codeFileType(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNdeleteStatus2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐDeleteStatus(ctx context.Context, sel ast.SelectionSet, v model.DeleteStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNdeleteStatus2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐDeleteStatus(ctx context.Context, sel ast.SelectionSet, v model.DeleteStatus) graphql.Marshaler {
 	return ec._deleteStatus(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNdeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐDeleteStatus(ctx context.Context, sel ast.SelectionSet, v *model.DeleteStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNdeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐDeleteStatus(ctx context.Context, sel ast.SelectionSet, v *model.DeleteStatus) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8511,11 +8511,11 @@ func (ec *executionContext) marshalNdeleteStatus2ᚖgithubᚗcomᚋneel1996ᚋgi
 	return ec._deleteStatus(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNfileLineChangeResult2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐFileLineChangeResult(ctx context.Context, sel ast.SelectionSet, v model.FileLineChangeResult) graphql.Marshaler {
+func (ec *executionContext) marshalNfileLineChangeResult2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐFileLineChangeResult(ctx context.Context, sel ast.SelectionSet, v model.FileLineChangeResult) graphql.Marshaler {
 	return ec._fileLineChangeResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNfileLineChangeResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐFileLineChangeResult(ctx context.Context, sel ast.SelectionSet, v *model.FileLineChangeResult) graphql.Marshaler {
+func (ec *executionContext) marshalNfileLineChangeResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐFileLineChangeResult(ctx context.Context, sel ast.SelectionSet, v *model.FileLineChangeResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8525,11 +8525,11 @@ func (ec *executionContext) marshalNfileLineChangeResult2ᚖgithubᚗcomᚋneel1
 	return ec._fileLineChangeResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNgitChangeResults2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitChangeResults(ctx context.Context, sel ast.SelectionSet, v model.GitChangeResults) graphql.Marshaler {
+func (ec *executionContext) marshalNgitChangeResults2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitChangeResults(ctx context.Context, sel ast.SelectionSet, v model.GitChangeResults) graphql.Marshaler {
 	return ec._gitChangeResults(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNgitChangeResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitChangeResults(ctx context.Context, sel ast.SelectionSet, v *model.GitChangeResults) graphql.Marshaler {
+func (ec *executionContext) marshalNgitChangeResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitChangeResults(ctx context.Context, sel ast.SelectionSet, v *model.GitChangeResults) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8539,7 +8539,7 @@ func (ec *executionContext) marshalNgitChangeResults2ᚖgithubᚗcomᚋneel1996�
 	return ec._gitChangeResults(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNgitCommitFileResult2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitFileResult(ctx context.Context, sel ast.SelectionSet, v []*model.GitCommitFileResult) graphql.Marshaler {
+func (ec *executionContext) marshalNgitCommitFileResult2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommitFileResult(ctx context.Context, sel ast.SelectionSet, v []*model.GitCommitFileResult) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8563,7 +8563,7 @@ func (ec *executionContext) marshalNgitCommitFileResult2ᚕᚖgithubᚗcomᚋnee
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOgitCommitFileResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitFileResult(ctx, sel, v[i])
+			ret[i] = ec.marshalOgitCommitFileResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommitFileResult(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8576,7 +8576,7 @@ func (ec *executionContext) marshalNgitCommitFileResult2ᚕᚖgithubᚗcomᚋnee
 	return ret
 }
 
-func (ec *executionContext) marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx context.Context, sel ast.SelectionSet, v []*model.GitCommits) graphql.Marshaler {
+func (ec *executionContext) marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommits(ctx context.Context, sel ast.SelectionSet, v []*model.GitCommits) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8600,7 +8600,7 @@ func (ec *executionContext) marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋg
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOgitCommits2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, sel, v[i])
+			ret[i] = ec.marshalOgitCommits2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommits(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8613,7 +8613,7 @@ func (ec *executionContext) marshalNgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋg
 	return ret
 }
 
-func (ec *executionContext) marshalNremoteDetails2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐRemoteDetails(ctx context.Context, sel ast.SelectionSet, v []*model.RemoteDetails) graphql.Marshaler {
+func (ec *executionContext) marshalNremoteDetails2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐRemoteDetails(ctx context.Context, sel ast.SelectionSet, v []*model.RemoteDetails) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8637,7 +8637,7 @@ func (ec *executionContext) marshalNremoteDetails2ᚕᚖgithubᚗcomᚋneel1996�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOremoteDetails2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐRemoteDetails(ctx, sel, v[i])
+			ret[i] = ec.marshalOremoteDetails2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐRemoteDetails(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8650,11 +8650,11 @@ func (ec *executionContext) marshalNremoteDetails2ᚕᚖgithubᚗcomᚋneel1996�
 	return ret
 }
 
-func (ec *executionContext) marshalNremoteMutationResult2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐRemoteMutationResult(ctx context.Context, sel ast.SelectionSet, v model.RemoteMutationResult) graphql.Marshaler {
+func (ec *executionContext) marshalNremoteMutationResult2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐRemoteMutationResult(ctx context.Context, sel ast.SelectionSet, v model.RemoteMutationResult) graphql.Marshaler {
 	return ec._remoteMutationResult(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNremoteMutationResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐRemoteMutationResult(ctx context.Context, sel ast.SelectionSet, v *model.RemoteMutationResult) graphql.Marshaler {
+func (ec *executionContext) marshalNremoteMutationResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐRemoteMutationResult(ctx context.Context, sel ast.SelectionSet, v *model.RemoteMutationResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8664,11 +8664,11 @@ func (ec *executionContext) marshalNremoteMutationResult2ᚖgithubᚗcomᚋneel1
 	return ec._remoteMutationResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNsettingsDataResults2githubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐSettingsDataResults(ctx context.Context, sel ast.SelectionSet, v model.SettingsDataResults) graphql.Marshaler {
+func (ec *executionContext) marshalNsettingsDataResults2githubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐSettingsDataResults(ctx context.Context, sel ast.SelectionSet, v model.SettingsDataResults) graphql.Marshaler {
 	return ec._settingsDataResults(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNsettingsDataResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐSettingsDataResults(ctx context.Context, sel ast.SelectionSet, v *model.SettingsDataResults) graphql.Marshaler {
+func (ec *executionContext) marshalNsettingsDataResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐSettingsDataResults(ctx context.Context, sel ast.SelectionSet, v *model.SettingsDataResults) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -8966,21 +8966,21 @@ func (ec *executionContext) marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 	return ec.___Type(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalObranchCompareResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐBranchCompareResults(ctx context.Context, sel ast.SelectionSet, v *model.BranchCompareResults) graphql.Marshaler {
+func (ec *executionContext) marshalObranchCompareResults2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐBranchCompareResults(ctx context.Context, sel ast.SelectionSet, v *model.BranchCompareResults) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._branchCompareResults(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOgitCommitFileResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommitFileResult(ctx context.Context, sel ast.SelectionSet, v *model.GitCommitFileResult) graphql.Marshaler {
+func (ec *executionContext) marshalOgitCommitFileResult2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommitFileResult(ctx context.Context, sel ast.SelectionSet, v *model.GitCommitFileResult) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._gitCommitFileResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx context.Context, sel ast.SelectionSet, v []*model.GitCommits) graphql.Marshaler {
+func (ec *executionContext) marshalOgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommits(ctx context.Context, sel ast.SelectionSet, v []*model.GitCommits) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -9007,7 +9007,7 @@ func (ec *executionContext) marshalOgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋg
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOgitCommits2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx, sel, v[i])
+			ret[i] = ec.marshalOgitCommits2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommits(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -9020,14 +9020,14 @@ func (ec *executionContext) marshalOgitCommits2ᚕᚖgithubᚗcomᚋneel1996ᚋg
 	return ret
 }
 
-func (ec *executionContext) marshalOgitCommits2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐGitCommits(ctx context.Context, sel ast.SelectionSet, v *model.GitCommits) graphql.Marshaler {
+func (ec *executionContext) marshalOgitCommits2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐGitCommits(ctx context.Context, sel ast.SelectionSet, v *model.GitCommits) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._gitCommits(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOremoteDetails2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚑserverᚋgraphᚋmodelᚐRemoteDetails(ctx context.Context, sel ast.SelectionSet, v *model.RemoteDetails) graphql.Marshaler {
+func (ec *executionContext) marshalOremoteDetails2ᚖgithubᚗcomᚋneel1996ᚋgitconvexᚋgraphᚋmodelᚐRemoteDetails(ctx context.Context, sel ast.SelectionSet, v *model.RemoteDetails) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

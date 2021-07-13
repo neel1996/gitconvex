@@ -4,6 +4,7 @@ import (
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/git"
+	"github.com/neel1996/gitconvex/git/commit"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/stretchr/testify/suite"
 	"io/ioutil"
@@ -121,9 +122,5 @@ func (suite *BranchCompareTestSuite) stageAndCommitTestFile() {
 		FileItem: suite.testFile,
 	}.StageItem()
 
-	git.CommitStruct{
-		Repo:          suite.repo,
-		CommitMessage: "Branch compare test commit",
-		RepoPath:      suite.repo.Workdir(),
-	}.CommitChanges()
+	_ = commit.NewCommitChanges(suite.repo, []string{"Branch compare test commit"}).Add()
 }
