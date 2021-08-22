@@ -3,18 +3,20 @@ package remote
 import (
 	"errors"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
 )
 
 type Validation interface {
-	ValidateRemoteFields() error
+	ValidateRemoteFields(remoteFields ...string) error
 }
 
 type validation struct {
-	repo         *git2go.Repository
+	repo         middleware.Repository
 	remoteFields []string
 }
 
-func (v validation) ValidateRemoteFields() error {
+func (v validation) ValidateRemoteFields(remoteFields ...string) error {
+	v.remoteFields = remoteFields
 	validateRepoErr := v.validateRepo()
 	if validateRepoErr != nil {
 		return validateRepoErr
@@ -51,16 +53,15 @@ func (v validation) validateRepo() error {
 }
 
 func (v validation) validateRemoteCollection() error {
-	if v.repo.Remotes == (git2go.RemoteCollection{}) {
+	if v.repo.Remotes().Get() == (git2go.RemoteCollection{}) {
 		return errors.New("remote collection is nil")
 	}
 
 	return nil
 }
 
-func NewRemoteValidation(repo *git2go.Repository, remoteFields ...string) Validation {
+func NewRemoteValidation(repo middleware.Repository) Validation {
 	return validation{
-		repo:         repo,
-		remoteFields: remoteFields,
+		repo: repo,
 	}
 }

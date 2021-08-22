@@ -2,6 +2,7 @@ package remote
 
 import (
 	"errors"
+	"github.com/neel1996/gitconvex/constants"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/model"
 )
@@ -42,7 +43,7 @@ func (r Operation) GitDeleteRemote() (*model.RemoteMutationResult, error) {
 	err := r.Delete.DeleteRemote()
 
 	if err != nil {
-		return nil, errors.New(global.RemoteDeleteError)
+		return nil, constants.RemoteDeleteError
 	}
 
 	return &model.RemoteMutationResult{Status: global.RemoteDeleteSuccess}, nil

@@ -1108,7 +1108,7 @@ type GitRepoStatusResults {
     "Remote host name based on the remote URL (E.g: https://github.com/github/repo.git -> Github)"
     gitRemoteHost: String
     "Total number of commits tracked by the current branch"
-    gitTotalCommits: Float
+    gitTotalCommits: Int
     "The latest commit (HEAD commit)"
     gitLatestCommit: String
     "Total number of files tracked by git repo"
@@ -1131,7 +1131,7 @@ Returns the total number of commits in the repo and the array of 10 commit log e
 """
 type GitCommitLogResults {
     "Total number of commits tracked by the branch"
-    totalCommits: Float
+    totalCommits: Int
     "Array of commit log entries ` + "`" + `gitCommits` + "`" + `"
     commits: [gitCommits]
 }
@@ -2831,9 +2831,9 @@ func (ec *executionContext) _GitCommitLogResults_totalCommits(ctx context.Contex
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*float64)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GitCommitLogResults_commits(ctx context.Context, field graphql.CollectedField, obj *model.GitCommitLogResults) (ret graphql.Marshaler) {
@@ -3157,9 +3157,9 @@ func (ec *executionContext) _GitRepoStatusResults_gitTotalCommits(ctx context.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*float64)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _GitRepoStatusResults_gitLatestCommit(ctx context.Context, field graphql.CollectedField, obj *model.GitRepoStatusResults) (ret graphql.Marshaler) {
@@ -8700,21 +8700,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
-}
-
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalFloat(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalFloat(*v)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {

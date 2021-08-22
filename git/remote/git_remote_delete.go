@@ -2,7 +2,7 @@ package remote
 
 import (
 	"fmt"
-	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/global"
 )
 
@@ -11,13 +11,14 @@ type Delete interface {
 }
 
 type deleteRemote struct {
-	repo       *git2go.Repository
-	remoteName string
+	repo             middleware.Repository
+	remoteName       string
+	remoteValidation Validation
 }
 
 // DeleteRemote deletes the remote based on the specified remoteName
 func (d deleteRemote) DeleteRemote() error {
-	validationError := NewRemoteValidation(d.repo, d.remoteName).ValidateRemoteFields()
+	validationError := d.remoteValidation.ValidateRemoteFields(d.remoteName)
 	if validationError != nil {
 		return validationError
 	}
@@ -31,8 +32,8 @@ func (d deleteRemote) DeleteRemote() error {
 	return nil
 }
 
-func (d *deleteRemote) deleteSelectedRemote(remoteEntry string) error {
-	err := d.repo.Remotes.Delete(remoteEntry)
+func (d *deleteRemote) deleteSelectedRemote(remoteName string) error {
+	err := d.repo.Remotes().Delete(remoteName)
 	if err != nil {
 		logger.Log(err.Error(), global.StatusError)
 		return err
@@ -42,9 +43,10 @@ func (d *deleteRemote) deleteSelectedRemote(remoteEntry string) error {
 	return nil
 }
 
-func NewDeleteRemote(repo *git2go.Repository, remoteName string) Delete {
+func NewDeleteRemote(repo middleware.Repository, remoteName string, remoteValidation Validation) Delete {
 	return deleteRemote{
-		repo:       repo,
-		remoteName: remoteName,
+		repo:             repo,
+		remoteName:       remoteName,
+		remoteValidation: remoteValidation,
 	}
 }

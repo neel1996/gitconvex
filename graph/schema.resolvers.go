@@ -5,17 +5,20 @@ package graph
 
 import (
 	"context"
-	"github.com/neel1996/gitconvex/utils"
 
 	"github.com/neel1996/gitconvex/api"
+	"github.com/neel1996/gitconvex/constants"
+	"github.com/neel1996/gitconvex/controller"
 	"github.com/neel1996/gitconvex/git"
 	"github.com/neel1996/gitconvex/git/branch"
 	"github.com/neel1996/gitconvex/git/commit"
+	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/git/remote"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/generated"
 	"github.com/neel1996/gitconvex/graph/model"
 	initialize "github.com/neel1996/gitconvex/init"
+	"github.com/neel1996/gitconvex/utils"
 )
 
 func (r *mutationResolver) AddRepo(ctx context.Context, repoName string, repoPath string, cloneSwitch bool, repoURL *string, initSwitch bool, authOption string, sshKeyPath *string, userName *string, password *string) (*model.AddRepoParams, error) {
@@ -256,7 +259,7 @@ func (r *mutationResolver) CommitChanges(ctx context.Context, repoID string, com
 	go repoObject.Repo(repoChan)
 	repo := <-repoChan
 
-	commitChanges := commit.NewCommitChanges(repo.GitRepo, utils.GenerateNonPointerArrayFrom(commitMessage))
+	commitChanges := commit.NewCommitChanges(middleware.NewRepository(repo.GitRepo), utils.GenerateNonPointerArrayFrom(commitMessage))
 	commitOperation := commit.Operation{Changes: commitChanges}
 
 	return commitOperation.GitCommitChange()
@@ -373,7 +376,7 @@ func (r *mutationResolver) EditRemote(ctx context.Context, repoID string, remote
 
 	if repo.GitRepo == nil {
 		logger.Log("Repo is invalid", global.StatusError)
-		return &model.RemoteMutationResult{Status: global.RemoteEditError}, nil
+		return &model.RemoteMutationResult{Status: constants.RemoteEditError.Error()}, nil
 	}
 
 	context.WithValue(ctx, initialize.Repo, repo.GitRepo)
@@ -435,84 +438,19 @@ func (r *queryResolver) GitFolderContent(ctx context.Context, repoID string, dir
 func (r *queryResolver) GitCommitLogs(ctx context.Context, repoID string, referenceCommit string) (*model.GitCommitLogResults, error) {
 	logger.Log("Initiating get commit logs request", global.StatusInfo)
 
-	repoChan := make(chan git.RepoDetails)
-	var repoObject git.RepoInterface
-	repoObject = git.RepoStruct{RepoId: repoID}
-	go repoObject.Repo(repoChan)
-	repo := <-repoChan
-
-	var commitLogObject git.CommitLogInterface
-	commitLogObject = git.CommitLogStruct{
-		Repo:            repo.GitRepo,
-		ReferenceCommit: referenceCommit,
-	}
-
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
-		logger.Log("Repo is invalid or HEAD is nil", global.StatusError)
-		return &model.GitCommitLogResults{
-			TotalCommits: nil,
-			Commits:      nil,
-		}, nil
-	}
-	return commitLogObject.CommitLogs(), nil
+	return controller.NewCommitLogController(repoID, referenceCommit).GetCommitLogs()
 }
 
 func (r *queryResolver) GitCommitFiles(ctx context.Context, repoID string, commitHash string) ([]*model.GitCommitFileResult, error) {
 	logger.Log("Initiating get commit files request", global.StatusInfo)
 
-	repoChan := make(chan git.RepoDetails)
-	var repoObject git.RepoInterface
-	repoObject = git.RepoStruct{RepoId: repoID}
-	go repoObject.Repo(repoChan)
-	repo := <-repoChan
-
-	var commitFileListObject git.CommitFileListInterface
-	commitFileListObject = git.CommitFileListStruct{
-		Repo:       repo.GitRepo,
-		CommitHash: commitHash,
-	}
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
-		logger.Log("Repo is invalid or HEAD is nil", global.StatusError)
-		return []*model.GitCommitFileResult{
-			{
-				Type:     "",
-				FileName: "",
-			},
-		}, nil
-	}
-	return commitFileListObject.CommitFileList(), nil
+	return controller.NewCommitFileHistoryController(repoID, commitHash).GetCommitFileHistory()
 }
 
 func (r *queryResolver) SearchCommitLogs(ctx context.Context, repoID string, searchType string, searchKey string) ([]*model.GitCommits, error) {
 	logger.Log("Initiating search commit logs request", global.StatusInfo)
 
-	repoChan := make(chan git.RepoDetails)
-	var repoObject git.RepoInterface
-	repoObject = git.RepoStruct{RepoId: repoID}
-	go repoObject.Repo(repoChan)
-	repo := <-repoChan
-
-	var searchCommitObject git.SearchCommitInterface
-
-	searchCommitObject = git.SearchCommitStruct{
-		Repo:       repo.GitRepo,
-		SearchType: searchType,
-		SearchKey:  searchKey,
-	}
-
-	if head, _ := repo.GitRepo.Head(); repo.GitRepo == nil || head == nil {
-		logger.Log("Repo is invalid or HEAD is nil", global.StatusError)
-		return []*model.GitCommits{
-			{
-				Hash:             nil,
-				Author:           nil,
-				CommitTime:       nil,
-				CommitMessage:    nil,
-				CommitFilesCount: nil,
-			},
-		}, nil
-	}
-	return searchCommitObject.SearchCommitLogs(), nil
+	return controller.NewCommitLogSearchController(repoID, searchType, searchKey).GetMatchingCommits()
 }
 
 func (r *queryResolver) CodeFileDetails(ctx context.Context, repoID string, fileName string) (*model.CodeFileType, error) {

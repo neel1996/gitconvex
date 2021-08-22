@@ -5,6 +5,7 @@ import (
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/git"
 	"github.com/neel1996/gitconvex/git/commit"
+	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/stretchr/testify/suite"
 	"io/ioutil"
@@ -122,5 +123,5 @@ func (suite *BranchCompareTestSuite) stageAndCommitTestFile() {
 		FileItem: suite.testFile,
 	}.StageItem()
 
-	_ = commit.NewCommitChanges(suite.repo, []string{"Branch compare test commit"}).Add()
+	_ = commit.NewCommitChanges(middleware.NewRepository(suite.repo), []string{"Branch compare test commit"}).Add()
 }

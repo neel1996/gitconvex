@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/neel1996/gitconvex/git"
 	"github.com/neel1996/gitconvex/git/branch"
+	"github.com/neel1996/gitconvex/git/commit"
+	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/git/remote"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/model"
@@ -10,12 +12,14 @@ import (
 	"strings"
 )
 
+//TODO: This is a temporary function and will be replaced with an clean interface over the course of refactoring
+
 // RepoStatus collects the basic details of the target repo and returns the consolidated result
 func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	logger.Log("Collecting repo status information", global.StatusInfo)
 
 	repoChan := make(chan git.RepoDetails)
-	commitChan := make(chan git.AllCommitData)
+	//commitChan := make(chan commit.AllCommitData)
 	trackedFileCountChan := make(chan int)
 
 	var repoObject git.RepoInterface
@@ -47,7 +51,11 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	)
 	remoteURL = &tempRemote
 
-	remoteUrlList := remote.NewRemoteUrlData(repo)
+	repoForRemote := middleware.NewRepository(repo)
+
+	remoteValidation := remote.NewRemoteValidation(repoForRemote)
+	remoteList := remote.NewRemoteList(repoForRemote, remoteValidation)
+	remoteUrlList := remote.NewRemoteUrlData(repoForRemote, remoteValidation, remoteList)
 	listRemoteUrl := remote.Operation{ListRemoteUrl: remoteUrlList}
 
 	remotes, remoteErr := listRemoteUrl.GitGetAllRemoteUrl()
@@ -57,7 +65,12 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	}
 
 	if len(remotes) > 0 && *remotes[0] != "" {
-		remoteNameObject := remote.NewGetRemoteName(repo, *remotes[0])
+		remoteNameObject := remote.NewGetRemoteName(
+			repoForRemote,
+			*remotes[0],
+			remoteValidation,
+			remoteList,
+		)
 		remoteName = remoteNameObject.GetRemoteNameWithUrl()
 		sRemote := strings.Split(*remotes[0], "/")
 		repoName = &sRemote[len(sRemote)-1]
@@ -91,16 +104,10 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	branches := branchList.BranchList
 	allBranches := branchList.AllBranchList
 
-	var latestCommit *string
+	listCommitLogs := commit.NewListAllLogs(middleware.NewRepository(repo), nil, nil)
+	totalCommits := commit.NewTotalCommits(listCommitLogs).Get()
 
-	var allCommitObject git.AllCommitInterface
-
-	allCommitObject = git.AllCommitStruct{Repo: repo}
-	go allCommitObject.AllCommits(commitChan)
-	commitData := <-commitChan
-	latestCommit = &commitData.LatestCommit
-	totalCommits := commitData.TotalCommits
-	totalCommitsPtr := &totalCommits
+	latestCommitMessage := commit.NewLatestMessage(middleware.NewRepository(repo)).Get()
 
 	var listFilesObject git.ListFilesInterface
 	listFilesObject = git.ListFilesStruct{
@@ -118,8 +125,8 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 		GitAllBranchList:     utils.GeneratePointerArrayFrom(allBranches),
 		GitCurrentBranch:     &currentBranch,
 		GitRemoteHost:        &remoteName,
-		GitTotalCommits:      totalCommitsPtr,
-		GitLatestCommit:      latestCommit,
+		GitTotalCommits:      &totalCommits,
+		GitLatestCommit:      &latestCommitMessage,
 		GitTotalTrackedFiles: trackedFilePtr,
 	}
 }

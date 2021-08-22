@@ -3,6 +3,7 @@ package commit
 import (
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/global"
 	"strings"
 )
@@ -12,7 +13,7 @@ type Changes interface {
 }
 
 type changes struct {
-	repo          *git2go.Repository
+	repo          middleware.Repository
 	commitMessage []string
 }
 
@@ -60,7 +61,7 @@ func (c changes) Add() error {
 	return nil
 }
 
-func (c changes) validateSignature(repo *git2go.Repository) (*git2go.Signature, error) {
+func (c changes) validateSignature(repo middleware.Repository) (*git2go.Signature, error) {
 	signature, signatureErr := repo.DefaultSignature()
 	if signatureErr != nil {
 		logger.Log(fmt.Sprintf("Error occurred while fetching repo signature -> %s", signatureErr.Error()), global.StatusError)
@@ -71,7 +72,7 @@ func (c changes) validateSignature(repo *git2go.Repository) (*git2go.Signature, 
 	return signature, nil
 }
 
-func (c changes) setHeadToNewCommit(repo *git2go.Repository, newCommitId *git2go.Oid, formattedMessage string) error {
+func (c changes) setHeadToNewCommit(repo middleware.Repository, newCommitId *git2go.Oid, formattedMessage string) error {
 	if _, newCommitErr := repo.LookupCommit(newCommitId); newCommitErr != nil {
 		logger.Log(newCommitErr.Error(), global.StatusError)
 		return newCommitErr
@@ -92,7 +93,7 @@ func (c changes) setHeadToNewCommit(repo *git2go.Repository, newCommitId *git2go
 	return nil
 }
 
-func (c changes) createNewCommit(headCommit *git2go.Commit, repo *git2go.Repository, signature *git2go.Signature, formattedMessage string, newTree *git2go.Tree) (*git2go.Oid, error) {
+func (c changes) createNewCommit(headCommit *git2go.Commit, repo middleware.Repository, signature *git2go.Signature, formattedMessage string, newTree *git2go.Tree) (*git2go.Oid, error) {
 	var (
 		newCommitId    *git2go.Oid
 		newCommitIdErr error
@@ -107,7 +108,7 @@ func (c changes) createNewCommit(headCommit *git2go.Commit, repo *git2go.Reposit
 	return newCommitId, newCommitIdErr
 }
 
-func (c changes) treeForNewCommit(repo *git2go.Repository) (*git2go.Tree, error) {
+func (c changes) treeForNewCommit(repo middleware.Repository) (*git2go.Tree, error) {
 	treeId, indexErr := c.updateRepoIndex()
 	if indexErr != nil {
 		logger.Log(indexErr.Error(), global.StatusError)
@@ -149,7 +150,7 @@ func (c changes) formatCommitMessage() string {
 	return strings.Join(c.commitMessage, "")
 }
 
-func NewCommitChanges(repo *git2go.Repository, message []string) Changes {
+func NewCommitChanges(repo middleware.Repository, message []string) Changes {
 	return changes{
 		repo:          repo,
 		commitMessage: message,

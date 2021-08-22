@@ -3,7 +3,7 @@ package remote
 import (
 	"errors"
 	"fmt"
-	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/global"
 )
 
@@ -12,23 +12,23 @@ type Edit interface {
 }
 
 type editRemote struct {
-	repo       *git2go.Repository
-	remoteName string
-	remoteURL  string
+	repo             middleware.Repository
+	remoteName       string
+	remoteURL        string
+	remoteValidation Validation
+	remoteList       List
 }
 
 func (e editRemote) EditRemote() error {
 	repo := e.repo
 
-	validationErr := NewRemoteValidation(e.repo, e.remoteName, e.remoteURL).ValidateRemoteFields()
+	validationErr := e.remoteValidation.ValidateRemoteFields(e.remoteName, e.remoteURL)
 	if validationErr != nil {
 		logger.Log(validationErr.Error(), global.StatusError)
 		return validationErr
 	}
 
-	remoteCollection := repo.Remotes
-	_, listErr := remoteCollection.List()
-
+	_, listErr := repo.Remotes().List()
 	if listErr != nil {
 		logger.Log(listErr.Error(), global.StatusError)
 		return listErr
@@ -39,7 +39,7 @@ func (e editRemote) EditRemote() error {
 		return remoteAvailabilityErr
 	}
 
-	err := repo.Remotes.SetUrl(e.remoteName, e.remoteURL)
+	err := repo.Remotes().SetUrl(e.remoteName, e.remoteURL)
 	if err != nil {
 		logger.Log(err.Error(), global.StatusError)
 		return err
@@ -51,7 +51,7 @@ func (e editRemote) EditRemote() error {
 
 func (e editRemote) isRemotePresentInRepo() error {
 	var err error
-	remoteList := NewRemoteList(e.repo).GetAllRemotes()
+	remoteList := e.remoteList.GetAllRemotes()
 
 	if remoteList == nil {
 		err = errors.New("no remotes are present in the repo")
@@ -69,10 +69,12 @@ func (e editRemote) isRemotePresentInRepo() error {
 	return err
 }
 
-func NewEditRemote(repo *git2go.Repository, remoteName string, remoteURL string) Edit {
+func NewEditRemote(repo middleware.Repository, remoteName string, remoteURL string, remoteValidation Validation, remoteList List) Edit {
 	return editRemote{
-		repo:       repo,
-		remoteName: remoteName,
-		remoteURL:  remoteURL,
+		repo:             repo,
+		remoteName:       remoteName,
+		remoteURL:        remoteURL,
+		remoteValidation: remoteValidation,
+		remoteList:       remoteList,
 	}
 }
