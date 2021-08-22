@@ -17,7 +17,7 @@ jobs:
     name: Gitconvex server test
     runs-on: ubuntu-latest
     env:
-      PKG_CONFIG_PATH: /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/pkgconfig/
+      PKG_CONFIG_PATH: /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.1/lib/pkgconfig/
 
     steps:
       - name: Install libgit2 from Homebrew
@@ -36,8 +36,8 @@ jobs:
 
       - name: Run Go Test
         run: |
-          sudo cp /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/lib* /usr/lib
-          export PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.0/lib/:$PATH"
+          sudo cp /home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.1/lib/lib* /usr/lib
+          export PATH="/home/linuxbrew/.linuxbrew/Cellar/libgit2/1.1.1/lib/:$PATH"
           git config --global user.name "${{ secrets.USER_NAME }}" && git config --global user.email "${{ secrets.USER_EMAIL }}"
           sudo mkdir -p /usr/local/gitconvex
           sudo chown $(whoami) /usr/local/gitconvex/
