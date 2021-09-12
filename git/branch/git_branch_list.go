@@ -3,6 +3,7 @@ package branch
 import (
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/model"
 	"go/types"
@@ -28,7 +29,7 @@ func (l listBranch) ListBranches() (model.ListOfBranches, error) {
 	var currentBranch string
 	repo := l.repo
 
-	validationErr := NewBranchFieldsValidation(repo).ValidateBranchFields()
+	validationErr := NewBranchFieldsValidation(middleware.NewRepository(repo)).ValidateBranchFields()
 	if validationErr != nil {
 		logger.Log(validationErr.Error(), global.StatusError)
 		return model.ListOfBranches{}, validationErr

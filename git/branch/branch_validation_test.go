@@ -1,18 +1,18 @@
 package branch
 
 import (
-	"fmt"
-	git2go "github.com/libgit2/git2go/v31"
+	"github.com/golang/mock/gomock"
+	"github.com/neel1996/gitconvex/mocks"
 	"github.com/stretchr/testify/suite"
-	"os"
 	"testing"
 )
 
 type BranchFieldValidationTestSuite struct {
 	suite.Suite
-	repo        *git2go.Repository
-	branchNames []string
-	validation  Validation
+	mockController *gomock.Controller
+	mockRepo       *mocks.MockRepository
+	branchNames    []string
+	validation     Validation
 }
 
 func TestBranchFieldValidationTestSuite(t *testing.T) {
@@ -20,34 +20,39 @@ func TestBranchFieldValidationTestSuite(t *testing.T) {
 }
 
 func (suite *BranchFieldValidationTestSuite) SetupTest() {
-	r, err := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	suite.repo = r
-	suite.branchNames = []string{"test_branch_1", "test_branch_2"}
-	suite.validation = NewBranchFieldsValidation(suite.repo, suite.branchNames[0], suite.branchNames[1])
+	suite.mockController = gomock.NewController(suite.T())
+	suite.mockRepo = mocks.NewMockRepository(suite.mockController)
+	suite.validation = NewBranchFieldsValidation(suite.mockRepo)
 }
 
 func (suite *BranchFieldValidationTestSuite) TestValidateBranchFields_WhenAllFieldsAreValid_ShouldReturnNil() {
-	err := suite.validation.ValidateBranchFields()
+	err := suite.validation.ValidateBranchFields("test_branch_1", "test_branch_2")
 
 	suite.Nil(err)
 }
 
 func (suite *BranchFieldValidationTestSuite) TestValidateBranchFields_WhenRepoIsNil_ShouldReturnError() {
-	suite.validation = NewBranchFieldsValidation(nil, "test_branch")
-	err := suite.validation.ValidateBranchFields()
+	suite.validation = NewBranchFieldsValidation(nil)
+	err := suite.validation.ValidateBranchFields("test_branch_1", "test_branch_2")
 
 	suite.NotNil(err)
-	suite.Equal("repo is nil", err.Error())
+	suite.Equal(NilRepoError, err)
 }
 
 func (suite *BranchFieldValidationTestSuite) TestValidateBranchFields_WhenBranchNameIsEmpty_ShouldReturnError() {
-	suite.validation = NewBranchFieldsValidation(suite.repo, "", "")
+	suite.validation = NewBranchFieldsValidation(suite.mockRepo)
+
 	err := suite.validation.ValidateBranchFields()
 
 	suite.NotNil(err)
-	suite.Equal("branch name is empty", err.Error())
+	suite.Equal(EmptyBranchNameError, err)
+}
+
+func (suite *BranchFieldValidationTestSuite) TestValidateBranchFields_WhenOneOfBranchNamesIsEmpty_ShouldReturnError() {
+	suite.validation = NewBranchFieldsValidation(suite.mockRepo)
+
+	err := suite.validation.ValidateBranchFields("test_branch_1", "", "test_branch_3")
+
+	suite.NotNil(err)
+	suite.Equal(EmptyBranchNameError, err)
 }

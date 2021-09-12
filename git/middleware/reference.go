@@ -3,6 +3,7 @@ package middleware
 import git "github.com/libgit2/git2go/v31"
 
 type Reference interface {
+	GetGitReference() *git.Reference
 	Target() *git.Oid
 	SetTarget(id *git.Oid, message string) (*git.Reference, error)
 }
@@ -17,6 +18,10 @@ func (r reference) Target() *git.Oid {
 
 func (r reference) SetTarget(id *git.Oid, message string) (*git.Reference, error) {
 	return r.ref.SetTarget(id, message)
+}
+
+func (r reference) GetGitReference() *git.Reference {
+	return r.ref
 }
 
 func NewReference(ref *git.Reference) Reference {

@@ -97,8 +97,7 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 	}
 
 	branchListObj := branch.NewBranchList(repo)
-	b := branch.Operation{List: branchListObj}
-	branchList, _ := b.GitListBranches()
+	branchList, _ := branchListObj.ListBranches()
 
 	currentBranch := branchList.CurrentBranch
 	branches := branchList.BranchList

@@ -7,10 +7,25 @@ type Commit interface {
 	Id() *git.Oid
 	Parent(uint) Commit
 	Tree() (*git.Tree, error)
+	GetGitCommit() *git.Commit
+	Author() *git.Signature
+	Message() string
 }
 
 type commit struct {
 	gitCommit *git.Commit
+}
+
+func (c commit) Author() *git.Signature {
+	return c.gitCommit.Author()
+}
+
+func (c commit) Message() string {
+	return c.gitCommit.Message()
+}
+
+func (c commit) GetGitCommit() *git.Commit {
+	return c.gitCommit
 }
 
 func (c commit) Tree() (*git.Tree, error) {
@@ -18,7 +33,12 @@ func (c commit) Tree() (*git.Tree, error) {
 }
 
 func (c commit) Parent(i uint) Commit {
-	return NewCommit(c.gitCommit.Parent(i))
+	parent := c.gitCommit.Parent(i)
+	if parent == nil {
+		return nil
+	}
+
+	return NewCommit(parent)
 }
 
 func (c commit) Id() *git.Oid {

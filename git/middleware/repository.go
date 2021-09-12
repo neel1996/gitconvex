@@ -7,15 +7,29 @@ type Repository interface {
 	Walk() (RevWalk, error)
 	Head() (Reference, error)
 	LookupCommit(oid *git.Oid) (*git.Commit, error)
+	LookupCommitV2(oid *git.Oid) (Commit, error)
 	DefaultSignature() (*git.Signature, error)
 	LookupTree(id *git.Oid) (*git.Tree, error)
 	Index() (Index, error)
 	CreateCommit(s string, signature *git.Signature, signature2 *git.Signature, message string, tree *git.Tree, parents ...*git.Commit) (*git.Oid, error)
 	DiffTreeToTree(tree *git.Tree, tree2 *git.Tree, options *git.DiffOptions) (*git.Diff, error)
+	CreateBranch(string, *git.Commit, bool) (*git.Branch, error)
+	LookupBranch(branchName string, branchType git.BranchType) (Branch, error)
+	CheckoutTree(tree *git.Tree, c *git.CheckoutOptions) error
+	SetHead(name string) error
+	GetGitRepository() *git.Repository
 }
 
 type repository struct {
 	repo *git.Repository
+}
+
+func (r repository) SetHead(name string) error {
+	return r.repo.SetHead(name)
+}
+
+func (r repository) CheckoutTree(tree *git.Tree, c *git.CheckoutOptions) error {
+	return r.repo.CheckoutTree(tree, c)
 }
 
 func (r repository) Remotes() Remotes {
@@ -25,6 +39,10 @@ func (r repository) Remotes() Remotes {
 func (r repository) CreateCommit(s string, signature *git.Signature, signature2 *git.Signature,
 	message string, tree *git.Tree, parents ...*git.Commit) (*git.Oid, error) {
 	return r.repo.CreateCommit(s, signature, signature2, message, tree, parents...)
+}
+
+func (r repository) CreateBranch(branchName string, commit *git.Commit, force bool) (*git.Branch, error) {
+	return r.repo.CreateBranch(branchName, commit, force)
 }
 
 func (r repository) Head() (Reference, error) {
@@ -47,6 +65,26 @@ func (r repository) LookupCommit(oid *git.Oid) (*git.Commit, error) {
 	return r.repo.LookupCommit(oid)
 }
 
+func (r repository) LookupCommitV2(oid *git.Oid) (Commit, error) {
+	gitCommit, err := r.repo.LookupCommit(oid)
+	if err != nil {
+		return nil, err
+	}
+	return NewCommit(gitCommit), nil
+}
+
+func (r repository) LookupBranch(branchName string, branchType git.BranchType) (Branch, error) {
+	gitBranch, err := r.repo.LookupBranch(branchName, branchType)
+	if err != nil {
+		return nil, err
+	}
+	return NewBranch(gitBranch), nil
+}
+
+func (r repository) LookupTree(id *git.Oid) (*git.Tree, error) {
+	return r.repo.LookupTree(id)
+}
+
 func (r repository) Walk() (RevWalk, error) {
 	walk, err := r.repo.Walk()
 
@@ -57,12 +95,12 @@ func (r repository) DefaultSignature() (*git.Signature, error) {
 	return r.repo.DefaultSignature()
 }
 
-func (r repository) LookupTree(id *git.Oid) (*git.Tree, error) {
-	return r.repo.LookupTree(id)
-}
-
 func (r repository) DiffTreeToTree(tree *git.Tree, tree2 *git.Tree, options *git.DiffOptions) (*git.Diff, error) {
 	return r.repo.DiffTreeToTree(tree, tree2, options)
+}
+
+func (r repository) GetGitRepository() *git.Repository {
+	return r.repo
 }
 
 func NewRepository(repo *git.Repository) Repository {

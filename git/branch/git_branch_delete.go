@@ -3,24 +3,24 @@ package branch
 import (
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/global"
+	"github.com/neel1996/gitconvex/validator"
 )
 
 type Delete interface {
-	DeleteBranch() error
+	DeleteBranch(branchName string) error
 }
 
 type deleteBranch struct {
-	repo       *git2go.Repository
-	branchName string
+	repo            middleware.Repository
+	branchValidator validator.ValidatorWithStringFields
 }
 
-// DeleteBranch deletes a branch from the repo
-func (d deleteBranch) DeleteBranch() error {
+func (d deleteBranch) DeleteBranch(branchName string) error {
 	repo := d.repo
-	branchName := d.branchName
 
-	validationErr := NewBranchFieldsValidation(repo, branchName).ValidateBranchFields()
+	validationErr := d.branchValidator.ValidateWithFields(branchName)
 	if validationErr != nil {
 		logger.Log(validationErr.Error(), global.StatusError)
 		return validationErr
@@ -42,9 +42,9 @@ func (d deleteBranch) DeleteBranch() error {
 	return nil
 }
 
-func NewDeleteBranch(repo *git2go.Repository, branchName string) Delete {
+func NewDeleteBranch(repo middleware.Repository, branchValidator validator.ValidatorWithStringFields) Delete {
 	return deleteBranch{
-		repo:       repo,
-		branchName: branchName,
+		repo:            repo,
+		branchValidator: branchValidator,
 	}
 }

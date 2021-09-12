@@ -1,24 +1,39 @@
 package branch
 
 import (
+	"errors"
 	"fmt"
+	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
+	"github.com/neel1996/gitconvex/mocks"
+	"github.com/neel1996/gitconvex/validator"
+	validatorMock "github.com/neel1996/gitconvex/validator/mocks"
 	"github.com/stretchr/testify/suite"
 	"os"
-	"path/filepath"
 	"testing"
 )
 
 type BranchAddTestSuite struct {
 	suite.Suite
-	repo       *git2go.Repository
-	noHeadRepo *git2go.Repository
-	branchName string
-	branchAdd  Add
+	repo                 middleware.Repository
+	mockController       *gomock.Controller
+	mockRepo             *mocks.MockRepository
+	mockReference        *mocks.MockReference
+	mockBranchValidation *validatorMock.MockValidatorWithStringFields
+	mockCommit           *mocks.MockCommit
+	branchName           string
+	branchValidation     validator.ValidatorWithStringFields
+	branchAdd            Add
 }
 
 func TestBranchAddTestSuite(t *testing.T) {
 	suite.Run(t, new(BranchAddTestSuite))
+}
+
+func (suite *BranchAddTestSuite) SetupSuite() {
+	suite.branchName = uuid.New().String()
 }
 
 func (suite *BranchAddTestSuite) SetupTest() {
@@ -26,54 +41,77 @@ func (suite *BranchAddTestSuite) SetupTest() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	noHeadPath := os.Getenv("GITCONVEX_TEST_REPO") + string(filepath.Separator) + "no_head"
-	noHeadRepo, _ := git2go.OpenRepository(noHeadPath)
 
-	suite.repo = r
-	suite.noHeadRepo = noHeadRepo
-	suite.branchName = "test_1"
-	suite.branchAdd = NewAddBranch(suite.repo, suite.branchName, false, nil)
+	suite.repo = middleware.NewRepository(r)
+	suite.branchValidation = validator.NewBranchValidator()
+
+	suite.mockController = gomock.NewController(suite.T())
+	suite.mockRepo = mocks.NewMockRepository(suite.mockController)
+	suite.mockReference = mocks.NewMockReference(suite.mockController)
+	suite.mockCommit = mocks.NewMockCommit(suite.mockController)
+	suite.mockBranchValidation = validatorMock.NewMockValidatorWithStringFields(suite.mockController)
+
+	suite.branchAdd = NewAddBranch(suite.mockRepo, suite.mockBranchValidation)
 }
 
 func (suite *BranchAddTestSuite) TearDownSuite() {
-	r, _ := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	_ = NewDeleteBranch(r, suite.branchName).DeleteBranch()
+	_ = NewDeleteBranch(suite.repo, validator.NewBranchValidator()).DeleteBranch(suite.branchName)
+	suite.mockController.Finish()
 }
 
 func (suite *BranchAddTestSuite) TestAddBranch_WhenBranchAdditionSucceeds_ShouldReturnNil() {
-	branchAddError := suite.branchAdd.AddBranch()
+	suite.branchAdd = NewAddBranch(suite.repo, suite.branchValidation)
+
+	branchAddError := suite.branchAdd.AddBranch(suite.branchName, false, nil)
 
 	suite.Nil(branchAddError)
 }
 
-func (suite *BranchAddTestSuite) TestAddBranch_WhenRepoIsNil_ShouldReturnError() {
-	suite.branchAdd = NewAddBranch(nil, "", false, nil)
-	branchAddError := suite.branchAdd.AddBranch()
+func (suite *BranchAddTestSuite) TestAddBranch_WhenBranchValidationFails_ShouldReturnError() {
+	suite.mockBranchValidation.EXPECT().ValidateWithFields("").Return(EmptyBranchNameError)
 
-	suite.NotNil(branchAddError)
-}
-
-func (suite *BranchAddTestSuite) TestAddBranch_WhenBranchNameIsEmpty_ShouldReturnError() {
-	suite.branchAdd = NewAddBranch(suite.repo, "", false, nil)
-	branchAddError := suite.branchAdd.AddBranch()
+	branchAddError := suite.branchAdd.AddBranch("", false, nil)
 
 	suite.NotNil(branchAddError)
 }
 
 func (suite *BranchAddTestSuite) TestAddBranch_WhenHeadIsNil_ShouldReturnError() {
-	suite.branchAdd = NewAddBranch(suite.noHeadRepo, suite.branchName, false, nil)
-	branchAddError := suite.branchAdd.AddBranch()
+	suite.mockBranchValidation.EXPECT().ValidateWithFields(suite.branchName).Return(nil)
+	suite.mockRepo.EXPECT().Head().Return(nil, errors.New("HEAD_ERROR"))
+
+	branchAddError := suite.branchAdd.AddBranch(suite.branchName, false, nil)
 
 	suite.NotNil(branchAddError)
 }
 
-func (suite *BranchAddTestSuite) TestAddBranch_WhenBranchAdditionFails_ShouldReturnError() {
-	r, _ := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	suite.branchAdd = NewAddBranch(r, "master", false, nil)
+func (suite *BranchAddTestSuite) TestAddBranch_WhenHeadCommitLookupFails_ShouldReturnError() {
+	oid, _ := git2go.NewOid("0608f9c6c97f386d1fa3948f3b8a61ae1cdb5621")
 
-	//Adding duplicate branches
-	_ = suite.branchAdd.AddBranch()
-	branchAddError := suite.branchAdd.AddBranch()
+	suite.mockBranchValidation.EXPECT().ValidateWithFields(suite.branchName).Return(nil)
+	suite.mockRepo.EXPECT().Head().Return(suite.mockReference, nil)
+	suite.mockReference.EXPECT().Target().Return(oid)
+	suite.mockRepo.EXPECT().LookupCommit(oid).Return(nil, errors.New("LOOKUP_ERROR"))
+
+	branchAddError := suite.branchAdd.AddBranch(suite.branchName, false, nil)
+
+	suite.NotNil(branchAddError)
+}
+
+func (suite *BranchAddTestSuite) TestAddBranch_WhenCreateBranchFails_ShouldReturnError() {
+	oid, _ := git2go.NewOid("0608f9c6c97f386d1fa3948f3b8a61ae1cdb5621")
+	commit := &git2go.Commit{}
+
+	suite.mockBranchValidation.EXPECT().ValidateWithFields(suite.branchName).Return(nil)
+	suite.mockRepo.EXPECT().Head().Return(suite.mockReference, nil)
+	suite.mockReference.EXPECT().Target().Return(oid)
+	suite.mockRepo.EXPECT().LookupCommit(oid).Return(commit, nil)
+	suite.mockRepo.EXPECT().CreateBranch(
+		suite.branchName,
+		commit,
+		false,
+	).Return(nil, errors.New("BRANCH_CREATE_ERROR"))
+
+	branchAddError := suite.branchAdd.AddBranch(suite.branchName, false, nil)
 
 	suite.NotNil(branchAddError)
 }

@@ -1,14 +1,16 @@
 package branch
 
 import (
+	"errors"
 	"fmt"
+	"github.com/golang/mock/gomock"
 	git2go "github.com/libgit2/git2go/v31"
-	"github.com/neel1996/gitconvex/git"
-	"github.com/neel1996/gitconvex/git/commit"
+	"github.com/neel1996/gitconvex/git/branch/test_utils"
 	"github.com/neel1996/gitconvex/git/middleware"
-	"github.com/neel1996/gitconvex/global"
+	"github.com/neel1996/gitconvex/mocks"
+	"github.com/neel1996/gitconvex/validator"
+	mocks2 "github.com/neel1996/gitconvex/validator/mocks"
 	"github.com/stretchr/testify/suite"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,11 +18,18 @@ import (
 
 type BranchCompareTestSuite struct {
 	suite.Suite
-	branchCompare Compare
-	repo          *git2go.Repository
-	baseBranch    string
-	compareBranch string
-	testFile      string
+	branchCompare       Compare
+	branchValidator     validator.ValidatorWithStringFields
+	repo                middleware.Repository
+	mockController      *gomock.Controller
+	mockRepo            *mocks.MockRepository
+	mockBranchValidator *mocks2.MockValidatorWithStringFields
+	mockBranch          *mocks.MockBranch
+	mockReference       *mocks.MockReference
+	mockCommit          *mocks.MockCommit
+	baseBranch          string
+	compareBranch       string
+	testFile            string
 }
 
 func TestBranchCompareTestSuite(t *testing.T) {
@@ -32,43 +41,49 @@ func (suite *BranchCompareTestSuite) SetupSuite() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	suite.repo = r
+
+	suite.repo = middleware.NewRepository(r)
+	suite.branchValidator = validator.NewBranchValidator()
 	suite.testFile = os.Getenv("GITCONVEX_TEST_REPO") + string(filepath.Separator) + "compare_test.txt"
 	suite.compareBranch = "new_compare"
-	addErr := NewAddBranch(r, suite.compareBranch, false, nil).AddBranch()
+
+	addErr := NewAddBranch(middleware.NewRepository(r), validator.NewBranchValidator()).AddBranch(suite.compareBranch, false, nil)
 	if addErr != nil {
 		fmt.Println(addErr)
 	}
-	suite.stageAndCommitTestFile()
+
+	test_utils.StageAndCommitTestFile(suite.repo, suite.compareBranch, suite.testFile)
 }
 
 func (suite *BranchCompareTestSuite) SetupTest() {
-	r, err := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	suite.repo = r
 	suite.baseBranch = "master"
 	suite.compareBranch = "new_compare"
-	suite.branchCompare = NewBranchCompare(suite.repo, suite.baseBranch, suite.compareBranch)
+
+	suite.mockController = gomock.NewController(suite.T())
+	suite.mockRepo = mocks.NewMockRepository(suite.mockController)
+	suite.mockBranch = mocks.NewMockBranch(suite.mockController)
+	suite.mockReference = mocks.NewMockReference(suite.mockController)
+	suite.mockCommit = mocks.NewMockCommit(suite.mockController)
+	suite.mockBranchValidator = mocks2.NewMockValidatorWithStringFields(suite.mockController)
+
+	suite.branchCompare = NewBranchCompare(suite.mockRepo, suite.mockBranchValidator)
 }
 
 func (suite *BranchCompareTestSuite) TearDownSuite() {
-	checkoutErr := NewBranchCheckout(suite.repo, "master").CheckoutBranch()
-	if checkoutErr != nil {
-		logger.Log(checkoutErr.Error(), global.StatusError)
-		return
-	}
+	test_utils.CheckoutTestBranch(suite.repo, suite.baseBranch)
 
 	err := os.Remove(suite.testFile)
 	if err != nil {
 		return
 	}
+	test_utils.DeleteTestBranch(suite.repo, suite.compareBranch)
 }
 
 func (suite *BranchCompareTestSuite) TestCompareBranch_WhenBranchesHaveDifferentCommits_ShouldReturnDifference() {
-	compareResults := suite.branchCompare.CompareBranch()
+	suite.branchCompare = NewBranchCompare(suite.repo, suite.branchValidator)
+	compareResults, err := suite.branchCompare.CompareBranch(suite.baseBranch, suite.compareBranch)
 
+	suite.Nil(err)
 	suite.NotNil(compareResults)
 	suite.NotZero(len(compareResults))
 	suite.NotZero(len(compareResults[0].Commits))
@@ -76,52 +91,99 @@ func (suite *BranchCompareTestSuite) TestCompareBranch_WhenBranchesHaveDifferent
 	suite.NotNil(*compareResults[0].Commits[0])
 	suite.NotEmpty(*compareResults[0].Commits[0].CommitMessage)
 	suite.NotEmpty(compareResults[0].Date)
-	suite.Equal(1, len(compareResults[0].Commits))
+	suite.Equal(2, len(compareResults[0].Commits))
 }
 
-func (suite *BranchCompareTestSuite) TestCompareBranch_WhenRepoIsNil_ShouldReturnEmptyDifference() {
-	suite.branchCompare = NewBranchCompare(nil, suite.baseBranch, suite.compareBranch)
-	compareResults := suite.branchCompare.CompareBranch()
+func (suite *BranchCompareTestSuite) TestCompareBranch_WhenBranchValidationFails_ShouldReturnError() {
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.baseBranch, "").Return(errors.New("VALIDATION_ERR"))
 
+	compareResults, err := suite.branchCompare.CompareBranch(suite.baseBranch, "")
+
+	suite.NotNil(err)
 	suite.Len(compareResults, 0)
 }
 
-func (suite *BranchCompareTestSuite) TestCompareBranch_WhenEitherOfBranchInputIsEmpty_ShouldReturnEmptyDifference() {
-	suite.branchCompare = NewBranchCompare(suite.repo, "", suite.compareBranch)
-	compareResults := suite.branchCompare.CompareBranch()
+func (suite *BranchCompareTestSuite) TestCompareBranch_WhenBaseBranchLookupFails_ShouldReturnError() {
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.baseBranch, suite.compareBranch).Return(nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.baseBranch, git2go.BranchLocal).Return(nil, errors.New("LOOKUP_ERROR"))
 
+	compareResults, err := suite.branchCompare.CompareBranch(suite.baseBranch, suite.compareBranch)
+
+	suite.NotNil(err)
 	suite.Len(compareResults, 0)
 }
 
-func (suite *BranchCompareTestSuite) TestCompareBranch_WhenBranchDoesNotExist_ShouldReturnEmptyDifference() {
-	suite.branchCompare = NewBranchCompare(suite.repo, suite.baseBranch, "no_exists")
-	compareResults := suite.branchCompare.CompareBranch()
+func (suite *BranchCompareTestSuite) TestCompareBranch_WhenDiffBranchLookupFails_ShouldReturnError() {
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.baseBranch, suite.compareBranch).Return(nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.baseBranch, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.compareBranch, git2go.BranchLocal).Return(nil, errors.New("LOOKUP_ERROR"))
 
+	compareResults, err := suite.branchCompare.CompareBranch(suite.baseBranch, suite.compareBranch)
+
+	suite.NotNil(err)
 	suite.Len(compareResults, 0)
 }
 
-func (suite *BranchCompareTestSuite) TestCompareBranch_WhenBranchDoesNotDiffer_ShouldReturnEmptyDifference() {
-	suite.branchCompare = NewBranchCompare(suite.repo, suite.baseBranch, suite.baseBranch)
-	compareResults := suite.branchCompare.CompareBranch()
+func (suite *BranchCompareTestSuite) TestCompareBranch_WhenBranchCompareReturnsZero_ShouldReturnError() {
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.baseBranch, suite.compareBranch).Return(nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.baseBranch, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.compareBranch, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockBranch.EXPECT().Reference().Return(suite.mockReference)
+	suite.mockBranch.EXPECT().Cmp(suite.mockReference).Return(0)
 
+	compareResults, err := suite.branchCompare.CompareBranch(suite.baseBranch, suite.compareBranch)
+
+	suite.NotNil(err)
 	suite.Len(compareResults, 0)
 }
 
-func (suite *BranchCompareTestSuite) stageAndCommitTestFile() {
-	checkoutErr := NewBranchCheckout(suite.repo, suite.compareBranch).CheckoutBranch()
-	if checkoutErr != nil {
-		logger.Log(checkoutErr.Error(), global.StatusError)
-		return
-	}
-	err := ioutil.WriteFile(suite.testFile, []byte{0}, 0644)
-	if err != nil {
-		logger.Log(err.Error(), global.StatusError)
-		return
-	}
-	git.StageItemStruct{
-		Repo:     suite.repo,
-		FileItem: suite.testFile,
-	}.StageItem()
+func (suite *BranchCompareTestSuite) TestCompareBranch_WhenCommitLookupForBaseBranchFails_ShouldReturnError() {
+	oid, _ := git2go.NewOid("591ee574417890b6771d8c314d6f116586414e29")
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.baseBranch, suite.compareBranch).Return(nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.baseBranch, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.compareBranch, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockBranch.EXPECT().Reference().Return(suite.mockReference)
+	suite.mockBranch.EXPECT().Cmp(suite.mockReference).Return(1)
+	suite.mockBranch.EXPECT().Target().Return(oid)
+	suite.mockRepo.EXPECT().LookupCommitV2(oid).Return(nil, errors.New("LOOKUP_ERROR"))
 
-	_ = commit.NewCommitChanges(middleware.NewRepository(suite.repo), []string{"Branch compare test commit"}).Add()
+	compareResults, err := suite.branchCompare.CompareBranch(suite.baseBranch, suite.compareBranch)
+
+	suite.NotNil(err)
+	suite.Len(compareResults, 0)
+}
+
+func (suite *BranchCompareTestSuite) TestCompareBranch_WhenCommitLookupForCompareBranchFails_ShouldReturnError() {
+	oid, _ := git2go.NewOid("591ee574417890b6771d8c314d6f116586414e29")
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.baseBranch, suite.compareBranch).Return(nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.baseBranch, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.compareBranch, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockBranch.EXPECT().Reference().Return(suite.mockReference)
+	suite.mockBranch.EXPECT().Cmp(suite.mockReference).Return(1)
+	suite.mockBranch.EXPECT().Target().Return(oid).MaxTimes(2)
+	suite.mockRepo.EXPECT().LookupCommitV2(oid).Return(suite.mockCommit, nil)
+	suite.mockRepo.EXPECT().LookupCommitV2(oid).Return(nil, errors.New("LOOKUP_ERROR"))
+
+	compareResults, err := suite.branchCompare.CompareBranch(suite.baseBranch, suite.compareBranch)
+
+	suite.NotNil(err)
+	suite.Len(compareResults, 0)
+}
+
+func (suite *BranchCompareTestSuite) TestCompareBranch_WhenParentCountOfCommitsIsZero_ShouldReturnEmptyResults() {
+	oid, _ := git2go.NewOid("591ee574417890b6771d8c314d6f116586414e29")
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.baseBranch, suite.compareBranch).Return(nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.baseBranch, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.compareBranch, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockBranch.EXPECT().Reference().Return(suite.mockReference)
+	suite.mockBranch.EXPECT().Cmp(suite.mockReference).Return(1)
+	suite.mockBranch.EXPECT().Target().Return(oid).MaxTimes(2)
+	suite.mockRepo.EXPECT().LookupCommitV2(oid).Return(suite.mockCommit, nil)
+	suite.mockRepo.EXPECT().LookupCommitV2(oid).Return(suite.mockCommit, nil)
+	suite.mockCommit.EXPECT().ParentCount().Return(uint(0)).Times(2)
+
+	compareResults, err := suite.branchCompare.CompareBranch(suite.baseBranch, suite.compareBranch)
+
+	suite.Nil(err)
+	suite.Len(compareResults, 0)
 }

@@ -1,38 +1,37 @@
 package branch
 
 import (
-	"errors"
-	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
 )
 
 type Validation interface {
-	ValidateBranchFields() error
+	ValidateBranchFields(branchNames ...string) error
 }
 
 type validateBranch struct {
-	repo       *git2go.Repository
-	branchName []string
+	repo middleware.Repository
 }
 
-func (v validateBranch) ValidateBranchFields() error {
+func (v validateBranch) ValidateBranchFields(branchNames ...string) error {
 	if v.repo == nil {
-		err := "repo is nil"
-		return errors.New(err)
+		return NilRepoError
 	}
 
-	for _, branchName := range v.branchName {
+	if len(branchNames) == 0 {
+		return EmptyBranchNameError
+	}
+
+	for _, branchName := range branchNames {
 		if branchName == "" {
-			err := "branch name is empty"
-			return errors.New(err)
+			return EmptyBranchNameError
 		}
 	}
 
 	return nil
 }
 
-func NewBranchFieldsValidation(repo *git2go.Repository, branchName ...string) Validation {
+func NewBranchFieldsValidation(repo middleware.Repository) Validation {
 	return validateBranch{
-		repo:       repo,
-		branchName: branchName,
+		repo: repo,
 	}
 }

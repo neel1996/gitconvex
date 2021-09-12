@@ -37,6 +37,7 @@ test:
 	export GITCONVEX_DEFAULT_PATH="$(PWD)/gitconvex-test" && \
 	rm -rf $$GITCONVEX_TEST_REPO && \
  	go clean --cache && \
+ 	./build_scripts/remove_test_repo.sh && \
  	./build_scripts/clone_test_repo.sh && \
  	go test ./... -count=1 -cover -coverprofile=coverage.out && \
 	rm -rf $$GITCONVEX_TEST_REPO
@@ -46,6 +47,7 @@ test-pretty:
 	export GITCONVEX_DEFAULT_PATH="$(PWD)/gitconvex-test" && \
 	rm -rf $$GITCONVEX_TEST_REPO && \
  	go clean --cache && \
+ 	./build_scripts/remove_test_repo.sh && \
  	./build_scripts/clone_test_repo.sh && \
  	gotestsum ./... -count=1 -cover -coverprofile=coverage.out && \
 	rm -rf $$GITCONVEX_TEST_REPO

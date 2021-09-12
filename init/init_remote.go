@@ -3,30 +3,17 @@ package initialize
 import (
 	"context"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/constants"
 	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/git/remote"
+	"github.com/neel1996/gitconvex/models"
 )
 
-const (
-	Repo       = "GIT_REPO"
-	RemoteName = "REMOTE_NAME"
-	RemoteUrl  = "REMOTE_URL"
-)
-
-type Remote struct {
-	AddRemote     remote.Add
-	DeleteRemote  remote.Delete
-	EditRemote    remote.Edit
-	ListRemote    remote.List
-	RemoteName    remote.Name
-	ListRemoteUrl remote.ListRemoteUrl
-}
-
-func RemoteObjects(ctx context.Context) Remote {
-	r := ctx.Value(Repo).(*git2go.Repository)
+func RemoteObjects(ctx context.Context) models.Remote {
+	r := ctx.Value(constants.Repo).(*git2go.Repository)
 	repo := middleware.NewRepository(r)
-	remoteName := ctx.Value(RemoteName).(string)
-	remoteUrl := ctx.Value(RemoteUrl).(string)
+	remoteName := ctx.Value(constants.RemoteName).(string)
+	remoteUrl := ctx.Value(constants.RemoteUrl).(string)
 
 	remoteValidation := remote.NewRemoteValidation(repo)
 
@@ -37,7 +24,7 @@ func RemoteObjects(ctx context.Context) Remote {
 	name := remote.NewGetRemoteName(repo, remoteUrl, remoteValidation, listRemote)
 	listRemoteURL := remote.NewRemoteUrlData(repo, remoteValidation, listRemote)
 
-	return Remote{
+	return models.Remote{
 		AddRemote:     addRemote,
 		DeleteRemote:  deleteRemote,
 		EditRemote:    editRemote,

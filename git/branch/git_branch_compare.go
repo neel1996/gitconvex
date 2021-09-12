@@ -3,78 +3,116 @@ package branch
 import (
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/model"
+	"github.com/neel1996/gitconvex/validator"
 	"sort"
 	"strings"
 )
 
 type Compare interface {
-	CompareBranch() []*model.BranchCompareResults
+	CompareBranch(baseBranchName string, diffBranchName string) ([]*model.BranchCompareResults, error)
 }
 
 type branchCompare struct {
-	repo       *git2go.Repository
-	baseBranch string
-	diffBranch string
+	repo            middleware.Repository
+	branchValidator validator.ValidatorWithStringFields
 }
 
-func returnBranchCompareError(errString string) []*model.BranchCompareResults {
-	if errString != "" {
-		logger.Log(errString, global.StatusWarning)
-		return []*model.BranchCompareResults{}
-	}
-	return nil
+func logAndReturnError(err error) ([]*model.BranchCompareResults, error) {
+	logger.Log(err.Error(), global.StatusError)
+	return []*model.BranchCompareResults{}, err
 }
 
 // CompareBranch compares two branches and returns the commits which are different from each other
 // The function uses the git client to fetch the results as go-git lacks this feature
-func (b branchCompare) CompareBranch() []*model.BranchCompareResults {
+func (b branchCompare) CompareBranch(baseBranchName string, diffBranchName string) ([]*model.BranchCompareResults, error) {
 	var diffCommits []*model.BranchCompareResults
 	var filteredCommits []model.GitCommits
-	repo := b.repo
 
-	if err := NewBranchFieldsValidation(repo, b.baseBranch, b.diffBranch).ValidateBranchFields(); err != nil {
-		return returnBranchCompareError(err.Error())
+	if validationErr := b.branchValidator.ValidateWithFields(baseBranchName, diffBranchName); validationErr != nil {
+		return logAndReturnError(validationErr)
 	}
 
-	baseBranch, baseBranchErr := repo.LookupBranch(b.baseBranch, git2go.BranchLocal)
-	compareBranch, compareBranchErr := repo.LookupBranch(b.diffBranch, git2go.BranchLocal)
-
-	if baseBranchErr != nil || compareBranchErr != nil {
-		return returnBranchCompareError(fmt.Sprintf("Unable to lookup target branches from the repo : %v %v", baseBranchErr, compareBranchErr))
+	baseBranch, compareBranch, lookupErr := b.lookupBranch(baseBranchName, diffBranchName)
+	if lookupErr != nil {
+		return logAndReturnError(LookupError)
 	}
 
-	compareResult := baseBranch.Cmp(compareBranch.Reference)
+	compareResult := baseBranch.Cmp(compareBranch.Reference())
 	if compareResult == 0 {
-		return returnBranchCompareError("There are no difference between both the branches")
+		return logAndReturnError(CompareError)
 	}
+
+	baseHeadCommit, compareHeadCommit, headCommitErr := b.getHeadCommits(baseBranch, compareBranch)
+	if headCommitErr != nil {
+		return logAndReturnError(NilHeadError)
+	}
+
+	baseBranchCommits, compareBranchCommits := b.getAncestorsOf(baseHeadCommit, compareHeadCommit)
+
+	filteredCommits = filterDifferingCommits(compareBranchCommits, baseBranchCommits)
+	commitMap := generateCommitMap(filteredCommits)
+	diffCommits = sortCommitsInDescendingOrderOfDate(commitMap, diffCommits)
+
+	return diffCommits, nil
+}
+
+func (b branchCompare) lookupBranch(baseBranchName string, diffBranchName string) (middleware.Branch, middleware.Branch, error) {
+	var (
+		baseBranchErr    error
+		compareBranchErr error
+	)
+
+	baseBranch, baseBranchErr := b.repo.LookupBranch(baseBranchName, git2go.BranchLocal)
+
+	if baseBranchErr != nil {
+		logger.Log(baseBranchErr.Error(), global.StatusError)
+		return nil, nil, baseBranchErr
+	}
+
+	compareBranch, compareBranchErr := b.repo.LookupBranch(diffBranchName, git2go.BranchLocal)
+	if compareBranchErr != nil {
+		logger.Log(compareBranchErr.Error(), global.StatusError)
+		return nil, nil, compareBranchErr
+	}
+
+	return baseBranch, compareBranch, nil
+}
+
+func (b branchCompare) getHeadCommits(baseBranch middleware.Branch, compareBranch middleware.Branch) (middleware.Commit, middleware.Commit, error) {
+	var (
+		baseHeadErr    error
+		compareHeadErr error
+	)
 
 	baseTarget := baseBranch.Target()
-	compareTarget := compareBranch.Target()
-
-	baseHead, _ := repo.LookupCommit(baseTarget)
-	compareHead, _ := repo.LookupCommit(compareTarget)
-
-	if baseHead == nil || compareHead == nil {
-		return returnBranchCompareError("Branch head is NIL")
+	baseHead, baseHeadErr := b.repo.LookupCommitV2(baseTarget)
+	if baseHeadErr != nil {
+		logger.Log(baseHeadErr.Error(), global.StatusError)
+		return nil, nil, baseHeadErr
 	}
 
-	baseBranchMap := make(map[string]*git2go.Commit)
-	compareBranchMap := make(map[string]*git2go.Commit)
+	compareTarget := compareBranch.Target()
+	compareHead, compareHeadErr := b.repo.LookupCommitV2(compareTarget)
+	if compareHeadErr != nil {
+		logger.Log(compareHeadErr.Error(), global.StatusError)
+		return nil, nil, compareHeadErr
+	}
 
-	baseBranchMap = getParentCommits(baseHead)
-	compareBranchMap = getParentCommits(compareHead)
+	return baseHead, compareHead, nil
+}
 
-	filteredCommits = filterDifferingCommits(compareBranchMap, baseBranchMap)
-	commitMap := generateCommitMaps(filteredCommits)
-	diffCommits = sortCommitsBasedOnDate(commitMap, diffCommits)
+func (b branchCompare) getAncestorsOf(baseHead middleware.Commit, compareHead middleware.Commit) (map[string]middleware.Commit, map[string]middleware.Commit) {
+	baseBranchMap := getParentCommitsOf(baseHead)
+	compareBranchMap := getParentCommitsOf(compareHead)
 
-	return diffCommits
+	return baseBranchMap, compareBranchMap
 }
 
 // Organizing differing commits based on date
-func generateCommitMaps(filteredCommits []model.GitCommits) map[string][]*model.GitCommits {
+func generateCommitMap(filteredCommits []model.GitCommits) map[string][]*model.GitCommits {
 	var commitMap = make(map[string][]*model.GitCommits)
 	var commitHashMap = make(map[string]bool)
 
@@ -83,7 +121,7 @@ func generateCommitMaps(filteredCommits []model.GitCommits) map[string][]*model.
 
 		j := i
 		for j < len(filteredCommits) {
-			if shouldBreakLoop(selectedDate, filteredCommits, j, commitHashMap) {
+			if isCommitDateNotTheSelectedDate(selectedDate, filteredCommits, j) && isCommitHashAlreadyInTheList(commitHashMap, filteredCommits, j) {
 				break
 			}
 
@@ -103,11 +141,15 @@ func generateCommitMaps(filteredCommits []model.GitCommits) map[string][]*model.
 	return commitMap
 }
 
-func shouldBreakLoop(selectedDate string, filteredCommits []model.GitCommits, iterator int, commitHashMap map[string]bool) bool {
+func isCommitDateNotTheSelectedDate(selectedDate string, filteredCommits []model.GitCommits, iterator int) bool {
 	if selectedDate != *filteredCommits[iterator].CommitTime {
 		return true
 	}
 
+	return false
+}
+
+func isCommitHashAlreadyInTheList(commitHashMap map[string]bool, filteredCommits []model.GitCommits, iterator int) bool {
 	if len(commitHashMap) > 0 && commitHashMap[*filteredCommits[iterator].Hash] {
 		return true
 	}
@@ -115,7 +157,7 @@ func shouldBreakLoop(selectedDate string, filteredCommits []model.GitCommits, it
 	return false
 }
 
-func filterDifferingCommits(compareBranchMap map[string]*git2go.Commit, baseBranchMap map[string]*git2go.Commit) []model.GitCommits {
+func filterDifferingCommits(compareBranchMap map[string]middleware.Commit, baseBranchMap map[string]middleware.Commit) []model.GitCommits {
 	var commits []model.GitCommits
 	for commitHash, commit := range compareBranchMap {
 		if baseBranchMap[commitHash] == nil {
@@ -135,9 +177,9 @@ func filterDifferingCommits(compareBranchMap map[string]*git2go.Commit, baseBran
 	return commits
 }
 
-func getParentCommits(head *git2go.Commit) map[string]*git2go.Commit {
-	var next *git2go.Commit
-	commitMap := make(map[string]*git2go.Commit)
+func getParentCommitsOf(head middleware.Commit) map[string]middleware.Commit {
+	var next middleware.Commit
+	commitMap := make(map[string]middleware.Commit)
 
 	if head.ParentCount() == 0 {
 		return commitMap
@@ -145,6 +187,7 @@ func getParentCommits(head *git2go.Commit) map[string]*git2go.Commit {
 
 	next = head.Parent(0)
 	for next != nil {
+		fmt.Println("Next : ", next)
 		commitMap[next.Id().String()] = next
 		next = next.Parent(0)
 	}
@@ -152,8 +195,7 @@ func getParentCommits(head *git2go.Commit) map[string]*git2go.Commit {
 	return commitMap
 }
 
-func sortCommitsBasedOnDate(commitMap map[string][]*model.GitCommits, diffCommits []*model.BranchCompareResults) []*model.BranchCompareResults {
-	// Sorting commits in reverse chronological order of date
+func sortCommitsInDescendingOrderOfDate(commitMap map[string][]*model.GitCommits, diffCommits []*model.BranchCompareResults) []*model.BranchCompareResults {
 	var keys []string
 	for k := range commitMap {
 		keys = append(keys, k)
@@ -161,7 +203,6 @@ func sortCommitsBasedOnDate(commitMap map[string][]*model.GitCommits, diffCommit
 	sort.Strings(keys)
 	sort.Sort(sort.Reverse(sort.StringSlice(keys)))
 
-	// Extracting differing commits to the resultant model
 	for _, date := range keys {
 		diffCommits = append(diffCommits, &model.BranchCompareResults{
 			Date:    date,
@@ -171,10 +212,9 @@ func sortCommitsBasedOnDate(commitMap map[string][]*model.GitCommits, diffCommit
 	return diffCommits
 }
 
-func NewBranchCompare(repo *git2go.Repository, baseBranch string, diffBranch string) Compare {
+func NewBranchCompare(repo middleware.Repository, branchValidator validator.ValidatorWithStringFields) Compare {
 	return branchCompare{
-		repo:       repo,
-		baseBranch: baseBranch,
-		diffBranch: diffBranch,
+		repo:            repo,
+		branchValidator: branchValidator,
 	}
 }

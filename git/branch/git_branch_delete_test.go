@@ -1,20 +1,29 @@
 package branch
 
 import (
+	"errors"
 	"fmt"
+	"github.com/golang/mock/gomock"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
+	"github.com/neel1996/gitconvex/mocks"
+	"github.com/neel1996/gitconvex/validator"
+	mocks2 "github.com/neel1996/gitconvex/validator/mocks"
 	"github.com/stretchr/testify/suite"
 	"os"
-	"path/filepath"
 	"testing"
 )
 
 type BranchDeleteTestSuite struct {
 	suite.Suite
-	branchDelete Delete
-	branchName   string
-	repo         *git2go.Repository
-	noHeadRepo   *git2go.Repository
+	mockController      *gomock.Controller
+	branchDelete        Delete
+	branchName          string
+	repo                middleware.Repository
+	mockBranch          *mocks.MockBranch
+	branchValidator     validator.ValidatorWithStringFields
+	mockRepo            *mocks.MockRepository
+	mockBranchValidator *mocks2.MockValidatorWithStringFields
 }
 
 func TestBranchDeleteTestSuite(t *testing.T) {
@@ -22,18 +31,14 @@ func TestBranchDeleteTestSuite(t *testing.T) {
 }
 
 func (suite *BranchDeleteTestSuite) SetupTest() {
-	r, err := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	noHeadPath := os.Getenv("GITCONVEX_TEST_REPO") + string(filepath.Separator) + "no_head"
-	noHeadRepo, _ := git2go.OpenRepository(noHeadPath)
-
-	suite.repo = r
-	suite.noHeadRepo = noHeadRepo
+	suite.mockController = gomock.NewController(suite.T())
 	suite.branchName = "delete_branch"
-	suite.branchDelete = NewDeleteBranch(suite.repo, suite.branchName)
+
+	suite.mockRepo = mocks.NewMockRepository(suite.mockController)
+	suite.mockBranchValidator = mocks2.NewMockValidatorWithStringFields(suite.mockController)
+	suite.mockBranch = mocks.NewMockBranch(suite.mockController)
+
+	suite.branchDelete = NewDeleteBranch(suite.mockRepo, suite.mockBranchValidator)
 }
 
 func (suite *BranchDeleteTestSuite) SetupSuite() {
@@ -41,62 +46,51 @@ func (suite *BranchDeleteTestSuite) SetupSuite() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	suite.repo = r
+
+	suite.repo = middleware.NewRepository(r)
+	suite.branchValidator = validator.NewBranchValidator()
 	suite.branchName = "delete_branch"
-	addErr := NewAddBranch(suite.repo, suite.branchName, false, nil).AddBranch()
+	addErr := NewAddBranch(suite.repo, validator.NewBranchValidator()).AddBranch(suite.branchName, false, nil)
 	if addErr != nil {
 		fmt.Println(addErr)
 	}
 }
 
-func (suite *BranchDeleteTestSuite) TearDownSuite() {
-	r, err := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	_ = NewBranchCheckout(r, "master").CheckoutBranch()
+func (suite *BranchDeleteTestSuite) TearDownTest() {
+	suite.mockController.Finish()
 }
 
 func (suite *BranchDeleteTestSuite) TestDeleteBranch_WhenBranchIsDeleted_ShouldReturnNil() {
-	err := suite.branchDelete.DeleteBranch()
+	suite.branchDelete = NewDeleteBranch(suite.repo, suite.branchValidator)
+
+	err := suite.branchDelete.DeleteBranch(suite.branchName)
 
 	suite.Nil(err)
 }
 
-func (suite *BranchDeleteTestSuite) TestDeleteBranch_WhenRepoIsNil_ShouldReturnError() {
-	suite.branchDelete = NewDeleteBranch(nil, suite.branchName)
-	err := suite.branchDelete.DeleteBranch()
+func (suite *BranchDeleteTestSuite) TestDeleteBranch_WhenValidationFails_ShouldReturnError() {
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.branchName).Return(errors.New("VALIDATION_ERROR"))
+
+	err := suite.branchDelete.DeleteBranch(suite.branchName)
 
 	suite.NotNil(err)
 }
 
-func (suite *BranchDeleteTestSuite) TestDeleteBranch_WhenBranchNameIsEmpty_ShouldReturnError() {
-	suite.branchDelete = NewDeleteBranch(suite.repo, "")
-	err := suite.branchDelete.DeleteBranch()
+func (suite *BranchDeleteTestSuite) TestDeleteBranch_WhenBranchLookupFails_ShouldReturnError() {
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.branchName).Return(nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.branchName, git2go.BranchLocal).Return(nil, errors.New("LOOKUP_ERR"))
+
+	err := suite.branchDelete.DeleteBranch(suite.branchName)
 
 	suite.NotNil(err)
 }
 
-func (suite *BranchDeleteTestSuite) TestDeleteBranch_WhenRepoHasNoHead_ShouldReturnError() {
-	suite.branchDelete = NewDeleteBranch(suite.noHeadRepo, suite.branchName)
-	err := suite.branchDelete.DeleteBranch()
+func (suite *BranchDeleteTestSuite) TestDeleteBranch_WhenBranchDeleteFails_ShouldReturnError() {
+	suite.mockBranchValidator.EXPECT().ValidateWithFields(suite.branchName).Return(nil)
+	suite.mockRepo.EXPECT().LookupBranch(suite.branchName, git2go.BranchLocal).Return(suite.mockBranch, nil)
+	suite.mockBranch.EXPECT().Delete().Return(errors.New("DELETE_ERROR"))
 
-	suite.NotNil(err)
-}
-
-func (suite *BranchDeleteTestSuite) TestDeleteBranch_WhenBranchDoesNotExists_ShouldReturnError() {
-	suite.branchDelete = NewDeleteBranch(suite.repo, "no_exists")
-	err := suite.branchDelete.DeleteBranch()
-
-	suite.NotNil(err)
-}
-
-func (suite *BranchDeleteTestSuite) TestDeleteBranch_WhenBranchIsCurrentBranch_ShouldReturnError() {
-	head, _ := suite.repo.Head()
-	name, _ := head.Branch().Name()
-
-	suite.branchDelete = NewDeleteBranch(suite.repo, name)
-	err := suite.branchDelete.DeleteBranch()
+	err := suite.branchDelete.DeleteBranch(suite.branchName)
 
 	suite.NotNil(err)
 }
