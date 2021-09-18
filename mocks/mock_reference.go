@@ -48,6 +48,20 @@ func (mr *MockReferenceMockRecorder) GetGitReference() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGitReference", reflect.TypeOf((*MockReference)(nil).GetGitReference))
 }
 
+// Name mocks base method.
+func (m *MockReference) Name() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Name")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Name indicates an expected call of Name.
+func (mr *MockReferenceMockRecorder) Name() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*MockReference)(nil).Name))
+}
+
 // SetTarget mocks base method.
 func (m *MockReference) SetTarget(id *git.Oid, message string) (*git.Reference, error) {
 	m.ctrl.T.Helper()

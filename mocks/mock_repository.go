@@ -218,6 +218,21 @@ func (mr *MockRepositoryMockRecorder) LookupTree(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LookupTree", reflect.TypeOf((*MockRepository)(nil).LookupTree), id)
 }
 
+// NewBranchIterator mocks base method.
+func (m *MockRepository) NewBranchIterator(branchType git.BranchType) (middleware.BranchIterator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBranchIterator", branchType)
+	ret0, _ := ret[0].(middleware.BranchIterator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewBranchIterator indicates an expected call of NewBranchIterator.
+func (mr *MockRepositoryMockRecorder) NewBranchIterator(branchType interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBranchIterator", reflect.TypeOf((*MockRepository)(nil).NewBranchIterator), branchType)
+}
+
 // Remotes mocks base method.
 func (m *MockRepository) Remotes() middleware.Remotes {
 	m.ctrl.T.Helper()

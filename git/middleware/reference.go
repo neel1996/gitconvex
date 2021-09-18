@@ -6,10 +6,15 @@ type Reference interface {
 	GetGitReference() *git.Reference
 	Target() *git.Oid
 	SetTarget(id *git.Oid, message string) (*git.Reference, error)
+	Name() string
 }
 
 type reference struct {
 	ref *git.Reference
+}
+
+func (r reference) Name() string {
+	return r.ref.Name()
 }
 
 func (r reference) Target() *git.Oid {

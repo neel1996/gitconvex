@@ -1,23 +1,30 @@
 package branch
 
 import (
+	"errors"
 	"fmt"
+	"github.com/golang/mock/gomock"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/middleware"
+	"github.com/neel1996/gitconvex/mocks"
 	"github.com/stretchr/testify/suite"
 	"os"
-	"path/filepath"
 	"testing"
 )
 
 type BranchListTestSuite struct {
 	suite.Suite
-	repo       *git2go.Repository
-	noHeadRepo *git2go.Repository
-	branchList List
+	repo           middleware.Repository
+	mockController *gomock.Controller
+	mockRepo       *mocks.MockRepository
+	mockReference  *mocks.MockReference
+	mockIterator   *mocks.MockBranchIterator
+	mockBranch     *mocks.MockBranch
+	branchList     List
 }
 
 func TestBranchListTestSuite(t *testing.T) {
-	//suite.Run(t, new(BranchListTestSuite))
+	suite.Run(t, new(BranchListTestSuite))
 }
 
 func (suite *BranchListTestSuite) SetupTest() {
@@ -25,35 +32,52 @@ func (suite *BranchListTestSuite) SetupTest() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	noHeadPath := os.Getenv("GITCONVEX_TEST_REPO") + string(filepath.Separator) + "no_head"
-	noHeadRepo, _ := git2go.OpenRepository(noHeadPath)
 
-	suite.repo = r
-	suite.noHeadRepo = noHeadRepo
-	suite.branchList = NewBranchList(suite.repo)
+	suite.mockController = gomock.NewController(suite.T())
+	suite.repo = middleware.NewRepository(r)
+	suite.mockRepo = mocks.NewMockRepository(suite.mockController)
+	suite.mockReference = mocks.NewMockReference(suite.mockController)
+	suite.mockIterator = mocks.NewMockBranchIterator(suite.mockController)
+	suite.mockBranch = mocks.NewMockBranch(suite.mockController)
+	suite.branchList = NewBranchList(suite.mockRepo)
 }
 
 func (suite *BranchListTestSuite) TestListBranches_WhenRepoHasBranches_ShouldReturnBranchList() {
+	suite.branchList = NewBranchList(suite.repo)
+
 	branchList, err := suite.branchList.ListBranches()
 
 	suite.Nil(err)
-	suite.Greater(len(branchList.BranchList), 2)
-	suite.Greater(len(branchList.AllBranchList), 2)
+	suite.Equal(2, len(branchList.BranchList))
+	suite.Equal(3, len(branchList.AllBranchList))
 	suite.Equal("master", branchList.CurrentBranch)
 }
 
-func (suite *BranchListTestSuite) TestListBranches_WhenRepoIsNil_ShouldReturnError() {
-	suite.branchList = NewBranchList(nil)
-	branchList, err := suite.branchList.ListBranches()
+func (suite *BranchListTestSuite) TestListBranches_WhenRepoHeadIsInvalid_ShouldReturnError() {
+	suite.mockRepo.EXPECT().Head().Return(nil, errors.New("HEAD_ERROR"))
+
+	_, err := suite.branchList.ListBranches()
 
 	suite.NotNil(err)
-	suite.Empty(branchList)
 }
 
-func (suite *BranchListTestSuite) TestListBranches_WhenRepoHasNoHead_ShouldReturnError() {
-	suite.branchList = NewBranchList(suite.noHeadRepo)
-	branchList, err := suite.branchList.ListBranches()
+func (suite *BranchListTestSuite) TestListBranches_WhenNewBranchIteratorFails_ShouldReturnError() {
+	suite.mockRepo.EXPECT().Head().Return(suite.mockReference, nil)
+	suite.mockReference.EXPECT().Name().Return("refs/head/master")
+	suite.mockRepo.EXPECT().NewBranchIterator(git2go.BranchAll).Return(nil, errors.New("ITERATOR_ERR"))
+
+	_, err := suite.branchList.ListBranches()
 
 	suite.NotNil(err)
-	suite.Empty(branchList)
+}
+
+func (suite *BranchListTestSuite) TestListBranches_WhenBranchIteratorReturnsError_ShouldReturnError() {
+	suite.mockRepo.EXPECT().Head().Return(suite.mockReference, nil)
+	suite.mockReference.EXPECT().Name().Return("refs/head/master")
+	suite.mockRepo.EXPECT().NewBranchIterator(git2go.BranchAll).Return(suite.mockIterator, nil)
+	suite.mockIterator.EXPECT().ForEach(gomock.Any()).Return(errors.New("iterator error"))
+
+	_, err := suite.branchList.ListBranches()
+
+	suite.NotNil(err)
 }

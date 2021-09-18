@@ -96,7 +96,7 @@ func RepoStatus(repoId string) *model.GitRepoStatusResults {
 		*remoteURL = *remotes[0]
 	}
 
-	branchListObj := branch.NewBranchList(repo)
+	branchListObj := branch.NewBranchList(middleware.NewRepository(repo))
 	branchList, _ := branchListObj.ListBranches()
 
 	currentBranch := branchList.CurrentBranch

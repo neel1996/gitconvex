@@ -7,10 +7,30 @@ type Branch interface {
 	Delete() error
 	Cmp(r Reference) int
 	Reference() Reference
+	IsRemote() bool
+	Name() (string, error)
+	IsTag() bool
+	IsNote() bool
 }
 
 type branch struct {
 	branch *git2go.Branch
+}
+
+func (b branch) IsNote() bool {
+	return b.branch.IsNote()
+}
+
+func (b branch) IsTag() bool {
+	return b.branch.IsTag()
+}
+
+func (b branch) Name() (string, error) {
+	return b.branch.Name()
+}
+
+func (b branch) IsRemote() bool {
+	return b.branch.IsRemote()
 }
 
 func (b branch) Reference() Reference {

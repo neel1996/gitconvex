@@ -1,12 +1,12 @@
 package branch
 
 import (
+	"errors"
 	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/global"
 	"github.com/neel1996/gitconvex/graph/model"
-	"go/types"
 	"strings"
 )
 
@@ -15,25 +15,22 @@ type List interface {
 }
 
 type listBranch struct {
-	repo *git2go.Repository
+	repo middleware.Repository
 }
 
-var (
-	localBranchList []string
-	allBranchList   []string
-)
+type branches struct {
+	localBranchList  []string
+	remoteBranchList []string
+	combinedBranches []string
+}
 
-// ListBranches fetches all the branches from the target repository
-// The result will be returned as a struct with the current branch and all the available branches
 func (l listBranch) ListBranches() (model.ListOfBranches, error) {
-	var currentBranch string
+	var (
+		currentBranch   string
+		localBranchList []string
+		allBranchList   []string
+	)
 	repo := l.repo
-
-	validationErr := NewBranchFieldsValidation(middleware.NewRepository(repo)).ValidateBranchFields()
-	if validationErr != nil {
-		logger.Log(validationErr.Error(), global.StatusError)
-		return model.ListOfBranches{}, validationErr
-	}
 
 	head, headErr := repo.Head()
 	if headErr != nil {
@@ -52,11 +49,14 @@ func (l listBranch) ListBranches() (model.ListOfBranches, error) {
 		return model.ListOfBranches{}, itrErr
 	}
 
-	err := l.runBranchIterator(localBranchIterator, currentBranch)
+	allBranches, err := l.getAllBranches(localBranchIterator, currentBranch)
 	if err != nil {
 		logger.Log(err.Error(), global.StatusError)
 		return model.ListOfBranches{}, err
 	}
+
+	allBranchList = append(allBranchList, allBranches.combinedBranches...)
+	localBranchList = append(localBranchList, allBranches.localBranchList...)
 
 	return model.ListOfBranches{
 		CurrentBranch: currentBranch,
@@ -65,49 +65,67 @@ func (l listBranch) ListBranches() (model.ListOfBranches, error) {
 	}, nil
 }
 
-func (l listBranch) runBranchIterator(localBranchIterator *git2go.BranchIterator, currentBranch string) error {
-	err := localBranchIterator.ForEach(func(branch *git2go.Branch, branchType git2go.BranchType) error {
+func (l listBranch) getAllBranches(localBranchIterator middleware.BranchIterator, currentBranch string) (branches, error) {
+	var (
+		localBranches  []string
+		remoteBranches []string
+	)
+
+	err := localBranchIterator.ForEach(func(b *git2go.Branch, branchType git2go.BranchType) error {
+		branch := middleware.NewBranch(b)
 		branchName, nameErr := branch.Name()
 		if nameErr != nil {
-			return types.Error{Msg: "Unable to fetch branch name"}
+			return nameErr
 		}
 
-		if !branch.IsTag() && !branch.IsNote() && branchName != currentBranch {
-			l.classifyRemoteAndLocalBranches(branch, branchName, currentBranch)
+		if branch.IsTag() || branch.IsNote() || branchName == currentBranch {
+			return nil
 		}
+
+		if branch.IsRemote() {
+			prefixedRemoteBranchName, err := l.getPrefixedRemoteBranch(branchName, currentBranch)
+			if err == nil {
+				remoteBranches = append(remoteBranches, prefixedRemoteBranchName)
+			}
+		} else {
+			localBranches = append(localBranches, branchName)
+		}
+
 		return nil
 	})
 
-	return err
+	return branches{
+		localBranchList:  localBranches,
+		remoteBranchList: remoteBranches,
+		combinedBranches: append(localBranches, remoteBranches...),
+	}, err
 }
 
-func (l listBranch) classifyRemoteAndLocalBranches(branch *git2go.Branch, branchName string, currentBranch string) {
-	if branch.IsRemote() && strings.Contains(branchName, "/") {
-		l.getRemoteBranchName(branchName, currentBranch)
-	} else {
-		allBranchList = append(allBranchList, branchName)
-		localBranchList = append(localBranchList, branchName)
+func (l listBranch) getPrefixedRemoteBranch(branchName string, currentBranch string) (string, error) {
+	shortBranchName := l.getShortBranchName(branchName)
+
+	if shortBranchName != "HEAD" && shortBranchName != currentBranch {
+		remoteBranchName := "remotes/" + branchName
+		return remoteBranchName, nil
 	}
+	return "", errors.New("invalid remote branch")
 }
 
-func (l listBranch) getRemoteBranchName(branchName string, currentBranch string) {
-	splitString := strings.Split(branchName, "/")
-	splitBranch := splitString[len(splitString)-1]
+func (l listBranch) getShortBranchName(b string) string {
+	str := strings.Split(b, "/")
+	branchName := str[len(str)-1]
 
-	if splitBranch != "HEAD" && splitBranch != currentBranch {
-		concatRemote := "remotes/" + strings.Join(splitString, "/")
-		allBranchList = append(allBranchList, concatRemote)
-	}
+	return branchName
 }
 
-func getCurrentBranchName(head *git2go.Reference) string {
+func getCurrentBranchName(head middleware.Reference) string {
 	branch := head.Name()
 	splitCurrentBranch := strings.Split(branch, "/")
 	branch = splitCurrentBranch[len(splitCurrentBranch)-1]
 	return branch
 }
 
-func NewBranchList(repo *git2go.Repository) List {
+func NewBranchList(repo middleware.Repository) List {
 	return listBranch{
 		repo: repo,
 	}

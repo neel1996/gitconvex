@@ -63,6 +63,63 @@ func (mr *MockBranchMockRecorder) Delete() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockBranch)(nil).Delete))
 }
 
+// IsNote mocks base method.
+func (m *MockBranch) IsNote() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsNote")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsNote indicates an expected call of IsNote.
+func (mr *MockBranchMockRecorder) IsNote() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNote", reflect.TypeOf((*MockBranch)(nil).IsNote))
+}
+
+// IsRemote mocks base method.
+func (m *MockBranch) IsRemote() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsRemote")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsRemote indicates an expected call of IsRemote.
+func (mr *MockBranchMockRecorder) IsRemote() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsRemote", reflect.TypeOf((*MockBranch)(nil).IsRemote))
+}
+
+// IsTag mocks base method.
+func (m *MockBranch) IsTag() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsTag")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsTag indicates an expected call of IsTag.
+func (mr *MockBranchMockRecorder) IsTag() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsTag", reflect.TypeOf((*MockBranch)(nil).IsTag))
+}
+
+// Name mocks base method.
+func (m *MockBranch) Name() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Name")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Name indicates an expected call of Name.
+func (mr *MockBranchMockRecorder) Name() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*MockBranch)(nil).Name))
+}
+
 // Reference mocks base method.
 func (m *MockBranch) Reference() middleware.Reference {
 	m.ctrl.T.Helper()
