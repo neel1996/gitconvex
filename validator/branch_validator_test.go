@@ -30,8 +30,15 @@ func (suite *BranchValidatorTestSuite) TestValidate_WhenPassedBranchesAreValid_S
 	suite.Nil(err)
 }
 
-func (suite *BranchValidatorTestSuite) TestValidate_WhenPassedEmptyStringIsPassed_ShouldReturnEmptybranchError() {
+func (suite *BranchValidatorTestSuite) TestValidate_WhenNoBranchesArePassed_ShouldReturnEmptyBranchError() {
 	err := suite.branchValidator.ValidateWithFields()
+
+	suite.NotNil(err)
+	suite.Equal(EmptyBranchName, err)
+}
+
+func (suite *BranchValidatorTestSuite) TestValidate_WhenEmptyStringIsPassed_ShouldReturnEmptyBranchError() {
+	err := suite.branchValidator.ValidateWithFields("")
 
 	suite.NotNil(err)
 	suite.Equal(EmptyBranchName, err)

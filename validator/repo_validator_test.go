@@ -42,3 +42,12 @@ func (suite *RepoValidatorTestSuite) TestValidate_WhenRepoIsNil_ShouldReturnRepo
 	suite.NotNil(err)
 	suite.Equal(NilRepoError, err)
 }
+
+func (suite *RepoValidatorTestSuite) TestValidate_WhenWrongTypeOfInputIsPassed_ShouldReturnRepoNilError() {
+	suite.repoValidator = NewRepoValidator()
+
+	err := suite.repoValidator.Validate("nil")
+
+	suite.NotNil(err)
+	suite.Equal(NilRepoError, err)
+}
