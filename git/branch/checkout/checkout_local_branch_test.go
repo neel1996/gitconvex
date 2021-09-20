@@ -43,7 +43,7 @@ func (suite *CheckOutLocalBranchTestSuite) SetupSuite() {
 }
 
 func (suite *CheckOutLocalBranchTestSuite) TearDownSuite() {
-	branch.NewDeleteBranch(suite.repo, validator.NewBranchValidator())
+	_ = branch.NewDeleteBranch(suite.repo, validator.NewBranchValidator()).DeleteBranch(suite.branchName)
 }
 
 func (suite *CheckOutLocalBranchTestSuite) SetupTest() {

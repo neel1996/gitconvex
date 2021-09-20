@@ -44,10 +44,10 @@ func (suite *CheckOutRemoteBranchTestSuite) SetupSuite() {
 	}
 
 	suite.repo = middleware.NewRepository(r)
-	suite.branchName = "remotes/origin/master"
-	suite.remoteBranchName = "origin/master"
-	suite.localBranchName = "master"
-	suite.localBranchReferenceName = "refs/heads/master"
+	suite.branchName = "remotes/origin/test_remote"
+	suite.remoteBranchName = "origin/test_remote"
+	suite.localBranchName = "test_remote"
+	suite.localBranchReferenceName = "refs/heads/test_remote"
 }
 
 func (suite *CheckOutRemoteBranchTestSuite) SetupTest() {
@@ -68,7 +68,7 @@ func (suite *CheckOutRemoteBranchTestSuite) TearDownTest() {
 }
 
 func (suite *CheckOutRemoteBranchTestSuite) TestCheckoutBranch_WhenBranchIsValid_ShouldCheckoutLocalBranch() {
-	suite.checkOutRemoteBranch = NewCheckoutRemoteBranch(suite.repo, suite.branchName, nil)
+	suite.checkOutRemoteBranch = NewCheckoutRemoteBranch(suite.repo, suite.branchName, branch.NewAddBranch(suite.repo, validator.NewBranchValidator()))
 
 	err := suite.checkOutRemoteBranch.CheckoutBranch()
 

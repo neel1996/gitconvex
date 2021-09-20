@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/golang/mock/gomock"
 	git2go "github.com/libgit2/git2go/v31"
+	"github.com/neel1996/gitconvex/git/branch/test_utils"
 	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/mocks"
 	"github.com/stretchr/testify/suite"
+	"log"
 	"os"
 	"testing"
 )
@@ -27,14 +29,20 @@ func TestBranchListTestSuite(t *testing.T) {
 	suite.Run(t, new(BranchListTestSuite))
 }
 
-func (suite *BranchListTestSuite) SetupTest() {
+func (suite *BranchListTestSuite) SetupSuite() {
 	r, err := git2go.OpenRepository(os.Getenv("GITCONVEX_TEST_REPO"))
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	suite.mockController = gomock.NewController(suite.T())
 	suite.repo = middleware.NewRepository(r)
+
+	test_utils.CheckoutTestBranchWithType(suite.repo, "test_remote", git2go.BranchRemote)
+	test_utils.CheckoutTestBranch(suite.repo, "master")
+}
+
+func (suite *BranchListTestSuite) SetupTest() {
+	suite.mockController = gomock.NewController(suite.T())
 	suite.mockRepo = mocks.NewMockRepository(suite.mockController)
 	suite.mockReference = mocks.NewMockReference(suite.mockController)
 	suite.mockIterator = mocks.NewMockBranchIterator(suite.mockController)
@@ -46,6 +54,8 @@ func (suite *BranchListTestSuite) TestListBranches_WhenRepoHasBranches_ShouldRet
 	suite.branchList = NewBranchList(suite.repo)
 
 	branchList, err := suite.branchList.ListBranches()
+
+	log.Println(branchList)
 
 	suite.Nil(err)
 	suite.Equal(2, len(branchList.BranchList))

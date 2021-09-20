@@ -1,7 +1,6 @@
 package branch
 
 import (
-	"fmt"
 	git2go "github.com/libgit2/git2go/v31"
 	"github.com/neel1996/gitconvex/git/middleware"
 	"github.com/neel1996/gitconvex/global"
@@ -187,7 +186,6 @@ func getParentCommitsOf(head middleware.Commit) map[string]middleware.Commit {
 
 	next = head.Parent(0)
 	for next != nil {
-		fmt.Println("Next : ", next)
 		commitMap[next.Id().String()] = next
 		next = next.Parent(0)
 	}

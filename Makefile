@@ -49,14 +49,22 @@ test-pretty:
  	go clean --cache && \
  	./build_scripts/remove_test_repo.sh && \
  	./build_scripts/clone_test_repo.sh && \
- 	gotestsum ./... -count=1 -cover -coverprofile=coverage.out && \
+ 	gotestsum ./... -count=1 -p=1 -cover -coverprofile=coverage.out && \
 	rm -rf $$GITCONVEX_TEST_REPO
 
 test-ci: git-testuser-setup
 	go generate && \
 	go clean --cache && \
     sh ./build_scripts/clone_test_repo.sh && \
-    go test ./... -count=1 -cover -coverprofile=coverage.out && \
+    go test ./... -count=1 -p=1 -cover -coverprofile=coverage.out && \
+    rm -rf $$GITCONVEX_TEST_REPO
+
+test-ci-pretty: git-testuser-setup
+	go generate && \
+	go clean --cache && \
+    sh ./build_scripts/clone_test_repo.sh && \
+    go get gotest.tools/gotestsum && \
+    gotestsum ./... -count=1 -p=1 -cover -coverprofile=coverage.out && \
     rm -rf $$GITCONVEX_TEST_REPO
 
 dockerise-test:

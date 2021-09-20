@@ -16,3 +16,23 @@ func CheckoutTestBranch(repo middleware.Repository, branchName string) {
 	})
 	fmt.Println(repo.SetHead("refs/heads/" + branchName))
 }
+
+func CheckoutTestBranchWithType(repo middleware.Repository, branchName string, branchType git2go.BranchType) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println(r)
+		}
+	}()
+
+	branch, err := repo.LookupBranch(branchName, branchType)
+	if err != nil {
+		AddTestBranch(repo, branchName)
+	}
+	targetCommit, _ := repo.LookupCommitV2(branch.Target())
+	tree, _ := targetCommit.Tree()
+	_ = repo.CheckoutTree(tree, &git2go.CheckoutOptions{
+		Strategy:       git2go.CheckoutSafe,
+		DisableFilters: false,
+	})
+	fmt.Println(repo.SetHead("refs/heads/" + branchName))
+}
