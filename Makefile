@@ -72,6 +72,9 @@ dockerise-test:
 	docker-compose -f docker-compose.test.yaml build && \
 	docker-compose -f docker-compose.test.yaml up
 
+check-coverage:
+	sh ./build_scripts/check_coverage.sh
+
 show-coverage:
 	go tool cover -html=coverage.out
 
