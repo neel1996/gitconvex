@@ -10,10 +10,6 @@ type commitHashSearch struct {
 	commits []git.Commit
 }
 
-func (h commitHashSearch) New(commits []git.Commit) Search {
-	return commitHashSearch{commits: commits}
-}
-
 func (h commitHashSearch) Search(searchKey string) []git.Commit {
 	var (
 		matchingCommits []git.Commit
@@ -32,10 +28,6 @@ func (h commitHashSearch) Search(searchKey string) []git.Commit {
 	}
 
 	return matchingCommits
-}
-
-func (h commitHashSearch) ToLower(_ string) string {
-	panic("Not applicable for hash search")
 }
 
 func (h commitHashSearch) isExceedingSearchLimit(searchLimitCounter int) bool {

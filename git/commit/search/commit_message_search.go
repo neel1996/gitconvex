@@ -11,10 +11,6 @@ type commitMessageSearch struct {
 	commits []git.Commit
 }
 
-func (m commitMessageSearch) New(commits []git.Commit) Search {
-	return commitMessageSearch{commits: commits}
-}
-
 func (m commitMessageSearch) Search(searchKey string) []git.Commit {
 	var (
 		matchingCommits []git.Commit
@@ -26,7 +22,7 @@ func (m commitMessageSearch) Search(searchKey string) []git.Commit {
 			break
 		}
 
-		if isMatch, _ := regexp.MatchString(m.ToLower(searchKey), m.ToLower(commit.Message())); isMatch {
+		if isMatch, _ := regexp.MatchString(m.toLower(searchKey), m.toLower(commit.Message())); isMatch {
 			matchingCommits = append(matchingCommits, commit)
 			counter++
 		}
@@ -35,7 +31,7 @@ func (m commitMessageSearch) Search(searchKey string) []git.Commit {
 	return matchingCommits
 }
 
-func (m commitMessageSearch) ToLower(value string) string {
+func (m commitMessageSearch) toLower(value string) string {
 	return strings.ToLower(strings.TrimSpace(value))
 }
 

@@ -11,10 +11,6 @@ type commitAuthorSearch struct {
 	commits []git.Commit
 }
 
-func (h commitAuthorSearch) New(commits []git.Commit) Search {
-	return commitAuthorSearch{commits: commits}
-}
-
 func (h commitAuthorSearch) Search(searchKey string) []git.Commit {
 	var (
 		matchingCommits []git.Commit
@@ -26,7 +22,7 @@ func (h commitAuthorSearch) Search(searchKey string) []git.Commit {
 			break
 		}
 
-		if isMatch, _ := regexp.MatchString(h.ToLower(searchKey), h.ToLower(commit.Author().Name)); isMatch {
+		if isMatch, _ := regexp.MatchString(h.toLower(searchKey), h.toLower(commit.Author().Name)); isMatch {
 			matchingCommits = append(matchingCommits, commit)
 			counter++
 		}
@@ -35,7 +31,7 @@ func (h commitAuthorSearch) Search(searchKey string) []git.Commit {
 	return matchingCommits
 }
 
-func (h commitAuthorSearch) ToLower(value string) string {
+func (h commitAuthorSearch) toLower(value string) string {
 	return strings.ToLower(strings.TrimSpace(value))
 }
 
