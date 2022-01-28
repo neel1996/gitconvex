@@ -34,23 +34,23 @@ RUN cd ~ && git clone https://github.com/openssl/openssl.git && \
     cp -rp *.so* /usr/lib/
 
 # Download libssh2
-RUN cd ~ && wget https://github.com/libssh2/libssh2/releases/download/libssh2-1.9.0/libssh2-1.9.0.tar.gz && \
-    tar -xzf libssh2-1.9.0.tar.gz && \
-    cd libssh2-1.9.0/ && \
+RUN cd ~ && wget https://github.com/libssh2/libssh2/releases/download/libssh2-1.10.0/libssh2-1.10.0.tar.gz && \
+    tar -xzf libssh2-1.10.0.tar.gz && \
+    cd libssh2-1.10.0/ && \
     mkdir build && cd build && \
     cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_INSTALL_PREFIX=../install .. && cmake --build . --target install
 
 # Download and Libgit2 setup
-RUN cd ~ && wget https://github.com/libgit2/libgit2/releases/download/v1.1.0/libgit2-1.1.0.tar.gz && \
-    tar -xzf libgit2-1.1.0.tar.gz && \
-    cd libgit2-1.1.0/ && \
+RUN cd ~ && wget https://github.com/libgit2/libgit2/archive/refs/tags/v1.1.1.tar.gz -O libgit2-1.1.1.tar.gz && \
+    tar -xzf libgit2-1.1.1.tar.gz && \
+    cd libgit2-1.1.1/ && \
     mkdir build && cd build && \
     cmake -DCMAKE_PREFIX_PATH=../../libssh2-1.9.0/install/ -DCMAKE_INSTALL_PREFIX=../install -DBUILD_CLAR=OFF .. && \
     cmake --build . --target install && \
     make install && \
-    cp -rp ~/libgit2-1.1.0/install/include/* /usr/include/ && \
-    cp -rp ~/libgit2-1.1.0/install/lib/pkgconfig/* /usr/lib/pkgconfig && \
-    cp -rp ~/libgit2-1.1.0/install/lib/lib* /usr/lib/
+    cp -rp ~/libgit2-1.1.1/install/include/* /usr/include/ && \
+    cp -rp ~/libgit2-1.1.1/install/lib/pkgconfig/* /usr/lib/pkgconfig && \
+    cp -rp ~/libgit2-1.1.1/install/lib/lib* /usr/lib/
 
 # Post Cleanup stage
 RUN apt-get remove cmake nodejs apt-transport-https ca-certificates gnupg software-properties-common wget -y
