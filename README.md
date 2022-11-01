@@ -8,7 +8,7 @@
 
 ## Build Status
 
-![Gitconvex UI pipeline](https://img.shields.io/github/workflow/status/neel1996/gitconvex-ui/Gitconvex%20UI%20pipeline/master?label=gitconvex%20ui%20build&logo=github&style=for-the-badge)
+![Gitconvex UI pipeline](https://img.shields.io/github/workflow/status/neel1996/gitconvex-ui/Gitconvex%20React%20UI%20pipeline/master?label=gitconvex%20ui%20build&logo=github&style=for-the-badge)
 ![Gitconvex Server pipeline](https://img.shields.io/github/workflow/status/neel1996/gitconvex-server/Gitconvex%20Server%20Pipeline/main?label=gitconvex%20server%20build&logo=github&style=for-the-badge)
 
 # Download options
